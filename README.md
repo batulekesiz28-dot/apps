@@ -31,15 +31,19 @@ Başka bir yerde yayında olan bir projeyi bağlamak için `"url"` ver:
 **İkonlar:** grid, chart, book, note, music, code, globe, cube, bolt, calc, image, chat, clock, pen, cart, map, spark (boş bırakılırsa baş harfler)
 **Renkler:** ink, gray, blue, green, amber, rose, violet, teal
 
-## Taslaklar
+## Giriş ve taslaklar
 
-Sayfaya sürüklenen ya da `+` ile eklenen HTML'ler yalnızca o tarayıcının IndexedDB'sinde durur. Denemek içindir. Kalıcı ve her cihazdan erişilebilir olması için sağ tık → **Yayına hazırla**.
+Site açılınca Google girişi ister; yalnızca `batulekesiz28@gmail.com` girebilir (Firebase projesi `apps-f1cfd`).
+
+Sayfaya sürüklenen ya da `+` ile eklenen HTML'ler Firestore'da (`hub/meta/drafts`) tutulur ve her cihazda anında görünür. Sınır: taslak başına ~900 KB. Firestore kuralı yalnızca bu e-postaya okuma/yazma izni verir.
+
+Not: `apps/` altındaki yayınlanmış dosyalar repo public olduğu sürece doğrudan URL ile açılabilir. Gizli kalması gerekenler taslak olarak durmalı.
 
 Taslaklar sandbox'ta çalışır (launcher verisine erişemez, `localStorage` kullanamaz). Yayındaki uygulamalar normal sayfa gibi çalışır.
 
 ## Yerelde denemek
 
-`index.html`'e çift tıklamak `apps.json`'u okuyamaz. Bunun yerine:
+`index.html`'e çift tıklamak `apps.json`'u okuyamaz ve girişsiz, tarayıcıya kayıtlı modda çalışır. Bunun yerine:
 
 ```
 python3 -m http.server

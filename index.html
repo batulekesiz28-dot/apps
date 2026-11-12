@@ -219,6 +219,29 @@ textarea.in{height:200px;padding:10px 12px;resize:vertical;font:11.5px/1.6 var(-
 .toast{display:flex;align-items:center;gap:8px;height:34px;padding:0 14px 0 12px;border-radius:11px;background:rgba(24,24,27,.92);color:#fff;font-size:12.5px;font-weight:500;backdrop-filter:blur(20px);box-shadow:0 10px 30px -8px rgba(0,0,0,.3)}
 .toast i{width:5px;height:5px;border-radius:50%;background:#4ADE80}
 
+/* ── Gate (Google sign-in) ──────────────────────── */
+body.locked .shell,body.locked .dock{visibility:hidden}
+.gate{position:fixed;inset:0;z-index:500;display:grid;place-items:center;padding:24px}
+.gate-card{width:min(340px,100%);display:grid;justify-items:center;text-align:center;gap:14px;padding:34px 28px 26px;border-radius:22px;background:rgba(255,255,255,.7);backdrop-filter:blur(30px) saturate(1.5);-webkit-backdrop-filter:blur(30px) saturate(1.5);box-shadow:0 0 0 .5px rgba(0,0,0,.09),0 30px 80px -24px rgba(0,0,0,.16)}
+.gate .mark-glyph{width:34px;height:34px;gap:3px;padding:4px}
+.gate .mark-glyph i{border-radius:3px}
+.gate h1{font-size:17px;font-weight:600;letter-spacing:-.02em}
+.gate p{font-size:12.5px;color:var(--ink2);line-height:1.55;min-height:19px}
+.gate p b{font-weight:500;color:var(--ink)}
+.gbtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:40px;border-radius:11px;background:#fff;font-size:13px;font-weight:500;box-shadow:0 0 0 .5px rgba(0,0,0,.16),0 1px 2px rgba(0,0,0,.05);transition:transform .35s var(--spring),box-shadow .2s}
+.gbtn:hover{box-shadow:0 0 0 .5px rgba(0,0,0,.24),0 4px 12px -4px rgba(0,0,0,.12)}
+.gbtn:active{transform:scale(.97)}
+.gbtn[disabled]{opacity:.5;pointer-events:none}
+.gate .spin{width:16px;height:16px;border-radius:50%;border:1px solid var(--line3);border-top-color:var(--ink);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.gate small{font:500 10px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
+.me{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:600;color:var(--ink2);background:var(--glass);border:.5px solid var(--line2);overflow:hidden;transition:transform .35s var(--spring)}
+.me:hover{border-color:var(--line3)}.me:active{transform:scale(.92)}
+.me img{width:100%;height:100%;object-fit:cover}
+.menu .who{padding:8px 10px 7px;font-size:11.5px;color:var(--ink3);line-height:1.4}
+.menu .who b{display:block;font-weight:500;color:var(--ink);font-size:12.5px}
+.status .dot.err{background:#EF4444;box-shadow:0 0 0 3px rgba(239,68,68,.12)}
+
 @media (max-width:640px){
   .top{padding:14px 16px 0;gap:8px}
   .mark-ver,.kbd{display:none}
@@ -242,6 +265,7 @@ textarea.in{height:200px;padding:10px 12px;resize:vertical;font:11.5px/1.6 var(-
       <span class="kbd">⌘K</span>
     </label>
     <button class="iconbtn solid" id="addBtn" title="Yeni taslak (⌘N)"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1.5v9M1.5 6h9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></button>
+    <button class="me" id="me" hidden title="Hesap"></button>
   </header>
 
   <main class="scroll" id="scroll">
@@ -252,7 +276,7 @@ textarea.in{height:200px;padding:10px 12px;resize:vertical;font:11.5px/1.6 var(-
         <div class="hint" id="pubHint" hidden></div>
       </section>
       <section class="sec" id="secDraft">
-        <h2 class="sec-h"><b>02</b><span>Taslaklar · bu tarayıcı</span><span id="nDraft"></span><span class="rule"></span></h2>
+        <h2 class="sec-h"><b>02</b><span id="draftLbl">Taslaklar · bu tarayıcı</span><span id="nDraft"></span><span class="rule"></span></h2>
         <div class="grid" id="gDraft"></div>
       </section>
       <div class="hint" id="noRes" hidden>Eşleşme yok.</div>
@@ -266,6 +290,18 @@ textarea.in{height:200px;padding:10px 12px;resize:vertical;font:11.5px/1.6 var(-
 </div>
 
 <div class="dock" id="dock" hidden></div>
+
+<div class="gate" id="gate" hidden>
+  <div class="gate-card">
+    <div class="mark-glyph"><i></i><i></i><i></i><i></i></div>
+    <h1 id="gTitle">AppShell</h1>
+    <p id="gMsg"></p>
+    <button class="gbtn" id="gBtn" hidden><svg width="16" height="16" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.2-.1-2.3-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.2-.1-2.3-.4-3.5z"/></svg>Google ile giriş</button>
+    <span class="spin" id="gSpin"></span>
+    <button class="btn ghost" id="gOut" hidden>Başka hesapla dene</button>
+    <small>özel alan</small>
+  </div>
+</div>
 
 <div class="scrim" id="scrim" hidden></div>
 <section class="win" id="win" hidden>
@@ -345,6 +381,46 @@ const DB=(()=>{let db;const ST='drafts';
   const req=(m,f)=>new Promise((ok,no)=>{const r=f(db.transaction(ST,m).objectStore(ST));r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)});
   return{open,all:()=>req('readonly',s=>s.getAll()),put:v=>req('readwrite',s=>s.put(v)),del:id=>req('readwrite',s=>s.delete(id)),get ok(){return!!db}}})();
 
+/* ── Cloud (Firebase) ────────────────────────────────────── */
+const FB={apiKey:'AIzaSyDpJc9g4XDBq32T9Pf1UKbuhzRmnx__mak',authDomain:'apps-f1cfd.firebaseapp.com',projectId:'apps-f1cfd'};
+const OWNER='batulekesiz28@gmail.com';
+const CLOUD=/^https?:$/.test(location.protocol)&&!new URLSearchParams(location.search).has('local');
+const MAX_BYTES=900000;
+let sync='ok';
+const loadScript=src=>new Promise((ok,no)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=no;document.head.appendChild(s)});
+async function loadFirebase(){
+  if(window.firebase?.auth&&window.firebase?.firestore)return;
+  const b='https://www.gstatic.com/firebasejs/10.12.2/';
+  await loadScript(b+'firebase-app-compat.js');
+  await Promise.all([loadScript(b+'firebase-auth-compat.js'),loadScript(b+'firebase-firestore-compat.js')]);
+}
+const sig=list=>list.map(d=>[d.id,d.name,d.icon,d.color,d.order,d.html?.length]).join('|');
+
+const Local={kind:'local',
+  async load(){try{await DB.open();return(await DB.all()).map(toDraft).sort((a,b)=>a.order-b.order)}catch{return[]}},
+  put:d=>DB.put(d),del:id=>DB.del(id),savePubOrder:k=>store.set('appshell:order',k)};
+const Cloud={kind:'cloud',meta:null,col:null,unsubs:[],
+  start(fs){
+    this.meta=fs.collection('hub').doc('meta');this.col=this.meta.collection('drafts');
+    return new Promise(res=>{let first=true;
+      this.unsubs.push(this.col.onSnapshot({includeMetadataChanges:true},snap=>{
+        const list=snap.docs.map(d=>toDraft(d.data())).sort((a,b)=>a.order-b.order);
+        setSync(snap.metadata.hasPendingWrites?'pending':'ok');
+        if(sig(list)!==sig(drafts)){drafts=list;if(!first&&painted)render()}
+        if(first){first=false;res()}
+      },err=>{setSync('error');toast('Senkron hatası: '+(err.code||err.message));if(first){first=false;res()}}));
+      this.unsubs.push(this.meta.onSnapshot(s=>{const o=s.data()?.pubOrder;if(!o)return;const before=pub.map(a=>a.key).join();sortBy(pub,o);
+        if(painted&&pub.map(a=>a.key).join()!==before)render()},()=>{}));
+    });
+  },
+  stop(){this.unsubs.forEach(u=>{try{u()}catch{}});this.unsubs=[]},
+  put(d){return this.col.doc(d.id).set(d)},
+  del(id){return this.col.doc(id).delete()},
+  savePubOrder(k){store.set('appshell:order',k);return this.meta.set({pubOrder:k},{merge:true})},
+};
+let S=Local;
+function setSync(s){sync=s;const d=$('#sDot');if(!d)return;d.classList.toggle('warn',s==='pending');d.classList.toggle('err',s==='error');statusText()}
+
 /* ── State ───────────────────────────────────────────────── */
 let pub=[],drafts=[],query='',manifest={ok:false,why:''},painted=false,justDragged=false;
 const toPub=a=>({key:'p:'+a.slug,kind:'pub',slug:a.slug,name:a.name||a.slug,icon:a.icon||'',color:a.color||'gray',desc:a.desc||'',url:a.url||a.file||`apps/${a.slug}/`});
@@ -358,9 +434,6 @@ async function loadManifest(){
     if(j.title){$('#brand').textContent=j.title;document.title=j.title}
     pub=(j.apps||[]).filter(a=>a&&a.slug).map(toPub);sortBy(pub,store.get('appshell:order',[]));manifest={ok:true,why:''};
   }catch(e){manifest={ok:false,why:'missing'};pub=[]}
-}
-async function loadDrafts(){
-  try{await DB.open();drafts=(await DB.all()).map(toDraft).sort((a,b)=>a.order-b.order)}catch{drafts=[]}
 }
 
 /* ── Render ──────────────────────────────────────────────── */
@@ -386,10 +459,17 @@ function render(){
   $('#secPub').hidden=!!(q&&!P.length);
   $('#secDraft').hidden=!!(q&&!D.length);
   $('#noRes').hidden=!(q&&!P.length&&!D.length);
-  $('#sDot').classList.toggle('warn',!manifest.ok);
-  $('#sTxt').textContent=(manifest.ok?`apps.json · ${pub.length} yayında`:manifest.why==='file'?'yerel mod':'apps.json yok')+` · ${drafts.length} taslak`;
+  $('#draftLbl').textContent=S.kind==='cloud'?'Taslaklar · senkron':'Taslaklar · bu tarayıcı';
+  statusText();
   wireCards();
   if(!painted){painted=true;intro()}
+}
+function statusText(){
+  const d=$('#sDot'),cloud=S.kind==='cloud';
+  if(!cloud)d.classList.toggle('warn',!manifest.ok);
+  const a=manifest.ok?`apps.json · ${pub.length} yayında`:manifest.why==='file'?'yerel mod':'apps.json yok';
+  const b=cloud?(sync==='pending'?'kaydediliyor…':sync==='error'?'senkron hatası':'senkron'):'bu tarayıcı';
+  $('#sTxt').textContent=`${a} · ${drafts.length} taslak · ${b}`;
 }
 function intro(){
   $$('.sec-h .rule').forEach((r,i)=>anim(r,[{transform:'scaleX(0)'},{transform:'scaleX(1)'}],{duration:900,delay:120+i*90,easing:OUT,fill:'backwards'}));
@@ -459,10 +539,11 @@ function sortable(grid,commit){
     addEventListener('pointermove',move,{passive:false});addEventListener('pointerup',up);addEventListener('pointercancel',up);
   });
 }
-sortable($('#gPub'),keys=>{sortBy(pub,keys);store.set('appshell:order',keys)});
+sortable($('#gPub'),keys=>{sortBy(pub,keys);Promise.resolve(S.savePubOrder(keys)).catch(()=>{})});
 sortable($('#gDraft'),async keys=>{sortBy(drafts,keys);drafts.forEach((d,i)=>d.order=i);
-  try{await Promise.all(drafts.map(d=>DB.put(rawDraft(d))))}catch{}});
-const rawDraft=d=>({id:d.id,name:d.name,icon:d.icon,color:d.color,html:d.html,order:d.order,ts:Date.now()});
+  try{await Promise.all(drafts.map(d=>S.put(rawDraft(d))))}catch{}});
+const rawDraft=d=>({id:d.id,name:d.name,icon:d.icon||'',color:d.color,html:d.html,order:d.order??0,ts:Date.now()});
+const tooBig=html=>S.kind==='cloud'&&new Blob([html]).size>MAX_BYTES;
 
 /* ── Window ──────────────────────────────────────────────── */
 const W={el:$('#win'),frame:$('#frame'),app:null,from:null,max:false,dx:0,dy:0,blob:null,min:false};
@@ -647,9 +728,12 @@ function openSheet(a){
     drop.ondrop=e=>{e.preventDefault();e.stopPropagation();drop.classList.remove('over');const f=e.dataTransfer.files[0];f&&take(f)};
     const save=async()=>{const name=N.value.trim();if(!name){N.focus();return toast('Bir ad gir')}
       const src=mode==='code'?s.querySelector('#sTx').value.trim():html;if(!src)return toast('HTML boş');
-      if(edit){Object.assign(a,{name,icon,color,html:src});await DB.put(rawDraft(a)).catch(()=>{});toast('Kaydedildi')}
-      else{const d=toDraft({id:uid(),name,icon,color,html:src,order:drafts.length});drafts.push(d);await DB.put(rawDraft(d)).catch(()=>toast('Kaydedilemedi'));toast('Taslak eklendi')}
-      closeSheet();render();if(!edit)pop(drafts.at(-1).key)};
+      if(tooBig(src))return toast('Dosya çok büyük (900 KB üstü), senkronlanamaz');
+      let d;
+      if(edit){Object.assign(a,{name,icon,color,html:src});d=a}
+      else{d=toDraft({id:uid(),name,icon,color,html:src,order:drafts.length});drafts.push(d)}
+      closeSheet();render();if(!edit)pop(d.key);
+      S.put(rawDraft(d)).then(()=>toast(edit?'Kaydedildi':'Taslak eklendi'),e=>toast('Kaydedilemedi: '+(e.code||e.message)))};
     s.querySelector('#sSave').onclick=save;
     N.onkeydown=e=>{if(e.key==='Enter')save()};
    });
@@ -674,7 +758,7 @@ async function removeDraft(a){
   if(el)await anim(el,[{opacity:1,transform:'none'},{opacity:0,transform:'scale(.8)'}],{duration:220,easing:EASE,fill:'forwards'}).finished.catch(()=>{});
   const grid=$('#gDraft');
   flip(grid,()=>{el?.remove()});
-  drafts=drafts.filter(d=>d.key!==a.key);await DB.del(a.id).catch(()=>{});
+  drafts=drafts.filter(d=>d.key!==a.key);await S.del(a.id).catch(e=>toast('Silinemedi: '+(e.code||e.message)));
   setTimeout(render,430);toast('Silindi');
 }
 function pop(key){const el=$(`.card[data-key="${CSS.escape(key)}"]`);if(!el)return;
@@ -697,9 +781,14 @@ addEventListener('dragleave',e=>{if(!hasFiles(e)||sheetEl)return;if(--dragDepth<
 addEventListener('dragover',e=>{if(hasFiles(e))e.preventDefault()});
 addEventListener('drop',async e=>{if(!hasFiles(e))return;e.preventDefault();dragDepth=0;$('#pdrop').classList.remove('on');if(sheetEl)return;
   const files=[...e.dataTransfer.files].filter(f=>/\.html?$/i.test(f.name));if(!files.length)return toast('Sadece .html dosyaları');
-  const added=[];for(const f of files){const d=toDraft({id:uid(),name:nameFrom(f.name),icon:'',html:await f.text(),order:drafts.length});
-    d.color=colorKeys[hash(d.name)%colorKeys.length];drafts.push(d);added.push(d.key);await DB.put(rawDraft(d)).catch(()=>{})}
-  render();added.forEach((k,i)=>setTimeout(()=>pop(k),i*70));toast(files.length>1?`${files.length} taslak eklendi`:'Taslak eklendi')});
+  const added=[];let big=0;
+  for(const f of files){const html=await f.text();if(tooBig(html)){big++;continue}
+    const d=toDraft({id:uid(),name:nameFrom(f.name),icon:'',html,order:drafts.length});
+    d.color=colorKeys[hash(d.name)%colorKeys.length];drafts.push(d);added.push(d);}
+  render();added.forEach((d,i)=>setTimeout(()=>pop(d.key),i*70));
+  await Promise.all(added.map(d=>S.put(rawDraft(d)))).catch(e=>toast('Kaydedilemedi: '+(e.code||e.message)));
+  if(added.length)toast(added.length>1?`${added.length} taslak eklendi`:'Taslak eklendi');
+  if(big)toast(`${big} dosya 900 KB'tan büyük, eklenmedi`)});
 
 /* ── Search & keys ───────────────────────────────────────── */
 $('#q').addEventListener('input',e=>{query=e.target.value;render();
@@ -708,6 +797,7 @@ $('#q').addEventListener('keydown',e=>{if(e.key==='Enter'){const c=$('.card[data
 $('#addBtn').onclick=()=>openSheet();
 addEventListener('keydown',e=>{
   const mod=e.metaKey||e.ctrlKey;
+  if(document.body.classList.contains('locked'))return;
   if(mod&&e.key.toLowerCase()==='k'){e.preventDefault();$('#q').focus();$('#q').select()}
   else if(mod&&e.key.toLowerCase()==='n'&&!e.shiftKey){e.preventDefault();openSheet()}
   else if(e.key==='Escape'){if(menuEl)hideMenu();else if(sheetEl)closeSheet();else if(W.app&&!W.min)closeWin()}
@@ -742,8 +832,69 @@ addEventListener('keydown',e=>{
 /* ── Clock ──────────────────────────────────────────────── */
 const clk=()=>{$('#clock').textContent=new Date().toLocaleString('tr-TR',{weekday:'short',hour:'2-digit',minute:'2-digit'})};clk();setInterval(clk,15000);
 
+/* ── Gate ───────────────────────────────────────────────── */
+function gate(state,msg){
+  const g=$('#gate'),was=g.hidden;document.body.classList.add('locked');g.hidden=false;
+  $('#gSpin').hidden=state!=='loading';$('#gBtn').hidden=state!=='signin'&&state!=='error';$('#gBtn').disabled=false;
+  $('#gOut').hidden=state!=='denied';
+  $('#gMsg').innerHTML=msg??(state==='loading'?'Bağlanıyor…':'Devam etmek için giriş yap.');
+  if(was)anim(g.firstElementChild,[{opacity:0,transform:'translateY(12px) scale(.97)'},{opacity:1,transform:'none'}],{duration:620,easing:OUT});
+}
+async function ungate(){
+  const g=$('#gate');if(g.hidden){document.body.classList.remove('locked');return}
+  await anim(g.firstElementChild,[{opacity:1},{opacity:0,transform:'scale(.97)'}],{duration:220,easing:EASE,fill:'forwards'}).finished.catch(()=>{});
+  g.hidden=true;g.firstElementChild.getAnimations().forEach(a=>a.cancel());document.body.classList.remove('locked');
+}
+const authMsg=e=>({'auth/unauthorized-domain':'Bu adres Firebase\'de izinli değil. <b>Authentication → Settings → Authorized domains</b> listesine ekle.',
+  'auth/network-request-failed':'Bağlantı hatası. İnternetini kontrol et.','auth/too-many-requests':'Çok fazla deneme. Biraz sonra tekrar dene.'}[e.code]||('Giriş başarısız: '+(e.code||e.message)));
+async function signIn(){
+  const p=new firebase.auth.GoogleAuthProvider();p.setCustomParameters({prompt:'select_account'});$('#gBtn').disabled=true;
+  try{await firebase.auth().signInWithPopup(p)}
+  catch(e){
+    if(['auth/popup-blocked','auth/operation-not-supported-in-this-environment','auth/cancelled-popup-request'].includes(e.code))return firebase.auth().signInWithRedirect(p);
+    if(e.code==='auth/popup-closed-by-user'){$('#gBtn').disabled=false;return}
+    gate('error',authMsg(e));
+  }
+}
+$('#gBtn').onclick=signIn;
+$('#gOut').onclick=()=>firebase.auth().signOut();
+$('#me').onclick=e=>{e.stopPropagation();const u=firebase.auth().currentUser;if(!u)return;hideMenu();
+  const m=document.createElement('div');m.className='menu';
+  m.innerHTML=`<div class="who"><b>${esc(u.displayName||'Hesap')}</b>${esc(u.email)}</div><div class="msep"></div><button class="mi" data-m="out"><svg viewBox="0 0 16 16"><path d="M6 2.5H3v11h3M10 5l3 3-3 3M13 8H6"/></svg>Çıkış yap</button>`;
+  document.body.appendChild(m);const b=$('#me').getBoundingClientRect(),r=m.getBoundingClientRect();
+  m.style.left=Math.max(8,b.right-r.width)+'px';m.style.top=(b.bottom+8)+'px';m.style.setProperty('--ox',r.width-16+'px');m.style.setProperty('--oy','0px');
+  anim(m,[{opacity:0,transform:'scale(.94)'},{opacity:1,transform:'none'}],{duration:260,easing:OUT});
+  m.onclick=ev=>{if(ev.target.closest('[data-m=out]')){hideMenu();firebase.auth().signOut()}};menuEl=m;
+};
+async function migrateLocal(){
+  if(store.get('appshell:migrated',false))return;
+  const local=await Local.load(),have=new Set(drafts.map(d=>d.id)),todo=local.filter(d=>!have.has(d.id)&&!tooBig(d.html));
+  if(todo.length){todo.forEach((d,i)=>{d.order=drafts.length+i;drafts.push(d)});render();
+    try{await Promise.all(todo.map(d=>Cloud.put(rawDraft(d))));toast(`${todo.length} yerel taslak buluta taşındı`)}catch(e){toast('Taşıma başarısız: '+(e.code||e.message));return}}
+  store.set('appshell:migrated',true);
+}
+
 /* ── Boot ───────────────────────────────────────────────── */
-(async()=>{await Promise.all([loadManifest(),loadDrafts()]);render()})();
+(async()=>{
+  const mp=loadManifest();
+  if(!CLOUD){S=Local;drafts=await Local.load();await mp;render();return}
+  gate('loading');
+  try{await loadFirebase()}catch{return gate('error','Firebase yüklenemedi. İnternet bağlantını kontrol et.')}
+  if(!firebase.apps.length)firebase.initializeApp(FB);
+  const fs=firebase.firestore();try{await fs.enablePersistence({synchronizeTabs:true})}catch{}
+  firebase.auth().getRedirectResult().catch(e=>gate('error',authMsg(e)));
+  firebase.auth().onAuthStateChanged(async u=>{
+    if(!u){Cloud.stop();S=Local;drafts=[];if(W.app)hideWin(false);closeSheet(true);hideMenu();$('#me').hidden=true;if(painted){$('#gDraft').innerHTML='';$('#gPub').innerHTML=''}return gate('signin')}
+    if((u.email||'').toLowerCase()!==OWNER){Cloud.stop();return gate('denied',`<b>${esc(u.email)}</b> bu alana erişemez.`)}
+    gate('loading','Taslaklar yükleniyor…');
+    await mp;S=Cloud;await Cloud.start(fs);
+    const me=$('#me');me.hidden=false;me.innerHTML=u.photoURL?`<img src="${esc(u.photoURL)}" alt="" referrerpolicy="no-referrer">`:esc(mono(u.displayName||u.email));
+    if(painted)render();
+    await ungate();
+    if(!painted)render();
+    migrateLocal();
+  });
+})();
 </script>
 </body>
 </html>

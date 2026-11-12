@@ -1,0 +1,6 @@
+{
+  "title": "AppShell",
+  "apps": [
+    { "slug": "saat", "name": "Saat", "icon": "clock", "color": "ink", "desc": "Minimal dünya saati" }
+  ]
+}

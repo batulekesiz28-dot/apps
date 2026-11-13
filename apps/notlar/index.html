@@ -130,7 +130,7 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
 .blk[data-t=h3]{margin-top:12px}.blk[data-t=h3] .txt{font-size:17px;font-weight:600;letter-spacing:-.01em}
 .blk[data-t^=h] .hd{top:calc(.5em + 2px)}
 .blk[data-t=h1] .hd{top:12px}
-.chk{width:18px;height:18px;margin:7px 6px 0 2px;border-radius:5px;flex-shrink:0;display:grid;place-items:center;box-shadow:inset 0 0 0 1.2px var(--ink4);transition:background .25s var(--ease),box-shadow .25s,transform .4s var(--spring)}
+.chk{width:24px;height:24px;border:3px solid transparent;background-clip:padding-box;margin:4px 3px -3px -1px;border-radius:5px;flex-shrink:0;display:grid;place-items:center;box-shadow:inset 0 0 0 1.2px var(--ink4);transition:background .25s var(--ease),box-shadow .25s,transform .4s var(--spring)}
 .chk:hover{box-shadow:inset 0 0 0 1.2px var(--ink3)}
 .chk:active{transform:scale(.85)}
 .chk svg{width:12px;height:12px;fill:none;stroke:var(--bg);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:14;stroke-dashoffset:14;transition:stroke-dashoffset .35s var(--out) .05s}
@@ -325,6 +325,83 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
 @media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important;animation-duration:.01ms!important}}
 /* Denetçi: telefonda dokunma alanları ve okunur yazı */
 @media (max-width:760px){.ni{height:40px;font-size:14px}.grp{font-size:11.5px}.grp button,.ni .more{width:32px;height:32px;opacity:1}kbd,.kbd{font-size:11.5px}.cnt,#saved{font-size:11.5px}#openPal,#newBtn{min-height:40px;min-width:40px}}
+
+@media (max-width:760px){.hello p,.ag .d,.sh,.ni .cnt,.card small{font-size:12px}.ni .more,.grp button,#themeBtn,#burger{min-width:40px;min-height:40px}.ni .more{width:40px;height:40px}}
+@media (max-width:760px){.chk{width:36px;height:36px;border-width:9px;margin:-2px -3px -9px -7px}.fd-r .chk{margin:0 -9px}.muted{font-size:12px}.daybar .tb{min-width:40px;min-height:40px}.tl-m .pill{height:40px}.tlr .tld small{font-size:12px}.blk .bdate{min-height:36px}.fd-g .fd-h,.found .fd-pg{min-height:40px}#topAct .tb{min-width:40px;min-height:40px}}
+/* ── Günler: daybar, bulunan tarihler, zaman çizelgesi ── */
+[data-theme=dark] .bdate{color:#7CB7F5}[data-theme=dark] .bdate.late{color:#FF9466}
+.page.daily{padding-top:18px}.page.daily .pg-head{padding-top:4px}.page.daily .pg-ic{font-size:40px}
+.tl-pool .tlc{width:100%;min-width:0}.tli .tlc{min-width:0}.tl-pool .tlc small{max-width:90px}
+.tld span{align-self:end}.tld small{align-self:start}
+.daybar{display:grid;gap:12px;margin:0 0 26px;padding-bottom:16px;border-bottom:.5px solid var(--line)}
+.db-nav{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.db-date{display:flex;align-items:baseline;gap:8px;height:34px;padding:0 10px;border-radius:9px;font-size:15px;font-weight:600;letter-spacing:-.01em;text-transform:capitalize}
+.db-date small{font-size:12.5px;font-weight:400;color:var(--ink3);text-transform:none}
+.db-date:hover{background:var(--hover)}
+.db-t{margin-left:4px;font-size:12.5px;color:var(--ink2);text-decoration:none;display:inline-flex;align-items:center}
+.db-t:last-child{margin-left:auto}
+.db-wk{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.wd{display:grid;justify-items:center;gap:2px;padding:7px 0 6px;border-radius:10px;color:var(--ink2);transition:background .15s,transform .3s var(--spring)}
+.wd span{font:500 11px/1 var(--mono);letter-spacing:.04em;color:var(--ink3)}
+.wd b{font-size:15px;font-weight:550;line-height:1.2}
+.wd i{width:4px;height:4px;border-radius:50%}.wd i.has{background:var(--accent)}
+.wd:hover{background:var(--hover)}.wd:active{transform:scale(.94)}
+.wd.tdy b{color:var(--accent)}
+.wd.on{background:var(--ink);color:var(--bg)}.wd.on span{color:inherit;opacity:.7}.wd.on b{color:inherit}.wd.on i.has{background:currentColor}
+.bdate{flex-shrink:0;align-self:center;display:inline-flex;align-items:center;gap:4px;min-height:24px;margin-left:6px;padding:0 7px;border-radius:6px;font-size:12px;color:#1B64B8;background:color-mix(in srgb,var(--accent) 10%,transparent);white-space:nowrap}
+.bdate svg.i{width:12px;height:12px}.bdate.late{color:#B33A06;background:color-mix(in srgb,var(--warn) 10%,transparent)}
+.found{margin-top:10px;padding-top:18px;border-top:.5px solid var(--line)}
+.found.empty p{font-size:13px;color:var(--ink3);line-height:1.6}
+.fd-g{margin-bottom:10px}
+.fd-h,.fd-pg{display:flex;align-items:center;gap:7px;height:30px;padding:0 6px;border-radius:7px;font-size:13px;font-weight:550;color:var(--ink);text-decoration:none}
+.fd-h small,.fd-pg small{font-weight:400;color:var(--ink3);font-size:12px}
+.fd-h:hover,.fd-pg:hover{background:var(--hover)}
+.fd-r{display:flex;align-items:center;gap:8px;min-height:32px;padding:2px 6px 2px 24px;border-radius:7px;font-size:14px}
+.fd-r:hover{background:var(--hover)}
+.fd-r .chk{position:static;margin:0 -3px}
+.fd-r.done .fd-t{color:var(--ink3);text-decoration:line-through}
+.fd-dot{width:5px;height:5px;border-radius:50%;background:var(--ink3);margin:0 6px}
+.fd-t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fd-b{height:26px;padding:0 8px;border-radius:7px;font-size:12px;color:var(--ink2);opacity:0;box-shadow:inset 0 0 0 .5px var(--line2)}
+.fd-r:hover .fd-b,.fd-b:focus-visible{opacity:1}.fd-b:hover{background:var(--hover2);color:var(--ink)}
+.datepop{max-width:320px}
+.dpop{display:grid;gap:8px;padding:4px 6px 8px}
+.dpi,.dpn{width:100%;height:34px;padding:0 10px;border:0;border-radius:8px;background:var(--hover);font:inherit;font-size:13.5px;color:var(--ink);outline:0}
+.dpi:focus{box-shadow:inset 0 0 0 1px var(--accent)}
+.dpv{font-size:12.5px;color:var(--accent);min-height:18px}.dpv.bad{color:var(--ink3)}
+.dpc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}
+.dpc button{display:flex;justify-content:space-between;align-items:center;gap:6px;height:32px;padding:0 9px;border-radius:8px;font-size:13px;box-shadow:inset 0 0 0 .5px var(--line2)}
+.dpc button small{font-size:12px;color:var(--ink3)}.dpc button:hover{background:var(--hover)}
+.dpr{display:flex;gap:6px}.dpx{flex-shrink:0;height:34px;padding:0 10px;border-radius:8px;font-size:12.5px;color:var(--warn)}.dpx:hover{background:var(--hover)}
+.tl-h{margin-bottom:18px}.tl-h h1{font-family:var(--serif);font-size:34px;font-weight:500;letter-spacing:-.02em}.tl-h p{color:var(--ink2);margin-top:4px;font-size:13.5px}
+.tl-m{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}.tl-m .pill.on{background:var(--ink);color:var(--bg)}
+.tl-b{display:grid;grid-template-columns:260px minmax(0,1fr);gap:22px;align-items:start}
+.tl-side{position:sticky;top:12px;max-height:calc(100vh - 140px);overflow:auto;padding-right:4px}
+.tl-pool{display:grid;gap:4px}
+.tl-tip{font-size:12px;color:var(--ink3);margin-top:16px;line-height:1.5}
+.tl-days{display:grid;border-top:.5px solid var(--line)}
+.tlr{display:grid;grid-template-columns:76px minmax(0,1fr);gap:10px;min-height:48px;padding:6px 0;border-bottom:.5px solid var(--line);transition:background .15s}
+.tlr.wk{background:color-mix(in srgb,var(--hover) 60%,transparent)}.tlr.mon{border-top:1px solid var(--line2)}
+.tlr.over{background:var(--sel)}
+.tlr.tdy .tld b{background:#1B64B8;color:#fff}
+.tld{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;align-items:center;column-gap:6px;padding:2px 6px;border-radius:8px;text-align:left;align-self:start}
+.tld:hover{background:var(--hover)}
+.tld b{grid-row:1/3;display:grid;place-items:center;width:30px;height:30px;border-radius:9px;font-size:14px;font-weight:600}
+.tld span{font-size:12.5px;color:var(--ink2)}.tld small{font:500 11px/1 var(--mono);color:var(--ink3);text-transform:uppercase}
+.tli{display:flex;flex-wrap:wrap;gap:4px;align-content:flex-start;align-items:center;min-width:0}
+.tle{color:var(--ink3);font-size:13px}
+.tlc{display:flex;align-items:center;gap:6px;max-width:100%;min-height:28px;padding:3px 9px 3px 7px;border-radius:8px;background:var(--card);box-shadow:inset 0 0 0 .5px var(--line2);font-size:13px;cursor:grab;transition:transform .3s var(--spring),box-shadow .15s}
+.tlc:hover{box-shadow:inset 0 0 0 .5px var(--ink4),0 4px 12px -6px rgba(0,0,0,.2)}
+.tlc.dragging{opacity:.4;transform:scale(.97)}
+.tlc .tt{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tlc small{flex-shrink:0;font-size:12px;color:var(--ink3);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tlc .bx{width:12px;height:12px;border-radius:3.5px;box-shadow:inset 0 0 0 1.3px var(--ink3);flex-shrink:0}.tlc .bx.on{background:var(--accent);box-shadow:none}
+.tlc .dt{width:5px;height:5px;border-radius:50%;background:var(--ink3);flex-shrink:0}
+.tlc.done .tt{color:var(--ink3);text-decoration:line-through}
+.tlc.fd{background:color-mix(in srgb,var(--accent) 7%,var(--card))}.tlc.late{box-shadow:inset 2px 0 0 var(--warn),inset 0 0 0 .5px var(--line2)}
+.tlc.pg{font-weight:550}
+@media (max-width:860px){.tl-b{grid-template-columns:minmax(0,1fr)}.tl-side{position:static;max-height:none;order:2}.tl-m{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-right:-16px;padding-bottom:2px}.tl-m .pill{flex-shrink:0}.tl-h h1{font-size:28px}}
+@media (max-width:760px){.wd{padding:9px 0 8px}.wd span{font-size:11.5px}.db-date{height:40px}.fd-b{opacity:1;height:36px}.fd-r{min-height:44px;padding-left:6px}.tlc{min-height:40px}.tld{min-height:40px}.dpc button,.dpi,.dpn,.dpx{height:40px}.bdate{height:28px}.db-t{min-height:40px}}
 </style>
 </head>
 <body>
@@ -336,7 +413,7 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
     <nav class="nav" id="nav"></nav>
     <div class="side-f">
       <button class="new" id="newBtn"><svg class="i" viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></svg>Yeni sayfa</button>
-      <button class="sq" id="themeBtn" title="Tema"><svg class="i" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/><path d="M8 2.5v11A5.5 5.5 0 0 0 8 2.5z" fill="currentColor"/></svg></button>
+      <button class="sq" id="themeBtn" title="Tema" aria-label="Temayı değiştir"><svg class="i" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/><path d="M8 2.5v11A5.5 5.5 0 0 0 8 2.5z" fill="currentColor"/></svg></button>
     </div>
   </aside>
   <main class="main">
@@ -413,6 +490,7 @@ const plain=h=>{const t=document.createElement('template');t.innerHTML=h||'';ret
 /* ── Icons ────────────────────────────────────────────────── */
 const SV=p=>`<svg class="i" viewBox="0 0 16 16">${p}</svg>`;
 const IC={
+  tl:SV('<path d="M2.5 4h4M2.5 8h7M2.5 12h5"/><circle cx="12" cy="4" r="1.2"/><circle cx="12.5" cy="8" r="1.2"/><circle cx="10.5" cy="12" r="1.2"/>'),
   home:SV('<path d="M2.5 7L8 2.5 13.5 7v6.5h-4v-4h-3v4h-4z"/>'),
   sun:SV('<circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.5M8 13v1.5M1.5 8H3M13 8h1.5M3.4 3.4l1 1M11.6 11.6l1 1M12.6 3.4l-1 1M4.4 11.6l-1 1"/>'),
   cal:SV('<rect x="2" y="3" width="12" height="11" rx="2"/><path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3"/>'),
@@ -449,7 +527,10 @@ const TYPES=[
 ];
 const ACTIONS=[
   {k:'@page',l:'Alt sayfa',d:'Yeni sayfa oluştur ve bağla',kw:'sayfa page alt link',b:SV('<path d="M4 2h5.5L12 4.5V14H4z"/><path d="M9.5 2v2.5H12"/>')},
-  {k:'@date',l:'Bugünün tarihi',d:'Tarih ekle',kw:'tarih date bugun',b:SV('<rect x="2" y="3" width="12" height="11" rx="2"/><path d="M2 6.5h12"/>')},
+  {k:'@date',l:'Bugünün tarihi',d:'Metne bugünün tarihini yaz',kw:'tarih date bugun',b:SV('<rect x="2" y="3" width="12" height="11" rx="2"/><path d="M2 6.5h12"/>')},
+  {k:'@due',l:'Tarih ver',d:'Satır o günde de görünsün (yarın, cuma…)',kw:'tarih ver zamanla planla due schedule son gün',b:SV('<rect x="2" y="3" width="12" height="11" rx="2"/><path d="M2 6.5h12M8 8.5v3l2 1"/>')},
+  {k:'@today',l:'Bugüne taşı',d:'Satırı bugünün notuna gönder',kw:'bugune tasi tasi move today',b:SV('<path d="M3 8h8M8 4.5L11.5 8 8 11.5M13.5 3v10"/>')},
+  {k:'@move',l:'Bir güne taşı',d:'Satırı seçtiğin günün notuna gönder',kw:'gune tasi tasi move tarih',b:SV('<path d="M2.5 8h7M7 5l3 3-3 3"/><rect x="11" y="3.5" width="3" height="9" rx="1"/>')},
 ];
 const PH={p:"Yaz ya da '/' ile blok ekle",h1:'Başlık 1',h2:'Başlık 2',h3:'Başlık 3',todo:'Yapılacak',bullet:'Liste',num:'Liste',quote:'Alıntı',callout:'Bir not yaz…',code:'Kod',kv:''};
 const LIST_T=new Set(['todo','bullet','num']);
@@ -521,7 +602,7 @@ function save(p,now){
   const f=()=>{timers.delete(p.id);S.put(snapshot(p)).then(()=>{if(!timers.size)setSaved('ok')},e=>{setSaved('err');toast('Kaydedilemedi: '+(e.code||e.message))})};
   if(now)f();else timers.set(p.id,setTimeout(f,450));
 }
-function touch(p){p.updated=Date.now();lastEdit=Date.now();save(p)}
+function touch(p){p.updated=Date.now();lastEdit=Date.now();FRESH.delete(p.id);save(p)}
 function flushAll(){for(const[id,t]of timers){clearTimeout(t);const p=pages.get(id);timers.delete(id);if(p)S.put(snapshot(p)).catch(()=>{})}}
 addEventListener('pagehide',flushAll);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)flushAll()});
@@ -542,8 +623,10 @@ const sorted=()=>[...pages.values()].sort((a,b)=>b.updated-a.updated);
 /* ── Router ───────────────────────────────────────────────── */
 function route(){
   const h=decodeURIComponent(location.hash.slice(1))||'home';const[v,id]=h.split('/');
-  if(v==='today'){let p=[...pages.values()].find(x=>x.tpl==='daily'&&x.date===today());if(!p)p=newPage({tpl:'daily'});location.replace('#p/'+p.id);return}
+  if(v==='today'||v==='day'){const d=v==='day'&&/^\d{4}-\d{2}-\d{2}$/.test(id||'')?id:today();let p=dailyOf(d);if(!p){p=newPage({tpl:'daily',date:d});FRESH.add(p.id)}location.replace('#p/'+p.id);return}
+  sweepFresh(v==='p'?id:null);
   if(v==='p'&&pages.has(id)){view='page';openId=id}
+  else if(v==='timeline'){view='timeline';openId=null}
   else if(v==='cal'){view='cal';openId=null}
   else if(v==='tpl'){view='tpl';openId=null}
   else{view='home';openId=null}
@@ -562,6 +645,7 @@ function renderSide(){
     navItem('#home',IC.home,'Ana sayfa',view==='home')+
     navItem('#today',IC.sun,'Bugün',view==='page'&&pages.get(openId)?.tpl==='daily'&&pages.get(openId)?.date===today(),hasToday?'':'<span class="cnt">+</span>')+
     navItem('#cal',IC.cal,'Takvim',view==='cal')+
+    navItem('#timeline',IC.tl,'Zaman çizelgesi',view==='timeline')+
     navItem('#tpl',IC.tpl,'Şablonlar',view==='tpl')+
     (favs.length?`<div class="grp">Favoriler</div>`+favs.map(pageItem).join(''):'')+
     `<div class="grp">Sayfalar<button data-act="new" title="Yeni sayfa">${IC.plus}</button></div>`+
@@ -591,7 +675,7 @@ function closeDrawer(){$('#app').classList.remove('drawer')}
 function renderView(soft){
   hideFloat();
   const v=$('#view'),sc=$('#scroll'),keep=soft?sc.scrollTop:0;
-  if(view==='page')renderPage();else if(view==='cal')renderCal();else if(view==='tpl')renderTpl();else renderHome();
+  if(view==='page')renderPage();else if(view==='timeline')renderTimeline();else if(view==='cal')renderCal();else if(view==='tpl')renderTpl();else renderHome();
   sc.scrollTop=keep;onScroll();
   if(!soft)anim(v,[{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'none'}],{duration:460,easing:OUT});
 }
@@ -648,11 +732,12 @@ let calM=(()=>{const d=new Date();return new Date(d.getFullYear(),d.getMonth(),1
 function renderCal(dir,quiet){
   setCrumb(IC.cal,'Takvim');
   const y=calM.getFullYear(),m=calM.getMonth(),first=new Date(y,m,1),off=(first.getDay()+6)%7,dim=new Date(y,m+1,0).getDate(),weeks=Math.ceil((off+dim)/7);
-  const start=new Date(y,m,1-off),t=today(),by=new Map();
+  const start=new Date(y,m,1-off),t=today(),by=new Map(),fix=dateIndex();
   for(const p of pages.values())if(p.date){if(!by.has(p.date))by.set(p.date,[]);by.get(p.date).push(p)}
   let cells='';
   for(let i=0;i<weeks*7;i++){const dd=new Date(start);dd.setDate(start.getDate()+i);const s=ymd(dd),its=(by.get(s)||[]).sort((a,b)=>a.created-b.created);
-    cells+=`<div class="cd${dd.getMonth()!==m?' out':''}${s===t?' today':''}${s===selDay?' sel':''}${i%7>4?' wk':''}" data-day="${s}"><span class="dn">${dd.getDate()}</span><div class="chips">${its.slice(0,3).map(p=>`<div class="c2" draggable="true" data-pid="${p.id}" title="${esc(titleOf(p))}">${iconOf(p)}<span>${esc(titleOf(p))}</span></div>`).join('')}${its.length>3?`<div class="more">+${its.length-3}</div>`:''}</div></div>`}
+    const fdn=fix.get(s)?.blocks.length||0;
+    cells+=`<div class="cd${dd.getMonth()!==m?' out':''}${s===t?' today':''}${s===selDay?' sel':''}${i%7>4?' wk':''}" data-day="${s}"><span class="dn">${dd.getDate()}</span><div class="chips">${its.slice(0,3).map(p=>`<div class="c2" draggable="true" data-pid="${p.id}" title="${esc(titleOf(p))}">${iconOf(p)}<span>${esc(titleOf(p))}</span></div>`).join('')}${its.length>3?`<div class="more">+${its.length-3}</div>`:''}${fdn?`<div class="more fdn">📌 ${fdn} tarihli satır</div>`:''}</div></div>`}
   const isCur=y===new Date().getFullYear()&&m===new Date().getMonth();
   $('#view').innerHTML=`<div class="wide cal"><div>
     <div class="cal-h"><h1>${MONTHS[m]} <em>${y}</em></h1>
@@ -671,6 +756,8 @@ function renderDay(animate){
   const quick=['daily','meet','todo','client','class','week'];
   $('#dp').innerHTML=`<h2>${esc(fmtShort(selDay))}</h2><div class="wd">${esc(fmtWd(selDay))}${selDay===today()?' · bugün':''}</div>
     <div class="lst">${its.length?its.map(p=>`<button class="row" data-pid="${p.id}"><span class="e">${iconOf(p)}</span><b>${esc(titleOf(p))}</b><small>${rel(p.updated)}</small></button>`).join(''):'<div class="none">Bu gün için plan yok.</div>'}</div>
+    ${(()=>{const e=dateIndex().get(selDay);return e&&e.blocks.length?`<div class="sh"><span>Bu güne tarihli satırlar</span><span class="rule"></span></div><div class="lst">${e.blocks.slice(0,8).map(o=>`<button class="row" data-pid="${o.p.id}"><span class="e">${o.b.t==='todo'?(o.b.c?'☑️':'⬜'):'📌'}</span><b>${esc(plain(o.b.h).slice(0,60))}</b><small>${esc(titleOf(o.p))}</small></button>`).join('')}</div>`:''})()}
+    <button class="pill" data-day-open="${selDay}" style="margin:6px 0 14px">📓 Bu günün notunu aç</button>
     <div class="sh"><span>Bu güne ekle</span><span class="rule"></span></div>
     <div class="tchips"><span class="pill" data-addday="">${IC.plus} Boş sayfa</span>${quick.map(k=>{const t=TPL.find(x=>x.k===k);return`<span class="pill" data-addday="${k}">${t.e} ${esc(t.n)}</span>`}).join('')}<span class="pill" data-addmore>Diğer…</span></div>`;
   if(animate)anim($('#dp'),[{opacity:.3,transform:'translateY(4px)'},{opacity:1,transform:'none'}],{duration:360,easing:OUT});
@@ -683,6 +770,7 @@ $('#view').addEventListener('click',e=>{
   if(e.target.closest('[data-act=new]')){go('#p/'+newPage().id);return}
   const tp=e.target.closest('[data-tpl]');if(tp){const p=newPage({tpl:tp.dataset.tpl});go('#p/'+p.id);return}
   const cv=e.target.closest('[data-cal]');if(cv){const d=+cv.dataset.cal;if(d===0){const n=new Date();calM=new Date(n.getFullYear(),n.getMonth(),1);selDay=today();renderCal(1)}else{calM=new Date(calM.getFullYear(),calM.getMonth()+d,1);renderCal(d)}return}
+  const dop=e.target.closest('[data-day-open]');if(dop){openDay(dop.dataset.dayOpen);return}
   const ad=e.target.closest('[data-addday]');if(ad){addOnDay(ad.dataset.addday,selDay);return}
   if(e.target.closest('[data-addmore]')){tplPicker(e.target.closest('[data-addmore]'),k=>addOnDay(k,selDay));return}
   const pid=e.target.closest('[data-pid]');if(pid&&view!=='page'){go('#p/'+pid.dataset.pid);return}
@@ -695,6 +783,149 @@ $('#view').addEventListener('dragend',e=>{e.target.closest?.('.c2')?.classList.r
 $('#view').addEventListener('dragover',e=>{const cd=e.target.closest('.cd');if(!cd||![...e.dataTransfer.types].includes('text/x-pid'))return;e.preventDefault();$$('.cd.over').forEach(x=>x!==cd&&x.classList.remove('over'));cd.classList.add('over')});
 $('#view').addEventListener('drop',e=>{const cd=e.target.closest('.cd');const id=e.dataTransfer.getData('text/x-pid');if(!cd||!id)return;e.preventDefault();
   const p=pages.get(id);if(!p)return;p.date=cd.dataset.day;touch(p);selDay=p.date;renderCal(0,true);toast(`${titleOf(p)} → ${fmtShort(p.date)}`)});
+
+/* ════════════════════════════════════════════════════════════
+   GÜNLER — Workflowy tarzı takvim: her güne bir günlük not,
+   her yerdeki tarihli satırlar o günde “Bulunan tarihler” olarak görünür,
+   30 günlük zaman çizelgesinde sürükle-bırak ile planlanır.
+   ════════════════════════════════════════════════════════════ */
+const TRM=['ocak','şubat','mart','nisan','mayıs','haziran','temmuz','ağustos','eylül','ekim','kasım','aralık'];
+const TRW=['pazartesi','salı','çarşamba','perşembe','cuma','cumartesi','pazar'];
+const lo=s=>String(s||'').toLocaleLowerCase('tr').trim();
+const dowOf=s=>(pd(s).getDay()+6)%7;
+function mkDate(y,m,d){const x=new Date(y,m,d);return x.getMonth()===m&&x.getDate()===d?ymd(x):null}
+function guessYear(m,d){const t=new Date(),y=t.getFullYear(),c=mkDate(y,m,d);if(!c)return null;return(pd(c)-t)/864e5<-60?mkDate(y+1,m,d):c}
+// natural language → YYYY-MM-DD (Turkish): bugün, yarın, öbür gün, dün, 3 gün sonra, 2 hafta sonra, gelecek hafta, cuma, gelecek salı, 15 kasım, 15.11.2026, 2026-11-15, ay sonu
+function parseTR(q){q=lo(q).replace(/[’']/g,'').replace(/\s+/g,' ');if(!q)return null;const t=today();
+  if(/^(bugün|bugun|today)$/.test(q))return t;
+  if(/^(yarın|yarin|tomorrow)$/.test(q))return addDays(t,1);
+  if(/^(öbür gün|obur gun|öbürgün|ertesi gün)$/.test(q))return addDays(t,2);
+  if(/^(dün|dun|yesterday)$/.test(q))return addDays(t,-1);
+  let m=q.match(/^(\d{1,3}) (gün|gun|hafta|ay) (sonra|sonraya|içinde|önce|once)$/);
+  if(m){const n=+m[1]*(m[2]==='hafta'?7:1),s=/önce|once/.test(m[3])?-1:1;if(m[2]==='ay'){const d=pd(t);d.setMonth(d.getMonth()+s*+m[1]);return ymd(d)}return addDays(t,s*n)}
+  if(/^(gelecek|önümüzdeki|haftaya) hafta$|^haftaya$/.test(q))return addDays(t,7-dowOf(t));
+  if(/^(ay sonu|ay sonunda)$/.test(q)){const d=pd(t);return ymd(new Date(d.getFullYear(),d.getMonth()+1,0))}
+  m=q.match(/^(gelecek |önümüzdeki |bu |haftaya )?(pazartesi|salı|sali|çarşamba|carsamba|perşembe|persembe|cuma|cumartesi|pazar)( günü)?$/);
+  if(m){const w=TRW.findIndex(x=>x.normalize('NFD').replace(/[̀-ͯ]/g,'').replace('ı','i')===m[2].normalize('NFD').replace(/[̀-ͯ]/g,'').replace('ı','i'));
+    let d=(w-dowOf(t)+7)%7;if(d===0)d=7;if(m[1]&&/gelecek|önümüzdeki|haftaya/.test(m[1])&&d<7)d+=dowOf(t)<w?7:0;return addDays(t,d)}
+  m=q.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);if(m)return mkDate(+m[1],+m[2]-1,+m[3]);
+  m=q.match(/^(\d{1,2})[./](\d{1,2})(?:[./](\d{2,4}))?$/);if(m){const y=m[3]?(m[3].length===2?2000+ +m[3]:+m[3]):null;return y?mkDate(y,+m[2]-1,+m[1]):guessYear(+m[2]-1,+m[1])}
+  m=q.match(/^(\d{1,2}) ([a-zçğıöşü]+)(?: (\d{4}))?$/);if(m){const mi=TRM.findIndex(x=>x.startsWith(m[2].slice(0,3)));if(mi>=0)return m[3]?mkDate(+m[3],mi,+m[1]):guessYear(mi,+m[1])}
+  return null}
+// dates written inside text count as Found Dates: “15 Kasım”, “15 Kasım 2026”, 15.11.2026, 2026-11-15
+const RX_DATE=new RegExp(`\\b(\\d{1,2}) (${TRM.join('|')})(?: (\\d{4}))?|\\b(\\d{1,2})[./](\\d{1,2})[./](\\d{4})\\b|\\b(\\d{4})-(\\d{2})-(\\d{2})\\b`,'gi');
+const scanCache=new Map();
+function scanDates(h){if(!h)return[];let r=scanCache.get(h);if(r)return r;const s=lo(plain(h));r=[];let m;RX_DATE.lastIndex=0;
+  while((m=RX_DATE.exec(s))){let d=null;if(m[2]){const mi=TRM.indexOf(m[2]);d=m[3]?mkDate(+m[3],mi,+m[1]):guessYear(mi,+m[1])}else if(m[6])d=mkDate(+m[6],+m[5]-1,+m[4]);else if(m[7])d=mkDate(+m[7],+m[8]-1,+m[9]);if(d&&!r.includes(d))r.push(d)}
+  if(scanCache.size>3000)scanCache.clear();scanCache.set(h,r);return r}
+const datesOf=b=>{const s=scanDates(b.h);return b.d?(s.includes(b.d)?s:[b.d,...s]):s};
+const isDaily=p=>p&&p.tpl==='daily'&&p.date;
+const dailyOf=d=>[...pages.values()].find(p=>isDaily(p)&&p.date===d);
+// d → [{p,b}] for every dated line outside that day's own note, plus dated pages
+function dateIndex(){const ix=new Map(),add=(d,o)=>{if(!ix.has(d))ix.set(d,{blocks:[],pages:[]});ix.get(d)[o.b?'blocks':'pages'].push(o)};
+  for(const p of pages.values()){if(p.date&&!isDaily(p))add(p.date,{p});
+    for(const b of p.blocks)for(const d of datesOf(b))if(!(isDaily(p)&&p.date===d))add(d,{p,b})}
+  return ix}
+const FRESH=new Set(); // auto-created day notes that were never touched get removed when you leave them
+function dayLabelLong(d){const l=dayLabel(d);return l===fmtShort(d)?fmtLong(d):`${l} · ${fmtLong(d)}`}
+function openDay(d){let p=dailyOf(d);if(!p){p=newPage({tpl:'daily',date:d});FRESH.add(p.id)}go('#p/'+p.id)}
+function sweepFresh(keep){for(const id of[...FRESH]){if(id===keep)continue;FRESH.delete(id);const p=pages.get(id);if(p&&p.updated===p.created)delPage(p)}}
+function moveToDay(srcP,b,d){
+  if(isDaily(srcP)&&srcP.date===d)return;let dst=dailyOf(d);if(!dst){dst=newPage({tpl:'daily',date:d})}FRESH.delete(dst.id);
+  const i=srcP.blocks.indexOf(b);if(i<0)return;srcP.blocks.splice(i,1);if(!srcP.blocks.length)srcP.blocks.push(B('p'));
+  if(b.d===d)delete b.d;
+  // drop it after the last non-empty line so the template's empty rows stay below
+  let at=dst.blocks.length;while(at>0&&!plain(dst.blocks[at-1].h).trim()&&dst.blocks[at-1].t!=='divider'&&dst.blocks[at-1].t!=='kv')at--;
+  dst.blocks.splice(at,0,b);touch(srcP);touch(dst);
+  if(P&&P.id===srcP.id){nodeOf(b)?.remove();renumber()}
+  toast(`→ ${dayLabel(d)} notuna taşındı`)}
+function setBlockDate(p,b,d){if(d)b.d=d;else delete b.d;touch(p);if(P&&P.id===p.id){replaceNode(b)}}
+// date popover: type “yarın”, “cuma”, “15 kasım”… or tap a chip
+function datePop(anchor,cur,cb,{title='Tarih ver',clear=true}={}){
+  const t=today(),chips=[['Bugün',t],['Yarın',addDays(t,1)],['Cumartesi',parseTR('cumartesi')],['Gelecek hafta',parseTR('gelecek hafta')],['1 hafta sonra',addDays(t,7)]];
+  const pop=float(anchor,`<div class="pop-h">${esc(title)}</div><div class="dpop"><input class="dpi" placeholder="yarın, cuma, 15 kasım, 3 gün sonra…" autocomplete="off" spellcheck="false" aria-label="Tarih yaz"><div class="dpv"></div>
+    <div class="dpc">${chips.map(([l,d])=>`<button data-dd="${d}">${l}<small>${esc(fmtShort(d))}</small></button>`).join('')}</div>
+    <div class="dpr"><input type="date" class="dpn" value="${cur||''}" aria-label="Takvimden seç">${clear&&cur?'<button data-dd="" class="dpx">Tarihi kaldır</button>':''}</div></div>`,{w:300,cls:'datepop'});
+  const inp=pop.querySelector('.dpi'),pv=pop.querySelector('.dpv');let val=null;
+  const show=()=>{val=parseTR(inp.value);pv.textContent=inp.value.trim()?(val?'→ '+dayLabelLong(val):'Anlaşılmadı — “yarın”, “cuma”, “15 kasım” gibi yaz'):'';pv.classList.toggle('bad',!!inp.value.trim()&&!val)};
+  inp.addEventListener('input',show);
+  inp.addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter'&&val){e.preventDefault();hideFloat();cb(val)}else if(e.key==='Escape')hideFloat()});
+  pop.querySelector('.dpn').addEventListener('change',e=>{if(e.target.value){hideFloat();cb(e.target.value)}});
+  pop.addEventListener('click',e=>{const c=e.target.closest('[data-dd]');if(!c)return;hideFloat();cb(c.dataset.dd||null)});
+  setTimeout(()=>inp.focus(),30);return pop}
+
+/* day chrome on daily notes: ‹ dün · tarih · yarın › + week strip; below: Found Dates */
+function dayBarHTML(d){const t=today(),ws=addDays(d,-dowOf(d)),ix=dateIndex();
+  const strip=Array.from({length:7},(_,i)=>{const s=addDays(ws,i),dp=dailyOf(s),has=(dp&&dp.blocks.some(b=>plain(b.h).trim()))||ix.has(s);
+    return`<button class="wd${s===d?' on':''}${s===t?' tdy':''}" data-day="${s}" aria-label="${esc(fmtLong(s))}"><span>${DOW[i]}</span><b>${pd(s).getDate()}</b><i${has?' class="has"':''}></i></button>`}).join('');
+  return`<div class="daybar"><div class="db-nav"><button class="tb" data-day="${addDays(d,-1)}" title="Önceki gün · Alt+," aria-label="Önceki gün">${IC.chevL}</button>
+    <button class="db-date" data-act="jump" title="Bir güne git (yaz: yarın, cuma, 15 kasım…)">${esc(dayLabel(d)===fmtShort(d)?fmtWd(d):dayLabel(d))}<small>${esc(fmtShort(d))} ${pd(d).getFullYear()}</small></button>
+    <button class="tb" data-day="${addDays(d,1)}" title="Sonraki gün · Alt+." aria-label="Sonraki gün">${IC.chevR}</button>
+    ${d!==t?`<button class="tb db-t" data-day="${t}">Bugün</button>`:''}<a class="tb db-t" href="#timeline">Zaman çizelgesi</a></div><div class="db-wk">${strip}</div></div>`}
+function foundHTML(d){const e=dateIndex().get(d);if(!e)return`<div class="found empty"><div class="sh"><span>Bu güne tarihli</span><span class="rule"></span></div><p>Başka sayfalarda bu güne tarih verilmiş bir şey yok. Bir satıra <b>/tarih</b> yazarak ya da “15 Kasım” gibi bir tarih yazarak buraya düşürebilirsin.</p></div>`;
+  const by=new Map();for(const o of e.blocks){if(!by.has(o.p.id))by.set(o.p.id,[]);by.get(o.p.id).push(o.b)}
+  return`<div class="found"><div class="sh"><span>Bu güne tarihli</span><span class="rule"></span><span>${e.blocks.length+e.pages.length}</span></div>
+    ${e.pages.map(o=>`<a class="fd-pg" href="#p/${o.p.id}"><span class="e">${iconOf(o.p)}</span>${esc(titleOf(o.p))}<small>sayfa</small></a>`).join('')}
+    ${[...by].map(([pid,bs])=>{const p=pages.get(pid);return`<div class="fd-g"><a class="fd-h" href="#p/${pid}"><span class="e">${iconOf(p)}</span>${esc(titleOf(p))}${isDaily(p)?` <small>${esc(dayLabel(p.date))}</small>`:''}</a>
+      ${bs.map(b=>`<div class="fd-r${b.t==='todo'&&b.c?' done':''}" data-ref="${pid}:${b.id}">${b.t==='todo'?`<button class="chk${b.c?' on':''}" data-fact="chk" aria-label="Tamamlandı">${IC.check}</button>`:'<span class="fd-dot"></span>'}
+        <span class="fd-t">${esc(plain(b.h)||'(boş satır)')}</span><button class="fd-b" data-fact="move" title="Bu günün notuna taşı">Buraya taşı</button><button class="fd-b" data-fact="date" title="Tarihi değiştir">Tarih</button></div>`).join('')}</div>`}).join('')}</div>`}
+function refRow(el){const[pid,bid]=(el.closest('[data-ref]')?.dataset.ref||'').split(':');const p=pages.get(pid),b=p?.blocks.find(x=>x.id===bid);return p&&b?{p,b}:null}
+
+/* ── Zaman çizelgesi: 30 gün + 12 ay; sürükle bırak ile planla ── */
+let tlStart=null;
+function chipHTML(o,kind){if(o.b){const b=o.b;return`<div class="tlc${b.t==='todo'&&b.c?' done':''}${kind?' '+kind:''}" draggable="true" data-ref="${o.p.id}:${b.id}" title="${esc(titleOf(o.p))}">${b.t==='todo'?`<span class="bx${b.c?' on':''}"></span>`:'<span class="dt"></span>'}<span class="tt">${esc(plain(b.h).slice(0,80)||'(boş)')}</span><small>${iconOf(o.p)} ${esc(titleOf(o.p).slice(0,18))}</small></div>`}
+  return`<div class="tlc pg" draggable="true" data-pref="${o.p.id}"><span class="e">${iconOf(o.p)}</span><span class="tt">${esc(titleOf(o.p))}</span><small>sayfa</small></div>`}
+function renderTimeline(){
+  setCrumb(IC.cal,'Zaman çizelgesi');const t=today();if(!tlStart)tlStart=t;
+  const ix=dateIndex(),days=[];const end=tlStart===t?addDays(t,29):(()=>{const d=pd(tlStart);return ymd(new Date(d.getFullYear(),d.getMonth()+1,0))})();
+  for(let d=tlStart;d<=end;d=addDays(d,1))days.push(d);
+  const months=Array.from({length:12},(_,i)=>{const d=new Date();d.setDate(1);d.setMonth(d.getMonth()+i);return ymd(d)});
+  // unscheduled = open todos with no date anywhere outside day notes · overdue = open todos on past days
+  const loose=[],late=[];
+  for(const p of pages.values())for(const b of p.blocks){if(b.t!=='todo'||b.c||!plain(b.h).trim())continue;const ds=datesOf(b);
+    if(isDaily(p)){if(p.date<t&&!ds.some(x=>x>=t))late.push({p,b})}else if(!ds.length)loose.push({p,b});else if(ds.every(x=>x<t))late.push({p,b})}
+  const rows=days.map(d=>{const dp=dailyOf(d),own=dp?dp.blocks.filter(b=>(b.t==='todo'||b.t==='bullet'||b.t==='p')&&plain(b.h).trim()).slice(0,8).map(b=>({p:dp,b})):[],e=ix.get(d);
+    const items=[...own.map(o=>chipHTML(o)),...(e?e.pages.map(o=>chipHTML(o)):[]),...(e?e.blocks.map(o=>chipHTML(o,'fd')):[])];
+    const wk=dowOf(d)>4;return`<div class="tlr${d===t?' tdy':''}${wk?' wk':''}${dowOf(d)===0?' mon':''}" data-tday="${d}">
+      <button class="tld" data-day="${d}" title="${esc(fmtLong(d))} notunu aç"><b>${pd(d).getDate()}</b><span>${esc(d===t?'Bugün':d===addDays(t,1)?'Yarın':DOW[dowOf(d)])}</span>${pd(d).getDate()===1||d===days[0]?`<small>${MONTHS[pd(d).getMonth()].slice(0,3)}</small>`:''}</button>
+      <div class="tli">${items.join('')||'<span class="tle">—</span>'}</div></div>`}).join('');
+  $('#view').innerHTML=`<div class="wide tl"><div class="tl-h"><h1>Zaman çizelgesi</h1><p>Önümüzdeki günler tek ekranda. Bir satırı bir güne sürükle; günün notuna tıkla, o gün açılsın.</p>
+      <div class="tl-m">${months.map((m,i)=>`<button class="pill${(i===0&&tlStart===t)||(i>0&&tlStart===m)?' on':''}" data-tlm="${i?m:t}">${i===0?'30 gün':MONTHS[pd(m).getMonth()]+(pd(m).getFullYear()!==pd(t).getFullYear()?' '+pd(m).getFullYear():'')}</button>`).join('')}</div></div>
+    <div class="tl-b"><aside class="tl-side">
+      <div class="sh"><span>Tarihsiz yapılacaklar</span><span class="rule"></span><span>${loose.length}</span></div><div class="tl-pool" data-pool>${loose.slice(0,40).map(o=>chipHTML(o)).join('')||'<p class="tle">Hepsi planlanmış ✓</p>'}</div>
+      ${late.length?`<div class="sh" style="margin-top:18px"><span>Geride kalanlar</span><span class="rule"></span><span>${late.length}</span></div><div class="tl-pool">${late.slice(0,30).map(o=>chipHTML(o,'late')).join('')}</div>`:''}
+      <p class="tl-tip">${matchMedia('(hover:none)').matches?'Bir satıra dokun → tarih seç.':'Sürükle → bir güne bırak. Gün notundaki satır o güne taşınır; başka sayfadaki satır yerinde kalır, sadece tarih alır.'}</p></aside>
+      <div class="tl-days">${rows}</div></div></div>`;
+  stagger('.tlr');
+}
+function scheduleRef(ref,pref,d){
+  if(pref){const p=pages.get(pref);if(!p)return;p.date=d;touch(p);toast(`${titleOf(p)} → ${dayLabel(d)}`);return}
+  const[pid,bid]=ref.split(':'),p=pages.get(pid),b=p?.blocks.find(x=>x.id===bid);if(!b)return;
+  if(isDaily(p))moveToDay(p,b,d);else{setBlockDate(p,b,d);toast(`→ ${dayLabel(d)}`)}}
+// timeline + found list interactions
+$('#view').addEventListener('click',e=>{
+  if(view==='timeline'){const m=e.target.closest('[data-tlm]');if(m){tlStart=m.dataset.tlm;renderTimeline();return}
+    const dd=e.target.closest('[data-day]');if(dd){openDay(dd.dataset.day);return}
+    const c=e.target.closest('.tlc');if(c){if(matchMedia('(hover:none)').matches||e.altKey){datePop(c,null,d=>{if(d){scheduleRef(c.dataset.ref,c.dataset.pref,d);renderTimeline()}},{title:'Hangi güne?',clear:false});return}
+      if(c.dataset.pref)go('#p/'+c.dataset.pref);else{const[pid,bid]=c.dataset.ref.split(':');pendingFocus=bid;go('#p/'+pid)}return}}
+  if(view==='page'&&P){const dy=e.target.closest('.daybar [data-day]');if(dy){openDay(dy.dataset.day);return}
+    if(e.target.closest('[data-act=jump]')){datePop(e.target.closest('[data-act=jump]'),P.date,d=>d&&openDay(d),{title:'Hangi güne gidelim?',clear:false});return}
+    const fa=e.target.closest('[data-fact]');if(fa){const o=refRow(fa);if(!o)return;const a=fa.dataset.fact;
+      if(a==='chk'){o.b.c=!o.b.c;touch(o.p);fa.classList.toggle('on',o.b.c);fa.closest('.fd-r').classList.toggle('done',o.b.c);return}
+      if(a==='move'){moveToDay(o.p,o.b,P.date);renderPage();return}
+      if(a==='date'){datePop(fa,o.b.d||P.date,d=>{setBlockDate(o.p,o.b,d);renderPage()});return}}
+    const bd=e.target.closest('[data-act=bdate]');if(bd){const b=blockOf(bd.closest('.blk').dataset.id);datePop(bd,b.d,d=>setBlockDate(P,b,d));return}}
+},true);
+$('#view').addEventListener('dragstart',e=>{const c=e.target.closest('.tlc');if(!c)return;e.dataTransfer.setData('text/x-ref',c.dataset.ref||'');e.dataTransfer.setData('text/x-pref',c.dataset.pref||'');e.dataTransfer.effectAllowed='move';c.classList.add('dragging')});
+$('#view').addEventListener('dragend',e=>{e.target.closest?.('.tlc')?.classList.remove('dragging');$$('.tlr.over').forEach(x=>x.classList.remove('over'))});
+$('#view').addEventListener('dragover',e=>{const r=e.target.closest('.tlr');if(!r||![...e.dataTransfer.types].includes('text/x-ref'))return;e.preventDefault();$$('.tlr.over').forEach(x=>x!==r&&x.classList.remove('over'));r.classList.add('over')});
+$('#view').addEventListener('drop',e=>{const r=e.target.closest('.tlr');if(!r)return;const ref=e.dataTransfer.getData('text/x-ref'),pref=e.dataTransfer.getData('text/x-pref');if(!ref&&!pref)return;e.preventDefault();
+  scheduleRef(ref,pref,r.dataset.tday);renderTimeline();const nr=$(`.tlr[data-tday="${r.dataset.tday}"]`);if(nr)anim(nr,[{background:'var(--sel)'},{background:'transparent'}],{duration:900,easing:EASE})});
+let pendingFocus=null;
+// keyboard: Alt+T today, Alt+, / Alt+. previous / next day
+addEventListener('keydown',e=>{if(!started||!$('#gate').hidden||!e.altKey||e.ctrlKey||e.metaKey)return;
+  if(e.code==='KeyT'){e.preventDefault();openDay(today())}
+  else if((e.code==='Comma'||e.code==='Period')&&view==='page'&&isDaily(P)){e.preventDefault();openDay(addDays(P.date,e.code==='Comma'?-1:1))}});
 
 /* ── Page view & editor ───────────────────────────────────── */
 let P=null;
@@ -709,14 +940,16 @@ function blockHTML(b){
   const txt=`<div class="txt" contenteditable="true" data-f="h" data-ph="${ph}" spellcheck="${b.t==='code'?'false':'true'}">${b.t==='code'?esc(plain(b.h)):clean(b.h)}</div>`;
   if(b.t==='callout')return`<div class="blk" data-id="${b.id}" data-t="callout">${hd}<div class="cw"><span class="co" data-act="co">${b.e||'💡'}</span>${txt}</div></div>`;
   const pre=b.t==='todo'?`<button class="chk${b.c?' on':''}" data-act="chk" tabindex="-1" aria-label="Tamamlandı">${IC.check}</button>`:b.t==='bullet'?'<span class="bul"></span>':b.t==='num'?'<span class="num">1.</span>':'';
-  return`<div class="blk${b.t==='todo'&&b.c?' done':''}" data-id="${b.id}" data-t="${b.t}">${hd}${pre}${txt}</div>`;
+  const dc=b.d?`<button class="bdate${b.d<today()&&!(b.t==='todo'&&b.c)?' late':''}" data-act="bdate" tabindex="-1" contenteditable="false" title="Tarihi değiştir">${IC.cal}${esc(dayLabel(b.d))}</button>`:'';
+  return`<div class="blk${b.t==='todo'&&b.c?' done':''}" data-id="${b.id}" data-t="${b.t}">${hd}${pre}${txt}${dc}</div>`;
 }
 function renumber(){let n=0;P.blocks.forEach(b=>{if(b.t==='num'){n++;const el=$(`.blk[data-id="${b.id}"] .num`);if(el)el.textContent=n+'.'}else n=0})}
 function renderPage(){
   P=pages.get(openId);if(!P)return;
   const star=`<button class="tb${P.fav?' on':''}" data-pact="fav" title="Favori">${IC.star}</button>`;
   setCrumb(iconOf(P),titleOf(P),star+`<button class="tb" data-pact="more" title="Seçenekler">${IC.more}</button>`);
-  $('#view').innerHTML=`<div class="wrap page">
+  const dly=isDaily(P);
+  $('#view').innerHTML=`<div class="wrap page${dly?' daily':''}">${dly?dayBarHTML(P.date):''}
     <div class="pg-head">
       ${P.icon?`<div class="pg-ic" data-act="icon">${P.icon}</div>`:''}
       <div class="pg-tools">${P.icon?'':`<button data-act="icon">☺ İkon ekle</button>`}${P.date?'':`<button data-act="date">${IC.cal} Tarih ekle</button>`}</div>
@@ -724,8 +957,9 @@ function renderPage(){
       <div class="pg-meta">${metaHTML()}</div>
     </div>
     <div class="blocks" id="blocks">${P.blocks.map(blockHTML).join('')}</div>
-    <div style="height:120px;cursor:text" data-act="tail"></div></div>`;
+    <div style="height:${dly?40:120}px;cursor:text" data-act="tail"></div>${dly?foundHTML(P.date):''}</div>`;
   renumber();
+  if(pendingFocus){const b=P.blocks.find(x=>x.id===pendingFocus);pendingFocus=null;if(b)requestAnimationFrame(()=>{const n=nodeOf(b);n?.scrollIntoView({block:'center'});n&&anim(n,[{background:'var(--sel)'},{background:'transparent'}],{duration:1400,easing:EASE});focusBlock(b,null)})}
   if(!P.title&&Date.now()-P.created<3000)requestAnimationFrame(()=>focusEnd($('.pg-title')));
 }
 function metaHTML(){
@@ -927,6 +1161,9 @@ function applySlash(i){
   const s=slash;if(!s)return;const t=s.items[i];if(!t)return;const{b,el,start}=s;closeSlash();
   rangeAt(el,start,caretOff(el)).deleteContents();b.h=normHTML(el.innerHTML);if(!b.h)el.innerHTML='';
   if(t.k==='@date'){setCaret(el,start);document.execCommand('insertText',false,fmtLong(today()));return}
+  if(t.k==='@due'){datePop(nodeOf(b).querySelector('.txt'),b.d,d=>{setBlockDate(P,b,d);focusBlock(b,null)});return}
+  if(t.k==='@today'){b.h=normHTML(el.innerHTML);moveToDay(P,b,today());return}
+  if(t.k==='@move'){b.h=normHTML(el.innerHTML);datePop(nodeOf(b).querySelector('.txt'),null,d=>d&&moveToDay(P,b,d),{title:'Hangi günün notuna?',clear:false});return}
   if(t.k==='@page'){const np=newPage();setCaret(el,start);document.execCommand('insertHTML',false,`<a href="#p/${np.id}">📄 Yeni sayfa</a>&nbsp;`);syncEl(el);toast('Alt sayfa oluşturuldu — bağlantıya tıkla');renderSide();return}
   if(t.k==='divider'){if(!el.textContent){b.t='divider';b.h='';replaceNode(b);insertAfter(b,B('p'))}else insertAfter(b,B('divider')),insertAfter(P.blocks[idx(b)+1],B('p'));return}
   if(t.k==='kv'&&el.textContent){insertAfter(b,B('kv','',{v:''}));return}
@@ -983,6 +1220,9 @@ function blockMenu(b,anchor){
   const p=float(anchor,`<button class="mi" data-bm="up"><span class="bi">${IC.up}</span><span class="tx">Yukarı taşı</span><span class="k">⌥⇧↑</span></button>
     <button class="mi" data-bm="down"><span class="bi">${IC.down}</span><span class="tx">Aşağı taşı</span><span class="k">⌥⇧↓</span></button>
     <button class="mi" data-bm="dup"><span class="bi">${IC.copy}</span><span class="tx">Çoğalt</span></button>
+    <button class="mi" data-bm="due"><span class="bi">${IC.cal}</span><span class="tx">${b.d?'Tarihi değiştir':'Tarih ver'}</span></button>
+    <button class="mi" data-bm="today"><span class="bi">${IC.sun}</span><span class="tx">Bugüne taşı</span></button>
+    <button class="mi" data-bm="move"><span class="bi">${IC.tl}</span><span class="tx">Bir güne taşı…</span></button>
     <button class="mi danger" data-bm="del"><span class="bi">${IC.trash}</span><span class="tx">Sil</span></button>
     <div class="sep"></div><div class="pop-h">Dönüştür</div>
     <div class="types">${TYPES.filter(t=>t.k!=='divider').map(t=>`<button data-bt="${t.k}" title="${esc(t.l)}" style="${t.k===b.t?'background:var(--hover2);color:var(--ink)':''}">${t.b}</button>`).join('')}</div>`,{w:240});
@@ -991,6 +1231,9 @@ function blockMenu(b,anchor){
     if(t){if(t!==b.t)setType(b,t,null);return}
     if(m==='up')moveBlock(b,-1);else if(m==='down')moveBlock(b,1);
     else if(m==='dup'){const c={...snapshot(b),id:uid()};insertAfter(b,c,null)}
+    else if(m==='due'){datePop(anchor,b.d,d=>setBlockDate(P,b,d))}
+    else if(m==='today'){moveToDay(P,b,today())}
+    else if(m==='move'){datePop(anchor,null,d=>d&&moveToDay(P,b,d),{title:'Hangi günün notuna?',clear:false})}
     else if(m==='del'){const prev=P.blocks[idx(b)-1];const n=nodeOf(b);anim(n,[{opacity:1},{opacity:0,transform:'translateX(-6px)'}],{duration:160,easing:EASE}).finished.then(()=>{removeBlock(b);edited();prev&&focusBlock(prev,null)})}});
 }
 function pageMenu(p,anchor){
@@ -1039,6 +1282,7 @@ function palette(){
     {ic:'☀️',l:'Bugünün notu',run:()=>go('#today')},
     {ic:'✍️',l:'Yeni sayfa',run:()=>go('#p/'+newPage().id)},
     {ic:'🗓️',l:'Takvim',run:()=>go('#cal')},
+    {ic:'🧭',l:'Zaman çizelgesi',run:()=>go('#timeline')},
     {ic:'🧩',l:'Şablonlar',run:()=>go('#tpl')},
     {ic:'🏠',l:'Ana sayfa',run:()=>go('#home')},
     {ic:'◐',l:'Temayı değiştir',run:()=>toggleTheme()},
@@ -1049,7 +1293,8 @@ function palette(){
       const score=!q?1:t.startsWith(q)?3:t.includes(q)?2:body.includes(q)?1:0;return{p,score}}).filter(x=>x.score).sort((a,b)=>b.score-a.score||b.p.updated-a.p.updated).slice(0,q?12:6);
     const cm=cmds.filter(c=>!q||c.l.toLocaleLowerCase('tr').includes(q));
     const tp=q?TPL.filter(t=>t.n.toLocaleLowerCase('tr').includes(q)).map(t=>({ic:t.e,l:'Şablon: '+t.n,run:()=>go('#p/'+newPage({tpl:t.k}).id)})):[];
-    items=[...ps.map(({p})=>({ic:iconOf(p),l:titleOf(p),sub:p.date?dayLabel(p.date):rel(p.updated),run:()=>go('#p/'+p.id)})),...cm,...tp];
+    const jd=parseTR(inp.value);
+    items=[...(jd?[{ic:'📅',l:`${dayLabelLong(jd)} — gününe git`,run:()=>openDay(jd)}]:[]),...ps.map(({p})=>({ic:iconOf(p),l:titleOf(p),sub:p.date?dayLabel(p.date):rel(p.updated),run:()=>go('#p/'+p.id)})),...cm,...tp];
     if(q&&!items.length)items=[{ic:'✍️',l:`“${inp.value.trim()}” adlı sayfa oluştur`,run:()=>go('#p/'+newPage({title:inp.value.trim()}).id)}];
     sel=Math.min(sel,items.length-1);
     let html='',i=0;const sec=(h,arr)=>{if(!arr.length)return;html+=`<div class="pop-h">${h}</div>`;arr.forEach(it=>{html+=`<button class="mi${i===sel?' act':''}" data-i="${i}"><span class="ic">${it.ic}</span><span class="tx">${esc(it.l)}</span>${it.sub?`<span class="k">${esc(it.sub)}</span>`:''}</button>`;i++})};

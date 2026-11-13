@@ -531,5 +531,94 @@
     "text": "Telefonda küçük yazı ve düğmeler (önceki kayıttan devam)"
    }
   ]
+ },
+ {
+  "at": "2026-11-13T23:00:11",
+  "change": "Notlar'a Workflowy tarzı günler + zaman çizelgesi; hub'a Canlı ada, radyal menü, Sakin mod; yeni Netleştir uygulaması",
+  "scores": {
+   "Notlar telefon": {
+    "before": 96,
+    "after": 100
+   },
+   "Notlar gün sayfası telefon": {
+    "before": 91,
+    "after": 100
+   },
+   "Notlar zaman çizelgesi telefon": {
+    "before": 89,
+    "after": 100
+   },
+   "Netleştir telefon": {
+    "before": 94,
+    "after": 100
+   },
+   "Netleştir bilgisayar": {
+    "before": 94,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Notlar",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Yapılacak kutucukları 18px'ti, parmakla zor",
+    "fix": "24px, telefonda 36px dokunma alanı (görünüş aynı)"
+   },
+   {
+    "app": "Notlar",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Zaman çizelgesinde boş gün çizgisi ve 'bugün' rakamı okunmuyordu",
+    "fix": "Daha koyu renkler"
+   },
+   {
+    "app": "Notlar",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Telefonda eski küçük yazılar ve menü düğmeleri (uzun süredir açıktı)",
+    "fix": "12px yazı, 40px düğme"
+   },
+   {
+    "app": "Notlar",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Telefonda zaman çizelgesinin ay seçicisi ekranı dolduruyordu",
+    "fix": "Yana kayan tek satır; günler önce, tarihsizler sonra"
+   },
+   {
+    "app": "Netleştir",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Bağlam anahtarı 22px'ti",
+    "fix": "26px, telefonda 36px"
+   },
+   {
+    "app": "Hub",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Sakin moddaki küçük simgeler soluktu",
+    "fix": "Koyu gri"
+   },
+   {
+    "app": "Hub",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Telefonda uzaklaştırılmış widget düğmeleri çok küçük kalıyordu",
+    "fix": "Uzaktayken widget'a ilk dokunuş önce ona yakınlaşıyor"
+   },
+   {
+    "app": "Hub",
+    "sev": "info",
+    "status": "open",
+    "text": "Uzaklaştırınca widget içi düğmeler doğal olarak küçülüyor; Denetçi bunu o anki yakınlığa göre ölçer"
+   },
+   {
+    "app": "Netleştir",
+    "sev": "info",
+    "status": "open",
+    "text": "Ücretsiz yardım (Pollinations) yazılan metni o servise gönderir; gizli bilgi için Claude anahtarı ya da çevrimdışı seçilmeli"
+   }
+  ]
  }
 ]

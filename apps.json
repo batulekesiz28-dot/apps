@@ -58,6 +58,14 @@
    "color": "amber",
    "desc": "Ünlü uygulamalar ve Reddit/forumlar araştırılarak hub için öneriler",
    "ai": true
+  },
+  {
+   "slug": "netlestir",
+   "name": "Netleştir",
+   "icon": "pen",
+   "color": "blue",
+   "desc": "Yarım yamalak yazdığın isteği yapay zekâ yardımıyla Claude'un en iyi anlayacağı net bir isteğe çevirir",
+   "ai": true
   }
  ]
 }

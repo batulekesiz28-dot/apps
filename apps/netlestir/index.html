@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Netleştir</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>try{const t=JSON.parse(localStorage.getItem('notlar:theme'));document.documentElement.dataset.theme=t||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch{document.documentElement.dataset.theme='light'}</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#FFFFFF;--bg2:#F8F8F7;--card:#FFFFFF;--ink:#18181B;--ink2:#52525B;--ink3:#6E6E77;--ink4:#E4E4E7;--line:rgba(0,0,0,.06);--line2:rgba(0,0,0,.1);--hover:rgba(0,0,0,.04);
+  --font:'Geist',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;--mono:'Geist Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --out:cubic-bezier(.16,1,.3,1);--spring:cubic-bezier(.3,1.4,.5,1);--acc:#2453C4;--acc2:#EAF1FF;--ok:#15803D;--warn:#B45309;color-scheme:light}
+[data-theme=dark]{--bg:#0E0E10;--bg2:#141416;--card:#18181B;--ink:#EDEDEF;--ink2:#A1A1AA;--ink3:#8B8B94;--ink4:#2A2A2F;--line:rgba(255,255,255,.06);--line2:rgba(255,255,255,.1);--hover:rgba(255,255,255,.05);--acc:#8DB0FF;--acc2:#1A2440;--ok:#4ADE80;--warn:#FBBF24;color-scheme:dark}
+html,body{background:var(--bg)}
+body{font-family:var(--font);color:var(--ink);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+button,input,textarea,select{font:inherit;color:inherit}
+button{background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+main{max-width:1180px;margin:0 auto;padding:calc(26px + env(safe-area-inset-top)) 22px 80px}
+header{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+.ttl{flex:1;min-width:240px}
+.ttl h1{font-size:28px;font-weight:500;letter-spacing:-.03em;display:flex;align-items:center;gap:10px}
+.ttl h1 i{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#2453C4,#7C3AED);display:grid;place-items:center}
+.ttl h1 i svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.ttl p{color:var(--ink2);font-size:13.5px;margin-top:6px;max-width:640px}
+.eng{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 12px 0 10px;border-radius:12px;box-shadow:inset 0 0 0 .5px var(--line2);font-size:13px;color:var(--ink2)}
+.eng b{color:var(--ink);font-weight:550}.eng i{width:8px;height:8px;border-radius:50%;background:var(--ok)}.eng i.off{background:var(--warn)}
+.eng:hover{background:var(--hover)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:16px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--card);border-radius:20px;box-shadow:0 0 0 .5px var(--line2),0 10px 30px -22px rgba(0,0,0,.25);padding:18px}
+.h{font:500 11.5px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.h .sp{flex:1}
+textarea.raw{width:100%;min-height:190px;resize:vertical;border:0;border-radius:14px;padding:14px;background:var(--bg2);box-shadow:inset 0 0 0 .5px var(--line);font-size:15px;line-height:1.6;outline:0}
+textarea.raw:focus{box-shadow:inset 0 0 0 1px var(--acc)}
+.seg{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.seg button{height:36px;padding:0 12px;border-radius:11px;font-size:13px;box-shadow:inset 0 0 0 .5px var(--line2);display:inline-flex;align-items:center;gap:6px}
+.seg button:hover{background:var(--hover)}.seg button.on{background:var(--ink);color:var(--bg);box-shadow:none}
+.opt{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:13px;color:var(--ink2);flex-wrap:wrap}
+.tg{position:relative;width:42px;height:26px;border-radius:13px;background:var(--ink4);transition:background .2s;flex-shrink:0}
+.tg::after{content:'';position:absolute;top:4px;left:4px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .3s var(--spring)}
+.tg.on{background:var(--acc)}.tg.on::after{transform:translateX(16px)}
+label.row{display:flex;align-items:center;gap:10px;cursor:pointer;min-height:36px}
+.go{display:flex;align-items:center;gap:10px;margin-top:16px;flex-wrap:wrap}
+.btn{height:44px;padding:0 18px;border-radius:13px;font-weight:550;display:inline-flex;align-items:center;gap:8px;transition:transform .4s var(--spring),background .2s,opacity .2s}
+.btn:active{transform:scale(.96)}
+.btn.pri{background:var(--ink);color:var(--bg)}
+.btn.sec{box-shadow:inset 0 0 0 .5px var(--line2)}.btn.sec:hover{background:var(--hover)}
+.btn[disabled]{opacity:.5;pointer-events:none}
+.btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.kbd{font:500 11.5px var(--mono);opacity:.7}
+.hint{font-size:12.5px;color:var(--ink3)}
+.out-empty{display:grid;place-items:center;text-align:center;gap:10px;min-height:340px;color:var(--ink3);font-size:13.5px;padding:20px}
+.out-empty b{color:var(--ink);font-size:15px;font-weight:550}
+.under{padding:12px 14px;border-radius:14px;background:var(--acc2);color:var(--ink);font-size:14px;margin-bottom:14px}
+.under b{font:600 11.5px var(--mono);letter-spacing:.06em;color:var(--acc);display:block;margin-bottom:3px}
+.tabs{display:flex;gap:4px;margin-bottom:10px;border-bottom:.5px solid var(--line2)}
+.tabs button{height:40px;padding:0 12px;font-size:13px;color:var(--ink3);border-bottom:2px solid transparent;margin-bottom:-.5px}
+.tabs button.on{color:var(--ink);border-color:var(--ink)}
+.tabs .n{font:500 11.5px var(--mono);margin-left:4px}
+textarea.final{width:100%;min-height:360px;resize:vertical;border:0;border-radius:14px;padding:14px;background:var(--bg2);box-shadow:inset 0 0 0 .5px var(--line);font:13.5px/1.65 var(--mono);outline:0;color:var(--ink)}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.qs{display:grid;gap:10px}
+.q{padding:12px 14px;border-radius:14px;box-shadow:inset 0 0 0 .5px var(--line2)}
+.q p{font-size:14px;font-weight:550}
+.q small{display:block;font-size:12.5px;color:var(--ink3);margin-top:2px}
+.q .ch{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.q .ch button{min-height:34px;padding:4px 11px;border-radius:10px;font-size:13px;box-shadow:inset 0 0 0 .5px var(--line2);text-align:left}
+.q .ch button:hover{background:var(--hover)}.q .ch button.on{background:var(--ink);color:var(--bg);box-shadow:none}
+.q input{width:100%;margin-top:8px;height:36px;border:0;border-radius:10px;padding:0 10px;background:var(--bg2);box-shadow:inset 0 0 0 .5px var(--line);outline:0;font-size:13px}
+.chg{display:grid;gap:6px;font-size:13.5px;color:var(--ink2)}
+.chg li{list-style:none;padding-left:18px;position:relative}.chg li::before{content:'✓';position:absolute;left:0;color:var(--ok);font-weight:700}
+.busy{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--ink2);min-height:340px;justify-content:center;flex-direction:column}
+.busy .orb{width:46px;height:46px;border-radius:50%;background:conic-gradient(from 0deg,#2453C4,#7C3AED,#EC4899,#2453C4);animation:spin 1.2s linear infinite;-webkit-mask:radial-gradient(circle,transparent 15px,#000 16px);mask:radial-gradient(circle,transparent 15px,#000 16px)}
+@keyframes spin{to{transform:rotate(1turn)}}
+.hist{margin-top:16px}
+.hi{display:flex;align-items:center;gap:10px;width:100%;min-height:44px;padding:6px 10px;border-radius:12px;text-align:left}
+.hi:hover{background:var(--hover)}
+.hi b{flex:1;min-width:0;font-weight:500;font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hi small{font:500 12px var(--mono);color:var(--ink3);flex-shrink:0}
+.note{font-size:12.5px;color:var(--ink3);margin-top:10px;line-height:1.5}
+.note.warn{color:var(--warn)}
+.scrim{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.35);display:grid;place-items:center;padding:16px}
+.sheet{width:min(520px,100%);background:var(--card);border-radius:20px;padding:20px;box-shadow:0 30px 80px -20px rgba(0,0,0,.5);display:grid;gap:12px;max-height:90vh;overflow:auto}
+.sheet h2{font-size:18px;font-weight:600;letter-spacing:-.01em}
+.sheet .opt2{display:grid;gap:8px}
+.sheet .o{display:flex;gap:10px;align-items:flex-start;padding:12px;border-radius:14px;box-shadow:inset 0 0 0 .5px var(--line2);cursor:pointer;text-align:left;width:100%}
+.sheet .o.on{box-shadow:inset 0 0 0 1.5px var(--acc)}
+.sheet .o b{display:block;font-weight:600}.sheet .o small{font-size:12.5px;color:var(--ink3)}
+.sheet input,.sheet select{width:100%;height:40px;border:0;border-radius:10px;padding:0 12px;background:var(--bg2);box-shadow:inset 0 0 0 .5px var(--line);outline:0}
+.sheet .r{display:flex;justify-content:flex-end;gap:8px}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:11px 16px;border-radius:13px;font-size:13px;z-index:80;box-shadow:0 14px 34px -12px rgba(0,0,0,.4);max-width:calc(100vw - 32px)}
+a{color:var(--acc)}
+@media (max-width:600px){main{padding:calc(16px + env(safe-area-inset-top)) 14px 60px}.seg button{height:40px}.btn{height:46px}.tabs button{height:44px}.q .ch button{min-height:40px}.eng{height:44px}label.row{min-height:44px}.tg{width:52px;height:36px;border-radius:18px}.tg::after{top:5px;left:5px;width:26px;height:26px}.tg.on::after{transform:translateX(16px)}[data-clr]{min-height:40px!important;padding:0 10px}.hi small{font-size:12px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="ttl"><h1><i><svg viewBox="0 0 16 16"><path d="M2.5 13.5l2.8-.6 7.4-7.4a1.4 1.4 0 0 0-2-2L3.3 10.9z"/><path d="M12.5 10.5l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6zM3 2l.4 1 1 .4-1 .4L3 4.8l-.4-1-1-.4 1-.4z"/></svg></i>Netleştir</h1>
+      <p>Ne istediğini yarım yamalak, hatalı, karışık yaz. Ben yazım hatalarını düzeltip ne istediğini çıkarırım ve Claude’un en iyi anlayacağı biçimde yeniden yazarım: amaç, bağlam, istekler, sınırlar, çıktı biçimi. Emin olamadığım yerleri sana soru olarak gösteririm.</p></div>
+    <button class="eng" id="engBtn" aria-label="Yardımcı yapay zekâ ayarı"><i id="engDot"></i><span id="engTxt"></span></button>
+  </header>
+  <div class="grid">
+    <section class="card">
+      <div class="h">Ne istiyorsun?<span class="sp"></span><span id="cnt"></span></div>
+      <textarea class="raw" id="raw" aria-label="İsteğin" placeholder="ör. notlar uygulamasını daa gelişmiş yap workflowy takvimi gibi birde yazdığımı düzgün hale getiren bi uygulma yap"></textarea>
+      <div class="seg" id="kind" role="radiogroup" aria-label="Ne için">
+        <button data-k="code" role="radio">💻 Kod · AppShell</button><button data-k="chat" role="radio">💬 Sohbet / soru</button><button data-k="research" role="radio">🔎 Araştırma</button><button data-k="write" role="radio">✍️ Yazı / metin</button><button data-k="design" role="radio">🎨 Tasarım</button>
+      </div>
+      <div class="opt"><label class="row"><button class="tg" id="ctxTg" role="switch" aria-label="AppShell kurallarını ekle"></button>AppShell kurallarını ve uygulama listesini bağlama ekle</label></div>
+      <div class="go"><button class="btn pri" id="goBtn"><svg viewBox="0 0 16 16"><path d="M8 1.5l1.6 4.2 4.4.3-3.4 2.8 1.1 4.3L8 10.7l-3.7 2.4 1.1-4.3L2 6l4.4-.3z"/></svg>Netleştir <span class="kbd">⌘↵</span></button>
+        <span class="hint" id="goHint"></span></div>
+      <div class="hist" id="hist"></div>
+    </section>
+    <section class="card" id="out" aria-live="polite"></section>
+  </div>
+</main>
+<script>
+'use strict';
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ls={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+const toast=m=>{const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2800)};
+const MODELS=[['claude-sonnet-5-5','Claude Sonnet 5.5 — hızlı ve çok iyi (önerilen)'],['claude-opus-5-5','Claude Opus 5.5 — en titiz, biraz daha yavaş'],['claude-haiku-5-5','Claude Haiku 5.5 — en hızlı, en ucuz']];
+let cfg=ls.get('netlestir:cfg',{engine:'auto',model:'claude-sonnet-5-5',kind:'code',ctx:true});
+let key=ls.get('netlestir:key','');
+let hist=ls.get('netlestir:hist',[]),cur=null,tab='prompt',busy=false,doc=null;
+
+/* ── What “a good request for Claude” means — distilled from Anthropic’s prompting guide ── */
+const KIND={
+  code:{l:'kod / AppShell',out:'Değişiklikleri doğrudan dosyalarda yap; bitince kısa Türkçe özet ver.',crit:'Denetçi (audit/run.py) hata vermez; telefon ve bilgisayarda düzgün görünür; değişiklik commit + push edilir.'},
+  chat:{l:'sohbet / soru',out:'Kısa, net ve doğrudan cevap; gerekirse madde işaretleri.',crit:'Soru eksiksiz cevaplanır; varsayımlar açıkça söylenir.'},
+  research:{l:'araştırma',out:'Kaynaklı özet; her önemli iddianın yanında kaynak; sonunda kaynak listesi.',crit:'Güncel ve güvenilir kaynaklar; çelişkiler belirtilir.'},
+  write:{l:'yazı / metin',out:'İstenen tonda, yayınlanmaya hazır metin.',crit:'Hedef kitleye uygun, akıcı, hatasız.'},
+  design:{l:'tasarım',out:'Görsel tasarım / arayüz; birkaç seçenek gösterilir.',crit:'Modern, sade, okunaklı; telefonda da düzgün.'}};
+const APPSHELL=`AppShell: GitHub Pages’te yayınlanan kişisel hub (repo batulekesiz28-dot/apps). Uygulamalar apps/<slug>/index.html, liste apps.json; tek dosyalık HTML+CSS+JS, Firebase ile senkron (sadece sahibi).
+Kurallar: her değişiklikten sonra Denetçi (python3 audit/run.py) çalıştır, hataları düzelt, audit/log.json’a Türkçe kayıt ekle, sonra commit + push. Metin ≥12px (telefon), dokunma alanı ≥24px (telefonda ≥40px), kontrast ≥4.5:1.
+Galaksi: Denetçi kara delik; etrafında sadece "ai": true uygulamalar döner. Öneriler uygulaması audit/ideas.json’dan beslenir.
+Kullanıcı: Türkçe, kısa ve samimi iletişim; uzun açıklama yerine iş bitsin ister.`;
+let appList='';fetch('../../apps.json',{cache:'no-cache'}).then(r=>r.json()).then(j=>{appList=(j.apps||[]).map(a=>`${a.name}${a.desc?' ('+a.desc+')':''}`).join('; ')}).catch(()=>{});
+
+const META=`Sen bir “istek netleştirici”sin. Kullanıcı Türkçe, aceleyle, yazım hatalarıyla ve yarım cümlelerle ne istediğini yazar. Görevin: bunu Claude’un (bir yapay zekâ asistanı) en iyi anlayacağı, eksiksiz ve net bir isteğe dönüştürmek.
+
+İyi bir istek için Anthropic’in önerdiği ilkeler:
+- Açık ve doğrudan ol: hiçbir şey bilmeyen yetenekli bir yeni çalışana anlatır gibi yaz. Belirsiz kelimeleri somutlaştır.
+- Nedenini söyle: her önemli isteğin arkasındaki amaç yazılırsa Claude daha iyi genelleştirir.
+- Bölümleri XML etiketleriyle ayır: <context>, <task>, <requirements>, <constraints>, <output_format>, <success_criteria>.
+- Ne yapılmamasını değil, ne yapılmasını söyle. Çıktı biçimini açıkça tarif et.
+- Kod/arayüz işlerinde “temel olanla yetinme, eksiksiz ve özenli bir uygulama yap” beklentisini belirt.
+- Kullanıcının söylemediği şeyleri UYDURMA. Emin olmadığın her nokta için makul bir varsayım yap ve onu soru olarak ayrıca listele.
+
+Yapacakların:
+1. Yazım hatalarını ve bozuk Türkçeyi kafanda düzelt; kullanıcının asıl niyetini çıkar.
+2. Birden fazla istek varsa hepsini ayrı ve numaralı maddeler olarak yaz; hiçbirini atlama.
+3. İsteği Türkçe yaz (etiket adları İngilizce kalabilir). Kullanıcının ağzından, Claude’a hitap eden bir istek olsun.
+4. Yalnızca aşağıdaki JSON’u döndür, başka hiçbir şey yazma:
+{"baslik":"en fazla 6 kelime","anlasilan":"1-2 cümle: ne istediğini nasıl anladın","istek":"son istek metni (XML etiketli)","degisiklikler":["neyi düzelttin/netleştirdin — kısa maddeler"],"sorular":[{"soru":"belirsiz nokta","varsayim":"istekte kullandığın varsayım","secenekler":["2-4 kısa seçenek, ilki varsayımın"]}]}`;
+
+function userMsg(raw,answers){const k=KIND[cfg.kind];
+  return`<kullanici_yazdi>\n${raw.trim()}\n</kullanici_yazdi>
+<hedef>Bu istek ${k.l} için. Önerilen çıktı biçimi: ${k.out} Başarı ölçütü örneği: ${k.crit}</hedef>
+${cfg.ctx?`<proje_baglami>\n${APPSHELL}${appList?`\nMevcut uygulamalar: ${appList}`:''}\n</proje_baglami>\nBu bağlamı isteğin <context> bölümüne sadece ilgili kısımlarıyla ekle.`:''}
+${answers&&answers.length?`<kullanici_cevaplari>\n${answers.map(a=>`- ${a.soru} → ${a.cevap}`).join('\n')}\n</kullanici_cevaplari>\nBu cevapları isteğe işle; cevaplanan soruları tekrar sorma.`:''}
+Sadece JSON döndür.`}
+
+/* ── Engines: your Claude key (best) → free relay → offline structure ── */
+async function viaClaude(msg){const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:cfg.model,max_tokens:3000,system:META,messages:[{role:'user',content:msg}]})});
+  const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j?.error?.message||('Claude hatası '+r.status));return(j.content||[]).map(c=>c.text||'').join('')}
+async function viaFree(msg){const body=JSON.stringify({model:'openai',messages:[{role:'system',content:META},{role:'user',content:msg}],response_format:{type:'json_object'}});
+  for(const u of['https://text.pollinations.ai/openai','https://gen.pollinations.ai/v1/chat/completions']){try{const r=await fetch(u,{method:'POST',headers:{'content-type':'application/json'},body});if(!r.ok)continue;const j=await r.json();const t=j?.choices?.[0]?.message?.content;if(t)return t}catch{}}
+  throw new Error('Ücretsiz yardım şu an cevap vermedi')}
+function parseOut(t){const a=t.indexOf('{'),b=t.lastIndexOf('}');if(a<0||b<a)throw new Error('Cevap anlaşılamadı');const o=JSON.parse(t.slice(a,b+1));
+  if(!o.istek)throw new Error('Cevapta istek yok');return{baslik:o.baslik||'İstek',anlasilan:o.anlasilan||'',istek:String(o.istek).trim(),degisiklikler:Array.isArray(o.degisiklikler)?o.degisiklikler:[],sorular:Array.isArray(o.sorular)?o.sorular.filter(q=>q&&q.soru).slice(0,6):[]}}
+// offline: split the request into separate asks and wrap them in the structure (cannot fix typos)
+function offline(raw,answers){const k=KIND[cfg.kind];const txt=raw.replace(/\s+/g,' ').trim();
+  const parts=txt.split(/(?:[.!?;\n]+\s*|,?\s+(?:bir ?de|birde|ayrıca|ayrica|hem de|sonra da|ve ayrıca|ek olarak)\s+)/i).map(s=>s.trim()).filter(s=>s.length>2);
+  const reqs=(parts.length?parts:[txt]).map((p,i)=>`${i+1}. ${p.charAt(0).toLocaleUpperCase('tr')+p.slice(1)}`).join('\n');
+  const ctx=cfg.ctx?`\n<context>\n${APPSHELL}${appList?`\nMevcut uygulamalar: ${appList}`:''}\n</context>\n`:'';
+  const ans=answers&&answers.length?`\n<notes>\n${answers.map(a=>`- ${a.soru}: ${a.cevap}`).join('\n')}\n</notes>\n`:'';
+  return{baslik:txt.split(' ').slice(0,5).join(' ')||'İstek',anlasilan:`${parts.length||1} ayrı istek buldum (çevrimdışı: yazım hatalarını düzeltemedim).`,
+    istek:`${ctx}<task>\nAşağıdaki isteklerin hepsini yap. Belirsiz kalan yerlerde en makul yorumu seç ve hangisini seçtiğini belirt.\n</task>\n\n<requirements>\n${reqs}\n</requirements>\n${ans}\n<output_format>\n${k.out}\n</output_format>\n\n<success_criteria>\n${k.crit}\n</success_criteria>`,
+    degisiklikler:['İsteği ayrı maddelere böldüm','Amaç, çıktı biçimi ve başarı ölçütü bölümlerini ekledim'],sorular:[],offline:true}}
+
+async function run(answers){const raw=$('#raw').value;if(!raw.trim()){toast('Önce ne istediğini yaz');$('#raw').focus();return}if(busy)return;busy=true;
+  cfg.lastRaw=raw;save();paintBusy();const msg=userMsg(raw,answers);let out=null,via='',err='';
+  const order=cfg.engine==='claude'?['claude']:cfg.engine==='free'?['free']:cfg.engine==='offline'?[]:(key?['claude','free']:['free']);
+  for(const e of order){try{out=parseOut(e==='claude'?await viaClaude(msg):await viaFree(msg));via=e;break}catch(x){err=x.message||String(x)}}
+  if(!out){out=offline(raw,answers);via='offline'}
+  out.raw=raw;out.via=via;out.err=via==='offline'&&order.length?err:'';out.at=Date.now();out.kind=cfg.kind;out.answers=answers||[];
+  cur=out;tab='prompt';busy=false;hist=[out,...hist.filter(h=>h.raw!==raw)].slice(0,30);ls.set('netlestir:hist',hist);sync();paint();paintHist()}
+
+/* ── UI ── */
+const VIA={claude:'Claude ile netleştirildi',free:'Ücretsiz yardımla netleştirildi',offline:'Çevrimdışı — sadece yapılandırıldı'};
+function paintBusy(){$('#out').innerHTML=`<div class="busy"><div class="orb"></div><div>Ne demek istediğini çözüyorum…</div><div class="hint">${key&&cfg.engine!=='free'?'Claude düşünüyor':'Ücretsiz yardım soruluyor'}</div></div>`;$('#goBtn').disabled=true}
+function paint(){$('#goBtn').disabled=false;const o=cur;
+  if(!o){$('#out').innerHTML=`<div class="out-empty"><div style="font-size:34px">✦</div><b>Netleştirilmiş isteğin burada çıkacak</b><div>Solda ne istediğini yaz, <b>Netleştir</b>’e bas.<br>Sonra kopyala ya da tek tıkla Claude’da aç.</div></div>`;return}
+  const qn=o.sorular.length;
+  $('#out').innerHTML=`<div class="h">${esc(o.baslik)}<span class="sp"></span><span>${esc(VIA[o.via]||'')}</span></div>
+    ${o.anlasilan?`<div class="under"><b>ŞÖYLE ANLADIM</b>${esc(o.anlasilan)}</div>`:''}
+    <div class="tabs" role="tablist"><button data-t="prompt" class="${tab==='prompt'?'on':''}" role="tab">İstek</button><button data-t="q" class="${tab==='q'?'on':''}" role="tab">Sorular<span class="n">${qn}</span></button><button data-t="chg" class="${tab==='chg'?'on':''}" role="tab">Ne değişti<span class="n">${o.degisiklikler.length}</span></button></div>
+    <div id="pane"></div>
+    ${o.err?`<p class="note warn">Yardım alınamadı (${esc(o.err)}); çevrimdışı yapılandırdım. ${key?'':'Claude anahtarı eklersen çok daha iyi sonuç verir.'}</p>`:''}`;
+  paintPane()}
+function paintPane(){const o=cur,p=$('#pane');if(!p)return;
+  if(tab==='prompt'){p.innerHTML=`<textarea class="final" id="final" aria-label="Netleştirilmiş istek" spellcheck="false">${esc(o.istek)}</textarea>
+    <div class="acts"><button class="btn pri" data-a="copy"><svg viewBox="0 0 16 16"><rect x="5" y="5" width="8.5" height="8.5" rx="2"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg>Kopyala</button>
+      <button class="btn sec" data-a="claude"><svg viewBox="0 0 16 16"><path d="M9.5 2.5h4v4M13.5 2.5L7.5 8.5M12 9.5v4H2.5V4h4"/></svg>Claude’da aç</button>
+      <button class="btn sec" data-a="again"><svg viewBox="0 0 16 16"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2.5v3h-3"/></svg>Yeniden</button></div>
+    <p class="note">İsteği burada düzenleyebilirsin; kopyalarken son hali alınır.${o.sorular.length?` <a href="#" data-t="q">${o.sorular.length} noktada varsayım yaptım</a> — cevaplarsan daha iyi olur.`:''}</p>`;
+    $('#final').addEventListener('input',e=>{o.istek=e.target.value;ls.set('netlestir:hist',hist)})}
+  else if(tab==='q'){p.innerHTML=o.sorular.length?`<div class="qs">${o.sorular.map((q,i)=>`<div class="q" data-qi="${i}"><p>${esc(q.soru)}</p><small>Şimdilik varsaydığım: ${esc(q.varsayim||'—')}</small>
+      <div class="ch">${(q.secenekler||[]).map((s,j)=>`<button data-qs="${j}" class="${q.cevap===s?'on':''}">${esc(s)}</button>`).join('')}</div><input placeholder="ya da kendin yaz…" value="${esc(q.cevap&&!(q.secenekler||[]).includes(q.cevap)?q.cevap:'')}" aria-label="Kendi cevabın"></div>`).join('')}</div>
+      <div class="acts"><button class="btn pri" data-a="answer">Cevaplarla yeniden yaz</button></div>`:'<div class="out-empty" style="min-height:160px">Belirsiz bir nokta bulmadım. 👌</div>';
+    p.querySelectorAll('.q input').forEach(inp=>inp.addEventListener('input',()=>{const q=o.sorular[+inp.closest('.q').dataset.qi];q.cevap=inp.value.trim()||undefined;inp.closest('.q').querySelectorAll('[data-qs]').forEach(b=>b.classList.remove('on'))}))}
+  else p.innerHTML=o.degisiklikler.length?`<ul class="chg">${o.degisiklikler.map(c=>`<li>${esc(c)}</li>`).join('')}</ul><p class="note">İlk yazdığın:</p><p class="note" style="color:var(--ink2)">${esc(o.raw)}</p>`:'<p class="note">Değişiklik listesi yok.</p>'}
+$('#out').addEventListener('click',async e=>{const t=e.target.closest('[data-t]');if(t){e.preventDefault();tab=t.dataset.t;paint();return}
+  const qs=e.target.closest('[data-qs]');if(qs){const box=qs.closest('.q'),q=cur.sorular[+box.dataset.qi],v=q.secenekler[+qs.dataset.qs];q.cevap=q.cevap===v?undefined:v;box.querySelectorAll('[data-qs]').forEach(b=>b.classList.toggle('on',b===qs&&!!q.cevap));box.querySelector('input').value='';return}
+  const a=e.target.closest('[data-a]')?.dataset.a;if(!a)return;
+  if(a==='copy'){await copy(cur.istek);toast('Kopyalandı — sohbete yapıştır')}
+  else if(a==='claude'){const u='https://claude.ai/new?q='+encodeURIComponent(cur.istek);if(u.length>14000){await copy(cur.istek);toast('Uzun olduğu için kopyaladım; Claude’da yapıştır');window.open('https://claude.ai/new','_blank','noopener')}else window.open(u,'_blank','noopener')}
+  else if(a==='again')run(cur.answers);
+  else if(a==='answer'){const ans=cur.sorular.filter(q=>q.cevap).map(q=>({soru:q.soru,cevap:q.cevap}));if(!ans.length){toast('Önce en az bir soruyu cevapla');return}run([...(cur.answers||[]),...ans])}});
+async function copy(t){try{await navigator.clipboard.writeText(t)}catch{const x=document.createElement('textarea');x.value=t;document.body.appendChild(x);x.select();document.execCommand('copy');x.remove()}}
+function paintHist(){$('#hist').innerHTML=hist.length?`<div class="h" style="margin-top:6px">Geçmiş<span class="sp"></span><button class="hint" data-clr style="min-height:32px">Temizle</button></div>${hist.slice(0,8).map((h,i)=>`<button class="hi" data-h="${i}"><b>${esc(h.baslik)}</b><small>${new Date(h.at).toLocaleDateString('tr-TR',{day:'numeric',month:'short'})}</small></button>`).join('')}`:''}
+$('#hist').addEventListener('click',e=>{if(e.target.closest('[data-clr]')){if(confirm('Geçmiş silinsin mi?')){hist=[];ls.set('netlestir:hist',hist);sync();paintHist()}return}
+  const h=e.target.closest('[data-h]');if(h){cur=hist[+h.dataset.h];$('#raw').value=cur.raw;if(cur.kind){cfg.kind=cur.kind;paintKind()}tab='prompt';paint();counter();if(innerWidth<900)$('#out').scrollIntoView({behavior:'smooth'})}});
+function paintKind(){$$('#kind [data-k]').forEach(b=>{b.classList.toggle('on',b.dataset.k===cfg.kind);b.setAttribute('aria-checked',b.dataset.k===cfg.kind)});$('#ctxTg').classList.toggle('on',!!cfg.ctx);$('#ctxTg').setAttribute('aria-checked',!!cfg.ctx)}
+$('#kind').addEventListener('click',e=>{const b=e.target.closest('[data-k]');if(!b)return;cfg.kind=b.dataset.k;if(cfg.kind==='code')cfg.ctx=true;save();paintKind()});
+$('#ctxTg').closest('label').addEventListener('click',e=>{e.preventDefault();cfg.ctx=!cfg.ctx;save();paintKind()});
+function save(){ls.set('netlestir:cfg',cfg)}
+function engLabel(){const e=cfg.engine;return e==='offline'?['off','Çevrimdışı']:e==='free'?['','Ücretsiz yardım']:key?['',`Claude · ${(MODELS.find(m=>m[0]===cfg.model)||MODELS[0])[1].split(' —')[0].replace('Claude ','')}`]:['','Ücretsiz yardım']}
+function paintEng(){const[c,t]=engLabel();$('#engDot').className=c;$('#engTxt').innerHTML=`Yardım: <b>${esc(t)}</b>`;$('#goHint').textContent=key||cfg.engine==='free'?'':'İpucu: Claude anahtarı eklersen sonuç çok daha iyi olur →'}
+$('#engBtn').onclick=engSheet;$('#goHint').onclick=engSheet;
+function engSheet(){const s=document.createElement('div');s.className='scrim';let eng=cfg.engine;
+  s.innerHTML=`<div class="sheet" role="dialog" aria-label="Yardım ayarları"><h2>Dışarıdan yardım</h2>
+    <div class="opt2">${[['auto','Otomatik (önerilen)','Claude anahtarı varsa Claude, yoksa ücretsiz yardım; ikisi de olmazsa çevrimdışı.'],['claude','Sadece Claude','En iyi sonuç. Kendi Anthropic API anahtarınla çalışır, ücreti senin hesabından düşer (istek başı birkaç kuruş).'],['free','Ücretsiz yardım','Anahtarsız, ücretsiz bir yapay zekâ servisi (Pollinations). Yazdığın metin o servise gider; gizli şey yazma. Bazen yavaş ya da kapalı olabilir.'],['offline','Çevrimdışı','İnternete hiçbir şey gitmez; isteği sadece bölümlere ayırır, yazım hatalarını düzeltemez.']].map(([k,b,d])=>`<button class="o${eng===k?' on':''}" data-e="${k}"><span><b>${b}</b><small>${d}</small></span></button>`).join('')}</div>
+    <label class="hint" for="kIn">Anthropic API anahtarı — sadece bu cihazda saklanır, hiçbir yere kaydedilmez</label><input id="kIn" type="password" placeholder="sk-ant-…" value="${esc(key)}" autocomplete="off">
+    <label class="hint" for="mIn">Model</label><select id="mIn">${MODELS.map(([v,l])=>`<option value="${v}"${v===cfg.model?' selected':''}>${esc(l)}</option>`).join('')}</select>
+    <p class="hint">Anahtarı <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a> → API Keys’ten alırsın.</p>
+    <div class="r"><button class="btn sec" data-x>Vazgeç</button><button class="btn pri" data-ok>Kaydet</button></div></div>`;
+  document.body.appendChild(s);
+  s.addEventListener('click',e=>{const o=e.target.closest('[data-e]');if(o){eng=o.dataset.e;s.querySelectorAll('[data-e]').forEach(x=>x.classList.toggle('on',x===o));return}
+    if(e.target===s||e.target.closest('[data-x]')){s.remove();return}
+    if(e.target.closest('[data-ok]')){key=s.querySelector('#kIn').value.trim();ls.set('netlestir:key',key);cfg.engine=eng;cfg.model=s.querySelector('#mIn').value;save();paintEng();s.remove();toast('Kaydedildi')}});
+  s.addEventListener('keydown',e=>{if(e.key==='Escape')s.remove()});setTimeout(()=>s.querySelector('[data-ok]').focus(),30)}
+const counter=()=>{const n=$('#raw').value.trim().length;$('#cnt').textContent=n?n+' karakter':''};
+$('#raw').addEventListener('input',()=>{counter();cfg.lastRaw=$('#raw').value;clearTimeout(counter.t);counter.t=setTimeout(save,500)});
+$('#raw').addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key==='Enter'){e.preventDefault();run()}});
+$('#goBtn').onclick=()=>run();
+// history follows the hub account when already signed in there (same site → shared login). Keys never leave the device.
+const FB={apiKey:'AIzaSyDpJc9g4XDBq32T9Pf1UKbuhzRmnx__mak',authDomain:'apps-f1cfd.firebaseapp.com',projectId:'apps-f1cfd'};
+const loadScript=src=>new Promise((ok,no)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=no;document.head.appendChild(s)});
+async function cloud(){if(new URLSearchParams(location.search).has('local')||!/^https?:$/.test(location.protocol))return;
+  try{const b='https://www.gstatic.com/firebasejs/10.12.2/';await loadScript(b+'firebase-app-compat.js');await Promise.all([loadScript(b+'firebase-auth-compat.js'),loadScript(b+'firebase-firestore-compat.js')]);
+    if(!firebase.apps.length)firebase.initializeApp(FB);
+    firebase.auth().onAuthStateChanged(u=>{if(!u)return;doc=firebase.firestore().collection('hub').doc('prompts');
+      doc.onSnapshot(s=>{const d=s.data();if(d&&Array.isArray(d.hist)&&!s.metadata.hasPendingWrites){const m=new Map([...d.hist,...hist].map(h=>[h.at,h]));hist=[...m.values()].sort((a,b)=>b.at-a.at).slice(0,30);ls.set('netlestir:hist',hist);paintHist()}},()=>{})})}catch{}}
+function sync(){if(doc)doc.set({hist:hist.map(h=>({...h})),updated:Date.now()},{merge:true}).catch(()=>{})}
+addEventListener('storage',e=>{if(e.key==='notlar:theme')document.documentElement.dataset.theme=JSON.parse(e.newValue)||'light'});
+// a request can arrive from the hub (#q=...)
+const hq=new URLSearchParams(location.hash.slice(1)).get('q');
+$('#raw').value=hq||cfg.lastRaw||'';counter();paintKind();paintEng();paint();paintHist();cloud();
+if(hq){history.replaceState(null,'',location.pathname+location.search);setTimeout(()=>run(),200)}
+</script>
+</body>
+</html>

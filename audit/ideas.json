@@ -655,6 +655,78 @@
     }
    ],
    "kind": "gap"
+  },
+  {
+   "id": "notesDigest",
+   "kind": "gap",
+   "app": "Notlar",
+   "area": "Takvim",
+   "title": "Sabah özeti",
+   "gap": "Takvim artık var ama günün planını görmek için uygulamayı açman gerekiyor.",
+   "best": [
+    {
+     "n": "Workflowy",
+     "how": "Today Digest: takvimde o gün ne varsa sabah 8’de e-postayla özet olarak gönderiyor."
+    }
+   ],
+   "why": "Gün başlamadan planı görmek, hiç açmadan bile işleri hatırlatıyor.",
+   "what": "Sabah hub ilk açıldığında Canlı ada genişleyip bugünün işlerini ve tarihli satırları 5 saniye gösterir; istersen telefon bildirimi.",
+   "effort": "S",
+   "impact": 2,
+   "sources": [
+    {
+     "t": "Workflowy 2026.05 — Today Digest",
+     "u": "https://blog.workflowy.com/2026-05-timeline-today-digest-ios-quick-add-and-more/amp/"
+    }
+   ]
+  },
+  {
+   "id": "notesGcal",
+   "kind": "gap",
+   "app": "Notlar",
+   "area": "Takvim",
+   "title": "Google Takvim etkinlikleri gün notunda",
+   "gap": "Google Takvim sadece hub widget’ında görünüyor; Notlar’ın gün sayfasında etkinlikler yok.",
+   "best": [
+    {
+     "n": "Workflowy",
+     "how": "Google Calendar senkronu ile etkinlikler Calendar düğümünde kendiliğinden beliriyor, Meet bağlantısına oradan katılınıyor."
+    }
+   ],
+   "why": "Toplantı notunu doğrudan o etkinliğin altına yazmak en doğal akış.",
+   "what": "Gün sayfasının üstünde o günün etkinlikleri; tıklayınca “Toplantı notu” şablonuyla not açılır ve etkinliğe bağlanır.",
+   "effort": "M",
+   "impact": 2,
+   "sources": [
+    {
+     "t": "Workflowy 2026.04 — Google Calendar Sync",
+     "u": "https://blog.workflowy.com/2026-04/"
+    }
+   ]
+  },
+  {
+   "id": "netExamples",
+   "kind": "gap",
+   "app": "Netleştir",
+   "area": "Kalite",
+   "title": "Örnekli istek ve kayıtlı şablonlar",
+   "gap": "Netleştir isteği yapılandırıyor ama örnek eklemiyor ve sık yaptığın istek türlerini şablon olarak saklamıyor.",
+   "best": [
+    {
+     "n": "Anthropic’in prompt rehberi",
+     "how": "İyi sonuç için ilgili ve çeşitli 3–5 örneği <example> etiketleri içinde vermeyi öneriyor."
+    }
+   ],
+   "why": "Örnek, “nasıl bir sonuç istiyorum”u tarif etmenin en kısa yolu.",
+   "what": "“Örnek ekle” düğmesi (beğendiğin eski bir çıktıyı örnek olarak ekler) ve “Şablon olarak kaydet”; sonra tek tıkla aynı yapıda yeni istek.",
+   "effort": "S",
+   "impact": 2,
+   "sources": [
+    {
+     "t": "Claude — Prompting best practices",
+     "u": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/be-clear-and-direct"
+    }
+   ]
   }
  ]
 }

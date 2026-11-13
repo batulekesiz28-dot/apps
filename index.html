@@ -762,7 +762,7 @@ function createNode(a,delay=0){
   const el=document.createElement('button');el.className='node'+(a.kind==='draft'?' draft':'');el.dataset.key=a.key;el.setAttribute('aria-label',a.name);
   el.innerHTML=nodeHTML(a);$('#nodes').appendChild(el);
   const n={a,el,aw:null,ax:0,ay:0,x:0,y:0,vx:0,vy:0,rot:0,tx:0,ty:0,ph:[Math.random()*6.28,Math.random()*6.28,Math.random()*6.28,Math.random()*6.28],drag:false,hover:0,hov:false,dim:false,gx:0,gy:0,ps:'',sc:1,hs:0};
-  n.aw=placeFor(a.key,n,spawnHint);nodes.set(a.key,n);if(!pos[a.key])rememberLayout(n,false);
+  n.fresh=!posOf(a.key)&&!spawnHint;n.aw=placeFor(a.key,n,spawnHint);nodes.set(a.key,n);if(!pos[a.key])rememberLayout(n,false);
   anc(n);n.x=n.ax;n.y=n.ay-LIFT*cam.z+40;place(n);
   anim(el.querySelector('.bob'),[{transform:'scale(0) rotate(-12deg)',opacity:0},{transform:'scale(1.12) rotate(3deg)',opacity:1,offset:.55},{transform:'none',opacity:1}],{duration:900,delay,easing:EASE,fill:'backwards'});
   anim(el.querySelector('.nlabel'),[{opacity:0,transform:'translateX(-50%) translateY(-6px)'},{opacity:1,transform:'translateX(-50%)'}],{duration:600,delay:delay+250,easing:OUT,fill:'backwards'});
@@ -779,7 +779,13 @@ function place(n){const off=n.x<-140||n.x>M.W+140||n.y<-160||n.y>M.H+160;if(off!
 function syncNodes(){
   const list=[...pub,...drafts],keys=new Set(list.map(a=>a.key));
   for(const k of[...nodes.keys()])if(!keys.has(k))removeNode(k);
-  let d=0;list.forEach(a=>{const n=nodes.get(a.key);if(n)updateNode(n,a);else{createNode(a,booted?0:260+d*90);d++}});
+  const hadAny=Object.keys(pos).length>0||Object.keys(legacy).length>0,fresh=[];
+  let d=0;list.forEach(a=>{const n=nodes.get(a.key);if(n)updateNode(n,a);else{const nn=createNode(a,booted?0:260+d*90);d++;if(nn.fresh&&a.kind==='pub')fresh.push(nn)}});
+  // a newly published app: say so and glide the camera to it if it landed off-screen
+  if(hadAny&&fresh.length)setTimeout(()=>{const f=fresh[0],sx=w2sx(f.aw[0]),sy=w2sy(f.aw[1]-LIFT);
+    toast(fresh.length>1?`${fresh.length} yeni uygulama eklendi`:`Yeni uygulama: ${f.a.name}`);
+    if(sx<80||sx>M.W-80||sy<90||sy>M.H-90)flyTo(f.aw[0],f.aw[1]-LIFT/2,Math.max(cam.z,.8));
+    setTimeout(()=>{anc(f);ripple(f.ax,f.ay,2)},700)},900);
   spawnHint=null;applyFilter();hintText();statusText();wake();
   // one-time migration: write world positions for anything that only had a legacy layout
   if(Object.keys(legacy).length&&[...nodes.keys()].some(k=>!store.get('appshell:pos',{})[k]))saveMeta();

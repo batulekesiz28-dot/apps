@@ -112,7 +112,7 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
 .blocks{position:relative}
 .blk{position:relative;display:flex;align-items:flex-start;gap:4px;margin-left:-30px;padding-left:30px;border-radius:6px}
 .blk.pick{background:var(--sel)}
-.hd{position:absolute;left:4px;top:5px;width:20px;height:22px;border-radius:5px;display:grid;place-items:center;color:var(--ink4);opacity:0;transition:opacity .12s,background .12s,color .12s;cursor:grab;touch-action:none}
+.hd{position:absolute;left:3px;top:4px;width:24px;height:24px;border-radius:5px;display:grid;place-items:center;color:var(--ink4);opacity:0;transition:opacity .12s,background .12s,color .12s;cursor:grab;touch-action:none}
 .blk:hover .hd{opacity:1}.hd:hover{background:var(--hover2);color:var(--ink2)}
 .hd svg{width:10px;height:14px;fill:currentColor;stroke:none}
 .txt{flex:1;min-width:0;outline:0;white-space:pre-wrap;word-break:break-word;font-size:16px;line-height:1.7;padding:3px 2px;caret-color:var(--ink)}
@@ -402,6 +402,40 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
 .tlc.pg{font-weight:550}
 @media (max-width:860px){.tl-b{grid-template-columns:minmax(0,1fr)}.tl-side{position:static;max-height:none;order:2}.tl-m{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-right:-16px;padding-bottom:2px}.tl-m .pill{flex-shrink:0}.tl-h h1{font-size:28px}}
 @media (max-width:760px){.wd{padding:9px 0 8px}.wd span{font-size:11.5px}.db-date{height:40px}.fd-b{opacity:1;height:36px}.fd-r{min-height:44px;padding-left:6px}.tlc{min-height:40px}.tld{min-height:40px}.dpc button,.dpi,.dpn,.dpx{height:40px}.bdate{height:28px}.db-t{min-height:40px}}
+
+/* ── sayfa içinde sayfa ── */
+.pgb{display:flex;align-items:center;gap:12px;flex:1;min-width:0;min-height:52px;margin:3px 0;padding:8px 12px 8px 10px;border-radius:12px;background:var(--card);box-shadow:inset 0 0 0 .5px var(--line2),0 1px 2px rgba(0,0,0,.03);color:var(--ink);text-decoration:none;cursor:pointer;outline:0;transition:box-shadow .2s,transform .35s var(--spring),background .15s}
+.pgb:hover{box-shadow:inset 0 0 0 .5px var(--ink4),0 8px 22px -12px rgba(0,0,0,.22);transform:translateY(-1px)}
+.pgb:focus-visible{box-shadow:inset 0 0 0 1.5px var(--accent)}
+.pgb:active{transform:scale(.99)}
+.pgi{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--tint);font-size:19px;flex-shrink:0}
+.pgt{flex:1;min-width:0;display:grid;gap:1px}
+.pgt b{font-size:14.5px;font-weight:600;letter-spacing:-.005em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-decoration:underline;text-decoration-color:var(--line2);text-underline-offset:3px}
+.pgt small{font-size:12.5px;color:var(--ink3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pgn{font:500 12px var(--mono);color:var(--ink3);flex-shrink:0;padding:3px 7px;border-radius:6px;background:var(--hover)}
+.pga{color:var(--ink3);display:grid;transition:transform .3s var(--spring)}.pgb:hover .pga{transform:translateX(3px);color:var(--ink)}
+.pgb.gone{opacity:.6;cursor:default}
+.blk[data-t=page]>.hd{top:19px}
+.subs{margin:6px 0 18px;display:grid;gap:10px}
+.sub-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:8px}
+.sub-g .pgb{margin:0}
+.sub-add{justify-self:start;display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 12px 0 9px;border-radius:9px;font-size:13px;color:var(--ink3);transition:background .15s,color .15s}
+.sub-add:hover{background:var(--hover);color:var(--ink)}.sub-add kbd{margin-left:4px}
+.crumb{gap:4px}.crumb .cr{display:inline-flex;align-items:center;gap:6px;min-width:0;max-width:220px;height:28px;padding:0 6px;border-radius:6px;color:var(--ink2);text-decoration:none}
+.crumb a.cr:hover{background:var(--hover);color:var(--ink)}.crumb .cr.cur{color:var(--ink);max-width:none;flex-shrink:1}
+.crumb .cr-sep,.crumb .cr-more{color:var(--ink4);flex-shrink:0}.crumb .cr-more{color:var(--ink3)}
+.ni.tr{padding-left:calc(4px + var(--dp,0)*16px);gap:5px}
+.tw,.tw0{width:24px;height:24px;flex-shrink:0;border-radius:5px;display:grid;place-items:center;color:var(--ink3)}
+.tw svg{width:12px;height:12px;transition:transform .25s var(--spring)}.tw.open svg{transform:rotate(90deg)}
+.tw:hover{background:var(--hover2);color:var(--ink)}
+.ni .more.add{margin-right:-6px}
+.tg-kids{position:relative}
+.tg-kids::before{content:'';position:absolute;left:calc(13px + var(--dp,0)*16px);top:2px;bottom:2px;width:.5px;background:var(--line2)}
+.mv-q{width:calc(100% - 10px);margin:2px 5px 6px;height:32px;border:0;border-radius:8px;padding:0 10px;background:var(--hover);font:inherit;font-size:13px;color:var(--ink);outline:0}
+.mv-l{max-height:300px;overflow:auto}.mv-l .tx small{display:block;font-size:12px;color:var(--ink3)}
+@media (hover:hover){.ni.tr:not(:hover):not(:focus-within) .more{display:none}}
+.crumb .cr.up{gap:2px;color:var(--ink2)}.crumb .cr.up svg.i{width:14px;height:14px}
+@media (max-width:760px){.pgb{min-height:58px}.tw,.tw0{width:36px;height:40px}.ni.tr{padding-left:calc(2px + var(--dp,0)*14px)}.sub-add{height:44px}.crumb .cr{height:40px;max-width:120px}.pgn{display:none}.mv-q{height:40px}}
 </style>
 </head>
 <body>
@@ -526,7 +560,7 @@ const TYPES=[
   {k:'divider',l:'Ayırıcı',d:'Yatay çizgi',kw:'ayirici divider cizgi ---',b:SV('<path d="M2 8h12"/>')},
 ];
 const ACTIONS=[
-  {k:'@page',l:'Alt sayfa',d:'Yeni sayfa oluştur ve bağla',kw:'sayfa page alt link',b:SV('<path d="M4 2h5.5L12 4.5V14H4z"/><path d="M9.5 2v2.5H12"/>')},
+  {k:'@page',l:'Sayfa',d:'Bu sayfanın içinde yeni bir sayfa aç',kw:'sayfa page alt link subpage içinde',b:SV('<path d="M4 2h5.5L12 4.5V14H4z"/><path d="M9.5 2v2.5H12"/>')},
   {k:'@date',l:'Bugünün tarihi',d:'Metne bugünün tarihini yaz',kw:'tarih date bugun',b:SV('<rect x="2" y="3" width="12" height="11" rx="2"/><path d="M2 6.5h12"/>')},
   {k:'@due',l:'Tarih ver',d:'Satır o günde de görünsün (yarın, cuma…)',kw:'tarih ver zamanla planla due schedule son gün',b:SV('<rect x="2" y="3" width="12" height="11" rx="2"/><path d="M2 6.5h12M8 8.5v3l2 1"/>')},
   {k:'@today',l:'Bugüne taşı',d:'Satırı bugünün notuna gönder',kw:'bugune tasi tasi move today',b:SV('<path d="M3 8h8M8 4.5L11.5 8 8 11.5M13.5 3v10"/>')},
@@ -564,7 +598,7 @@ const CLOUD=/^https?:$/.test(location.protocol)&&!new URLSearchParams(location.s
 const pages=new Map();
 let S=null,openId=null,view='home',lastEdit=0,started=false;
 const norm=p=>({id:p.id,title:p.title||'',icon:p.icon||'',blocks:Array.isArray(p.blocks)&&p.blocks.length?p.blocks.map(b=>({...b,id:b.id||uid(),t:b.t||'p',h:b.h||''})):[B('p')],
-  date:p.date||null,fav:!!p.fav,tpl:p.tpl||'',created:p.created||Date.now(),updated:p.updated||Date.now()});
+  date:p.date||null,parent:p.parent||null,fav:!!p.fav,tpl:p.tpl||'',created:p.created||Date.now(),updated:p.updated||Date.now()});
 const Local={kind:'local',key:'notlar:v1',
   load(){return ls.get(this.key,[])},
   put(){return new Promise((ok,no)=>{try{localStorage.setItem(this.key,JSON.stringify([...pages.values()]));ok()}catch(e){no(e)}})},
@@ -637,9 +671,14 @@ addEventListener('hashchange',()=>{if(started)route()});
 
 /* ── Sidebar ──────────────────────────────────────────────── */
 function navItem(href,ic,label,on,extra=''){return`<a class="ni${on?' on':''}" href="${href}" data-href="${href}"><span class="ic">${ic}</span><span class="t">${esc(label)}</span>${extra}</a>`}
-function pageItem(p){return`<a class="ni${p.id===openId?' on':''}" href="#p/${p.id}" data-pid="${p.id}"><span class="ic">${iconOf(p)}</span><span class="t">${esc(titleOf(p))}</span><button class="more" data-more="${p.id}" title="Seçenekler">${IC.more}</button></a>`}
+function pageItem(p){return`<a class="ni${p.id===openId?' on':''}" href="#p/${p.id}" data-pid="${p.id}"><span class="ic">${iconOf(p)}</span><span class="t">${esc(titleOf(p))}</span><button class="more" data-more="${p.id}" title="Seçenekler" aria-label="${esc(titleOf(p))} seçenekleri">${IC.more}</button></a>`}
+// tree item: chevron (if it has children) + indent + quick “add inside”
+function treeItem(p,depth,seen=new Set()){if(seen.has(p.id))return'';seen.add(p.id);const ks=kidsOf(p.id),open=treeOpen.has(p.id);
+  return`<a class="ni tr${p.id===openId?' on':''}" href="#p/${p.id}" data-pid="${p.id}" style="--dp:${depth}">${ks.length?`<button class="tw${open?' open':''}" data-tw="${p.id}" aria-label="${open?'Daralt':'Genişlet'}" aria-expanded="${open}">${IC.chevR}</button>`:'<span class="tw0"></span>'}<span class="ic">${iconOf(p)}</span><span class="t">${esc(titleOf(p))}</span><button class="more add" data-addkid="${p.id}" title="İçine alt sayfa ekle" aria-label="${esc(titleOf(p))} içine alt sayfa ekle">${IC.plus}</button><button class="more" data-more="${p.id}" title="Seçenekler" aria-label="${esc(titleOf(p))} seçenekleri">${IC.more}</button></a>`+
+    (ks.length&&open?`<div class="tg-kids" style="--dp:${depth}">${ks.map(k=>treeItem(k,depth+1,seen)).join('')}</div>`:'')}
 function renderSide(){
-  const all=sorted(),favs=all.filter(p=>p.fav),daily=all.filter(p=>p.tpl==='daily').sort((a,b)=>(b.date||'').localeCompare(a.date||'')).slice(0,5),rest=all.filter(p=>p.tpl!=='daily'&&!p.fav);
+  const all=sorted(),favs=all.filter(p=>p.fav),daily=all.filter(p=>p.tpl==='daily').sort((a,b)=>(b.date||'').localeCompare(a.date||'')).slice(0,5),rest=all.filter(p=>p.tpl!=='daily'&&!p.fav&&(!p.parent||!pages.has(p.parent))).sort((a,b)=>a.created-b.created);
+  const op=openId&&pages.get(openId);if(op)for(const a of ancestors(op))treeOpen.add(a.id);
   const hasToday=all.some(p=>p.tpl==='daily'&&p.date===today());
   $('#nav').innerHTML=`<div class="hl" id="hl"></div>`+
     navItem('#home',IC.home,'Ana sayfa',view==='home')+
@@ -649,7 +688,7 @@ function renderSide(){
     navItem('#tpl',IC.tpl,'Şablonlar',view==='tpl')+
     (favs.length?`<div class="grp">Favoriler</div>`+favs.map(pageItem).join(''):'')+
     `<div class="grp">Sayfalar<button data-act="new" title="Yeni sayfa">${IC.plus}</button></div>`+
-    (rest.length?rest.map(pageItem).join(''):`<div class="empty-s">Henüz sayfa yok.</div>`)+
+    (rest.length?rest.map(p=>treeItem(p,0)).join(''):`<div class="empty-s">Henüz sayfa yok.</div>`)+
     (daily.length?`<div class="grp">Günlük</div>`+daily.map(pageItem).join(''):'');
 }
 (()=>{const nav=$('#nav');
@@ -660,6 +699,9 @@ function renderSide(){
   nav.addEventListener('pointerleave',()=>{const hl=$('#hl');if(hl)hl.style.opacity='0'});
   nav.addEventListener('click',e=>{
     const m=e.target.closest('[data-more]');if(m){e.preventDefault();e.stopPropagation();pageMenu(pages.get(m.dataset.more),m);return}
+    const tw=e.target.closest('[data-tw]');if(tw){e.preventDefault();e.stopPropagation();const id=tw.dataset.tw;treeOpen.has(id)?treeOpen.delete(id):treeOpen.add(id);saveTree();renderSide();return}
+    const ak=e.target.closest('[data-addkid]');if(ak){e.preventDefault();e.stopPropagation();const par=pages.get(ak.dataset.addkid);if(!par)return;
+      const c=newPage();c.parent=par.id;par.blocks.push(B('page','',{pid:c.id}));touch(c);touch(par);treeOpen.add(par.id);saveTree();go('#p/'+c.id);return}
     if(e.target.closest('[data-act=new]')){e.preventDefault();go('#p/'+newPage().id);return}
     const a=e.target.closest('a.ni');if(a){e.preventDefault();go(a.getAttribute('href'))}
   });
@@ -927,6 +969,49 @@ addEventListener('keydown',e=>{if(!started||!$('#gate').hidden||!e.altKey||e.ctr
   if(e.code==='KeyT'){e.preventDefault();openDay(today())}
   else if((e.code==='Comma'||e.code==='Period')&&view==='page'&&isDaily(P)){e.preventDefault();openDay(addDays(P.date,e.code==='Comma'?-1:1))}});
 
+/* ════════════════════════════════════════════════════════════
+   SAYFA İÇİNDE SAYFA — Notion gibi: her sayfanın alt sayfaları olur,
+   sayfa bloğu kart olarak görünür, kenar çubuğunda ağaç, üstte yol.
+   ════════════════════════════════════════════════════════════ */
+const kidsOf=id=>[...pages.values()].filter(p=>p.parent===id&&!isDaily(p)).sort((a,b)=>a.created-b.created);
+function ancestors(p){const a=[],seen=new Set([p.id]);let c=p;while(c.parent&&pages.has(c.parent)&&!seen.has(c.parent)){seen.add(c.parent);c=pages.get(c.parent);a.unshift(c)}return a}
+function descendants(id){const out=[],st=[id];while(st.length){const x=st.pop();for(const k of kidsOf(x)){out.push(k);st.push(k.id)}}return out}
+const pathOf=p=>ancestors(p).map(titleOf).join(' / ');
+let treeOpen=new Set(ls.get('notlar:tree',[]));const saveTree=()=>ls.set('notlar:tree',[...treeOpen]);
+function crumbHTML(p){const an=ancestors(p);
+  if(matchMedia('(max-width:760px)').matches&&an.length){const up=an.at(-1);return`<a class="cr up" href="#p/${up.id}" aria-label="${esc(titleOf(up))} sayfasına dön">${IC.chevL}<span>${esc(titleOf(up))}</span></a><span class="cr-sep">/</span><span class="cr cur"><span>${esc(titleOf(p))}</span></span>`}
+  const show=an.length>3?an.slice(-2):an,short=an.length>3;
+  return(short?'<span class="cr-more">…</span><span class="cr-sep">/</span>':'')+show.map(a=>`<a class="cr" href="#p/${a.id}"><span class="ic">${iconOf(a)}</span><span>${esc(titleOf(a))}</span></a><span class="cr-sep">/</span>`).join('')+`<span class="cr cur"><span class="ic">${iconOf(p)}</span><span>${esc(titleOf(p))}</span></span>`}
+function pageCard(b){const c=pages.get(b.pid);if(!c)return`<span class="pgb gone" data-act="pgopen" tabindex="0" contenteditable="false"><span class="pgi">🗑️</span><span class="pgt"><b>Silinmiş sayfa</b><small>Bu bağlantıyı kaldırabilirsin</small></span></span>`;
+  const n=kidsOf(c.id).length,sum=firstText(c);
+  return`<a class="pgb" href="#p/${c.id}" data-act="pgopen" tabindex="0" contenteditable="false" draggable="false"><span class="pgi">${iconOf(c)}</span><span class="pgt"><b>${esc(titleOf(c))}</b>${sum?`<small>${esc(sum.slice(0,90))}</small>`:''}</span>${n?`<span class="pgn">${n} alt sayfa</span>`:''}<span class="pga">${IC.chevR}</span></a>`}
+// create a child page under P, as a page block after `after` (or replacing it when empty), then open it — like Notion
+function addSubpage(after,{open=true,replaceEmpty=true}={}){if(!P)return;const parent=P;
+  const c=newPage();c.parent=parent.id;touch(c);
+  const nb=B('page','',{pid:c.id});
+  if(after&&replaceEmpty&&!['divider','kv','page'].includes(after.t)&&!plain(after.h).trim()){Object.assign(after,{t:'page',h:'',pid:c.id});delete after.c;replaceNode(after)}
+  else if(after)insertAfter(after,nb,null);else{parent.blocks.push(nb)}
+  treeOpen.add(parent.id);saveTree();touch(parent);renderSide();
+  if(open)go('#p/'+c.id);return c}
+function deletePageTree(p){const ds=descendants(p.id),all=[p,...ds],ids=new Set(all.map(x=>x.id));
+  const par=p.parent&&pages.get(p.parent);if(par){const before=par.blocks.length;par.blocks=par.blocks.filter(b=>!(b.t==='page'&&ids.has(b.pid)));if(!par.blocks.length)par.blocks.push(B('p'));if(before!==par.blocks.length)touch(par)}
+  for(const x of all){delPage(x);treeOpen.delete(x.id)}saveTree();return all.length}
+function movePage(p,to){const old=p.parent&&pages.get(p.parent);if((old?.id||null)===(to?.id||null))return;
+  if(old){old.blocks=old.blocks.filter(b=>!(b.t==='page'&&b.pid===p.id));if(!old.blocks.length)old.blocks.push(B('p'));touch(old)}
+  p.parent=to?to.id:null;touch(p);if(to){to.blocks.push(B('page','',{pid:p.id}));treeOpen.add(to.id);saveTree();touch(to)}
+  renderSide();if(view==='page')renderView(true);toast(to?`→ ${titleOf(to)} içine taşındı`:'En üst düzeye taşındı')}
+function movePicker(p,anchor){const bad=new Set([p.id,...descendants(p.id).map(x=>x.id)]);
+  const cands=sorted().filter(x=>!bad.has(x.id)&&!isDaily(x));
+  const pop=float(anchor,`<div class="pop-h">Nereye taşınsın?</div><input class="mv-q" placeholder="Sayfa ara…" aria-label="Sayfa ara"><div class="mv-l scroll-y"></div>`,{w:280});
+  const q=pop.querySelector('.mv-q'),l=pop.querySelector('.mv-l');
+  const draw=()=>{const s=q.value.trim().toLocaleLowerCase('tr');l.innerHTML=(p.parent?`<button class="mi" data-mv=""><span class="bi">${IC.home}</span><span class="tx">En üst düzey</span></button>`:'')+
+    cands.filter(x=>!s||titleOf(x).toLocaleLowerCase('tr').includes(s)).slice(0,30).map(x=>`<button class="mi" data-mv="${x.id}"><span class="bi">${iconOf(x)}</span><span class="tx">${esc(titleOf(x))}${x.parent?`<small>${esc(pathOf(x))}</small>`:''}</span></button>`).join('')||'<div class="pal-e" style="padding:12px">Sayfa yok</div>'};
+  draw();q.addEventListener('input',draw);q.addEventListener('keydown',e=>e.stopPropagation());setTimeout(()=>q.focus(),30);
+  l.addEventListener('click',e=>{const b=e.target.closest('[data-mv]');if(!b)return;hideFloat();movePage(p,b.dataset.mv?pages.get(b.dataset.mv):null)})}
+function kidsHTML(){const linked=new Set(P.blocks.filter(b=>b.t==='page').map(b=>b.pid)),loose=kidsOf(P.id).filter(k=>!linked.has(k.id));
+  return`<div class="subs">${loose.length?`<div class="sh"><span>Alt sayfalar</span><span class="rule"></span><span>${loose.length}</span></div><div class="sub-g">${loose.map(k=>pageCard({pid:k.id})).join('')}</div>`:''}
+    <button class="sub-add" data-act="addsub">${IC.plus}<span>Alt sayfa ekle</span><kbd>/sayfa</kbd></button></div>`}
+
 /* ── Page view & editor ───────────────────────────────────── */
 let P=null;
 const blockOf=id=>P.blocks.find(b=>b.id===id);
@@ -936,6 +1021,7 @@ function blockHTML(b){
   const hd=`<button class="hd" data-act="hd" tabindex="-1" title="Sürükle / menü">${IC.grip}</button>`;
   const ph=esc(PH[b.t]??'');
   if(b.t==='divider')return`<div class="blk" data-id="${b.id}" data-t="divider">${hd}<hr class="div" tabindex="0"></div>`;
+  if(b.t==='page')return`<div class="blk" data-id="${b.id}" data-t="page">${hd}${pageCard(b)}</div>`;
   if(b.t==='kv')return`<div class="blk" data-id="${b.id}" data-t="kv">${hd}<div class="kv"><div class="txt k" contenteditable="true" data-f="h" data-ph="Alan adı">${clean(b.h)}</div><div class="txt v" contenteditable="true" data-f="v" data-ph="Boş">${clean(b.v)}</div></div></div>`;
   const txt=`<div class="txt" contenteditable="true" data-f="h" data-ph="${ph}" spellcheck="${b.t==='code'?'false':'true'}">${b.t==='code'?esc(plain(b.h)):clean(b.h)}</div>`;
   if(b.t==='callout')return`<div class="blk" data-id="${b.id}" data-t="callout">${hd}<div class="cw"><span class="co" data-act="co">${b.e||'💡'}</span>${txt}</div></div>`;
@@ -947,7 +1033,7 @@ function renumber(){let n=0;P.blocks.forEach(b=>{if(b.t==='num'){n++;const el=$(
 function renderPage(){
   P=pages.get(openId);if(!P)return;
   const star=`<button class="tb${P.fav?' on':''}" data-pact="fav" title="Favori">${IC.star}</button>`;
-  setCrumb(iconOf(P),titleOf(P),star+`<button class="tb" data-pact="more" title="Seçenekler">${IC.more}</button>`);
+  setCrumb(iconOf(P),titleOf(P),star+`<button class="tb" data-pact="more" title="Seçenekler" aria-label="Sayfa seçenekleri">${IC.more}</button>`);$('#crumb').innerHTML=crumbHTML(P);
   const dly=isDaily(P);
   $('#view').innerHTML=`<div class="wrap page${dly?' daily':''}">${dly?dayBarHTML(P.date):''}
     <div class="pg-head">
@@ -957,7 +1043,7 @@ function renderPage(){
       <div class="pg-meta">${metaHTML()}</div>
     </div>
     <div class="blocks" id="blocks">${P.blocks.map(blockHTML).join('')}</div>
-    <div style="height:${dly?40:120}px;cursor:text" data-act="tail"></div>${dly?foundHTML(P.date):''}</div>`;
+    <div style="height:${dly?40:56}px;cursor:text" data-act="tail"></div><div id="kids">${kidsHTML()}</div>${dly?foundHTML(P.date):''}</div>`;
   renumber();
   if(pendingFocus){const b=P.blocks.find(x=>x.id===pendingFocus);pendingFocus=null;if(b)requestAnimationFrame(()=>{const n=nodeOf(b);n?.scrollIntoView({block:'center'});n&&anim(n,[{background:'var(--sel)'},{background:'transparent'}],{duration:1400,easing:EASE});focusBlock(b,null)})}
   if(!P.title&&Date.now()-P.created<3000)requestAnimationFrame(()=>focusEnd($('.pg-title')));
@@ -968,7 +1054,8 @@ function metaHTML(){
     `<span class="muted" id="edited">düzenlendi ${rel(P.updated)}</span>`;
 }
 function refreshMeta(){const m=$('.pg-meta');if(m)m.innerHTML=metaHTML();const tools=$('.pg-tools');if(tools)tools.innerHTML=(P.icon?'':`<button data-act="icon">☺ İkon ekle</button>`)+(P.date?'':`<button data-act="date">${IC.cal} Tarih ekle</button>`)}
-function sideLabel(){const a=$(`.ni[data-pid="${P.id}"]`);if(a){a.querySelector('.t').textContent=titleOf(P);a.querySelector('.ic').textContent=iconOf(P)}$('#crumb').innerHTML=`<span class="ic">${iconOf(P)}</span><span>${esc(titleOf(P))}</span>`}
+function sideLabel(){const a=$(`.ni[data-pid="${P.id}"]`);if(a){a.querySelector('.t').textContent=titleOf(P);a.querySelector('.ic').textContent=iconOf(P)}$('#crumb').innerHTML=crumbHTML(P)}
+function renderKids(){const k=$('#kids');if(k&&P)k.innerHTML=kidsHTML()}
 function edited(){touch(P);const e=$('#edited');if(e)e.textContent='düzenlendi az önce'}
 
 /* Caret helpers */
@@ -986,7 +1073,7 @@ const collapsed=()=>{const s=getSelection();return s.rangeCount&&s.getRangeAt(0)
 function caretRect(){const s=getSelection();if(!s.rangeCount)return null;const r=s.getRangeAt(0).cloneRange();r.collapse(true);const rs=r.getClientRects();return rs[0]||null}
 function onFirstLine(el){const c=caretRect();if(!c)return true;const lh=parseFloat(getComputedStyle(el).lineHeight)||24;return c.top-el.getBoundingClientRect().top<lh*.85}
 function onLastLine(el){const c=caretRect();if(!c)return true;const lh=parseFloat(getComputedStyle(el).lineHeight)||24;return el.getBoundingClientRect().bottom-c.bottom<lh*.85}
-function focusBlock(b,off,f){if(!b)return;if(b.t==='divider'){nodeOf(b)?.querySelector('.div')?.focus();return}setCaret(txtOf(b,f||(b.t==='kv'&&off==null?'v':'h')),off)}
+function focusBlock(b,off,f){if(!b)return;if(b.t==='divider'){nodeOf(b)?.querySelector('.div')?.focus();return}if(b.t==='page'){nodeOf(b)?.querySelector('.pgb')?.focus();return}setCaret(txtOf(b,f||(b.t==='kv'&&off==null?'v':'h')),off)}
 
 /* Block ops */
 const idx=b=>P.blocks.indexOf(b);
@@ -1030,6 +1117,12 @@ $('#view').addEventListener('keydown',e=>{
   if(view!=='page'||!P)return;
   const tEl=e.target;
   if(tEl.classList.contains('pg-title')){if(e.key==='Enter'||(e.key==='ArrowDown'&&onLastLine(tEl))){e.preventDefault();const b=P.blocks[0];if(e.key==='Enter'&&(b.t!=='p'||plain(b.h)))insertBeforeFirst();else focusBlock(b,0)}return}
+  if(tEl.classList.contains('pgb')){const b=blockOf(tEl.closest('.blk').dataset.id);if(!b)return;
+    if(e.key==='Enter'){e.preventDefault();if(b.pid&&pages.has(b.pid))go('#p/'+b.pid);return}
+    if(e.key==='Backspace'||e.key==='Delete'){e.preventDefault();const prev=P.blocks[idx(b)-1];removeBlock(b);edited();toast('Bağlantı kaldırıldı — sayfa “Alt sayfalar”da duruyor');prev?focusBlock(prev,null):focusBlock(P.blocks[0],0);renderKids();return}
+    if(e.key==='ArrowUp'){e.preventDefault();focusBlock(P.blocks[idx(b)-1],null);return}
+    if(e.key==='ArrowDown'){e.preventDefault();const n=P.blocks[idx(b)+1];n?focusBlock(n,0):insertAfter(b,B('p'));return}
+    return}
   if(tEl.classList.contains('div')){const b=blockOf(tEl.closest('.blk').dataset.id);
     if(e.key==='Backspace'||e.key==='Delete'){e.preventDefault();const prev=P.blocks[idx(b)-1];removeBlock(b);edited();prev?focusBlock(prev,null):focusBlock(P.blocks[0],0)}
     else if(e.key==='Enter'){e.preventDefault();insertAfter(b,B('p'))}
@@ -1091,6 +1184,8 @@ $('#view').addEventListener('click',e=>{
   const a=e.target.closest('.txt a[href]');if(a){const h=a.getAttribute('href');if(h.startsWith('#p/')){e.preventDefault();go(h)}else if(e.metaKey||e.ctrlKey){e.preventDefault();window.open(h,'_blank','noopener')}return}
   const act=e.target.closest('[data-act]')?.dataset.act;
   if(act==='chk'){toggleTodo(blockOf(e.target.closest('.blk').dataset.id));return}
+  if(act==='pgopen'){e.preventDefault();const b=blockOf(e.target.closest('.blk')?.dataset.id);const id=b?.pid||e.target.closest('[href]')?.getAttribute('href')?.slice(3);if(id&&pages.has(id))go('#p/'+id);return}
+  if(act==='addsub'){const last=P.blocks.at(-1);addSubpage(last,{replaceEmpty:true});return}
   if(act==='hd'){blockMenu(blockOf(e.target.closest('.blk').dataset.id),e.target.closest('.hd'));return}
   if(act==='co'){const b=blockOf(e.target.closest('.blk').dataset.id);emojiPicker(e.target,em=>{b.e=em;e.target.textContent=em;edited()});return}
   if(act==='icon'){emojiPicker(e.target.closest('[data-act]'),em=>{P.icon=em;renderPage();sideLabel();edited()},!!P.icon);return}
@@ -1164,7 +1259,7 @@ function applySlash(i){
   if(t.k==='@due'){datePop(nodeOf(b).querySelector('.txt'),b.d,d=>{setBlockDate(P,b,d);focusBlock(b,null)});return}
   if(t.k==='@today'){b.h=normHTML(el.innerHTML);moveToDay(P,b,today());return}
   if(t.k==='@move'){b.h=normHTML(el.innerHTML);datePop(nodeOf(b).querySelector('.txt'),null,d=>d&&moveToDay(P,b,d),{title:'Hangi günün notuna?',clear:false});return}
-  if(t.k==='@page'){const np=newPage();setCaret(el,start);document.execCommand('insertHTML',false,`<a href="#p/${np.id}">📄 Yeni sayfa</a>&nbsp;`);syncEl(el);toast('Alt sayfa oluşturuldu — bağlantıya tıkla');renderSide();return}
+  if(t.k==='@page'){b.h=normHTML(el.innerHTML);addSubpage(b,{replaceEmpty:true});return}
   if(t.k==='divider'){if(!el.textContent){b.t='divider';b.h='';replaceNode(b);insertAfter(b,B('p'))}else insertAfter(b,B('divider')),insertAfter(P.blocks[idx(b)+1],B('p'));return}
   if(t.k==='kv'&&el.textContent){insertAfter(b,B('kv','',{v:''}));return}
   setType(b,t.k,start);
@@ -1224,11 +1319,13 @@ function blockMenu(b,anchor){
     <button class="mi" data-bm="today"><span class="bi">${IC.sun}</span><span class="tx">Bugüne taşı</span></button>
     <button class="mi" data-bm="move"><span class="bi">${IC.tl}</span><span class="tx">Bir güne taşı…</span></button>
     <button class="mi danger" data-bm="del"><span class="bi">${IC.trash}</span><span class="tx">Sil</span></button>
-    <div class="sep"></div><div class="pop-h">Dönüştür</div>
-    <div class="types">${TYPES.filter(t=>t.k!=='divider').map(t=>`<button data-bt="${t.k}" title="${esc(t.l)}" style="${t.k===b.t?'background:var(--hover2);color:var(--ink)':''}">${t.b}</button>`).join('')}</div>`,{w:240});
+    ${b.t==='page'?`<div class="sep"></div><button class="mi" data-bm="pgopen"><span class="bi">${IC.chevR}</span><span class="tx">Sayfayı aç</span></button><button class="mi" data-bm="pgmove"><span class="bi">${IC.tl}</span><span class="tx">Başka sayfaya taşı…</span></button>`:`<div class="sep"></div><div class="pop-h">Dönüştür</div>
+    <div class="types">${TYPES.filter(t=>t.k!=='divider').map(t=>`<button data-bt="${t.k}" title="${esc(t.l)}" style="${t.k===b.t?'background:var(--hover2);color:var(--ink)':''}">${t.b}</button>`).join('')}</div>`}`,{w:240});
   p.dataset.for=b.id;
   p.addEventListener('click',e=>{const m=e.target.closest('[data-bm]')?.dataset.bm,t=e.target.closest('[data-bt]')?.dataset.bt;if(!m&&!t)return;hideFloat();
     if(t){if(t!==b.t)setType(b,t,null);return}
+    if(m==='pgopen'){if(pages.has(b.pid))go('#p/'+b.pid);return}
+    if(m==='pgmove'){const c=pages.get(b.pid);if(c)movePicker(c,anchor);return}
     if(m==='up')moveBlock(b,-1);else if(m==='down')moveBlock(b,1);
     else if(m==='dup'){const c={...snapshot(b),id:uid()};insertAfter(b,c,null)}
     else if(m==='due'){datePop(anchor,b.d,d=>setBlockDate(P,b,d))}
@@ -1241,16 +1338,20 @@ function pageMenu(p,anchor){
   const pop=float(anchor,`<button class="mi" data-pm="fav"><span class="bi">${IC.star}</span><span class="tx">${p.fav?'Favorilerden çıkar':'Favorilere ekle'}</span></button>
     <button class="mi" data-pm="dup"><span class="bi">${IC.copy}</span><span class="tx">Çoğalt</span></button>
     <button class="mi" data-pm="md"><span class="bi">${IC.md}</span><span class="tx">Markdown olarak kopyala</span></button>
+    <button class="mi" data-pm="sub"><span class="bi">${IC.plus}</span><span class="tx">İçine alt sayfa ekle</span></button>
+    <button class="mi" data-pm="move"><span class="bi">${IC.tl}</span><span class="tx">Taşı…</span></button>
     <div class="sep"></div>
     <button class="mi danger" data-pm="del"><span class="bi">${IC.trash}</span><span class="tx">Sayfayı sil</span></button>
     <div class="sep"></div><div class="pop-h" style="text-transform:none;letter-spacing:0;font-family:var(--font);font-size:11.5px">Oluşturuldu ${esc(new Date(p.created).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'}))}</div>`,{w:240});
   pop.addEventListener('click',e=>{const b=e.target.closest('[data-pm]');if(!b)return;const k=b.dataset.pm;
-    if(k==='del'&&!b.classList.contains('confirm')){b.classList.add('confirm');b.querySelector('.tx').textContent='Emin misin? Sil';return}
+    if(k==='del'&&!b.classList.contains('confirm')){const n=descendants(p.id).length;b.classList.add('confirm');b.querySelector('.tx').textContent=n?`Emin misin? ${n} alt sayfasıyla sil`:'Emin misin? Sil';return}
+    if(k==='move'){hideFloat();movePicker(p,anchor);return}
+    if(k==='sub'){hideFloat();if(P?.id!==p.id){go('#p/'+p.id);setTimeout(()=>addSubpage(P.blocks.at(-1)),80)}else addSubpage(P.blocks.at(-1));return}
     hideFloat();
     if(k==='fav'){p.fav=!p.fav;touch(p);renderSide();if(P?.id===p.id)$('[data-pact=fav]')?.classList.toggle('on',p.fav)}
     else if(k==='dup'){const c=dupPage(p);renderSide();go('#p/'+c.id);toast('Kopya oluşturuldu')}
     else if(k==='md'){copyText(toMd(p)).then(()=>toast('Markdown kopyalandı'))}
-    else if(k==='del'){const was=openId===p.id;delPage(p);toast('Sayfa silindi');if(was)go('#home');else{renderSide();if(view!=='page')renderView(true)}}});
+    else if(k==='del'){const was=openId===p.id||descendants(p.id).some(x=>x.id===openId),par=p.parent&&pages.get(p.parent);const n=deletePageTree(p);toast(n>1?`${n} sayfa silindi`:'Sayfa silindi');if(was)go(par?'#p/'+par.id:'#home');else{renderSide();renderView(true)}}});
 }
 function emojiPicker(anchor,cb,canRemove){
   const p=float(anchor,`<div class="emoji">${EMOJI.map(e=>`<button data-em="${e}">${e}</button>`).join('')}</div>${canRemove?`<div class="sep"></div><button class="mi" data-em=""><span class="tx" style="color:var(--ink3)">İkonu kaldır</span></button>`:''}`,{w:300});
@@ -1263,7 +1364,7 @@ function tplPicker(anchor,cb){
 function toMd(p){const out=[`# ${p.icon?p.icon+' ':''}${titleOf(p)}`,''];if(p.date)out.push(`_${fmtLong(p.date)}_`,'');let n=0;
   for(const b of p.blocks){const t=plain(b.h);if(b.t!=='num')n=0;
     out.push(b.t==='h1'?`## ${t}`:b.t==='h2'?`### ${t}`:b.t==='h3'?`#### ${t}`:b.t==='todo'?`- [${b.c?'x':' '}] ${t}`:b.t==='bullet'?`- ${t}`:b.t==='num'?`${++n}. ${t}`:
-      b.t==='quote'?`> ${t}`:b.t==='callout'?`> ${b.e||'💡'} ${t}`:b.t==='code'?'```\n'+t+'\n```':b.t==='divider'?'---':b.t==='kv'?`**${t}:** ${plain(b.v)}`:t)}
+      b.t==='quote'?`> ${t}`:b.t==='callout'?`> ${b.e||'💡'} ${t}`:b.t==='code'?'```\n'+t+'\n```':b.t==='divider'?'---':b.t==='page'?`- 📄 ${pages.get(b.pid)?titleOf(pages.get(b.pid)):'(silinmiş sayfa)'}`:b.t==='kv'?`**${t}:** ${plain(b.v)}`:t)}
   return out.join('\n')}
 async function copyText(t){try{await navigator.clipboard.writeText(t)}catch{const x=document.createElement('textarea');x.value=t;document.body.appendChild(x);x.select();document.execCommand('copy');x.remove()}}
 
@@ -1294,7 +1395,7 @@ function palette(){
     const cm=cmds.filter(c=>!q||c.l.toLocaleLowerCase('tr').includes(q));
     const tp=q?TPL.filter(t=>t.n.toLocaleLowerCase('tr').includes(q)).map(t=>({ic:t.e,l:'Şablon: '+t.n,run:()=>go('#p/'+newPage({tpl:t.k}).id)})):[];
     const jd=parseTR(inp.value);
-    items=[...(jd?[{ic:'📅',l:`${dayLabelLong(jd)} — gününe git`,run:()=>openDay(jd)}]:[]),...ps.map(({p})=>({ic:iconOf(p),l:titleOf(p),sub:p.date?dayLabel(p.date):rel(p.updated),run:()=>go('#p/'+p.id)})),...cm,...tp];
+    items=[...(jd?[{ic:'📅',l:`${dayLabelLong(jd)} — gününe git`,run:()=>openDay(jd)}]:[]),...ps.map(({p})=>({ic:iconOf(p),l:titleOf(p),sub:p.parent?pathOf(p):p.date?dayLabel(p.date):rel(p.updated),run:()=>go('#p/'+p.id)})),...cm,...tp];
     if(q&&!items.length)items=[{ic:'✍️',l:`“${inp.value.trim()}” adlı sayfa oluştur`,run:()=>go('#p/'+newPage({title:inp.value.trim()}).id)}];
     sel=Math.min(sel,items.length-1);
     let html='',i=0;const sec=(h,arr)=>{if(!arr.length)return;html+=`<div class="pop-h">${h}</div>`;arr.forEach(it=>{html+=`<button class="mi${i===sel?' act':''}" data-i="${i}"><span class="ic">${it.ic}</span><span class="tx">${esc(it.l)}</span>${it.sub?`<span class="k">${esc(it.sub)}</span>`:''}</button>`;i++})};

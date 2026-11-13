@@ -620,5 +620,42 @@
     "text": "Ücretsiz yardım (Pollinations) yazılan metni o servise gönderir; gizli bilgi için Claude anahtarı ya da çevrimdışı seçilmeli"
    }
   ]
+ },
+ {
+  "at": "2026-11-13T23:08:33",
+  "change": "Notlar: Notion gibi sayfa içinde sayfa (sayfa kartı, kenar çubuğunda ağaç, üstte yol, taşı, alt sayfalarıyla sil)",
+  "scores": {
+   "Notlar iç içe sayfa bilgisayar": {
+    "before": 95,
+    "after": 100
+   },
+   "Notlar iç içe sayfa telefon": {
+    "before": 98,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Notlar",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Ağaçtaki aç/kapa okları ve blok tutamacı 20px'ti",
+    "fix": "24px, telefonda 36–40px"
+   },
+   {
+    "app": "Notlar",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Telefonda üstteki yol (SAT / Matematik / …) sığmıyordu",
+    "fix": "Telefonda sadece ‹ üst sayfa / bu sayfa"
+   },
+   {
+    "app": "Notlar",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Kenar çubuğunda görünmez düğmeler sayfa adlarını kısaltıyordu",
+    "fix": "Düğmeler sadece üstüne gelince yer kaplıyor"
+   }
+  ]
  }
 ]

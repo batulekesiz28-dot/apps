@@ -27,7 +27,12 @@ Her işte bu dosyadaki standarda uy. Özet:
   - Widget'lar: `const WT={` (clock, weather, focus, rss, gcal, today, timer, cal, streak, links, countdown, habits, word, noise…), `cleanW` kaydedilen alanlar
   - Sekmeli uygulamalar (OS gibi): `TABS`, `openApp`, `switchTo`, `goHome`, `closeTab`, `switcher` (Alt+Q), `#dock`
   - Canlı ada `paintFocusBar`/`islandItems`, radyal menü `radial`, Sakin mod `calm`, komut paleti `palette`/`cmds`
-  - Temalar `THEMES` (7 tema), Firebase senkron `saveMeta` (Firestore `hub/meta`)
+  - Temalar `THEMES` + `themeMenu` (eski seçici, tema düğmesi), `themeStudio` (paletten), Firebase senkron `saveMeta` (Firestore `hub/meta`)
+  - Köprü `window.HUB` (dosyanın sonunda) → `ui/worlds.js` bunu kullanır
+- `ui/worlds.js` + `ui/worlds.css` — **Arayüz dünyaları** (tema DEĞİL, ayrı arayüz sistemleri): galaksi (hub'ın kendisi), defter, terminal, organik, isvicre, mekansal.
+  Seçim `appshell:world`, seçici `Worlds.picker()` (⇧⌘U, üstteki küre düğmesi, radyal "Arayüz"). Her dünya `R[ad]` nesnesi: `html`, `live` (veriyle yenilenen bölgeler), `mount`, `key`, `resize`.
+  Ortak veri `D()` (uygulamalar, bugün, notlar, çalışma). Yeni dünya eklerken mevcutlara dokunma, `R` ve `WORLDS`'e ekle.
+- `shared/skin.js|css` — hub'da seçilen renk temasını uygulamalara taşır.
 - `apps/notlar` — Notion benzeri notlar: bloklar, `/` komutları, şablonlar, takvim, **günler** (Workflowy tarzı: `openDay`, `dateIndex`, `parseTR`), **zaman çizelgesi** (`renderTimeline`), **sayfa içinde sayfa** (`parent` alanı, `kidsOf`, `addSubpage`, `treeItem`). Firestore `hub/notes`.
 - `apps/studylog` — çalışma sayacı, günler/hedefler/takip; görevler (`addTask`), rozetler (`checkMiles`), içgörüler (`insightsHTML`). Yerel anahtar `studylog:v1`, Firestore `hub/studylog`.
 - `apps/saat` — dünya saati · `apps/denetci` — denetim uygulaması · `apps/oneriler` — öneriler (`audit/ideas.json`)

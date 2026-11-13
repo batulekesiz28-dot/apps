@@ -1722,7 +1722,7 @@ function perfSample(dt){if(performance.now()<6000||dt>250)return; // ignore star
   const w=PERF.win;w.push(dt);if(w.length<90)return;const slow=w.filter(v=>v>24).length;PERF.win=[];PERF.bad=slow>30?(PERF.bad||0)+1:0;
   if(PERF.bad>=2){PERF.bad=0;setTier(TIER+1);toast(TIER>=2?'Akıcılık için hafif moda geçtim':'Akıcılık için görüntü kalitesini biraz düşürdüm')}}
 function setTier(t){TIER=clamp(t,0,2);try{localStorage.setItem('appshell:tier',TIER)}catch{}buildMesh();mKey='';patKey='';wakeMesh()}
-function setPaused(p){paused=p;if(p){cancelAnimationFrame(raf);raf=0}else{last=0;wake()}}
+function setPaused(p){if(document.body.classList.contains('inworld'))p=true;paused=p;if(p){cancelAnimationFrame(raf);raf=0}else{last=0;wake()}}
 const touchInput=()=>{lastInput=performance.now()};
 ['pointermove','pointerdown','keydown','wheel'].forEach(ev=>addEventListener(ev,touchInput,{passive:true,capture:true}));
 document.addEventListener('visibilitychange',()=>setPaused(document.hidden||(!!W.app&&!W.min)));
@@ -1834,7 +1834,7 @@ function stopNotes(){try{notesUnsub?.()}catch{}studyUnsubs.forEach(u=>{try{u()}c
 function studyToday(){const k=dayKey(new Date());let m=STUDY.sess.reduce((a,s)=>a+(s.date===k?s.min||0:0),0);const r=STUDY.run;if(r&&r.date===k)m+=(r.acc+(r.on?(Date.now()-r.at)/1000:0))/60;return m}
 const fmMin=m=>{m=Math.round(m);return m<60?m+' dk':Math.floor(m/60)+' sa'+(m%60?' '+m%60+' dk':'')};
 addEventListener('storage',e=>{if(e.key==='notlar:v1'&&notesOn)readLocalNotes()});
-function renderNoteWidgets(){for(const r of WEL.values())if(r.w.type==='today'||r.w.type==='cal'||r.w.type==='streak')renderW(r)}
+function renderNoteWidgets(){window.Worlds?.refresh();for(const r of WEL.values())if(r.w.type==='today'||r.w.type==='cal'||r.w.type==='streak')renderW(r)}
 function openNotes(h){const a=find('p:notlar');if(!a)return toast('Notlar uygulaması bulunamadı');
   const t=tabOf(a.key);if(t?.fr){try{t.fr.contentWindow.location.hash=h}catch{}return switchTo(a.key)}
   openApp({...a,url:a.url+h},nodes.get(a.key)?.el)}
@@ -1878,8 +1878,8 @@ setInterval(()=>{if(!document.hidden&&!(W.app&&!W.min))paintFocusBar()},1000);
 /* ── Radyal menü: boş alanda sağ tık ya da basılı tut ── */
 let radEl=null;
 const RAD=[['search','Ara',()=>palette()],['pen','Netleştir',()=>{const a=find('p:netlestir');a?openApp(a,nodes.get(a.key)?.el):toast('Netleştir bulunamadı')}],['note','Bugün',()=>openNotes('#today')],
-  ['widget','Widget',()=>widgetGallery()],['moon','Tema',()=>themeStudio()],['fit','Tümü',()=>fitAll()],['calm','Sakin',()=>calm(true)]];
-const RIC={search:'<circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5l3 3"/>',pen:'<path d="M2.5 13.5l2.8-.6 7.4-7.4a1.4 1.4 0 0 0-2-2L3.3 10.9z"/>',note:'<path d="M3.5 2.5h9v11h-9z"/><path d="M6 5.5h4M6 8h4"/>',widget:'<rect x="2.5" y="2.5" width="4.5" height="4.5" rx="1"/><rect x="9" y="2.5" width="4.5" height="4.5" rx="1"/><rect x="2.5" y="9" width="4.5" height="4.5" rx="1"/><path d="M11.2 9v4.5M9 11.2h4.5"/>',moon:'<path d="M13.5 9.5A5.5 5.5 0 0 1 6.5 2.5a5.5 5.5 0 1 0 7 7z"/>',fit:'<path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/>',calm:'<circle cx="8" cy="8" r="5.5"/><path d="M8 5v3l2 1.5"/>'};
+  ['widget','Widget',()=>widgetGallery()],['moon','Tema',()=>themeMenu()],['world','Arayüz',()=>window.Worlds?.picker()],['fit','Tümü',()=>fitAll()],['calm','Sakin',()=>calm(true)]];
+const RIC={world:'<circle cx="8" cy="8" r="5.5"/><path d="M2.5 8h11M8 2.5c2 2 2 9 0 11M8 2.5c-2 2-2 9 0 11"/>',search:'<circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5l3 3"/>',pen:'<path d="M2.5 13.5l2.8-.6 7.4-7.4a1.4 1.4 0 0 0-2-2L3.3 10.9z"/>',note:'<path d="M3.5 2.5h9v11h-9z"/><path d="M6 5.5h4M6 8h4"/>',widget:'<rect x="2.5" y="2.5" width="4.5" height="4.5" rx="1"/><rect x="9" y="2.5" width="4.5" height="4.5" rx="1"/><rect x="2.5" y="9" width="4.5" height="4.5" rx="1"/><path d="M11.2 9v4.5M9 11.2h4.5"/>',moon:'<path d="M13.5 9.5A5.5 5.5 0 0 1 6.5 2.5a5.5 5.5 0 1 0 7 7z"/>',fit:'<path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/>',calm:'<circle cx="8" cy="8" r="5.5"/><path d="M8 5v3l2 1.5"/>'};
 function radial(x,y){closeRadial(true);hideMenu();const R=Math.min(84,innerWidth/4),n=RAD.length,cx=clamp(x,R+34,innerWidth-R-34),cy=clamp(y,R+34,innerHeight-R-34);
   const el=document.createElement('div');el.className='radial';el.setAttribute('role','menu');el.style.left=cx+'px';el.style.top=cy+'px';
   el.innerHTML=`<div class="rd-c"></div>`+RAD.map(([ic,l],i)=>{const a=-Math.PI/2+i/n*Math.PI*2,dx=Math.cos(a)*R,dy=Math.sin(a)*R;
@@ -1913,7 +1913,7 @@ function paintCalm(){const d=new Date(),it=islandItems().filter(x=>x.k!=='apps')
 ['pointerdown','keydown','wheel'].forEach(ev=>addEventListener(ev,()=>{if(calmOn)calm(false)},{capture:true,passive:true}));
 addEventListener('pointermove',e=>{if(calmOn&&(Math.abs(e.movementX)+Math.abs(e.movementY)>6))calm(false)},{passive:true});
 // after 4 idle minutes with nothing open, settle into calm mode (saves battery: the galaxy loop stops)
-setInterval(()=>{if(!calmOn&&booted&&!document.hidden&&!(W.app&&!W.min)&&!palEl&&!sheetEl&&!menuEl&&!radEl&&performance.now()-lastInput>4*60e3&&!document.activeElement?.closest?.('#widgets'))calm(true)},5000);
+setInterval(()=>{if(!calmOn&&booted&&!document.body.classList.contains('inworld')&&!document.hidden&&!(W.app&&!W.min)&&!palEl&&!sheetEl&&!menuEl&&!radEl&&performance.now()-lastInput>4*60e3&&!document.activeElement?.closest?.('#widgets'))calm(true)},5000);
 
 /* ── Weather (Open-Meteo, no key) ── */
 const WX={};
@@ -2540,7 +2540,8 @@ function palette(){
     {ic:UI.graph,l:'Galaksiyi göster',k:'G',run:fitAll},
     {ic:UI.group,l:'Akıllı kümeleme · oto senkron',k:'K',run:smartSheet},
     ...THEME_KEYS.map(k=>({ic:UI.moon,l:'Tema: '+THEMES[k].n,k:k===document.documentElement.dataset.theme?'✓':'',run:()=>setTheme(k)})),
-    {ic:UI.fit,l:'Tema stüdyosu',k:'⇧⌘L',run:()=>themeStudio()},
+    {ic:UI.fit,l:'Tema stüdyosu',run:()=>themeStudio()},
+    {ic:UI.fit,l:'Arayüz değiştir (6 dünya)',k:'⇧⌘U',run:()=>window.Worlds?.picker()},
     {ic:UI.fit,l:'Sakin mod',run:()=>calm(true)},
     ...(TABS.length?[{ic:UI.fit,l:'Açık uygulamalar (değiştirici)',k:'⌥Q',run:()=>switcher(false,0)}]:[]),
     {ic:UI.zoom,l:'Görüntü: otomatik akıcılık'+(PERF.auto?' ✓':''),run:()=>{PERF.auto=true;localStorage.removeItem('appshell:perf');setTier(0);toast('Akıcılık otomatik — gerekirse kaliteyi kendim düşürürüm')}},
@@ -2692,7 +2693,7 @@ addEventListener('drop',async e=>{if(!hasFiles(e))return;e.preventDefault();drag
 $('#addBtn').onclick=e=>{e.stopPropagation();const b=$('#addBtn').getBoundingClientRect();
   popMenu(b.right-210,b.bottom+8,`<button class="mi" data-a="draft">${si(UI.plus)}Yeni taslak<span class="k">⌘N</span></button><button class="mi" data-a="widget">${si(UI.widget)}Widget ekle<span class="k">W</span></button>`,
     ev=>{const x=ev.target.closest('[data-a]');if(!x)return;hideMenu();if(x.dataset.a==='draft'){spawnHint=null;openSheet()}else widgetGallery()})};
-$('#themeBtn').onclick=e=>{e.stopPropagation();themeStudio()};
+$('#themeBtn').onclick=e=>{e.stopPropagation();themeMenu()};
 addEventListener('keydown',e=>{
   if(document.body.classList.contains('locked'))return;if(osKeys(e))return;const mod=e.metaKey||e.ctrlKey,k=e.key.toLowerCase();
   if(mod&&k==='k'){e.preventDefault();palEl?closePal():palette();return}
@@ -2745,7 +2746,7 @@ applyTheme(document.documentElement.dataset.theme);
 buildMesh();introStart=performance.now();wake();
 (async()=>{
   const mp=loadManifest();
-  if(!CLOUD){S=Local;drafts=await Local.load();await mp;mountWidgets();syncNodes();booted=true;GX.key='';seedWidgets();seedMore();autoClusters();ensureNotes();return}
+  if(!CLOUD){S=Local;drafts=await Local.load();await mp;mountWidgets();syncNodes();booted=true;GX.key='';seedWidgets();seedMore();autoClusters();ensureNotes();window.Worlds?.boot();return}
   gate('loading');
   try{await loadFirebase()}catch{return gate('error','Firebase yüklenemedi. İnternet bağlantını kontrol et.')}
   if(!firebase.apps.length)firebase.initializeApp(FB);
@@ -2757,9 +2758,18 @@ buildMesh();introStart=performance.now();wake();
     gate('loading','Yükleniyor…');await mp;S=Cloud;await Cloud.start(fs);
     const me=$('#me');me.hidden=false;me.innerHTML=u.photoURL?`<img src="${esc(u.photoURL)}" alt="" referrerpolicy="no-referrer">`:esc(mono(u.displayName||u.email));
     await ungate();introStart=performance.now();introT=0;wakeMesh();
-    mountWidgets();syncNodes();booted=true;GX.key='';seedWidgets();seedMore();migrateLocal();autoClusters();ensureNotes();
+    mountWidgets();syncNodes();booted=true;GX.key='';seedWidgets();seedMore();migrateLocal();autoClusters();ensureNotes();window.Worlds?.boot();
   });
 })();
+
+/* ── Arayüz dünyaları için köprü (ui/worlds.js bunu kullanır) ── */
+window.HUB={apps:()=>pub,open:k=>{const a=find(k);if(a)openApp(a,nodes.get(k)?.el)},openNotes:h=>openNotes(h),palette:()=>palette(),
+  items:()=>{try{return islandItems()}catch{return[]}},notes:()=>NOTES,study:()=>STUDY,studyToday:()=>{try{return studyToday()}catch{return 0}},dayKey,
+  icon:a=>miniIcon(a),themeMenu:()=>themeMenu(),tabs:()=>TABS.length,booted:()=>booted,
+  pause:on=>{if(on)setPaused(true);else setPaused(document.hidden||(!!W.app&&!W.min))},esc};
+addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.shiftKey&&(e.key==='u'||e.key==='U')){e.preventDefault();window.Worlds?.picker()}});
 </script>
+<link rel="stylesheet" href="ui/worlds.css">
+<script src="ui/worlds.js"></script>
 </body>
 </html>

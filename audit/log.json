@@ -727,5 +727,102 @@
     "text": "Tema yazı tipleri ilk açılışta internetten yükleniyor; yavaş bağlantıda kısa süre sistem yazısı görünür"
    }
   ]
+ },
+ {
+  "at": "2026-11-14T02:06:55",
+  "change": "6 arayüz dünyası (Galaksi, Defter, Terminal, Organik, İsviçre, Mekânsal) + önizlemeli Arayüz seçici; eski tema seçici geri geldi",
+  "scores": {
+   "Defter telefon": {
+    "before": null,
+    "after": 100
+   },
+   "Defter masaüstü": {
+    "before": null,
+    "after": 100
+   },
+   "Terminal telefon": {
+    "before": null,
+    "after": 100
+   },
+   "Terminal masaüstü": {
+    "before": null,
+    "after": 100
+   },
+   "Organik telefon": {
+    "before": null,
+    "after": 100
+   },
+   "Organik masaüstü": {
+    "before": null,
+    "after": 100
+   },
+   "İsviçre telefon": {
+    "before": null,
+    "after": 100
+   },
+   "İsviçre masaüstü": {
+    "before": null,
+    "after": 100
+   },
+   "Mekânsal telefon": {
+    "before": null,
+    "after": 100
+   },
+   "Mekânsal masaüstü": {
+    "before": null,
+    "after": 100
+   },
+   "Arayüz seçici telefon": {
+    "before": null,
+    "after": 100
+   },
+   "Arayüz seçici masaüstü": {
+    "before": null,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Organik",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Yaprak kartlarındaki yazı arka planla karışıyordu",
+    "fix": "Yapraklara düz koyu yeşil zemin"
+   },
+   {
+    "app": "Mekânsal",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Arkadaki cam pencerelerin yazısı çok soluktu",
+    "fix": "Arkada kalanlar gizleniyor, yandakiler daha az soluk"
+   },
+   {
+    "app": "İsviçre",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Küçük kırmızı yazılar sınırda kontrasttaydı",
+    "fix": "Kırmızı bir ton koyulaştırıldı"
+   },
+   {
+    "app": "Defter",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Telefonda bağlantılara dokunmak zordu",
+    "fix": "Telefonda satır aralığı 40px"
+   },
+   {
+    "app": "Terminal",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Telefonda komut satırı alçaktı",
+    "fix": "40px yükseklik"
+   },
+   {
+    "app": "Hub",
+    "sev": "bilgi",
+    "status": "open",
+    "text": "Dünyaların yazı tipleri ilk açılışta internetten iniyor; bir an yedek yazı tipi görünebilir"
+   }
+  ]
  }
 ]

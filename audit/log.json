@@ -99,5 +99,40 @@
     "fix": "Telefon için 12px alt sınır ve 40px düğme."
    }
   ]
+ },
+ {
+  "at": "2026-11-13T20:05:00+03:00",
+  "change": "Hub galaksiye dönüştü: ortada Denetçi kara delik, her küme bir güneş, uygulamalar gezegen",
+  "scores": {
+   "Hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Hub bilgisayar": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Hub",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Dönen gezegenlere tıklamak zordu: imleç bir gezegene yaklaşınca gökyüzü duruyor, uzaklaşınca dönmeye devam ediyor."
+   },
+   {
+    "app": "Hub",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Widget kartları galaksinin içine düşüyordu; artık otomatik olarak galaksinin dışına diziliyor."
+   },
+   {
+    "app": "Hub",
+    "sev": "info",
+    "status": "open",
+    "text": "Galaksinin tamamı ekrana sığınca (%36) uygulama adları gizleniyor; yakınlaşınca görünüyor.",
+    "fix": "İstenirse uzak görünümde sadece güneş adları yerine kısa uygulama adları da gösterilebilir."
+   }
+  ]
  }
 ]

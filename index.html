@@ -49,6 +49,7 @@ canvas{position:fixed;inset:0;pointer-events:none}
 #field{z-index:0}#fx{z-index:1}
 #stage{position:fixed;inset:0;z-index:2}
 #widgets{position:fixed;inset:0;z-index:3;pointer-events:none}
+.node.bhole .tile,.node.bhole .shadow,.node.bhole .port{opacity:0!important}.node.bhole .nlabel{top:82px}
 #widgets.moving .wg,.wg.drag{will-change:transform}
 #nodes{position:fixed;inset:0;z-index:3;pointer-events:none}
 body.panning,body.panning #stage,body.panning .node,body.panning .wg{cursor:grabbing!important}
@@ -410,7 +411,7 @@ body.locked .top,body.locked #nodes,body.locked .status,body.locked .hint,body.l
     <span>Ara veya komut</span><span class="kbd">⌘K</span>
   </button>
   <button class="ib" id="themeBtn" title="Tema (⇧⌘L)" aria-label="Temayı değiştir"><svg viewBox="0 0 16 16"><path id="themeIcon" d="M13.5 9.5A5.5 5.5 0 0 1 6.5 2.5a5.5 5.5 0 1 0 7 7z"/></svg></button>
-  <button class="ib" id="layoutBtn" title="Grafiği düzenle (G)" aria-label="Grafiği düzenle"><svg viewBox="0 0 16 16"><circle cx="4" cy="4" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="7" cy="12.5" r="2"/><path d="M5.9 4.3l4.2.5M5 5.7l1.4 4.9M10.9 6.7l-2.7 4.3"/></svg></button>
+  <button class="ib" id="layoutBtn" title="Galaksiyi göster (G)" aria-label="Galaksiyi göster"><svg viewBox="0 0 16 16"><circle cx="4" cy="4" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="7" cy="12.5" r="2"/><path d="M5.9 4.3l4.2.5M5 5.7l1.4 4.9M10.9 6.7l-2.7 4.3"/></svg></button>
   <button class="ib solid" id="addBtn" title="Yeni taslak (⌘N)" aria-label="Yeni taslak"><svg viewBox="0 0 12 12"><path d="M6 1.5v9M1.5 6h9"/></svg></button>
   <button class="ib me" id="me" hidden title="Hesap"></button>
 </header>
@@ -648,14 +649,19 @@ function layoutMesh(){
   let gw=WG;while(gw*cam.z<19)gw*=2;while(gw*cam.z>40&&gw>7.5)gw/=2;
   const g=gw*cam.z,cols=Math.ceil(M.W/g)+3,rows=Math.ceil(M.H/g)+3,c0=Math.floor(s2wx(0)/gw)-1,r0=Math.floor(s2wy(0)/gw)-1;
   const K=['dx','dy','vx','vy','en'];
-  if(gw!==M.gw||cols!==M.cols||rows!==M.rows){M.n=cols*rows;for(const k of['rx','ry',...K])M[k]=new Float32Array(M.n);M.flat=true}
+  if(gw!==M.gw||cols!==M.cols||rows!==M.rows){M.n=cols*rows;for(const k of['rx','ry','wk',...K])M[k]=new Float32Array(M.n);M.flat=true}
   else if(c0!==M.c0||r0!==M.r0){const dc=c0-M.c0,dr=r0-M.r0;
     for(const k of K){const a=M[k],b=new Float32Array(M.n);
       for(let r=0;r<rows;r++){const sr=r+dr;if(sr<0||sr>=rows)continue;for(let c=0;c<cols;c++){const sc=c+dc;if(sc<0||sc>=cols)continue;b[r*cols+c]=a[sr*cols+sc]}}M[k]=b}}
   M.gw=gw;M.gap=g;M.cols=cols;M.rows=rows;M.c0=c0;M.r0=r0;
   const bx=w2sx(c0*gw),by=w2sy(r0*gw);M.ox=bx;M.oy=by;
-  for(let r=0;r<rows;r++){const y=by+r*g;for(let c=0;c<cols;c++){const i=r*cols+c;M.rx[i]=bx+c*g;M.ry[i]=y}}
-  meshDirty=true;
+  // spacetime well: grid lines bend toward the black hole and darken near it
+  const SIG=260,AMP=120,lim=SIG*2.6;let warp=false;
+  for(let r=0;r<rows;r++){const wy=(r0+r)*gw;for(let c=0;c<cols;c++){const i=r*cols+c,wx=(c0+c)*gw;
+    if(wx>-lim&&wx<lim&&wy>-lim&&wy<lim){const d=Math.hypot(wx,wy)||1,q=d/SIG,ex=Math.exp(-q*q),sh=AMP*q*ex/d;
+      M.rx[i]=w2sx(wx-wx*sh);M.ry[i]=w2sy(wy-wy*sh);M.wk[i]=ex*.8;if(ex>.03)warp=true}
+    else{M.rx[i]=bx+c*g;M.ry[i]=by+r*g;M.wk[i]=0}}}
+  M.warp=warp;meshDirty=true;
 }
 const nx=i=>M.rx[i]+M.dx[i],ny=i=>M.ry[i]+M.dy[i];
 function meshIdx(x,y){const c=Math.round((x-M.ox)/M.gap),r=Math.round((y-M.oy)/M.gap);return c<0||r<0||c>=M.cols||r>=M.rows?-1:r*M.cols+c}
@@ -702,8 +708,8 @@ function drawFlat(){
   const sc=M.gap*dpr/T;pat.setTransform(new DOMMatrix([sc,0,0,sc,M.ox*dpr-T*sc/2,M.oy*dpr-T*sc/2]));
   cx.save();cx.setTransform(1,0,0,1,0,0);cx.fillStyle=pat;cx.fillRect(0,0,cv.width,cv.height);cx.restore();meshDirty=false}
 function drawMesh(now){
-  const{W,H,cols,rows,n,en}=M;cx.clearRect(0,0,W,H);
-  if(M.flat&&introT>=1&&pat!==undefined&&typeof DOMMatrix!=='undefined')return drawFlat();
+  const{W,H,cols,rows,n,en,wk}=M;cx.clearRect(0,0,W,H);
+  if(M.flat&&!M.warp&&introT>=1&&typeof DOMMatrix!=='undefined')return drawFlat();
   let reveal=1;if(introT<1){introT=clamp((now-introStart)/1500,0,1);reveal=1-Math.pow(1-introT,3)}
   const cxm=W/2,cym=H/2,maxR=Math.hypot(W,H)*.6*reveal,full=reveal>=1;
   const vis=i=>full?1:clamp((maxR-Math.hypot(M.rx[i]-cxm,M.ry[i]-cym))/140,0,1);
@@ -711,8 +717,8 @@ function drawMesh(now){
   const la=cam.z<.6?.75:1;
   const L=[new Path2D(),new Path2D(),new Path2D()];
   for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){const i=r*cols+c;if(!full&&vis(i)<.5)continue;const x=nx(i),y=ny(i);
-    if(c<cols-1){const j=i+1,e=en[i]>en[j]?en[i]:en[j],b=e>.45?2:e>.08?1:0;L[b].moveTo(x,y);L[b].lineTo(nx(j),ny(j))}
-    if(r<rows-1){const j=i+cols,e=en[i]>en[j]?en[i]:en[j],b=e>.45?2:e>.08?1:0;L[b].moveTo(x,y);L[b].lineTo(nx(j),ny(j))}}
+    if(c<cols-1){const j=i+1,e=Math.max(en[i],en[j],wk[i],wk[j]),b=e>.45?2:e>.08?1:0;L[b].moveTo(x,y);L[b].lineTo(nx(j),ny(j))}
+    if(r<rows-1){const j=i+cols,e=Math.max(en[i],en[j],wk[i],wk[j]),b=e>.45?2:e>.08?1:0;L[b].moveTo(x,y);L[b].lineTo(nx(j),ny(j))}}
   cx.lineWidth=.5;for(let b=0;b<3;b++){cx.strokeStyle=`rgba(${TH.l},${TH.la[b]*(b?1:la)})`;cx.stroke(L[b])}
   const base=new Path2D(),r0=M.dpr>1?1:1.05,D=TH.dot,Hh=TH.hot,NB=6,bk=[];
   for(let i=0;i<n;i++){const v=vis(i);if(v<=0)continue;const e=en[i],x=nx(i),y=ny(i);
@@ -761,7 +767,7 @@ function placeFor(key,self,hint){
 function rememberLayout(n,save=true){pos[n.a.key]=[Math.round(n.aw[0]),Math.round(n.aw[1])];if(save)saveMeta()}
 let spawnHint=null;
 function createNode(a,delay=0){
-  const el=document.createElement('button');el.className='node'+(a.kind==='draft'?' draft':'');el.dataset.key=a.key;el.setAttribute('aria-label',a.name);
+  const el=document.createElement('button');el.className='node'+(a.kind==='draft'?' draft':'')+(a.key===BH_KEY?' bhole':'');el.dataset.key=a.key;el.setAttribute('aria-label',a.name);
   el.innerHTML=nodeHTML(a);$('#nodes').appendChild(el);
   const n={a,el,aw:null,ax:0,ay:0,x:0,y:0,vx:0,vy:0,rot:0,tx:0,ty:0,ph:[Math.random()*6.28,Math.random()*6.28,Math.random()*6.28,Math.random()*6.28],drag:false,hover:0,hov:false,dim:false,gx:0,gy:0,ps:'',sc:1,hs:0};
   n.fresh=!posOf(a.key)&&!spawnHint;n.aw=placeFor(a.key,n,spawnHint);nodes.set(a.key,n);if(!pos[a.key])rememberLayout(n,false);
@@ -822,7 +828,7 @@ function wireNode(n){
       if(!started){el.focus({preventScroll:true});openApp(n.a,el);return}
       n.drag=false;el.classList.remove('dragging');
       if(e.pointerType!=='mouse'&&Math.hypot(n.gx+ox-sx,n.gy+oy-sy)<10){setTimeout(()=>justDragged=false,0);showMenu(n.x,n.y+40,n.a);wakeMesh();return}
-      n.aw=nearestFree(s2wx(n.x),s2wy(n.y+LIFT*cam.z),n);rememberLayout(n);anc(n);ripple(n.ax,n.ay,1.6);
+      dropToGalaxy(n);
       setTimeout(()=>justDragged=false,0);wakeMesh()};
     addEventListener('pointermove',mv,{passive:true});addEventListener('pointerup',up);addEventListener('pointercancel',up);
   });
@@ -921,7 +927,7 @@ function autoLayout(){
   saveMeta();wake();setTimeout(fitAll,120);
   toast('Graf düzenlendi',()=>{pos=prev;for(const n of nodes.values())n.aw=[1e9,1e9];for(const n of nodes.values())n.aw=placeFor(n.a.key,n);saveMeta();wakeMesh()});
 }
-$('#layoutBtn').onclick=e=>{anim(e.currentTarget.firstElementChild,[{transform:'rotate(0)'},{transform:'rotate(360deg)'}],{duration:700,easing:OUT});autoLayout()};
+$('#layoutBtn').onclick=e=>{anim(e.currentTarget.firstElementChild,[{transform:'rotate(0)'},{transform:'rotate(360deg)'}],{duration:700,easing:OUT});fitAll()};
 
 /* ════════════════════════════════════════════════════════════
    GROUPS — yumuşak, organik küme alanları
@@ -1014,7 +1020,6 @@ function groupLabelMenu(x,y,g){
   const mem=Object.keys(members).filter(k=>members[k]===g&&nodes.has(k));
   popMenu(x,y,`<div class="who"><b>${esc(groups[g].name)}</b>${mem.length} uygulama</div><div class="msep"></div>
     <button class="mi" data-gm="edit">${si(UI.edit)}Adı ve rengi düzenle</button>
-    <button class="mi" data-gm="gather">${si(UI.graph)}Bir araya topla</button>
     <button class="mi danger" data-gm="drop">${si(UI.del)}Kümeyi dağıt</button>`,
     e=>{const b=e.target.closest('[data-gm]');if(!b)return;hideMenu();const k=b.dataset.gm;
       if(k==='edit')groupSheet(g);
@@ -1056,6 +1061,84 @@ function hidePeek(now){clearTimeout(PK.t);if(!PK.shown)return;PK.shown=false;PK.
 /* ════════════════════════════════════════════════════════════
    LOOP — tek rAF; ağ uyur, boştayken 30fps'e iner
    ════════════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════════
+   GALAXY — ortada kara delik (Denetçi), her küme bir güneş,
+   küme uygulamaları gezegen; kümesizler kara deliğin yörüngesinde
+   ════════════════════════════════════════════════════════════ */
+const BH_KEY='p:denetci';
+const GX={T:(Date.now()/1000)%100000,ts:1,sys:[],loose:[],RS:0,RG:400,key:''};
+let sunHover=null;
+const hashU=s=>(hash(s)%10007)/10007;
+const hexA=(h,a)=>{const n=parseInt(h.slice(1),16);return`rgba(${n>>16&255},${n>>8&255},${n&255},${a})`};
+function galaxyModel(){
+  const key=[...nodes.keys()].join()+'|'+JSON.stringify(members)+'|'+JSON.stringify(groups);if(key===GX.key)return;GX.key=key;
+  const by={},loose=[],nm=(a,b)=>a.a.name.localeCompare(b.a.name,'tr');
+  for(const n of nodes.values()){if(n.a.key===BH_KEY)continue;const g=groupOf(n.a.key);if(g)(by[g]||=[]).push(n);else loose.push(n)}
+  GX.sys=Object.keys(by).sort((a,b)=>(groups[a].name||'').localeCompare(groups[b].name||'','tr')).map(g=>{const ms=by[g].sort(nm),orbits=ms.map((n,j)=>96+j*66);return{g,ms,orbits,R:orbits[orbits.length-1]+48,ph:hashU(g)*6.283,x:0,y:0}});
+  loose.sort(nm);const rings=[];let r=230,i=0;while(i<loose.length){const cap=Math.max(3,Math.floor(2*Math.PI*r/150));rings.push({r,ms:loose.slice(i,i+cap)});i+=cap;r+=100}GX.loose=rings;
+  const inner=rings.length?rings[rings.length-1].r+70:170,S=GX.sys.length,maxR=S?Math.max(...GX.sys.map(s=>s.R)):0;
+  GX.RS=S?Math.max(inner+maxR+80,S>1?(2*maxR+100)/(2*Math.sin(Math.PI/S)):0,520):0;
+  GX.RG=S?GX.RS+maxR+30:inner;
+  relocateWidgets();
+}
+function galaxyStep(dt){
+  // the pointer near a planet holds the sky still so it's easy to click (planets would otherwise slide away)
+  let near=false;if(FINE&&ptr.amp>.3)for(const n of nodes.values()){const dx=n.x-ptr.x,dy=n.y-ptr.y;if(dx*dx+dy*dy<90*90){near=true;break}}
+  const hold=!!(near||hoverNode||sunHover||menuEl||sheetEl||linkDrag||[...nodes.values()].some(n=>n.drag));
+  GX.ts+=((hold?0:1)-GX.ts)*(1-Math.pow(.86,dt/16.667));if(!REDUCED)GX.T+=dt/1000*GX.ts;
+  const T=GX.T,S=GX.sys.length;
+  GX.sys.forEach((s,k)=>{const a=k/S*6.2832+T*6.2832/480-1.2;s.x=Math.cos(a)*GX.RS;s.y=Math.sin(a)*GX.RS*.9;
+    s.ms.forEach((n,j)=>{const r=s.orbits[j],per=34*Math.pow(r/96,1.5),ang=hashU(n.a.key)*6.283+T*6.2832/per;n.aw=[s.x+Math.cos(ang)*r,s.y+Math.sin(ang)*r]})});
+  for(const ring of GX.loose){const per=90*Math.pow(ring.r/230,1.5),m=ring.ms.length;ring.ms.forEach((n,i)=>{const ang=i/m*6.2832+T*6.2832/per+ring.r*.013;n.aw=[Math.cos(ang)*ring.r,Math.sin(ang)*ring.r]})}
+  const bh=nodes.get(BH_KEY);if(bh)bh.aw=[0,0];
+}
+function drawBH(x,y,Z,time,dark){const R=Math.max(12,40*Z);if(x<-R*6||x>M.W+R*6||y<-R*6||y>M.H+R*6)return;
+  const g=fx.createRadialGradient(x,y,R*.8,x,y,R*3.4);g.addColorStop(0,dark?'rgba(255,160,90,.20)':'rgba(24,24,27,.13)');g.addColorStop(1,'rgba(0,0,0,0)');fx.fillStyle=g;fx.beginPath();fx.arc(x,y,R*3.4,0,6.2832);fx.fill();
+  const disk=(a0,a1)=>{fx.save();fx.translate(x,y);fx.rotate(-.18);fx.scale(1,.36);
+    for(let i=0;i<4;i++){const rr=R*(1.4+i*.34);fx.lineWidth=Math.max(1,(2.6-i*.5)*Math.min(1.4,Z))/.36*.5;fx.strokeStyle=dark?`rgba(255,${200-i*28},${130-i*22},${.6-i*.12})`:`rgba(24,24,27,${.5-i*.09})`;
+      fx.setLineDash([rr*.8,rr*.3]);fx.lineDashOffset=-time*(46-i*7)*Math.max(.5,Z);fx.beginPath();fx.arc(0,0,rr,a0,a1);fx.stroke()}
+    fx.setLineDash([]);fx.restore()};
+  disk(Math.PI,Math.PI*2); // back half
+  fx.fillStyle='#050506';fx.beginPath();fx.arc(x,y,R,0,6.2832);fx.fill();
+  fx.lineWidth=1.3;fx.strokeStyle=dark?'rgba(255,205,150,.75)':'rgba(255,255,255,.7)';fx.beginPath();fx.arc(x,y,R*1.03,0,6.2832);fx.stroke();
+  disk(0,Math.PI); // front half passes in front of the hole
+}
+function drawGalaxy(time){
+  groupHits=[];const Z=cam.z,L=TH.l,dark=document.documentElement.dataset.theme==='dark',cx0=w2sx(0),cy0=w2sy(0);
+  fx.save();fx.lineWidth=1;
+  if(GX.RS){fx.setLineDash([2,7]);fx.strokeStyle=`rgba(${L},.12)`;fx.beginPath();fx.ellipse(cx0,cy0,GX.RS*Z,GX.RS*.9*Z,0,0,6.2832);fx.stroke();fx.setLineDash([])}
+  for(const r of GX.loose){fx.strokeStyle=`rgba(${L},.09)`;fx.beginPath();fx.arc(cx0,cy0,r.r*Z,0,6.2832);fx.stroke()}
+  drawBH(cx0,cy0,Z,time,dark);
+  for(const s of GX.sys){const x=w2sx(s.x),y=w2sy(s.y),grp=groups[s.g];if(!grp)continue;const col=GCOL[grp.color]||GCOL.gray;
+    if(x+(s.R+60)*Z<0||x-(s.R+60)*Z>M.W||y+(s.R+60)*Z<0||y-(s.R+60)*Z>M.H)continue;
+    const hot=sunHover===s.g;
+    for(const r of s.orbits){fx.strokeStyle=hot?hexA(col,.35):`rgba(${L},.1)`;fx.beginPath();fx.arc(x,y,r*Z,0,6.2832);fx.stroke()}
+    const R=Math.max(7,18*Z)*(1+Math.sin(time*1.4+s.ph)*.035)*(hot?1.12:1);
+    const g=fx.createRadialGradient(x,y,R*.4,x,y,R*4.6);g.addColorStop(0,hexA(col,dark?.5:.34));g.addColorStop(.35,hexA(col,dark?.16:.1));g.addColorStop(1,hexA(col,0));
+    fx.fillStyle=g;fx.beginPath();fx.arc(x,y,R*4.6,0,6.2832);fx.fill();
+    fx.fillStyle=col;fx.beginPath();fx.arc(x,y,R,0,6.2832);fx.fill();
+    fx.fillStyle='rgba(255,255,255,.32)';fx.beginPath();fx.arc(x-R*.32,y-R*.32,R*.42,0,6.2832);fx.fill();
+    const name=(grp.name||'').toLocaleUpperCase('tr'),fs=Math.round(Math.max(10.5,12*Math.min(1.15,Z)));
+    fx.font=`600 ${fs}px "Geist Mono",ui-monospace,Menlo,monospace`;if('letterSpacing' in fx)fx.letterSpacing='1.5px';fx.textAlign='center';fx.textBaseline='top';
+    const ly=y+R+8,w=fx.measureText(name).width;fx.fillStyle=dark?'rgba(13,13,15,.7)':'rgba(255,255,255,.82)';fx.beginPath();fx.roundRect?.(x-w/2-7,ly-3,w+14,fs+7,6);fx.fill();
+    fx.fillStyle=dark?'rgba(255,255,255,.9)':col;fx.fillText(name,x,ly);
+    groupHits.push({g:s.g,x:Math.min(x-R,x-w/2-7),y:y-R,w:Math.max(R*2,w+14),h:R*2+fs+18})}
+  fx.restore()}
+// drop a dragged app: on a sun → joins that küme; near the black hole → leaves its küme
+let dropHint=false;
+function dropToGalaxy(n){const key=n.a.key;if(key===BH_KEY)return;const wx=s2wx(n.x),wy=s2wy(n.y),cur=groupOf(key);
+  let best=null,bd=1e18;for(const s of GX.sys){const d=Math.hypot(s.x-wx,s.y-wy);if(d<s.R+30&&d<bd){bd=d;best=s}}
+  const innerR=GX.loose.length?GX.loose[GX.loose.length-1].r+90:320;
+  if(best&&best.g!==cur){const prev=assignGroup(key,best.g),pobj=prev&&{...groups[prev]};toast(`${n.a.name} → ${groups[best.g].name}`,()=>{if(prev&&!groups[prev])groups[prev]=pobj;assignGroup(key,prev)})}
+  else if(!best&&cur&&Math.hypot(wx,wy)<innerR){const gobj={...groups[cur]},prev=assignGroup(key,null);toast(`${n.a.name} kara deliğin yörüngesine geçti`,()=>{if(!groups[prev])groups[prev]=gobj;assignGroup(key,prev)})}
+  else if(!best&&!dropHint){dropHint=true;toast('Bir güneşin üstüne bırakırsan o kümeye girer')}
+  ripple(n.x,n.y,1.4)}
+// keep widget cards out of the galaxy disc
+function relocateWidgets(){if(!wReady||!booted)return;const RG=GX.RG+40;let moved=false;
+  for(const r of WEL.values()){if(wDrag?.r===r)continue;const[x,y]=r.w.w,w=r.ww,h=r.wh||160,cx=clamp(0,x,x+w),cy=clamp(0,y,y+h);
+    if(Math.hypot(cx,cy)<RG){r.w.w=wSpot(w,h,[RG+60,-RG*.55],r.w.id);moved=true}}
+  if(moved)saveMeta()}
+
 function frame(t){
   raf=0;if(paused)return;
   const idle=t-lastInput>8000&&!linkDrag;
@@ -1064,29 +1147,17 @@ function frame(t){
   stepCam(k);if(cam.x!==cam.px||cam.y!==cam.py||cam.z!==cam.pz){camMoved();meshDirty=true}
   stepWidgets(k);
   const list=[...nodes.values()],anyDrag=list.some(n=>n.drag),Z=cam.z,LZ=LIFT*Z;
+  galaxyModel();galaxyStep(dt);
   for(const n of list){
-    anc(n);const ax0=n.ax,ay0=n.ay;n.hover+=((n.hov||n.drag?1:0)-n.hover)*(1-Math.pow(.85,k));
+    n.hover+=((n.hov||n.drag?1:0)-n.hover)*(1-Math.pow(.85,k));
+    const sx=w2sx(n.aw[0]),sy=w2sy(n.aw[1]);n.ax=sx;n.ay=sy;
     if(n.drag){n.tx=n.gx;n.ty=n.gy;continue}
-    const calm=1-n.hover*.75,sw=REDUCED?0:1;
-    let tx=ax0+(Math.sin(time*.52+n.ph[0])*8+Math.sin(time*1.21+n.ph[1])*2.8)*calm*sw*Z;
-    let ty=ay0-LZ-n.hover*6*Z+(Math.sin(time*.71+n.ph[2])*6.5+Math.sin(time*1.53+n.ph[3])*2.2)*calm*sw*Z;
-    n.tx=tx;n.ty=ty;
+    n.tx=sx;n.ty=sy-n.hover*4*Z;
   }
-  // group cohesion: members drift gently toward their group's centre
-  const gc={};for(const n of list){const g=groupOf(n.a.key);if(!g)continue;(gc[g]||=[0,0,0]);gc[g][0]+=n.tx;gc[g][1]+=n.ty;gc[g][2]++}
-  for(const n of list){const g=groupOf(n.a.key);if(!g||n.drag||gc[g][2]<2)continue;const cxg=gc[g][0]/gc[g][2],cyg=gc[g][1]/gc[g][2],ddx=cxg-n.tx,ddy=cyg-n.ty,d=Math.hypot(ddx,ddy)||1,p=Math.min(18*Z,Math.max(0,d-110*Z)*.05);n.tx+=ddx/d*p;n.ty+=ddy/d*p}
-  for(const[ka,kb]of links){const a=nodes.get(ka),b=nodes.get(kb);if(!a||!b)continue;
-    const ddx=b.tx-a.tx,ddy=b.ty-a.ty,d=Math.hypot(ddx,ddy)||1,ux=ddx/d,uy=ddy/d;
-    const pa=b.drag?Math.min(90*Z,Math.max(0,d-150*Z)*.22):Math.min(26*Z,Math.max(0,d-130*Z)*.06);
-    const pb=a.drag?Math.min(90*Z,Math.max(0,d-150*Z)*.22):Math.min(26*Z,Math.max(0,d-130*Z)*.06);
-    if(!a.drag){a.tx+=ux*pa;a.ty+=uy*pa}if(!b.drag){b.tx-=ux*pb;b.ty-=uy*pb}}
-  const CD=96*Z;for(let i=0;i<list.length;i++)for(let j=i+1;j<list.length;j++){const a=list[i],b=list[j];const ddx=b.tx-a.tx,ddy=b.ty-a.ty;if(ddx>CD||ddx<-CD||ddy>CD||ddy<-CD)continue;
-    const d=Math.hypot(ddx,ddy)||1;if(d<CD){const p=(CD-d)*.5,ux=ddx/d,uy=ddy/d;if(!a.drag){a.tx-=ux*p;a.ty-=uy*p}if(!b.drag){b.tx+=ux*p;b.ty+=uy*p}}}
   for(const n of list){
-    const st=n.drag?.32:.065,dp=Math.pow(n.drag?.7:.86,k);
+    const st=n.drag?.32:.09,dp=Math.pow(n.drag?.7:.8,k);
     n.vx=(n.vx+(n.tx-n.x)*st*k)*dp;n.vy=(n.vy+(n.ty-n.y)*st*k)*dp;n.x+=n.vx*k;n.y+=n.vy*k;
-    const swRot=REDUCED?0:Math.sin(time*.6+n.ph[1])*2.4*(1-n.hover*.8);
-    n.rot+=(clamp(n.vx*(n.drag?1.4:.9),-16,16)+swRot-n.rot)*(1-Math.pow(.8,k));place(n);
+    n.rot+=(clamp(n.drag?n.vx*1.4:0,-16,16)-n.rot)*(1-Math.pow(.8,k));place(n);
   }
   highlight();
   // preview card: shows after ~450ms of hovering (frame-driven, survives the buoy's motion)
@@ -1094,13 +1165,8 @@ function frame(t){
   ptr.sx+=(ptr.x-ptr.sx)*(1-Math.pow(1-.22,k));ptr.sy+=(ptr.y-ptr.sy)*(1-Math.pow(1-.22,k));ptr.amp+=(ptr.tAmp-ptr.amp)*(1-Math.pow(1-.07,k));
   if(meshAwake||introT<1){const settled=stepMesh(k,t);drawMesh(t);if(settled&&introT>=1)meshAwake=false}
   else if(meshDirty)drawMesh(t);
-  // fx canvas: only clear/redraw the region that actually holds ink (last frame ∪ this frame)
-  let b0=1e9,b1=1e9,b2=-1e9,b3=-1e9;const gb=(x,y,p)=>{if(x-p<b0)b0=x-p;if(y-p<b1)b1=y-p;if(x+p>b2)b2=x+p;if(y+p>b3)b3=y+p};
-  const PN=80+70*Z;for(const n of list){gb(n.x,n.y,PN);gb(n.ax,n.ay,PN)}
-  if(linkDrag)gb(linkDrag.x,linkDrag.y,40);
-  const nb=b2>b0?[Math.max(0,b0|0),Math.max(0,b1|0),Math.min(M.W,Math.ceil(b2)),Math.min(M.H,Math.ceil(b3))]:null,pb=fxBox;
-  if(pb)fx.clearRect(pb[0],pb[1],pb[2]-pb[0],pb[3]-pb[1]);if(nb)fx.clearRect(nb[0],nb[1],nb[2]-nb[0],nb[3]-nb[1]);fxBox=nb;
-  drawGroups(time);drawLinks(time);drawTethers(time);drawRubber(time);followPeek(k);
+  fx.clearRect(0,0,M.W,M.H);
+  drawGalaxy(time);drawRubber(time);followPeek(k);
   raf=requestAnimationFrame(frame);
 }
 const wake=()=>{if(!raf&&!paused)raf=requestAnimationFrame(frame)};
@@ -1112,9 +1178,9 @@ document.addEventListener('visibilitychange',()=>setPaused(document.hidden||(!!W
 /* Pointer on empty canvas */
 addEventListener('pointermove',e=>{if(e.pointerType==='mouse'||ptr.down){ptr.x=e.clientX;ptr.y=e.clientY;if(ptr.sx<-1e3){ptr.sx=ptr.x;ptr.sy=ptr.y}ptr.tAmp=wDrag||e.target.closest?.('.wg,.zbar,.top')?0:1;wakeMesh()}
   if(linkDrag&&linkDrag.mode==='click')updateLink(e.clientX,e.clientY)},{passive:true});
-document.documentElement.addEventListener('pointerleave',()=>{ptr.tAmp=0;wakeMesh()});
+document.documentElement.addEventListener('pointerleave',()=>{ptr.tAmp=0;sunHover=null;wakeMesh()});
 addEventListener('blur',()=>{ptr.tAmp=0;wakeMesh()});
-$('#stage').addEventListener('pointermove',e=>{if(e.pointerType!=='mouse'||linkDrag)return;$('#stage').classList.toggle('ongroup',!!groupAt(e.clientX,e.clientY));const h=linkHit(e.clientX,e.clientY);
+$('#stage').addEventListener('pointermove',e=>{if(e.pointerType!=='mouse'||linkDrag)return;sunHover=groupAt(e.clientX,e.clientY);$('#stage').classList.toggle('ongroup',!!sunHover);const h=linkHit(e.clientX,e.clientY);
   if(h!==hoverLink){hoverLink=h;$('#stage').classList.toggle('onlink',h>=0);wake()}});
 $('#stage').addEventListener('pointerdown',e=>{
   if(linkDrag){if(linkDrag.mode==='click')cancelLink();return}
@@ -1177,6 +1243,7 @@ function worldBounds(){let x0=1e18,y0=1e18,x1=-1e18,y1=-1e18,n=0;
   const add=(a,b,c,d)=>{if(a<x0)x0=a;if(b<y0)y0=b;if(c>x1)x1=c;if(d>y1)y1=d;n++};
   for(const nd of nodes.values())if(!nd.dim)add(nd.aw[0]-70,nd.aw[1]-LIFT-40,nd.aw[0]+70,nd.aw[1]+14);
   for(const r of wRects())add(r.x,r.y,r.x+r.w,r.y+r.h);
+  if(nodes.size)add(-GX.RG-20,-GX.RG-20,GX.RG+20,GX.RG+20);
   return n?{x0,y0,x1,y1}:null}
 function fitAll(){const b=worldBounds();if(!b)return flyTo(0,0,1);const sm=M.W<700;
   const z=clamp(Math.min((M.W-(sm?40:140))/(b.x1-b.x0),(M.H-(sm?170:200))/(b.y1-b.y0)),ZMIN,1.15);
@@ -1418,7 +1485,7 @@ function applyRemoteWidgets(arr){
     const ta=r.el.querySelector('textarea');if(w.text!==r.w.text&&document.activeElement!==ta){r.w.text=w.text;if(ta){ta.value=w.text||'';r.el.querySelector('.wn-f').textContent=(w.text||'').length+' / 2000'}}
     if(re){delete WX[r.w.id];renderW(r)}}
   widgets=next;store.set('appshell:widgets',widgets);wake()}
-function mountWidgets(){wReady=true;for(const w of widgets||[])mountWidget(w,true)}
+function mountWidgets(){wReady=true;for(const w of widgets||[])mountWidget(w,true);GX.key=''}
 function clearWidgets(){for(const r of[...WEL.values()])unmountWidget(r,true);wReady=false;stopNotes()}
 // first run: put a few useful cards next to the apps
 function seedWidgets(){if(widgets!==null||!wReady)return;if(S.kind==='cloud'&&!metaFresh)return;widgets=[];
@@ -1568,7 +1635,7 @@ function palette(){
     {ic:UI.widget,l:'Widget ekle',k:'W',run:widgetGallery},
     {ic:UI.fit,l:'Hepsini göster',k:'1',run:fitAll},
     {ic:UI.zoom,l:'Yakınlaştırmayı sıfırla (%100)',k:'0',run:()=>zoomTo(1)},
-    {ic:UI.graph,l:'Grafiği düzenle',k:'G',run:autoLayout},
+    {ic:UI.graph,l:'Galaksiyi göster',k:'G',run:fitAll},
     {ic:UI.moon,l:document.documentElement.dataset.theme==='dark'?'Açık temaya geç':'Karanlık temaya geç',k:'⇧⌘L',run:toggleTheme},
     {ic:UI.fs,l:document.fullscreenElement?'Tam ekrandan çık':'Tarayıcı tam ekranı',k:'F',run:toggleFS},
     {ic:UI.key,l:'Klavye kısayolları',k:'?',run:shortcuts},
@@ -1617,7 +1684,7 @@ function shortcuts(){
   const K=(...k)=>k.map(x=>`<span class="kbd">${x}</span>`).join('');
   sheet('Klavye kısayolları',`<div class="keys">
     <span>Ara / komut paleti</span><span>${K('⌘','K')}</span><span>Yeni taslak</span><span>${K('⌘','N')}</span>
-    <span>Grafiği düzenle</span><span>${K('G')}</span><span>Tema değiştir</span><span>${K('⇧','⌘','L')}</span>
+    <span>Galaksiyi göster</span><span>${K('G')}</span><span>Tema değiştir</span><span>${K('⇧','⌘','L')}</span>
     <span>Tarayıcı tam ekranı</span><span>${K('F')}</span><span>Uygulamayı kapat</span><span>${K('⇧','Esc')}</span>
     <span>Bağlantı kur</span><span>${K('⇧')} + sürükle</span><span>Kısayollar</span><span>${K('?')}</span>
     <span>Boş alana çift tıkla</span><span>yeni taslak</span><span>HTML'i ekrana bırak</span><span>taslak ekle</span>
@@ -1723,7 +1790,7 @@ addEventListener('keydown',e=>{
   if(typing(e)||mod||e.altKey||sheetEl||palEl)return;
   if(e.key==='?'){e.preventDefault();shortcuts()}
   else if(k==='/'){e.preventDefault();palette()}
-  else if(k==='g'&&!W.app){autoLayout()}
+  else if(k==='g'&&!W.app){fitAll()}
   else if(k==='f'){toggleFS()}
   else if(W.app&&!W.min){}
   else if(e.key==='+'||e.key==='='){zoomTo(cam.tz*1.25)}
@@ -1765,7 +1832,7 @@ applyTheme(document.documentElement.dataset.theme==='dark'?'dark':'light');
 buildMesh();introStart=performance.now();wake();
 (async()=>{
   const mp=loadManifest();
-  if(!CLOUD){S=Local;drafts=await Local.load();await mp;mountWidgets();syncNodes();booted=true;seedWidgets();autoClusters();return}
+  if(!CLOUD){S=Local;drafts=await Local.load();await mp;mountWidgets();syncNodes();booted=true;GX.key='';seedWidgets();autoClusters();return}
   gate('loading');
   try{await loadFirebase()}catch{return gate('error','Firebase yüklenemedi. İnternet bağlantını kontrol et.')}
   if(!firebase.apps.length)firebase.initializeApp(FB);
@@ -1777,7 +1844,7 @@ buildMesh();introStart=performance.now();wake();
     gate('loading','Yükleniyor…');await mp;S=Cloud;await Cloud.start(fs);
     const me=$('#me');me.hidden=false;me.innerHTML=u.photoURL?`<img src="${esc(u.photoURL)}" alt="" referrerpolicy="no-referrer">`:esc(mono(u.displayName||u.email));
     await ungate();introStart=performance.now();introT=0;wakeMesh();
-    mountWidgets();syncNodes();booted=true;seedWidgets();migrateLocal();autoClusters();
+    mountWidgets();syncNodes();booted=true;GX.key='';seedWidgets();migrateLocal();autoClusters();
   });
 })();
 </script>

@@ -126,6 +126,10 @@ body.far .port{display:none}
 .wk button.h::after{content:'';position:absolute;left:50%;bottom:3px;width:3px;height:3px;margin-left:-1.5px;border-radius:50%;background:currentColor;opacity:.7}
 .wg-sk{height:10px;border-radius:5px;background:var(--line2);margin:8px 0;animation:sk 1.2s ease-in-out infinite alternate}
 @keyframes sk{to{opacity:.4}}
+.gpre{display:flex;flex-wrap:wrap;gap:6px}
+.gpre button{display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 12px 0 10px;border-radius:9px;font-size:12.5px;box-shadow:inset 0 0 0 .5px var(--line3);transition:background .15s,transform .4s var(--spring)}
+.gpre button:hover{background:var(--hover)}.gpre button:active{transform:scale(.95)}.gpre button.on{box-shadow:inset 0 0 0 1.2px var(--ink)}
+.gpre i{width:8px;height:8px;border-radius:50%}
 .wgal{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .wgal button{display:flex;gap:11px;align-items:flex-start;text-align:left;padding:12px;border-radius:13px;box-shadow:inset 0 0 0 .5px var(--line2);transition:background .2s,box-shadow .2s,transform .4s var(--spring)}
 .wgal button:hover{background:var(--hover);box-shadow:inset 0 0 0 .5px var(--line3)}
@@ -877,9 +881,9 @@ function finishLink(t){
   const from=linkDrag.from;cancelLink();if(t.a.key===from)return;
   if(hasLink(from,t.a.key)){toast('Zaten bağlı');return}
   links.push(pairKey(from,t.a.key));saveMeta();statusText();
-  const a=nodes.get(from);ripple(t.x,t.y+TAIL*cam.z,1.4);if(a)ripple(a.x,a.y+TAIL*cam.z,1);
+  const a=nodes.get(from);clusterLink(from,t.a.key);ripple(t.x,t.y+TAIL*cam.z,1.4);if(a)ripple(a.x,a.y+TAIL*cam.z,1);
   [a,t].forEach(n=>n&&anim(n.el.querySelector('.bob'),[{transform:'scale(1)'},{transform:'scale(1.18)',offset:.4},{transform:'none'}],{duration:640,easing:EASE}));
-  toast(`${a?.a.name||''} ↔ ${t.a.name} bağlandı`);
+  if(!sheetEl)toast(`${a?.a.name||''} ↔ ${t.a.name} bağlandı`);
 }
 function cancelLink(){if(!linkDrag)return;if(linkDrag.target)nodes.get(linkDrag.target)?.el.classList.remove('target');linkDrag=null;document.body.classList.remove('linking');hlState='x';wake()}
 function removeLink(i){const l=links[i];if(!l)return;const g=linkGeo[i];links.splice(i,1);hoverLink=-1;$('#stage').classList.remove('onlink');saveMeta();statusText();
@@ -934,7 +938,7 @@ function drawGroups(){
     gx.beginPath();H.forEach((p,i)=>i?gx.lineTo(p[0],p[1]):gx.moveTo(p[0],p[1]));if(H.length>2)gx.closePath();gx.fill();gx.stroke();
     fx.globalAlpha=dark?.13:.075;fx.drawImage(gcv,bx,by,bw,bh,bx,by,bw,bh);fx.globalAlpha=1;
     const lx=(x0+x1)/2,ly=y0-PAD+18*Z,name=groups[g].name.toLocaleUpperCase('tr');
-    fx.font='500 10.5px "Geist Mono",ui-monospace,Menlo,monospace';fx.textAlign='center';fx.textBaseline='middle';
+    fx.font='600 11.5px "Geist Mono",ui-monospace,Menlo,monospace';fx.textAlign='center';fx.textBaseline='middle';
     const w=fx.measureText(name).width+22;
     fx.fillStyle=col;fx.globalAlpha=.9;fx.beginPath();fx.arc(lx-w/2+9,ly,3,0,6.2832);fx.fill();fx.globalAlpha=1;
     fx.fillStyle=dark?'rgba(255,255,255,.72)':col;fx.fillText(name,lx+6,ly);
@@ -948,38 +952,65 @@ function assignGroup(key,g){const prev=members[key];if(g)members[key]=g;else del
   saveMeta();wake();const n=nodes.get(key);if(n)ripple(n.x,n.y+TAIL*cam.z,1.2);return prev}
 function groupMenu(x,y,a){
   const cur=groupOf(a.key),ids=Object.keys(groups);
-  popMenu(x,y,`<div class="who"><b>${esc(a.name)}</b>grup seç</div><div class="msep"></div>`+
+  popMenu(x,y,`<div class="who"><b>${esc(a.name)}</b>küme seç</div><div class="msep"></div>`+
     ids.map(id=>`<button class="mi" data-g="${id}"><span class="gdot" style="background:${GCOL[groups[id].color]||GCOL.gray}"></span>${esc(groups[id].name)}${id===cur?'<span class="k">✓</span>':''}</button>`).join('')+
-    `${ids.length?'<div class="msep"></div>':''}<button class="mi" data-g="+">${si(UI.plus)}Yeni grup…</button>${cur?`<button class="mi" data-g="-">${si(UI.unlinkall)}Gruptan çıkar</button>`:''}`,
+    `${ids.length?'<div class="msep"></div>':''}<button class="mi" data-g="+">${si(UI.plus)}Yeni küme…</button>${cur?`<button class="mi" data-g="-">${si(UI.unlinkall)}Kümeden çıkar</button>`:''}`,
     e=>{const b=e.target.closest('[data-g]');if(!b)return;hideMenu();const g=b.dataset.g;
-      if(g==='+')groupSheet(null,a.key);else if(g==='-'){const gobj={...groups[cur]};const prev=assignGroup(a.key,null);toast(`${a.name} gruptan çıkarıldı`,()=>{if(prev&&!groups[prev])groups[prev]=gobj;assignGroup(a.key,prev)})}
+      if(g==='+')groupSheet(null,a.key);else if(g==='-'){const gobj={...groups[cur]};const prev=assignGroup(a.key,null);toast(`${a.name} kümeden çıkarıldı`,()=>{if(prev&&!groups[prev])groups[prev]=gobj;assignGroup(a.key,prev)})}
       else{assignGroup(a.key,g);toast(`${a.name} → ${groups[g].name}`)}});
 }
-function groupSheet(gid,assignKey){
+const GPRE=[['İş','blue'],['Notlar','amber'],['Eğlence','rose'],['Okul','violet'],['Finans','green'],['Kişisel','teal'],['Araçlar','gray']];
+function groupSheet(gid,assignKey,fresh){
   const g=gid?groups[gid]:null;let color=g?.color||Object.keys(GCOL)[Object.keys(groups).length%6];
-  sheet(g?'Grubu düzenle':'Yeni grup',
-    `<div class="f"><label class="fl" for="gN">Ad</label><input class="in" id="gN" value="${esc(g?.name||'')}" placeholder="İş, Aile, Okul…" autocomplete="off"></div>
+  sheet(fresh?'Kümeye ad ver':g?'Kümeyi düzenle':'Yeni küme',
+    `${fresh?`<div class="note" style="margin-bottom:14px">Bağladığın uygulamalar bir kümeye alındı. Bundan sonra bu kümeye bağladığın her uygulama da içine girer.</div>`:''}
+     <div class="f"><span class="fl">Hazır</span><div class="gpre" id="gP">${GPRE.map(([n,c])=>`<button data-n="${n}" data-c="${c}"><i style="background:${GCOL[c]}"></i>${n}</button>`).join('')}</div></div>
+     <div class="f"><label class="fl" for="gN">Ad</label><input class="in" id="gN" value="${esc(fresh?'':g?.name||'')}" placeholder="İş, Notlar, Eğlence…" autocomplete="off"></div>
      <div class="f"><span class="fl">Renk</span><div class="gsw" id="gC">${Object.entries(GCOL).map(([k,v])=>`<button data-c="${k}" class="${k===color?'on':''}" style="background:${v}" title="${k}"></button>`).join('')}</div></div>`,
-    `<span class="grow"></span><button class="btn ghost" data-x2>İptal</button><button class="btn solid" id="gS">${g?'Kaydet':'Oluştur'}</button>`,
+    `<span class="grow"></span><button class="btn ghost" data-x2>${fresh?'Sonra':'İptal'}</button><button class="btn solid" id="gS">${g?'Kaydet':'Oluştur'}</button>`,
     s=>{const N=s.querySelector('#gN');setTimeout(()=>N.focus(),60);s.querySelector('[data-x2]').onclick=()=>closeSheet();
       s.querySelector('#gC').onclick=e=>{const b=e.target.closest('[data-c]');if(!b)return;color=b.dataset.c;$$('#gC button',s).forEach(x=>x.classList.toggle('on',x===b))};
+      s.querySelector('#gP').onclick=e=>{const b=e.target.closest('[data-n]');if(!b)return;N.value=b.dataset.n;color=b.dataset.c;$$('#gC button',s).forEach(x=>x.classList.toggle('on',x.dataset.c===color));
+        $$('#gP button',s).forEach(x=>x.classList.toggle('on',x===b));if(fresh)setTimeout(save,140)};
       const save=()=>{const name=N.value.trim();if(!name){N.focus();return toast('Bir ad gir')}
         const id=gid||('g'+uid());groups[id]={name,color};closeSheet();
-        if(assignKey){assignGroup(assignKey,id);toast(`${find(assignKey)?.name||''} → ${name}`)}else{saveMeta();wake();toast('Grup güncellendi')}};
+        if(assignKey){assignGroup(assignKey,id);toast(`${find(assignKey)?.name||''} → ${name}`)}else{saveMeta();wake();toast(fresh?`Küme: ${name}`:'Küme güncellendi')}};
       s.querySelector('#gS').onclick=save;N.onkeydown=e=>{if(e.key==='Enter')save()}});
 }
+/* ── Links → clusters: linking two apps puts them in the same küme ── */
+const gSize=g=>Object.keys(members).filter(k=>members[k]===g&&nodes.has(k)).length;
+function nudgeNear(k,toward){const n=nodes.get(k),t=nodes.get(toward);if(!n||!t)return;
+  if(Math.hypot(n.aw[0]-t.aw[0],n.aw[1]-t.aw[1])<300)return; // already close enough
+  const side=n.aw[0]<t.aw[0]?-1:1;n.aw=[1e9,1e9];n.aw=nearestFree(t.aw[0]+side*150,t.aw[1],n);rememberLayout(n,false)}
+function clusterLink(a,b){
+  const ga=groupOf(a),gb=groupOf(b);
+  if(ga&&gb){if(ga===gb)return;const[keep,drop]=gSize(ga)>=gSize(gb)?[ga,gb]:[gb,ga],dObj={...groups[drop]},moved=Object.keys(members).filter(k=>members[k]===drop);
+    moved.forEach(k=>members[k]=keep);delete groups[drop];saveMeta();wake();
+    toast(`${dObj.name} → ${groups[keep].name} ile birleşti`,()=>{groups[drop]=dObj;moved.forEach(k=>members[k]=drop);saveMeta();wake()});return}
+  if(ga||gb){const g=ga||gb,k=ga?b:a;members[k]=g;nudgeNear(k,ga?a:b);saveMeta();wake();toast(`${find(k)?.name||''} → ${groups[g].name}`);return}
+  const id='g'+uid();groups[id]={name:'Yeni küme',color:Object.keys(GCOL)[Object.keys(groups).length%6]};members[a]=members[b]=id;nudgeNear(b,a);saveMeta();wake();
+  setTimeout(()=>groupSheet(id,null,true),450)}
+// one-time: turn already-linked apps into clusters
+function autoClusters(){if(store.get('appshell:clustered',false)||!links.length)return;
+  const adj={};for(const[a,b]of links){if(!nodes.has(a)||!nodes.has(b))continue;(adj[a]||=[]).push(b);(adj[b]||=[]).push(a)}
+  const seen=new Set();let made=0;
+  for(const s0 of Object.keys(adj)){if(seen.has(s0))continue;const comp=[],st=[s0];seen.add(s0);while(st.length){const k=st.pop();comp.push(k);for(const j of adj[k])if(!seen.has(j)){seen.add(j);st.push(j)}}
+    const gs=[...new Set(comp.map(groupOf).filter(Boolean))];
+    if(gs.length===1)comp.forEach(k=>{if(!groupOf(k))members[k]=gs[0]});
+    else if(!gs.length){const id='g'+uid();groups[id]={name:'Küme '+(Object.keys(groups).length+1),color:Object.keys(GCOL)[Object.keys(groups).length%6]};comp.forEach(k=>members[k]=id);made++}}
+  store.set('appshell:clustered',true);saveMeta();wake();if(made)toast(`Bağlı uygulamalar ${made} kümeye alındı — etiketine tıklayıp ad ver`)}
 function groupLabelMenu(x,y,g){
   const mem=Object.keys(members).filter(k=>members[k]===g&&nodes.has(k));
   popMenu(x,y,`<div class="who"><b>${esc(groups[g].name)}</b>${mem.length} uygulama</div><div class="msep"></div>
     <button class="mi" data-gm="edit">${si(UI.edit)}Adı ve rengi düzenle</button>
     <button class="mi" data-gm="gather">${si(UI.graph)}Bir araya topla</button>
-    <button class="mi danger" data-gm="drop">${si(UI.del)}Grubu dağıt</button>`,
+    <button class="mi danger" data-gm="drop">${si(UI.del)}Kümeyi dağıt</button>`,
     e=>{const b=e.target.closest('[data-gm]');if(!b)return;hideMenu();const k=b.dataset.gm;
       if(k==='edit')groupSheet(g);
       else if(k==='gather'){const ns=mem.map(m=>nodes.get(m));const cxg=ns.reduce((a,n)=>a+n.aw[0],0)/ns.length,cyg=ns.reduce((a,n)=>a+n.aw[1],0)/ns.length;
         ns.forEach(n=>n.aw=[1e9,1e9]);ns.forEach((n,i)=>{const ang=i/ns.length*Math.PI*2,r=ns.length>1?95:0;n.aw=nearestFree(cxg+Math.cos(ang)*r*1.3,cyg+Math.sin(ang)*r,n);rememberLayout(n,false);setTimeout(()=>{anc(n);ripple(n.ax,n.ay,1)},i*80)});saveMeta()}
       else if(k==='drop'){const saved={g:{...groups[g]},m:mem};mem.forEach(m=>delete members[m]);delete groups[g];saveMeta();wake();
-        toast('Grup dağıtıldı',()=>{groups[g]=saved.g;saved.m.forEach(m=>members[m]=g);saveMeta();wake()})}});
+        toast('Küme dağıtıldı',()=>{groups[g]=saved.g;saved.m.forEach(m=>members[m]=g);saveMeta();wake()})}});
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -1479,7 +1510,7 @@ function popMenu(x,y,html,onClick){
   const lx=clamp(x,8,innerWidth-r.width-8),ly=clamp(y,8,innerHeight-r.height-8);m.style.left=lx+'px';m.style.top=ly+'px';m.style.setProperty('--ox',(x-lx)+'px');m.style.setProperty('--oy',(y-ly)+'px');
   anim(m,[{opacity:0,transform:'scale(.94)'},{opacity:1,transform:'none'}],{duration:260,easing:OUT});m.addEventListener('click',onClick);menuEl=m;return m}
 function showMenu(x,y,a){
-  const dg=degree(a.key),gg=groupOf(a.key),lk=[['connect','Başka uygulamaya bağla','⇧'],...(dg?[['unlinkall',`Bağlantıları kaldır (${dg})`]]:[]),['group',gg?`Grup: ${groups[gg].name}`:'Gruba ekle…']];
+  const dg=degree(a.key),gg=groupOf(a.key),lk=[['connect','Başka uygulamaya bağla','⇧'],...(dg?[['unlinkall',`Bağlantıları kaldır (${dg})`]]:[]),['group',gg?`Küme: ${groups[gg].name}`:'Kümeye ekle…']];
   const items=a.kind==='pub'?[['open','Aç','↵'],['tab','Yeni sekmede aç'],['link','Adresi kopyala'],'-',...lk,['home','Merkeze getir']]
     :[['open','Aç','↵'],['edit','Düzenle'],['ship','Yayına hazırla'],['dl','HTML indir'],'-',...lk,['home','Merkeze getir'],'-',['del','Sil']];
   popMenu(x,y,items.map(i=>i==='-'?'<div class="msep"></div>':`<button class="mi${i[0]==='del'?' danger':''}" data-m="${i[0]}" role="menuitem">${si(UI[i[0]])}${i[1]}${i[2]?`<span class="k">${i[2]}</span>`:''}</button>`).join(''),
@@ -1713,7 +1744,7 @@ applyTheme(document.documentElement.dataset.theme==='dark'?'dark':'light');
 buildMesh();introStart=performance.now();wake();
 (async()=>{
   const mp=loadManifest();
-  if(!CLOUD){S=Local;drafts=await Local.load();await mp;mountWidgets();syncNodes();booted=true;seedWidgets();return}
+  if(!CLOUD){S=Local;drafts=await Local.load();await mp;mountWidgets();syncNodes();booted=true;seedWidgets();autoClusters();return}
   gate('loading');
   try{await loadFirebase()}catch{return gate('error','Firebase yüklenemedi. İnternet bağlantını kontrol et.')}
   if(!firebase.apps.length)firebase.initializeApp(FB);
@@ -1725,7 +1756,7 @@ buildMesh();introStart=performance.now();wake();
     gate('loading','Yükleniyor…');await mp;S=Cloud;await Cloud.start(fs);
     const me=$('#me');me.hidden=false;me.innerHTML=u.photoURL?`<img src="${esc(u.photoURL)}" alt="" referrerpolicy="no-referrer">`:esc(mono(u.displayName||u.email));
     await ungate();introStart=performance.now();introT=0;wakeMesh();
-    mountWidgets();syncNodes();booted=true;seedWidgets();migrateLocal();
+    mountWidgets();syncNodes();booted=true;seedWidgets();migrateLocal();autoClusters();
   });
 })();
 </script>

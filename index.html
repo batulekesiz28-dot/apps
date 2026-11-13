@@ -87,6 +87,16 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .rim{position:absolute;inset:0;width:100%;height:100%;fill:none;stroke:rgba(0,0,0,.1);stroke-width:1;pointer-events:none;z-index:2}
 .tile.dark .rim{stroke:rgba(255,255,255,.12)}
 .node.draft .rim{stroke:rgba(0,0,0,.22);stroke-dasharray:3 3}
+.port{position:absolute;right:-9px;top:23px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 0 0 .5px rgba(0,0,0,.18),0 2px 6px -2px rgba(0,0,0,.2);display:grid;place-items:center;opacity:0;transform:scale(.3);transition:opacity .25s var(--ease),transform .45s var(--spring);cursor:crosshair;z-index:3;pointer-events:auto}
+.port::after{content:'';width:6px;height:6px;border-radius:50%;background:var(--ink);transition:transform .35s var(--spring)}
+.node:hover .port{opacity:1;transform:none}
+.port:hover::after{transform:scale(1.5)}
+body.linking .port,.node.dragging .port{opacity:0!important;pointer-events:none}
+.node.faded{opacity:.28}
+.node.target .bob{transform:scale(1.16)}
+.node.target .tile{box-shadow:inset 0 0 0 1.5px var(--ink)}
+body.linking,body.linking .node,body.linking #stage{cursor:crosshair}
+#stage.onlink{cursor:pointer}
 .nlabel{position:absolute;left:50%;top:74px;transform:translateX(-50%);white-space:nowrap;max-width:140px;overflow:hidden;text-overflow:ellipsis;font-size:11.5px;font-weight:450;letter-spacing:-.005em;color:var(--ink2);padding:2px 7px;border-radius:6px;background:rgba(255,255,255,.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:color .2s,opacity .3s}
 .node:hover .nlabel{color:var(--ink)}
 .nlabel i{font-style:normal;font:500 9px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-left:5px}
@@ -234,6 +244,7 @@ body.locked .top,body.locked #nodes,body.locked .status,body.locked .hint,body.l
     <input id="q" type="text" placeholder="Ara" autocomplete="off" spellcheck="false">
     <span class="kbd">⌘K</span>
   </label>
+  <button class="ib" id="layoutBtn" title="Grafiği düzenle"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><circle cx="4" cy="4" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="7" cy="12.5" r="2"/><path d="M5.9 4.3l4.2.5M5 5.7l1.4 4.9M10.9 6.7l-2.7 4.3"/></svg></button>
   <button class="ib solid" id="addBtn" title="Yeni taslak (⌘N)"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1.5v9M1.5 6h9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></button>
   <button class="ib me" id="me" hidden title="Hesap"></button>
 </header>
@@ -347,7 +358,7 @@ async function loadFirebase(){if(window.firebase?.auth&&window.firebase?.firesto
 const sig=list=>list.map(d=>[d.id,d.name,d.icon,d.color,d.html?.length]).join('|');
 const Local={kind:'local',
   async load(){try{await DB.open();return(await DB.all()).map(toDraft)}catch{return[]}},
-  put:d=>DB.put(d),del:id=>DB.del(id),saveLayout:l=>store.set('appshell:layout',l)};
+  put:d=>DB.put(d),del:id=>DB.del(id),saveLayout:l=>{store.set('appshell:layout',l);store.set('appshell:links',links)}};
 const Cloud={kind:'cloud',meta:null,col:null,unsubs:[],
   start(fs){this.meta=fs.collection('hub').doc('meta');this.col=this.meta.collection('drafts');
     return new Promise(res=>{let first=true;
@@ -356,17 +367,26 @@ const Cloud={kind:'cloud',meta:null,col:null,unsubs:[],
         if(sig(list)!==sig(drafts)){drafts=list;if(!first&&booted)syncNodes()}
         if(first){first=false;res()}
       },err=>{setSync('error');toast('Senkron hatası: '+(err.code||err.message));if(first){first=false;res()}}));
-      this.unsubs.push(this.meta.onSnapshot(s=>{const l=s.data()?.layout;if(l)applyRemoteLayout(l)},()=>{}));
+      this.unsubs.push(this.meta.onSnapshot(s=>{const d=s.data()||{};if(d.layout)applyRemoteLayout(d.layout);if(Array.isArray(d.links))applyRemoteLinks(d.links)},()=>{}));
     })},
   stop(){this.unsubs.forEach(u=>{try{u()}catch{}});this.unsubs=[]},
   put(d){return this.col.doc(d.id).set(d)},del(id){return this.col.doc(id).delete()},
-  saveLayout(l){store.set('appshell:layout',l);return this.meta.set({layout:l},{merge:true})}};
+  saveLayout(l){store.set('appshell:layout',l);store.set('appshell:links',links);return this.meta.set({layout:l,links:links.map(([a,b])=>a+'|'+b)},{merge:true})}};
 let S=Local;
 function setSync(s){sync=s;const d=$('#sDot');d.classList.toggle('warn',s==='pending');d.classList.toggle('err',s==='error');statusText()}
 
 /* ── App state ────────────────────────────────────────────── */
 let pub=[],drafts=[],query='',manifest={ok:false,why:''},booted=false,justDragged=false;
 let layout=store.get('appshell:layout',{});
+let links=store.get('appshell:links',[]);           // [[keyA,keyB], …] (sorted pair)
+let linkDrag=null,hoverLink=-1,hoverNode=null;
+const pairKey=(a,b)=>a<b?[a,b]:[b,a];
+const hasLink=(a,b)=>{const[x,y]=pairKey(a,b);return links.some(l=>l[0]===x&&l[1]===y)};
+const degree=k=>links.reduce((n,l)=>n+(l[0]===k||l[1]===k?1:0),0);
+const neighbors=k=>new Set(links.filter(l=>l[0]===k||l[1]===k).map(l=>l[0]===k?l[1]:l[0]));
+const saveMeta=()=>Promise.resolve(S.saveLayout({...layout})).catch(()=>{});
+function applyRemoteLinks(arr){const next=arr.map(s=>String(s).split('|')).filter(p=>p.length===2);
+  if(JSON.stringify(next)===JSON.stringify(links))return;links=next;store.set('appshell:links',links);statusText();wake()}
 const toPub=a=>({key:'p:'+a.slug,kind:'pub',slug:a.slug,name:a.name||a.slug,icon:a.icon||'',color:a.color||'gray',desc:a.desc||'',url:a.url||a.file||`apps/${a.slug}/`});
 const toDraft=d=>({key:'d:'+d.id,kind:'draft',id:d.id,name:d.name,icon:d.icon||'',color:d.color||colorKeys[hash(d.id)%colorKeys.length],html:d.html,order:d.order??0});
 const rawDraft=d=>({id:d.id,name:d.name,icon:d.icon||'',color:d.color,html:d.html,order:d.order??0,ts:Date.now()});
@@ -428,16 +448,16 @@ function drawMesh(now){
     if(c<cols-1){const j=i+1,e=en[i]>en[j]?en[i]:en[j],b=e>.45?2:e>.08?1:0;L[b].moveTo(x,y);L[b].lineTo(nx(j),ny(j))}
     if(r<rows-1){const j=i+cols,e=en[i]>en[j]?en[i]:en[j],b=e>.45?2:e>.08?1:0;L[b].moveTo(x,y);L[b].lineTo(nx(j),ny(j))}}
   cx.lineWidth=.5;
-  cx.strokeStyle='rgba(24,24,27,.045)';cx.stroke(L[0]);
-  cx.strokeStyle='rgba(24,24,27,.12)';cx.stroke(L[1]);
-  cx.strokeStyle='rgba(24,24,27,.22)';cx.stroke(L[2]);
+  cx.strokeStyle='rgba(24,24,27,.085)';cx.stroke(L[0]);
+  cx.strokeStyle='rgba(24,24,27,.17)';cx.stroke(L[1]);
+  cx.strokeStyle='rgba(24,24,27,.28)';cx.stroke(L[2]);
   // dots
-  const base=new Path2D(),r0=M.dpr>1?.75:.85;
-  cx.fillStyle='#D4D4D8';
+  const base=new Path2D(),r0=M.dpr>1?1:1.05;
+  cx.fillStyle='#C2C2C9';
   for(let i=0;i<n;i++){const v=vis(i);if(v<=0)continue;const e=en[i],x=nx(i),y=ny(i);
     if(e<.06&&v>=1){base.moveTo(x+r0,y);base.arc(x,y,r0,0,6.2832);continue}
-    const g=Math.round(212-(212-113)*e);cx.fillStyle=`rgba(${g},${g},${g+4},${v})`;cx.beginPath();cx.arc(x,y,r0+e*.9,0,6.2832);cx.fill()}
-  cx.fillStyle='#D4D4D8';cx.fill(base);
+    const g=Math.round(194-(194-90)*e);cx.fillStyle=`rgba(${g},${g},${g+4},${v})`;cx.beginPath();cx.arc(x,y,r0+e*.9,0,6.2832);cx.fill()}
+  cx.fillStyle='#C2C2C9';cx.fill(base);
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -446,7 +466,7 @@ function drawMesh(now){
 const nodes=new Map();
 const LIFT=92,TAIL=63;
 const nodeHTML=a=>{const[bg,fg]=COLORS[a.color]||COLORS.gray,ic=ICONS[a.icon];
-  return`<span class="bob"><span class="shadow"></span><span class="tile${a.color==='ink'?' dark':''}" style="--bg-t:${bg};--fg-t:${fg}">${ic?`<svg class="glyph" viewBox="0 0 24 24">${ic}</svg>`:`<span class="mono">${esc(mono(a.name))}</span>`}${SE_OK?`<svg class="rim" viewBox="0 0 64 64"><path d="${SE}"/></svg>`:''}</span></span><span class="nlabel">${esc(a.name)}${a.kind==='draft'?'<i>taslak</i>':''}</span>`};
+  return`<span class="bob"><span class="shadow"></span><span class="tile${a.color==='ink'?' dark':''}" style="--bg-t:${bg};--fg-t:${fg}">${ic?`<svg class="glyph" viewBox="0 0 24 24">${ic}</svg>`:`<span class="mono">${esc(mono(a.name))}</span>`}${SE_OK?`<svg class="rim" viewBox="0 0 64 64"><path d="${SE}"/></svg>`:''}</span></span><span class="port" title="Sürükle ve başka bir uygulamaya bağla"></span><span class="nlabel">${esc(a.name)}${a.kind==='draft'?'<i>taslak</i>':''}</span>`};
 function isFree(i,self,minD=118){const x=M.rx[i],y=M.ry[i];for(const n of nodes.values()){if(n===self||n.ai==null)continue;if(Math.hypot(M.rx[n.ai]-x,M.ry[n.ai]-y)<minD)return false}return true}
 function inBounds(i){const x=M.rx[i],y=M.ry[i],sm=M.W<700;return x>(sm?46:80)&&x<M.W-(sm?46:80)&&y>(sm?196:206)&&y<M.H-(sm?64:72)}
 function nearestFree(x,y,self){
@@ -465,7 +485,7 @@ function placeFor(key,self,hint){
     const j=nearest(c[0]+Math.cos(ang)*rad*1.25,c[1]+Math.sin(ang)*rad*.8);if(inBounds(j)&&isFree(j,self))return j}
   return nearestFree(c[0],c[1],self);
 }
-function rememberLayout(n,save=true){layout[n.a.key]=[+(M.rx[n.ai]/M.W).toFixed(4),+(M.ry[n.ai]/M.H).toFixed(4)];if(save)Promise.resolve(S.saveLayout({...layout})).catch(()=>{})}
+function rememberLayout(n,save=true){layout[n.a.key]=[+(M.rx[n.ai]/M.W).toFixed(4),+(M.ry[n.ai]/M.H).toFixed(4)];if(save)saveMeta()}
 let spawnHint=null;
 function createNode(a,delay=0){
   const el=document.createElement('button');el.className='node'+(a.kind==='draft'?' draft':'');el.dataset.key=a.key;el.setAttribute('aria-label',a.name);el.title=a.desc||a.name;
@@ -485,7 +505,7 @@ function updateNode(n,a){const changed=n.a.name!==a.name||n.a.icon!==a.icon||n.a
 function removeNode(key,quiet){const n=nodes.get(key);if(!n)return;nodes.delete(key);
   if(!quiet)ripple(nx(n.ai),ny(n.ai),1.3);
   n.removing=true;anim(n.el,[{opacity:1,filter:'blur(0)'},{opacity:0,filter:'blur(6px)'}],{duration:380,easing:EASE,fill:'forwards'}).finished.then(()=>n.el.remove(),()=>n.el.remove());
-  delete layout[key];}
+  delete layout[key];const before=links.length;links=links.filter(l=>l[0]!==key&&l[1]!==key);if(before!==links.length&&booted)saveMeta();}
 function place(n){n.el.style.transform=`translate3d(${(n.x-32).toFixed(2)}px,${(n.y-32).toFixed(2)}px,0) rotate(${n.rot.toFixed(2)}deg)`}
 
 function syncNodes(){
@@ -504,13 +524,17 @@ function applyRemoteLayout(l){
 /* Interactions on nodes */
 function wireNode(n){
   const el=n.el,tile=()=>el.querySelector('.tile');
-  el.addEventListener('pointerenter',()=>{n.hov=true});
-  el.addEventListener('pointerleave',()=>{n.hov=false;el.classList.remove('tilting');const t=tile();t.style.setProperty('--rx','0deg');t.style.setProperty('--ry','0deg')});
+  el.addEventListener('pointerenter',()=>{n.hov=true;hoverNode=n});
+  el.addEventListener('pointerleave',()=>{n.hov=false;if(hoverNode===n)hoverNode=null;el.classList.remove('tilting');const t=tile();t.style.setProperty('--rx','0deg');t.style.setProperty('--ry','0deg')});
   el.addEventListener('pointermove',e=>{if(!FINE||n.drag)return;const t=tile(),r=t.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
     el.classList.add('tilting');t.style.setProperty('--ry',((x-.5)*16).toFixed(2)+'deg');t.style.setProperty('--rx',((.5-y)*16).toFixed(2)+'deg');
     t.style.setProperty('--hx',(x*100).toFixed(1)+'%');t.style.setProperty('--hy',(y*100).toFixed(1)+'%')});
+  el.querySelector('.port').addEventListener('pointerdown',e=>{if(e.button!==0)return;e.preventDefault();e.stopPropagation();startLink(n,e,'drag')});
   el.addEventListener('pointerdown',e=>{
-    if(e.button!==0||query)return;e.preventDefault();
+    if(e.button!==0)return;
+    if(linkDrag){e.preventDefault();e.stopPropagation();if(linkDrag.mode==='click')finishLink(n);return}
+    if(e.shiftKey){e.preventDefault();startLink(n,e,'drag');return}
+    if(query)return;e.preventDefault();
     const sx=e.clientX,sy=e.clientY,ox=e.clientX-n.x,oy=e.clientY-n.y;let started=false;
     const timer=e.pointerType==='touch'?setTimeout(()=>begin(e),260):0;
     function begin(ev){if(started)return;started=true;n.drag=true;justDragged=true;el.classList.add('dragging');el.classList.remove('tilting');
@@ -521,11 +545,12 @@ function wireNode(n){
     const up=()=>{clearTimeout(timer);removeEventListener('pointermove',mv);removeEventListener('pointerup',up);removeEventListener('pointercancel',up);
       if(!started){el.focus({preventScroll:true});openApp(n.a,el);return}
       n.drag=false;el.classList.remove('dragging');
+      if(e.pointerType!=='mouse'&&Math.hypot(n.gx+ox-sx,n.gy+oy-sy)<10){setTimeout(()=>justDragged=false,0);showMenu(n.x,n.y+40,n.a);wake();return} // long-press → menu
       const i=nearestFree(n.x,n.y+LIFT,n);n.ai=i;rememberLayout(n);ripple(nx(i),ny(i),1.6);
       setTimeout(()=>justDragged=false,0);wake()};
     addEventListener('pointermove',mv,{passive:true});addEventListener('pointerup',up);addEventListener('pointercancel',up);
   });
-  el.addEventListener('click',e=>{if(e.detail===0&&!justDragged)openApp(n.a,el)}); // keyboard
+  el.addEventListener('click',e=>{if(e.detail===0&&!justDragged&&!linkDrag)openApp(n.a,el)}); // keyboard
   el.addEventListener('contextmenu',e=>{e.preventDefault();showMenu(e.clientX,e.clientY,n.a)});
 }
 
@@ -546,6 +571,13 @@ function frame(t){
       if(ptr.amp>.01&&!n.hov){const ddx=ptr.sx-n.x,ddy=ptr.sy-n.y,d=Math.hypot(ddx,ddy);if(d<200){const f=(1-d/200);tx+=ddx*.16*f*f*ptr.amp;ty+=ddy*.16*f*f*ptr.amp}}}
     n.tx=tx;n.ty=ty;
   }
+  // link springs: linked buoys lean toward each other; dragging one tugs its neighbours
+  for(const[ka,kb]of links){const a=nodes.get(ka),b=nodes.get(kb);if(!a||!b)continue;
+    const ddx=b.tx-a.tx,ddy=b.ty-a.ty,d=Math.hypot(ddx,ddy)||1,ux=ddx/d,uy=ddy/d;
+    const pa=b.drag?Math.min(90,Math.max(0,d-150)*.22):Math.min(26,Math.max(0,d-130)*.06);
+    const pb=a.drag?Math.min(90,Math.max(0,d-150)*.22):Math.min(26,Math.max(0,d-130)*.06);
+    if(!a.drag){a.tx+=ux*pa;a.ty+=uy*pa}if(!b.drag){b.tx-=ux*pb;b.ty-=uy*pb}}
+  highlight();
   for(let i=0;i<list.length;i++)for(let j=i+1;j<list.length;j++){const a=list[i],b=list[j];const ddx=b.tx-a.tx,ddy=b.ty-a.ty,d=Math.hypot(ddx,ddy)||1;
     if(d<96){const p=(96-d)*.5,ux=ddx/d,uy=ddy/d;if(!a.drag){a.tx-=ux*p;a.ty-=uy*p}if(!b.drag){b.tx+=ux*p;b.ty+=uy*p}}}
   for(const n of list){
@@ -558,7 +590,7 @@ function frame(t){
     const ax0=nx(n.ai),ay0=ny(n.ai);M.tx[n.ai]+=(n.x-ax0)*.0035;M.ty[n.ai]+=(n.y+TAIL-ay0)*.0035;
   }
   ptr.sx+=(ptr.x-ptr.sx)*(1-Math.pow(1-.22,k));ptr.sy+=(ptr.y-ptr.sy)*(1-Math.pow(1-.22,k));ptr.amp+=(ptr.tAmp-ptr.amp)*(1-Math.pow(1-.07,k));
-  stepMesh(k,t);drawMesh(t);drawTethers(time);
+  stepMesh(k,t);drawMesh(t);drawLinks(time);drawTethers(time);drawRubber(time);
   if(!paused)raf=requestAnimationFrame(frame);
 }
 function drawTethers(time){
@@ -573,6 +605,84 @@ function drawTethers(time){
       cx.beginPath();cx.arc(px,py,pulse+7,0,6.2832);cx.strokeStyle='rgba(24,24,27,.12)';cx.stroke()}
   }
 }
+/* ════════════════════════════════════════════════════════════
+   LINKS — Obsidian tarzı uygulama bağlantıları
+   ════════════════════════════════════════════════════════════ */
+const linkGeo=[];
+function curve(a,b,i){const mx=(a.x+b.x)/2,my=(a.y+b.y)/2,dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1,bend=Math.min(60,d*.16)*((i%2)?1:-1)*.6;
+  return[a.x,a.y,mx-dy/d*bend,my+dx/d*bend+Math.min(24,d*.05),b.x,b.y]}
+const qAt=(g,t)=>{const u=1-t;return[u*u*g[0]+2*u*t*g[2]+t*t*g[4],u*u*g[1]+2*u*t*g[3]+t*t*g[5]]};
+function drawLinks(time){
+  linkGeo.length=0;const hk=hoverNode?.a.key;
+  links.forEach(([ka,kb],i)=>{const a=nodes.get(ka),b=nodes.get(kb);if(!a||!b){linkGeo.push(null);return}
+    const g=curve(a,b,i);linkGeo.push(g);
+    const hot=hk&&(hk===ka||hk===kb),dim=a.dim||b.dim||(hk&&!hot),over=hoverLink===i;
+    cx.beginPath();cx.moveTo(g[0],g[1]);cx.quadraticCurveTo(g[2],g[3],g[4],g[5]);
+    cx.lineWidth=over?2:hot?1.4:1;cx.strokeStyle=over?'rgba(220,38,38,.6)':`rgba(24,24,27,${dim?.07:hot?.62:.3})`;cx.stroke();
+    if(!dim&&!REDUCED){const cnt=hot?3:1;for(let p=0;p<cnt;p++){const t=((time*(hot?.32:.18)+p/cnt+i*.37)%1),[px,py]=qAt(g,t),fade=Math.sin(t*Math.PI);
+      cx.beginPath();cx.arc(px,py,hot?1.9:1.5,0,6.2832);cx.fillStyle=`rgba(24,24,27,${(hot?.75:.45)*fade})`;cx.fill()}}
+  });
+}
+function drawRubber(time){
+  if(!linkDrag)return;const a=nodes.get(linkDrag.from);if(!a)return;const t=linkDrag.target?nodes.get(linkDrag.target):null;
+  const bx=t?t.x:linkDrag.x,by=t?t.y:linkDrag.y,g=curve(a,{x:bx,y:by},0);
+  cx.beginPath();cx.moveTo(g[0],g[1]);cx.quadraticCurveTo(g[2],g[3],g[4],g[5]);cx.setLineDash([4,4]);cx.lineDashOffset=-time*30;
+  cx.lineWidth=1.2;cx.strokeStyle=t?'rgba(24,24,27,.8)':'rgba(24,24,27,.45)';cx.stroke();cx.setLineDash([]);
+  cx.beginPath();cx.arc(bx,by,t?5:3.5,0,6.2832);cx.fillStyle='#fff';cx.fill();cx.lineWidth=1.2;cx.strokeStyle='rgba(24,24,27,.8)';cx.stroke();
+}
+let hlState='';
+function highlight(){
+  const hk=linkDrag?null:hoverNode?.a.key,nb=hk&&degree(hk)?neighbors(hk):null,sig=hk&&nb?hk+[...nb].join():'';
+  if(sig===hlState)return;hlState=sig;
+  for(const n of nodes.values())n.el.classList.toggle('faded',!!nb&&n.a.key!==hk&&!nb.has(n.a.key));
+}
+function nodeAt(x,y,skip){let best=null,bd=56;for(const n of nodes.values()){if(n.a.key===skip||n.dim)continue;const d=Math.hypot(n.x-x,n.y-y);if(d<bd){bd=d;best=n}}return best}
+function startLink(n,e,mode){
+  hideMenu();linkDrag={from:n.a.key,x:e.clientX??n.x,y:e.clientY??n.y,mode,target:null};document.body.classList.add('linking');n.hov=false;
+  anim(n.el.querySelector('.bob'),[{transform:'scale(1.12)'},{transform:'scale(1)'}],{duration:500,easing:SPRING});
+  if(mode==='drag'){
+    const mv=ev=>{linkDrag&&updateLink(ev.clientX,ev.clientY)};
+    const up=ev=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up);removeEventListener('pointercancel',up);
+      if(!linkDrag)return;const t=linkDrag.target&&nodes.get(linkDrag.target);if(t)finishLink(t);else cancelLink()};
+    addEventListener('pointermove',mv,{passive:true});addEventListener('pointerup',up);addEventListener('pointercancel',up);
+  }else toast('Bağlanacak uygulamaya tıkla · Esc iptal');
+  wake();
+}
+function updateLink(x,y){linkDrag.x=x;linkDrag.y=y;const t=nodeAt(x,y,linkDrag.from),tk=t?.a.key||null;
+  if(tk!==linkDrag.target){if(linkDrag.target)nodes.get(linkDrag.target)?.el.classList.remove('target');if(t)t.el.classList.add('target');linkDrag.target=tk}wake()}
+function finishLink(t){
+  const from=linkDrag.from;cancelLink(true);if(t.a.key===from)return;
+  if(hasLink(from,t.a.key)){toast('Zaten bağlı');return}
+  links.push(pairKey(from,t.a.key));saveMeta();statusText();
+  const a=nodes.get(from);ripple(t.x,t.y+TAIL,1.4);if(a)ripple(a.x,a.y+TAIL,1);
+  [a,t].forEach(n=>n&&anim(n.el.querySelector('.bob'),[{transform:'scale(1)'},{transform:'scale(1.18)',offset:.4},{transform:'none'}],{duration:640,easing:EASE}));
+  toast(`${a?.a.name||''} ↔ ${t.a.name} bağlandı`);
+}
+function cancelLink(silent){if(!linkDrag)return;if(linkDrag.target)nodes.get(linkDrag.target)?.el.classList.remove('target');linkDrag=null;document.body.classList.remove('linking');hlState='x';wake()}
+function removeLink(i){const l=links[i];if(!l)return;const g=linkGeo[i];links.splice(i,1);hoverLink=-1;saveMeta();statusText();
+  if(g){const[mx,my]=qAt(g,.5);ripple(mx,my,1.2)}toast('Bağlantı kaldırıldı');wake()}
+function linkHit(x,y){let best=-1,bd=9;linkGeo.forEach((g,i)=>{if(!g)return;for(let s=1;s<20;s++){const[px,py]=qAt(g,s/20),d=Math.hypot(px-x,py-y);if(d<bd){bd=d;best=i}}});return best}
+
+/* Auto-arrange as a force-directed graph, then re-anchor on the mesh */
+function autoLayout(){
+  const list=[...nodes.values()];if(list.length<2)return toast('Düzenlenecek kadar uygulama yok');
+  const P=list.map(n=>({n,x:n.x,y:n.y+LIFT,vx:0,vy:0})),idx=new Map(P.map((p,i)=>[p.n.a.key,i]));
+  const cxm=M.W/2,cym=M.H/2+50,sm=M.W<700;
+  for(let it=0;it<500;it++){
+    for(let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++){const a=P[i],b=P[j],dx=b.x-a.x,dy=b.y-a.y,d2=dx*dx+dy*dy+.01,d=Math.sqrt(d2),f=(sm?9000:26000)/d2;
+      a.vx-=dx/d*f;a.vy-=dy/d*f;b.vx+=dx/d*f;b.vy+=dy/d*f}
+    for(const[ka,kb]of links){const a=P[idx.get(ka)],b=P[idx.get(kb)];if(!a||!b)continue;const dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1,f=(d-(sm?120:190))*.04;
+      a.vx+=dx/d*f;a.vy+=dy/d*f;b.vx-=dx/d*f;b.vy-=dy/d*f}
+    for(const p of P){p.vx+=(cxm-p.x)*.012;p.vy+=(cym-p.y)*.012;p.x+=clamp(p.vx,-30,30);p.y+=clamp(p.vy,-30,30);p.vx*=.6;p.vy*=.6;
+      p.x=clamp(p.x,90,M.W-90);p.y=clamp(p.y,220,M.H-80)}
+  }
+  for(const p of P)p.n.ai=null;
+  P.sort((a,b)=>degree(b.n.a.key)-degree(a.n.a.key));
+  P.forEach((p,i)=>{p.n.ai=nearestFree(p.x,p.y,p.n);rememberLayout(p.n,false);setTimeout(()=>ripple(nx(p.n.ai),ny(p.n.ai),1),i*70)});
+  saveMeta();wake();toast('Graf düzenlendi');
+}
+$('#layoutBtn').onclick=e=>{anim(e.currentTarget,[{transform:'rotate(0)'},{transform:'rotate(360deg)'}],{duration:700,easing:OUT});autoLayout()};
+
 const wake=()=>{if(!raf&&!paused)raf=requestAnimationFrame(frame)};
 function setPaused(p){paused=p;if(!p){last=0;wake()}}
 document.addEventListener('visibilitychange',()=>setPaused(document.hidden||(!!W.app&&!W.min)));
@@ -581,7 +691,17 @@ document.addEventListener('visibilitychange',()=>setPaused(document.hidden||(!!W
 addEventListener('pointermove',e=>{if(e.pointerType==='mouse'||ptr.down){ptr.x=e.clientX;ptr.y=e.clientY;if(ptr.sx<-1e3){ptr.sx=ptr.x;ptr.sy=ptr.y}ptr.tAmp=1}},{passive:true});
 document.documentElement.addEventListener('pointerleave',()=>{ptr.tAmp=0});
 addEventListener('blur',()=>{ptr.tAmp=0});
-$('#stage').addEventListener('pointerdown',e=>{hideMenu();ptr.down=true;ptr.x=ptr.sx=e.clientX;ptr.y=ptr.sy=e.clientY;ptr.tAmp=1;ripple(e.clientX,e.clientY,1.2);
+$('#stage').addEventListener('pointermove',e=>{if(e.pointerType!=='mouse')return;
+  if(linkDrag&&linkDrag.mode==='click'){updateLink(e.clientX,e.clientY);return}
+  const h=linkDrag?-1:linkHit(e.clientX,e.clientY);if(h!==hoverLink){hoverLink=h;$('#stage').classList.toggle('onlink',h>=0);wake()}});
+addEventListener('pointermove',e=>{if(linkDrag&&linkDrag.mode==='click')updateLink(e.clientX,e.clientY)},{passive:true});
+$('#stage').addEventListener('pointerdown',e=>{
+  if(linkDrag){if(linkDrag.mode==='click')cancelLink();return}
+  const h=e.pointerType==='mouse'?hoverLink:linkHit(e.clientX,e.clientY);
+  if(h>=0){const[ka,kb]=links[h],A=find(ka),Bn=find(kb);
+    popMenu(e.clientX,e.clientY,`<div class="who"><b>${esc(A?.name||'')} ↔ ${esc(Bn?.name||'')}</b>bağlantı</div><div class="msep"></div><button class="mi danger" data-m="unl"><svg viewBox="0 0 16 16">${I.del}</svg>Bağlantıyı kaldır</button>`,
+      ev=>{if(ev.target.closest('[data-m=unl]')){hideMenu();removeLink(h)}});return}
+  hideMenu();ptr.down=true;ptr.x=ptr.sx=e.clientX;ptr.y=ptr.sy=e.clientY;ptr.tAmp=1;ripple(e.clientX,e.clientY,1.2);
   const up=()=>{ptr.down=false;if(e.pointerType!=='mouse')ptr.tAmp=0;removeEventListener('pointerup',up)};addEventListener('pointerup',up)});
 $('#stage').addEventListener('dblclick',e=>{spawnHint=[e.clientX,e.clientY+LIFT];openSheet()});
 addEventListener('resize',()=>{const was=[...nodes.values()].map(n=>[n,M.rx[n.ai]/M.W,M.ry[n.ai]/M.H]);buildMesh();
@@ -605,7 +725,7 @@ function statusText(){
   const cloud=S.kind==='cloud';if(!cloud)$('#sDot').classList.toggle('warn',!manifest.ok);
   const a=manifest.ok?`${pub.length} yayında`:manifest.why==='file'?'yerel mod':'apps.json yok';
   const b=cloud?(sync==='pending'?'kaydediliyor…':sync==='error'?'senkron hatası':'senkron'):'bu tarayıcı';
-  $('#sTxt').textContent=`${a} · ${drafts.length} taslak · ${b}`;
+  const lc=links.filter(l=>nodes.has(l[0])&&nodes.has(l[1])).length;$('#sTxt').textContent=`${a} · ${drafts.length} taslak · ${lc} bağlantı · ${b}`;
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -688,15 +808,16 @@ $('#wbar').addEventListener('pointerdown',e=>{
 /* ── Context menu ─────────────────────────────────────────── */
 const I={open:'<path d="M3 8h10M9 4l4 4-4 4"/>',tab:'<path d="M9.5 2.5h4v4M13.5 2.5L7.5 8.5M12 9.5v3.5H3V4h3.5"/>',link:'<path d="M6.5 9.5l3-3M7 4.5l1-1a2.5 2.5 0 0 1 3.5 3.5l-1 1M9 11.5l-1 1A2.5 2.5 0 0 1 4.5 9l1-1"/>',
   edit:'<path d="M10.5 2.5l3 3L6 13H3v-3z"/>',ship:'<path d="M8 2.5v8M4.5 6L8 2.5 11.5 6M3 13.5h10"/>',dl:'<path d="M8 2.5v8M4.5 7L8 10.5 11.5 7M3 13.5h10"/>',del:'<path d="M3 4.5h10M6.5 4.5v-2h3v2M4.5 4.5l.6 9h5.8l.6-9"/>',
-  out:'<path d="M6 2.5H3v11h3M10 5l3 3-3 3M13 8H6"/>',home:'<path d="M8 3v4M8 9v4M3 8h4M9 8h4"/>'};
+  out:'<path d="M6 2.5H3v11h3M10 5l3 3-3 3M13 8H6"/>',connect:'<circle cx="4" cy="8" r="2"/><circle cx="12" cy="8" r="2"/><path d="M6 8h4"/>',unlinkall:'<circle cx="4" cy="8" r="2"/><circle cx="12" cy="8" r="2"/><path d="M6.5 6.5l3 3M9.5 6.5l-3 3"/>',home:'<path d="M8 3v4M8 9v4M3 8h4M9 8h4"/>'};
 let menuEl=null;
 function popMenu(x,y,html,onClick){
   hideMenu();const m=document.createElement('div');m.className='menu';m.innerHTML=html;document.body.appendChild(m);const r=m.getBoundingClientRect();
   const lx=clamp(x,8,innerWidth-r.width-8),ly=clamp(y,8,innerHeight-r.height-8);m.style.left=lx+'px';m.style.top=ly+'px';m.style.setProperty('--ox',(x-lx)+'px');m.style.setProperty('--oy',(y-ly)+'px');
   anim(m,[{opacity:0,transform:'scale(.94)'},{opacity:1,transform:'none'}],{duration:260,easing:OUT});m.addEventListener('click',onClick);menuEl=m;return m}
 function showMenu(x,y,a){
-  const items=a.kind==='pub'?[['open','Aç','↵'],['tab','Yeni sekmede aç'],['link','Bağlantıyı kopyala'],'-',['home','Merkeze getir']]
-    :[['open','Aç','↵'],['edit','Düzenle'],['ship','Yayına hazırla'],['dl','HTML indir'],['home','Merkeze getir'],'-',['del','Sil']];
+  const dg=degree(a.key),lk=[['connect','Başka uygulamaya bağla','⇧'],...(dg?[['unlinkall',`Bağlantıları kaldır (${dg})`]]:[])];
+  const items=a.kind==='pub'?[['open','Aç','↵'],['tab','Yeni sekmede aç'],['link','Adresi kopyala'],'-',...lk,['home','Merkeze getir']]
+    :[['open','Aç','↵'],['edit','Düzenle'],['ship','Yayına hazırla'],['dl','HTML indir'],'-',...lk,['home','Merkeze getir'],'-',['del','Sil']];
   popMenu(x,y,items.map(i=>i==='-'?'<div class="msep"></div>':`<button class="mi${i[0]==='del'?' danger':''}" data-m="${i[0]}"><svg viewBox="0 0 16 16">${I[i[0]]}</svg>${i[1]}${i[2]?`<span class="k">${i[2]}</span>`:''}</button>`).join(''),
     e=>{const b=e.target.closest('[data-m]');if(!b)return;const k=b.dataset.m;
       if(k==='del'&&!b.classList.contains('confirm')){b.classList.add('confirm');b.lastChild.textContent='Emin misin? Sil';return}
@@ -705,6 +826,8 @@ function showMenu(x,y,a){
       else if(k==='link')copy(new URL(a.url,location.href).href,'Bağlantı kopyalandı');
       else if(k==='edit')openSheet(a);else if(k==='ship')shipSheet(a);else if(k==='dl')download(a.html,slugify(a.name)+'.html');
       else if(k==='home'&&n){n.ai=nearestFree(M.W/2,M.H/2+20,n);rememberLayout(n);ripple(nx(n.ai),ny(n.ai),1.6);wake()}
+      else if(k==='connect'&&n)startLink(n,{clientX:n.x+60,clientY:n.y},'click');
+      else if(k==='unlinkall'){links=links.filter(l=>l[0]!==a.key&&l[1]!==a.key);saveMeta();statusText();if(n)ripple(n.x,n.y+TAIL,1.3);toast('Bağlantılar kaldırıldı');wake()}
       else if(k==='del')removeDraft(a)});
 }
 function hideMenu(){if(!menuEl)return;const m=menuEl;menuEl=null;anim(m,[{opacity:1},{opacity:0,transform:'scale(.97)'}],{duration:120,easing:EASE}).finished.then(()=>m.remove(),()=>m.remove())}
@@ -807,7 +930,7 @@ addEventListener('keydown',e=>{
   if(document.body.classList.contains('locked'))return;const mod=e.metaKey||e.ctrlKey;
   if(mod&&e.key.toLowerCase()==='k'){e.preventDefault();$('#q').focus();$('#q').select()}
   else if(mod&&e.key.toLowerCase()==='n'&&!e.shiftKey){e.preventDefault();openSheet()}
-  else if(e.key==='Escape'){if(menuEl)hideMenu();else if(sheetEl)closeSheet();else if(W.app&&!W.min)closeWin()}
+  else if(e.key==='Escape'){if(linkDrag)cancelLink();else if(menuEl)hideMenu();else if(sheetEl)closeSheet();else if(W.app&&!W.min)closeWin()}
 });
 const clk=()=>{$('#clock').textContent=new Date().toLocaleString('tr-TR',{weekday:'short',hour:'2-digit',minute:'2-digit'})};clk();setInterval(clk,15000);
 

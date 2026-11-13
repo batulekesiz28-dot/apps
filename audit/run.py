@@ -6,7 +6,8 @@ ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE='http://localhost:8766/'
 def targets():
     apps=json.load(open(os.path.join(ROOT,'apps.json')))['apps']
-    t=[('hub','Hub','')]+[(a['slug'],a['name'],f"apps/{a['slug']}/") for a in apps]
+    # apps hosted elsewhere (url outside this repo) are skipped
+    t=[('hub','Hub','')]+[(a['slug'],a['name'],f"apps/{a['slug']}/") for a in apps if not a.get('url')]
     want=sys.argv[1:]
     return [x for x in t if not want or x[0] in want]
 async def main():

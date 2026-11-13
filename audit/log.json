@@ -228,5 +228,34 @@
     "fix": "İstenirse her uygulamaya da aynı 7 tema eklenebilir."
    }
   ]
+ },
+ {
+  "at": "2026-11-13T21:40:00+03:00",
+  "change": "SAT Bank ve SAT Math hub'a eklendi (SAT güneşi)",
+  "scores": {
+   "Hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Hub bilgisayar": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Hub",
+    "sev": "info",
+    "status": "fixed",
+    "text": "SAT Bank ve SAT Math kendi sitelerinde kalıyor (öğretmen erişimi bozulmasın diye); hub onları aynı adresten açıyor."
+   },
+   {
+    "app": "SAT Bank",
+    "sev": "info",
+    "status": "open",
+    "text": "SAT Bank ayrı bir repoda ve ayrı Firebase projesinde; Denetçi'nin otomatik taramasına henüz dahil değil.",
+    "fix": "İstenirse SAT Bank reposuna da aynı denetim eklenebilir."
+   }
+  ]
  }
 ]

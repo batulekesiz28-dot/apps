@@ -632,7 +632,7 @@ function applyRemoteGroups(g,m){if(JSON.stringify(g)===JSON.stringify(groups)&&J
   groups=g;members=m;store.set('appshell:groups',groups);store.set('appshell:members',members);wake()}
 const groupOf=k=>{const g=members[k];return g&&groups[g]?g:null};
 let linkDrag=null,hoverLink=-1,hoverNode=null;
-const toPub=a=>({key:'p:'+a.slug,kind:'pub',slug:a.slug,name:a.name||a.slug,icon:a.icon||'',color:a.color||'gray',desc:a.desc||'',url:a.url||a.file||`apps/${a.slug}/`});
+const toPub=a=>({key:'p:'+a.slug,kind:'pub',slug:a.slug,name:a.name||a.slug,icon:a.icon||'',color:a.color||'gray',desc:a.desc||'',group:a.group||'',groupColor:a.groupColor||'',url:a.url||a.file||`apps/${a.slug}/`});
 const toDraft=d=>({key:'d:'+d.id,kind:'draft',id:d.id,name:d.name,icon:d.icon||'',color:d.color||colorKeys[hash(d.id)%colorKeys.length],html:d.html,order:d.order??0});
 const rawDraft=d=>({id:d.id,name:d.name,icon:d.icon||'',color:d.color,html:d.html,order:d.order??0,ts:Date.now()});
 const find=k=>pub.find(a=>a.key===k)||drafts.find(a=>a.key===k);
@@ -863,6 +863,12 @@ function syncNodes(){
   for(const k of[...nodes.keys()])if(!keys.has(k))removeNode(k);
   const hadAny=Object.keys(pos).length>0||Object.keys(legacy).length>0,fresh=[];
   let d=0;list.forEach(a=>{const n=nodes.get(a.key);if(n)updateNode(n,a);else{const nn=createNode(a,booted?0:260+d*90);d++;if(nn.fresh&&a.kind==='pub')fresh.push(nn)}});
+  // apps.json may suggest a küme ("group"): applied once per app, then it's the user's choice
+  const hinted=store.get('appshell:hinted',[]);let hc=false;
+  for(const a of pub){if(!a.group||hinted.includes(a.key))continue;hinted.push(a.key);hc=true;if(groupOf(a.key))continue;
+    let g=Object.keys(groups).find(k=>(groups[k].name||'').toLocaleLowerCase('tr')===a.group.toLocaleLowerCase('tr'));
+    if(!g){g='g'+uid();groups[g]={name:a.group,color:a.groupColor||'violet'}}members[a.key]=g}
+  if(hc){store.set('appshell:hinted',hinted);if(booted)saveMeta();GX.key=''}
   // a newly published app: say so and glide the camera to it if it landed off-screen
   if(hadAny&&fresh.length)setTimeout(()=>{const f=fresh[0],sx=w2sx(f.aw[0]),sy=w2sy(f.aw[1]-LIFT);
     toast(fresh.length>1?`${fresh.length} yeni uygulama eklendi`:`Yeni uygulama: ${f.a.name}`);

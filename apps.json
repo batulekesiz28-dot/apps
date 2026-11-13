@@ -20,7 +20,8 @@
    "name": "Study Log",
    "icon": "chart",
    "color": "green",
-   "desc": "Çalışma sayacı, günlük saatler, hedefler ve takip"
+   "desc": "Çalışma sayacı, günlük saatler, hedefler ve takip",
+   "group": "SAT"
   },
   {
    "slug": "denetci",
@@ -28,6 +29,26 @@
    "icon": "spark",
    "color": "violet",
    "desc": "Her değişikliği senin gözünden denetler: erişim, kullanım, estetik, hız"
+  },
+  {
+   "slug": "sat-bank",
+   "name": "SAT Bank",
+   "icon": "book",
+   "color": "blue",
+   "desc": "SAT Reading & Writing soru bankası",
+   "url": "../sat-bank/",
+   "group": "SAT",
+   "groupColor": "violet"
+  },
+  {
+   "slug": "sat-math",
+   "name": "SAT Math",
+   "icon": "calc",
+   "color": "violet",
+   "desc": "SAT Math · Desmos",
+   "url": "../sat-bank/math.html",
+   "group": "SAT",
+   "groupColor": "violet"
   }
  ]
 }

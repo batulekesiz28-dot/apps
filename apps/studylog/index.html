@@ -130,6 +130,8 @@ main{max-width:980px;margin:0 auto;padding:10px 22px 60px}
 .add{margin-top:6px;justify-self:start}
 
 /* ── Days view ── */
+.dleft{display:grid;gap:22px;min-width:0}
+@media (min-width:861px){.dayp{position:sticky;top:76px}}
 .dgrid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:22px;align-items:start}
 @media (max-width:860px){.dgrid{grid-template-columns:minmax(0,1fr)}}
 .cal{padding:20px}
@@ -250,7 +252,7 @@ main{max-width:980px;margin:0 auto;padding:10px 22px 60px}
   <div class="brand"><i></i>Study Log</div>
   <nav class="tabs" id="tabs">
     <span class="ind" id="ind"></span>
-    <button data-v="timer">Sayaç</button><button data-v="days">Günler</button><button data-v="goals">Hedefler</button><button data-v="stats">Takip</button>
+    <button data-v="days">Günler</button><button data-v="goals">Hedefler</button><button data-v="stats">Takip</button>
   </nav>
   <button class="ib" id="themeBtn" title="Tema" aria-label="Tema"><svg viewBox="0 0 16 16"><path d="M13.5 9.5A5.5 5.5 0 0 1 6.5 2.5a5.5 5.5 0 1 0 7 7z"/></svg></button>
   <button class="me" id="me" hidden title="Hesap"></button>
@@ -301,7 +303,7 @@ const DEF={subjects:[{id:'s1',name:'Matematik',color:PAL[0],goalW:0},{id:'s2',na
   goalDay:180,goalWeek:1200,presets:[15,25,45,60,90],topics:{},lastTopic:{},run:null,sel:'s1',mode:'up',target:1500,updated:0};
 let set=JSON.parse(JSON.stringify(DEF));
 const sessions=new Map();            // id → {id,subj,topic,date,start,end,min,src,updated}
-let view='timer',calM=null,selDay=today(),statRange=7,distRange='week';
+let view='days',calM=null,selDay=today(),statRange=7,distRange='week';
 
 /* ── Storage ── */
 const FB={apiKey:'AIzaSyDpJc9g4XDBq32T9Pf1UKbuhzRmnx__mak',authDomain:'apps-f1cfd.firebaseapp.com',projectId:'apps-f1cfd'};
@@ -349,7 +351,7 @@ function forgetTopic(subj,t){set.topics[subj]=topicsOf(subj).filter(x=>x!==t);if
 function startRun(o={}){const subj=o.subj||set.sel||set.subjects[0]?.id;if(!subj){toast('Önce bir ders ekle');return}
   const mode=o.mode||set.mode,target=o.target||set.target;
   const topic=(o.topic??($('#topic')?.value||'')).trim();rememberTopic(subj,topic);
-  set.run={subj,topic,mode,target:mode==='down'?target:0,acc:0,at:Date.now(),on:true,date:today(),start:Date.now()};saveSet(true);render();beep(660,.06)}
+  set.run={subj,topic,mode,target:mode==='down'?target:0,acc:0,at:Date.now(),on:true,date:o.date||selDay,start:Date.now()};saveSet(true);render();beep(660,.06)}
 function pauseRun(){const r=set.run;if(!r)return;if(r.on){r.acc+=(Date.now()-r.at)/1000;r.on=false}else{r.at=Date.now();r.on=true}saveSet(true);render()}
 function finishRun(auto){const r=set.run;if(!r)return;rememberTopic(r.subj,r.topic);const sec=Math.min(elapsed(),r.mode==='down'?r.target:1e9),min=Math.round(sec/60);
   set.run=null;saveSet(true);
@@ -363,17 +365,17 @@ function chime(){[0,180,360].forEach((t,i)=>setTimeout(()=>beep([880,1108,1318][
 function tick(){
   const r=set.run;document.body.classList.toggle('running',!!(r&&r.on));
   if(r&&r.mode==='down'&&elapsed()>=r.target){finishRun(true);return}
-  if(view==='timer')paintDial();
+  if(view==='days')paintDial();
   const mt=$('#mtT');if(mt&&r)mt.textContent=clock(r.mode==='down'?r.target-elapsed():elapsed());
-  const ts=$('#todayT');if(ts){const m=todayMin();ts.textContent=fm(m);const b=$('#todayB');if(b)paintTodayBar(b)}
+  const ts=$('#todayT');if(ts){ts.textContent=fm(dayTot(selDay));const b=$('#todayB');if(b)paintTodayBar(b)}
   document.title=r?`${clock(r.mode==='down'?r.target-elapsed():elapsed())} · ${subjOf(r.subj).name}`:'Study Log';
 }
 setInterval(tick,1000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)tick()});
 
 /* ── Router ── */
-function go(v){if(v==='start'){v='timer';if(!set.run&&set.subjects.length)setTimeout(()=>startRun({mode:'up',topic:lastTopic(set.sel)}),0)}
-  if(!['timer','days','goals','stats'].includes(v))v='timer';if(location.hash!=='#'+v)history.replaceState(null,'','#'+v);view=v;render();moveInd()}
+function go(v){if(v==='start'){v='days';selDay=today();if(!set.run&&set.subjects.length)setTimeout(()=>startRun({mode:'up',topic:lastTopic(set.sel)}),0)}
+  if(!['days','goals','stats'].includes(v))v='days';if(location.hash!=='#'+v)history.replaceState(null,'','#'+v);view=v;render();moveInd()}
 addEventListener('hashchange',()=>go(location.hash.slice(1)));
 $('#tabs').addEventListener('click',e=>{const b=e.target.closest('[data-v]');if(b)go(b.dataset.v)});
 function moveInd(){const b=$(`#tabs [data-v="${view}"]`),ind=$('#ind');$$('#tabs button').forEach(x=>x.classList.toggle('on',x===b));if(!b)return;
@@ -384,26 +386,27 @@ addEventListener('resize',moveInd);
 let lastView='';
 function render(soft){
   const m=$('#main'),sx=scrollY,same=lastView===view;
-  if(soft&&view==='timer'&&document.activeElement?.id==='topic'){paintSessions();paintToday();paintDial();return} // don't steal focus while typing
+  if(soft&&view==='days'&&document.activeElement?.id==='topic'){paintToday();paintDial();return} // don't steal focus while typing
   m.onclick=null;
-  m.innerHTML=({timer:vTimer,days:vDays,goals:vGoals,stats:vStats})[view]();
+  m.innerHTML=({days:vDays,goals:vGoals,stats:vStats})[view]();
   if(same)m.firstElementChild?.classList.remove('view');lastView=view;if(same)scrollTo(0,sx);
-  if(view==='timer'){paintDial();wireTimer()}
+  if(view==='days'){paintDial();wireTimer()}
   tick();
 }
 const chipSub=(s,on)=>`<button class="chip${on?' on':''}" data-sub="${s.id}"><i style="background:${s.color}"></i>${esc(s.name)}</button>`;
-function paintTodayBar(b){const tot=todayMin(),g=set.goalDay||1,by={};list().forEach(s=>{if(s.date===today())by[s.subj]=(by[s.subj]||0)+s.min});
-  if(set.run&&set.run.date===today())by[set.run.subj]=(by[set.run.subj]||0)+liveMin();
+const dayTot=k=>minsOn(k)+(set.run&&set.run.date===k?liveMin():0);
+function paintTodayBar(b){const tot=dayTot(selDay),g=set.goalDay||1,by={};list().forEach(s=>{if(s.date===selDay)by[s.subj]=(by[s.subj]||0)+s.min});
+  if(set.run&&set.run.date===selDay)by[set.run.subj]=(by[set.run.subj]||0)+liveMin();
   b.innerHTML=Object.entries(by).map(([k,v])=>`<i style="width:${Math.min(100,v/g*100)}%;background:${subjOf(k).color}"></i>`).join('');
   const p=$('#todayP');if(p)p.textContent=tot>=g?'hedef tamam ✓':`hedef ${fm(g)} · %${Math.round(tot/g*100)}`}
-function paintToday(){const t=$('#todayT');if(t){t.textContent=fm(todayMin());paintTodayBar($('#todayB'))}}
+function paintToday(){const t=$('#todayT');if(t){t.textContent=fm(dayTot(selDay));paintTodayBar($('#todayB'))}}
 
-function vTimer(){
+function timerCard(){
   const r=set.run,st=streak();
   const subs=set.subjects.map(s=>chipSub(s,(r?r.subj:set.sel)===s.id)).join('')+`<button class="chip add" data-act="newsub">+ Ders</button>`;
-  return`<div class="view tgrid">
-   <section class="card tcard">
-     <div class="today"><div class="t"><b class="num" id="todayT">${fm(todayMin())}</b><span>bugün</span>${st.n?`<span class="streak">${st.n} gün seri</span>`:''}</div>
+  const dl=selDay===today()?'bugün':parse(selDay).toLocaleDateString('tr-TR',{day:'numeric',month:'long'});
+  return`<section class="card tcard">
+     <div class="today"><div class="t"><b class="num" id="todayT">${fm(dayTot(selDay))}</b><span>${esc(dl)}</span>${st.n?`<span class="streak">${st.n} gün seri</span>`:''}</div>
        <div class="bar" id="todayB"></div><div class="h"><span id="todayP"></span></div></div>
      <div><span class="fl">Ders</span><div class="scroll" id="subs">${subs}</div></div>
      <div><input class="topic" id="topic" placeholder="Ne çalışıyorsun? (konu, sayfa, test…)" value="${esc(r?r.topic:lastTopic(set.sel))}" autocomplete="off" maxlength="120">
@@ -416,10 +419,7 @@ function vTimer(){
         <button class="btn pri go" data-act="pause">${r.on?'<svg viewBox="0 0 16 16"><path d="M5.5 3.5v9M10.5 3.5v9"/></svg>Duraklat':'<svg viewBox="0 0 16 16"><path d="M5 3.5l8 4.5-8 4.5z"/></svg>Devam'}</button>
         <button class="btn sec" data-act="finish" title="Bitir ve kaydet" aria-label="Bitir"><svg viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7"/></svg></button>`
        :`<button class="btn pri go" data-act="start"><svg viewBox="0 0 16 16"><path d="M5 3.5l8 4.5-8 4.5z"/></svg>Başla</button>`}</div>
-   </section>
-   <section class="card sess"><div class="h">Bugünkü oturumlar<span class="sp" id="sessN"></span></div><div id="sessL"></div>
-     <button class="btn sec add" data-act="manual"><svg viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></svg>Elle ekle</button></section>
-  </div>`}
+   </section>`}
 function paintTopics(){const el=$('#tps');if(!el)return;const subj=set.run?set.run.subj:set.sel;el.innerHTML=topicChips(subj,$('#topic')?.value.trim())}
 function paintDial(){const r=set.run,tm=$('#tm'),pg=$('#pg'),sub=$('#dsub');if(!tm)return;const C=867.08;
   let frac,txt,label;
@@ -431,7 +431,7 @@ function paintDial(){const r=set.run,tm=$('#tm'),pg=$('#pg'),sub=$('#dsub');if(!
 function sessRow(s){const sb=subjOf(s.subj);return`<button class="si" data-sid="${s.id}"><span class="c" style="background:${sb.color}"></span><span style="min-width:0"><div class="n">${esc(sb.name)}${s.topic?` <span style="color:var(--ink3);font-weight:400">· ${esc(s.topic)}</span>`:''}</div><div class="m">${s.start?hm(s.start)+(s.end?' – '+hm(s.end):''):'elle eklendi'}</div></span><span class="d num">${fs2(s.min)}</span></button>`}
 function paintSessions(){const l=$('#sessL');if(!l)return;const arr=list().filter(s=>s.date===today()).sort((a,b)=>(b.start||b.updated)-(a.start||a.updated));
   $('#sessN').textContent=arr.length?arr.length+' oturum':'';l.innerHTML=arr.length?`<div class="sl">${arr.map(sessRow).join('')}</div>`:'<div class="empty">Henüz kayıt yok. Başla’ya bas ya da elle ekle.</div>'}
-function wireTimer(){paintSessions();paintToday();
+function wireTimer(){paintToday();
   const m=$('#main');
   m.onclick=e=>{const sub=e.target.closest('[data-sub]'),act=e.target.closest('[data-act]'),p=e.target.closest('[data-p]'),md=e.target.closest('[data-m]'),si=e.target.closest('[data-sid]');
     if(sub){if(set.run){set.run.subj=sub.dataset.sub;saveSet(true)}else{set.sel=sub.dataset.sub;saveSet();$('#topic').value=lastTopic(set.sel)}$$('#subs [data-sub]').forEach(x=>x.classList.toggle('on',x===sub));paintTopics();paintDial();return}
@@ -440,7 +440,6 @@ function wireTimer(){paintSessions();paintToday();
     if(tp){const t=tp.dataset.tp,subj=set.run?set.run.subj:set.sel;$('#topic').value=t;if(set.run){set.run.topic=t;saveSet(true)}else{rememberTopic(subj,t);saveSet()}paintTopics();return}
     if(md){set.mode=md.dataset.m;saveSet();$$('#mode button').forEach(x=>x.classList.toggle('on',x===md));$('#pre').hidden=set.mode!=='down';paintDial();return}
     if(p){if(p.dataset.p==='x'){customTarget();return}set.target=+p.dataset.p*60;saveSet();$$('#pre [data-p]').forEach(x=>x.classList.toggle('on',x===p));paintDial();return}
-    if(si){editSession(sessions.get(si.dataset.sid));return}
     if(!act)return;const a=act.dataset.act;
     if(a==='start')startRun();else if(a==='pause')pauseRun();else if(a==='finish')finishRun(false);else if(a==='discard')discardRun();
     else if(a==='manual')editSession(null);else if(a==='newsub')subjectSheet(null)};
@@ -455,7 +454,7 @@ function customTarget(){sheet('Özel süre',`<div><span class="fl">Dakika</span>
 /* ── Session editor (manual add / edit) ── */
 function editSession(s,day){
   const isNew=!s;s=s?{...s}:{id:uid(),subj:set.sel||set.subjects[0]?.id,topic:lastTopic(set.sel),date:day||today(),min:30,src:'manual'};
-  const QM=[15,30,45,60,90,120],canTimer=isNew&&s.date===today()&&!set.run;let tab='manual',tmode='up',ttarget=set.target||1500;
+  const QM=[15,30,45,60,90,120],canTimer=isNew&&!set.run;let tab='manual',tmode='up',ttarget=set.target||1500;
   sheet(isNew?(day&&day!==today()?'Bu güne ekle':'Ekle'):'Oturumu düzenle',
    `${canTimer?`<div class="seg" id="eTab" style="margin:0;justify-self:start"><button data-t="manual" class="on">Süre gir</button><button data-t="timer">Sayaçla</button></div>`:''}
     <div><span class="fl">Ders</span><div class="row" id="eS">${set.subjects.map(x=>chipSub(x,x.id===s.subj)).join('')}</div></div>
@@ -473,7 +472,7 @@ function editSession(s,day){
      TP.onclick=e=>{const x=e.target.closest('[data-tpx]'),b=e.target.closest('[data-tp]');if(x){forgetTopic(s.subj,x.dataset.tpx);tpaint();return}if(b){T.value=b.dataset.tp;tpaint()}};T.oninput=tpaint;
      sh.querySelector('#eQ').onclick=e=>{const b=e.target.closest('[data-q]');if(!b)return;M.value=b.dataset.q;$$('#eQ .chip',sh).forEach(x=>x.classList.toggle('on',x===b))};
      M.oninput=()=>$$('#eQ .chip',sh).forEach(x=>x.classList.toggle('on',+x.dataset.q===+M.value));
-     sh.querySelector('#eOk').onclick=()=>{if(tab==='timer'){const topic=sh.querySelector('#eT').value.trim();closeSheet();set.sel=s.subj;startRun({subj:s.subj,topic,mode:tmode,target:ttarget});toast(`${subjOf(s.subj).name} sayacı başladı`);return}
+     sh.querySelector('#eOk').onclick=()=>{if(tab==='timer'){const topic=sh.querySelector('#eT').value.trim();closeSheet();set.sel=s.subj;startRun({subj:s.subj,topic,mode:tmode,target:ttarget,date:s.date});toast(`${subjOf(s.subj).name} sayacı başladı`);return}
        const min=clamp(Math.round(+M.value||0),1,900);if(!s.subj)return toast('Bir ders seç');
        s.min=min;s.date=sh.querySelector('#eD').value||today();s.topic=sh.querySelector('#eT').value.trim();rememberTopic(s.subj,s.topic);saveSet();
        if(s.start&&s.src==='timer'&&!isNew)s.end=s.start+min*60000;putSession(s);closeSheet();render();toast(isNew?`${subjOf(s.subj).name} · ${fm(min)} eklendi`:'Kaydedildi')};
@@ -498,16 +497,16 @@ function vDays(){
   const strip=[];let mx=1;for(let i=13;i>=0;i--){const k=addDays(tk,-i),m=minsOn(k);strip.push([k,m]);mx=Math.max(mx,m)}
   const day=list().filter(s=>s.date===selDay).sort((a,b)=>(a.start||0)-(b.start||0)),dm=minsOn(selDay)+(set.run&&set.run.date===selDay?liveMin():0);
   return`<div class="view dgrid" style="--heat:${acc.trim()||'#18181B'}">
-   <section class="card cal"><div class="calh"><b>${MON[calM.m]} ${calM.y}</b><span class="num">${fm(mTot)}</span>
+   <div class="dleft"><section class="card cal"><div class="calh"><b>${MON[calM.m]} ${calM.y}</b><span class="num">${fm(mTot)}</span>
      <button class="ib" data-cal="-1" aria-label="Önceki ay"><svg viewBox="0 0 16 16"><path d="M10 3.5L5.5 8l4.5 4.5"/></svg></button><button class="ib" data-cal="0" aria-label="Bu ay"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="2"/></svg></button><button class="ib" data-cal="1" aria-label="Sonraki ay"><svg viewBox="0 0 16 16"><path d="M6 3.5L10.5 8 6 12.5"/></svg></button></div>
      <div class="cg">${cells}</div>
      <div class="legend">az<i style="opacity:.14"></i><i style="opacity:.4"></i><i style="opacity:.7"></i><i></i>hedef ●</div></section>
+     ${timerCard()}</div>
    <section class="card dayp"><div class="h">${esc(longDay(selDay))}</div>
      <div class="big num">${fm(dm)}</div><div class="bar">${set.goalDay?`<i style="width:${Math.min(100,dm/set.goalDay*100)}%;background:var(--ink)"></i>`:''}</div>
      <div class="dg" style="font-size:12.5px;color:var(--ink3)">${set.goalDay?(dm>=set.goalDay?'Günlük hedef tamamlandı ✓':`Hedefin %${Math.round(dm/set.goalDay*100)}’i · ${fm(set.goalDay)}`):''}</div>
-     ${set.run?miniTimer():''}
      <div class="sl">${day.length?day.map(sessRow).join(''):'<div class="empty" style="padding-left:10px">Bu gün kayıt yok.</div>'}</div>
-     <div class="qrow">${set.run?'':`<button class="btn pri" data-act="quick" title="${esc(subjOf(set.sel).name)} için kronometreyi hemen başlat"><svg viewBox="0 0 16 16"><path d="M5 3.5l8 4.5-8 4.5z"/></svg>Kronometre · ${esc(subjOf(set.sel).name)}</button>`}<button class="btn sec" data-act="addday"><svg viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></svg>Bu güne ekle</button></div>
+     <button class="btn sec add" data-act="addday"><svg viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></svg>Bu güne ekle</button>
      <div class="h" style="margin-top:8px">Son 14 gün</div>
      <div class="spark7">${strip.map(([k,m])=>`<i class="${k===selDay?'on':''}" title="${esc(longDay(k))} · ${fm(m)}" style="height:${Math.max(4,m/mx*100)}%"></i>`).join('')}</div></section>
   </div>`}
@@ -602,8 +601,8 @@ function sheet(title,body,foot,mount){closeSheet(true);const s=document.createEl
 function closeSheet(now){if(!sheetEl)return;const s=sheetEl;sheetEl=null;if(now)return s.remove();anim(s,[{opacity:1},{opacity:0}],{duration:180,easing:EASE}).finished.then(()=>s.remove())}
 addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet();
   if(e.target.closest?.('input,textarea')||sheetEl||e.metaKey||e.ctrlKey)return;
-  if(e.key===' '&&view==='timer'){e.preventDefault();set.run?pauseRun():startRun()}
-  else if('1234'.includes(e.key))go(['timer','days','goals','stats'][+e.key-1])});
+  if(e.key===' '&&view==='days'){e.preventDefault();set.run?pauseRun():startRun()}
+  else if('123'.includes(e.key))go(['days','goals','stats'][+e.key-1])});
 function toast(msg,undo){const t=document.createElement('div');t.className='toast'+(undo?' u':'');t.innerHTML=`<span>${esc(msg)}</span>${undo?'<button>Geri al</button>':''}`;$('#toasts').prepend(t);
   anim(t,[{opacity:0,transform:'translateY(10px) scale(.95)'},{opacity:1,transform:'none'}],{duration:380,easing:OUT});
   const kill=()=>anim(t,[{opacity:1},{opacity:0}],{duration:200,easing:EASE,fill:'forwards'}).finished.then(()=>t.remove());const tm=setTimeout(kill,undo?5500:2600);
@@ -625,7 +624,7 @@ $('#gBtn').onclick=async()=>{const p=new firebase.auth.GoogleAuthProvider();p.se
   try{await firebase.auth().signInWithPopup(p)}catch(e){if(['auth/popup-blocked','auth/operation-not-supported-in-this-environment','auth/cancelled-popup-request'].includes(e.code))return firebase.auth().signInWithRedirect(p);if(e.code!=='auth/popup-closed-by-user')gate('error',authMsg(e))}};
 $('#gOut').onclick=()=>firebase.auth().signOut();
 $('#me').onclick=()=>{if(confirm('Çıkış yapılsın mı?'))firebase.auth().signOut()};
-function boot(){go(location.hash.slice(1)||'timer');requestAnimationFrame(moveInd)}
+function boot(){go(location.hash.slice(1)||'days');requestAnimationFrame(moveInd)}
 (async()=>{
   if(!CLOUD){S=Local;Local.load();boot();return}
   gate('loading');

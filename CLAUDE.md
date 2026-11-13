@@ -12,6 +12,14 @@ Bu proje uzun bir çalışmanın ürünü ve **çalışıyor**. Sen onu devralı
 - Kullanıcıyla Türkçe, kısa ve samimi konuş. Teknik ayrıntı yerine “ne değişti, nereden görürsün” anlat. Bitince “Ctrl+Shift+R ile yenile” de.
 - Değişikliği yerelde gerçekten dene (Playwright/Chrome ile ekran görüntüsü al), sonra Denetçi kuralını uygula.
 
+## Kalite standardı (kullanıcının ana talimatı) — `docs/STANDART.md`
+Her işte bu dosyadaki standarda uy. Özet:
+- Yeni bir şeye başlamadan önce o alanın 3–5 lider ürününü gerçekten araştır; neyin neden iyi olduğunu kısaca söyle. Kopyalama, en iyilerini birleştirip özgün yap.
+- “Sadece çalışan” yetmez: tutarlı boşluk sistemi, net hiyerarşi, kaliteli tipografi, tutarlı köşe yarıçapı, gereksiz kutu/çizgi yok, her şeyi karta koyma.
+- Akıcı ama yormayan animasyon: transform/opacity, 60 FPS, `prefers-reduced-motion` + kullanıcının animasyon ayarı (`appshell:motion`).
+- Boş, yükleniyor, hata, başarı durumlarını; tooltip, sağ tık, klavye kısayolu, focus/hover durumlarını da tasarla.
+- Teslimden önce gerçek kullanım akışlarını test et (butonlar, menüler, temalar, veri korunuyor mu, konsol hatası var mı).
+
 ## Projenin haritası (ne nerede)
 - `index.html` — **hub** (galaksi masaüstü). Tek dosya: CSS + JS. Önemli bölümler (`grep` ile bul):
   - Kamera/ızgara: `w2sx`, `cam`, `drawMesh`, `buildMesh` · akıcılık: `TIER`, `perfSample`, `frame()` içindeki kare hızı sınırı

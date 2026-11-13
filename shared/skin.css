@@ -1,0 +1,51 @@
+/* AppShell tema evrenleri — uygulamalar için ortak katman (hub ile aynı palet).
+   Uygulamaların ortak değişken adlarını ezer: --bg --bg2 --panel --card --surface --ink… --accent --acc --font --serif */
+html[data-skin]{--on-accent:#fff}
+/* Evren */
+html[data-skin=evren]{--bg:#05060F;--bg2:#0B0D1C;--panel:#0B0D1C;--card:#10132A;--surface:#10132A;--tint:#14172D;
+  --ink:#EEF0FF;--ink2:#B4BAE0;--ink3:#8D94C2;--ink4:#2A2E50;--line:rgba(170,180,255,.08);--line2:rgba(170,180,255,.15);--hover:rgba(170,180,255,.07);--hover2:rgba(170,180,255,.12);
+  --sel:rgba(169,155,255,.2);--accent:#A99BFF;--acc:#B4A9FF;--acc2:#1B1D3A;--on-accent:#0B0A20;
+  --font:'Sora',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;--serif:'Sora',-apple-system,system-ui,sans-serif;
+  --shadow:0 0 0 .5px rgba(170,180,255,.18),0 0 40px -16px rgba(123,97,255,.5),0 18px 40px -14px rgba(0,0,0,.7);color-scheme:dark}
+html[data-skin=evren] body{background:radial-gradient(1px 1px at 10% 20%,rgba(255,255,255,.7),transparent),radial-gradient(1px 1px at 80% 12%,rgba(255,255,255,.6),transparent),radial-gradient(1.5px 1.5px at 62% 70%,rgba(255,255,255,.5),transparent),radial-gradient(1px 1px at 30% 85%,rgba(255,255,255,.5),transparent),radial-gradient(50% 40% at 85% 10%,rgba(123,97,255,.14),transparent 70%),radial-gradient(45% 40% at 5% 95%,rgba(40,140,255,.1),transparent 70%),var(--bg);background-attachment:fixed}
+html[data-skin=evren] .card{border-radius:22px;background:linear-gradient(160deg,rgba(30,34,70,.7),rgba(16,19,42,.85));box-shadow:inset 0 1px 0 rgba(255,255,255,.06),var(--shadow)}
+html[data-skin=evren] .btn.pri{background:linear-gradient(135deg,#8B7BFF,#4F7BFF);color:#fff;box-shadow:0 0 22px -6px rgba(123,97,255,.7)}
+/* Cyberpunk */
+html[data-skin=cyberpunk]{--bg:#0A0A10;--bg2:#101018;--panel:#0E0E16;--card:#12121A;--surface:#12121A;--tint:#191924;
+  --ink:#F3F3F7;--ink2:#C7C7D3;--ink3:#9A9AAE;--ink4:#2A2A38;--line:rgba(0,240,255,.1);--line2:rgba(0,240,255,.2);--hover:rgba(252,238,10,.07);--hover2:rgba(252,238,10,.12);
+  --sel:rgba(252,238,10,.18);--accent:#FCEE0A;--acc:#FCEE0A;--acc2:#1E1D10;--on-accent:#0A0A10;--warn:#FF5F5F;
+  --font:'Rajdhani',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;--serif:'Rajdhani',-apple-system,system-ui,sans-serif;--mono:'Share Tech Mono',ui-monospace,monospace;
+  --shadow:0 0 0 1px rgba(0,240,255,.25),0 18px 40px -14px rgba(0,0,0,.85);color-scheme:dark}
+html[data-skin=cyberpunk] body{font-size-adjust:.53;font-weight:500;background:repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0 1px,transparent 1px 3px),radial-gradient(50% 40% at 100% 0%,rgba(252,238,10,.06),transparent 70%),radial-gradient(50% 40% at 0% 100%,rgba(0,240,255,.08),transparent 70%),var(--bg);background-attachment:fixed}
+html[data-skin=cyberpunk] .card{border-radius:3px;box-shadow:0 0 0 1px rgba(0,240,255,.2),inset 3px 0 0 rgba(252,238,10,.85),0 18px 40px -20px rgba(0,0,0,.9)}
+html[data-skin=cyberpunk] .btn,html[data-skin=cyberpunk] .chip,html[data-skin=cyberpunk] .pill{border-radius:3px}
+html[data-skin=cyberpunk] .btn.pri{background:#FCEE0A;color:#0A0A10;clip-path:polygon(0 0,100% 0,100% 68%,calc(100% - 12px) 100%,0 100%)}
+html[data-skin=cyberpunk] h1,html[data-skin=cyberpunk] h2{text-transform:uppercase;letter-spacing:.06em}
+/* Neon */
+html[data-skin=neon]{--bg:#0E0320;--bg2:#150730;--panel:#140629;--card:#1A0B33;--surface:#1A0B33;--tint:#22103F;
+  --ink:#FFF4FD;--ink2:#E3C9F0;--ink3:#B99BD0;--ink4:#3A2257;--line:rgba(255,79,179,.12);--line2:rgba(255,79,179,.24);--hover:rgba(255,79,179,.09);--hover2:rgba(255,79,179,.15);
+  --sel:rgba(255,79,179,.22);--accent:#FF4FB3;--acc:#FF7AC6;--acc2:#2A0F45;--on-accent:#1A0010;
+  --font:'Space Grotesk',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;--serif:'Space Grotesk',-apple-system,system-ui,sans-serif;
+  --shadow:0 0 0 1px rgba(255,79,179,.35),0 0 28px -10px rgba(255,79,179,.55),0 20px 44px -16px rgba(0,0,0,.8);color-scheme:dark}
+html[data-skin=neon] body{background:radial-gradient(60% 35% at 50% 0%,rgba(255,79,179,.16),transparent 70%),linear-gradient(transparent 70%,rgba(61,245,242,.05)),var(--bg);background-attachment:fixed}
+html[data-skin=neon] .card{border-radius:20px;background:linear-gradient(170deg,rgba(40,16,74,.88),rgba(26,11,51,.92))}
+html[data-skin=neon] .btn.pri{background:linear-gradient(135deg,#FF4FB3,#FF8A3D);color:#fff;box-shadow:0 0 22px -4px rgba(255,79,179,.75)}
+html[data-skin=neon] h1{text-shadow:0 0 18px rgba(255,79,179,.55)}
+/* Doğa */
+html[data-skin=doga]{--bg:#EEF0E4;--bg2:#F4F4EA;--panel:#E8EBDD;--card:#FBFAF3;--surface:#FBFAF3;--tint:#F3F2E8;
+  --ink:#1C2A1E;--ink2:#435446;--ink3:#596A5B;--ink4:#D3D8C6;--line:rgba(40,60,30,.08);--line2:rgba(40,60,30,.14);--hover:rgba(47,107,63,.06);--hover2:rgba(47,107,63,.1);
+  --sel:rgba(47,107,63,.16);--accent:#2F6B3F;--acc:#2F6B3F;--acc2:#E2EBDA;--on-accent:#FBFAF3;--warn:#A4441A;--info:#3F5F8A;--ok:#2F6B3F;
+  --font:'Nunito',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;--serif:'Fraunces',Georgia,serif;
+  --shadow:0 0 0 .5px rgba(40,60,30,.12),0 16px 36px -16px rgba(60,70,30,.25),0 2px 6px rgba(60,70,30,.05);color-scheme:light}
+html[data-skin=doga] body{background:radial-gradient(60% 45% at 0% 0%,rgba(255,226,150,.35),transparent 65%),radial-gradient(120% 40% at 80% 110%,rgba(122,154,104,.18),transparent 60%),var(--bg);background-attachment:fixed}
+html[data-skin=doga] .card{border-radius:24px}
+html[data-skin=doga] .btn,html[data-skin=doga] .chip{border-radius:999px}
+html[data-skin=doga] .btn.pri{background:#2F6B3F;color:#FBFAF3}
+html[data-skin=doga] h1,html[data-skin=doga] h2{font-family:var(--serif);letter-spacing:-.01em}
+/* Diğer temalar: sadece renk ailesi */
+html[data-skin=aurora]{--bg:#04121A;--bg2:#08202B;--panel:#071B24;--card:#0A1D27;--surface:#0A1D27;--tint:#0F2631;--ink:#E8FFF8;--ink2:#A9D8CC;--ink3:#7FB3A7;--ink4:#1D3C46;--line:rgba(120,255,210,.08);--line2:rgba(120,255,210,.15);--hover:rgba(120,255,210,.07);--accent:#3CE6A0;--acc:#5CF0B4;--on-accent:#04121A;color-scheme:dark}
+html[data-skin=gunbatimi]{--bg:#FFF3EC;--bg2:#FFF7F2;--panel:#FFEDE3;--card:#FFFAF6;--surface:#FFFAF6;--tint:#FFF0E8;--ink:#2B1A22;--ink2:#5E4450;--ink3:#7A5D69;--ink4:#EBD3CF;--line:rgba(120,40,60,.07);--line2:rgba(120,40,60,.12);--hover:rgba(120,40,60,.05);--accent:#B4365E;--acc:#B4365E;color-scheme:light}
+html[data-skin=kagit]{--bg:#F4EFE4;--bg2:#F7F3EA;--panel:#EFE9DB;--card:#FBF8F1;--surface:#FBF8F1;--tint:#F1EBDD;--ink:#2A2620;--ink2:#575045;--ink3:#6E665A;--ink4:#DCD3C1;--line:rgba(60,50,30,.08);--line2:rgba(60,50,30,.13);--hover:rgba(60,50,30,.05);--accent:#6B4F2A;--acc:#6B4F2A;color-scheme:light}
+/* hareket ayarı (hub ile aynı) */
+html[data-motion=off] *,html[data-motion=off] *::before,html[data-motion=off] *::after{animation:none!important;transition:none!important}
+html[data-skin=doga] .kbd{opacity:.85}

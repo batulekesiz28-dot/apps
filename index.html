@@ -19,7 +19,7 @@
 <link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js">
 <link rel="preload" as="script" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js">
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script>/* theme before first paint — no flash */(function(){const D={dark:1,cyberpunk:1,evren:1,aurora:1},OK={light:1,dark:1,cyberpunk:1,evren:1,aurora:1,gunbatimi:1,kagit:1};let t;try{t=JSON.parse(localStorage.getItem('appshell:theme'))}catch{}
+<script>/* theme before first paint — no flash */(function(){const D={dark:1,cyberpunk:1,evren:1,aurora:1,neon:1},OK={light:1,dark:1,cyberpunk:1,evren:1,aurora:1,gunbatimi:1,kagit:1,neon:1,doga:1};try{document.documentElement.dataset.motion=JSON.parse(localStorage.getItem('appshell:motion'))||'full'}catch{};let t;try{t=JSON.parse(localStorage.getItem('appshell:theme'))}catch{}
   if(!OK[t])t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';const r=document.documentElement;r.dataset.theme=t;r.dataset.family=D[t]?'dark':'light'})()</script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -606,6 +606,123 @@ body.locked .island{display:none}
   .as-x{width:40px;height:40px;top:2px;right:2px}
   .as-g{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+/* ═══════════════════════════════════════════════════════════
+   TEMA EVRENLERİ — her tema kendi arka planı, yazısı, kartı, düğmesi,
+   ışığı ve hareketiyle gelir. Kullanım mantığı hiçbir temada değişmez.
+   ═══════════════════════════════════════════════════════════ */
+:root{--sys:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;--display:var(--font);--accent:#2563EB;--glow:none}
+/* Evren — derin uzay, cam paneller, yıldız tozu */
+[data-theme=evren]{--font:'Sora',var(--sys);--display:'Sora',var(--sys);--accent:#A99BFF;--glow:0 0 0 .5px rgba(170,180,255,.2),0 0 46px -14px rgba(123,97,255,.55)}
+[data-theme=evren] .wg{border-radius:24px;background:linear-gradient(160deg,rgba(30,34,70,.78),rgba(14,16,34,.86));backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);box-shadow:inset 0 1px 0 rgba(255,255,255,.07),var(--glow),0 24px 50px -24px rgba(0,0,0,.8)}
+[data-theme=evren] .ib,[data-theme=evren] .search{border-radius:14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 0 0 .5px rgba(170,180,255,.2)}
+[data-theme=evren] .ib:hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 .5px rgba(170,180,255,.35),0 0 22px -6px rgba(123,97,255,.6)}
+[data-theme=evren] .ib.solid{background:linear-gradient(135deg,#8B7BFF,#4F7BFF);color:#fff;box-shadow:0 0 24px -4px rgba(123,97,255,.75)}
+[data-theme=evren] .mark-name{letter-spacing:.02em}
+[data-theme=evren] #sky::before{content:'';position:absolute;top:12%;left:-10%;width:160px;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,#fff);opacity:0;transform:rotate(-18deg);animation:shoot 13s ease-in 4s infinite}
+@keyframes shoot{0%,92%{opacity:0;transform:translate(0,0) rotate(-18deg)}93%{opacity:.9}100%{opacity:0;transform:translate(70vw,-22vh) rotate(-18deg)}}
+/* Cyberpunk — Night City: sarı + camgöbeği, köşe parantezleri, tarama çizgisi */
+[data-theme=cyberpunk]{--bg:#0A0A10;--surface:#12121A;--surface2:#191924;--ink:#F3F3F7;--ink2:#C7C7D3;--ink3:#9A9AAE;--ink4:#2A2A38;
+  --line:rgba(0,240,255,.09);--line2:rgba(0,240,255,.18);--line3:rgba(0,240,255,.34);--hover:rgba(252,238,10,.08);
+  --glass:rgba(18,18,26,.84);--menu:rgba(16,16,24,.94);--scrim:rgba(4,4,8,.66);--labelbg:rgba(10,10,16,.88);
+  --font:'Rajdhani',var(--sys);--display:'Rajdhani',var(--sys);--mono:'Share Tech Mono',ui-monospace,monospace;--accent:#FCEE0A;
+  --shadow:0 0 0 1px rgba(0,240,255,.28),0 18px 40px -14px rgba(0,0,0,.85)}
+[data-theme=cyberpunk] body{font-size-adjust:.53;font-weight:500}
+[data-theme=cyberpunk] .wg{border-radius:3px;background:linear-gradient(180deg,rgba(24,24,34,.96),rgba(14,14,20,.96));box-shadow:0 0 0 1px rgba(0,240,255,.22),0 22px 44px -20px rgba(0,0,0,.9)}
+[data-theme=cyberpunk] .wg::before,[data-theme=cyberpunk] .wg::after{content:'';position:absolute;width:14px;height:14px;pointer-events:none;border:2px solid #FCEE0A}
+[data-theme=cyberpunk] .wg::before{top:-2px;left:-2px;border-right:0;border-bottom:0}
+[data-theme=cyberpunk] .wg::after{right:-2px;bottom:-2px;border-left:0;border-top:0}
+[data-theme=cyberpunk] .wg-h{color:#00F0FF;letter-spacing:.16em}
+[data-theme=cyberpunk] .ib,[data-theme=cyberpunk] .search,[data-theme=cyberpunk] .menu,[data-theme=cyberpunk] .pal,[data-theme=cyberpunk] .sheet,[data-theme=cyberpunk] .dock,[data-theme=cyberpunk] .toast{border-radius:3px}
+[data-theme=cyberpunk] .ib{box-shadow:0 0 0 1px rgba(0,240,255,.25)}
+[data-theme=cyberpunk] .ib:hover{color:#FCEE0A;box-shadow:0 0 0 1px #FCEE0A,0 0 16px -4px rgba(252,238,10,.6)}
+[data-theme=cyberpunk] .ib.solid{background:#FCEE0A;color:#0A0A10;clip-path:polygon(0 0,100% 0,100% 70%,70% 100%,0 100%);box-shadow:none}
+[data-theme=cyberpunk] .mark-name{text-transform:uppercase;letter-spacing:.2em;font-weight:700;color:#FCEE0A}
+[data-theme=cyberpunk] .nlabel{color:#00F0FF;text-transform:uppercase;letter-spacing:.08em;font-weight:600;text-shadow:none;border-radius:2px}
+[data-theme=cyberpunk] .mi:hover,[data-theme=cyberpunk] .mi:focus-visible{background:rgba(252,238,10,.12);color:#FCEE0A}
+[data-theme=cyberpunk] .toast{background:#FCEE0A;color:#0A0A10}
+[data-theme=cyberpunk] #sky{background:radial-gradient(60% 50% at 90% 0%,rgba(252,238,10,.09),transparent 70%),radial-gradient(55% 50% at 0% 100%,rgba(0,240,255,.12),transparent 70%),linear-gradient(#0A0A10,#0D0C16)}
+[data-theme=cyberpunk] #sky::before{content:'';position:absolute;left:0;right:0;top:-10%;height:12%;background:linear-gradient(180deg,transparent,rgba(0,240,255,.06),transparent);animation:scan 9s linear infinite}
+@keyframes scan{to{transform:translateY(120vh)}}
+/* Neon — synthwave: pembe/camgöbeği ışık, ufukta güneş, kayan ızgara */
+[data-theme=neon]{--bg:#0E0320;--surface:#1A0B33;--surface2:#22103F;--ink:#FFF4FD;--ink2:#E3C9F0;--ink3:#B99BD0;--ink4:#3A2257;
+  --line:rgba(255,79,179,.12);--line2:rgba(255,79,179,.22);--line3:rgba(61,245,242,.36);--hover:rgba(255,79,179,.1);
+  --glass:rgba(26,11,51,.8);--menu:rgba(28,12,54,.92);--scrim:rgba(8,2,18,.62);--labelbg:rgba(14,3,32,.86);
+  --font:'Space Grotesk',var(--sys);--display:'Audiowide','Space Grotesk',var(--sys);--accent:#FF4FB3;
+  --glow:0 0 0 1px rgba(255,79,179,.45),0 0 30px -6px rgba(255,79,179,.55),0 0 60px -20px rgba(61,245,242,.45);
+  --shadow:0 0 0 1px rgba(255,79,179,.35),0 0 30px -10px rgba(255,79,179,.5),0 20px 44px -14px rgba(0,0,0,.8);color-scheme:dark}
+[data-theme=neon] .wg{border-radius:20px;background:linear-gradient(170deg,rgba(40,16,74,.9),rgba(22,8,44,.92));box-shadow:var(--glow),0 26px 50px -24px rgba(0,0,0,.9)}
+[data-theme=neon] .wg-h{color:#3DF5F2;text-shadow:0 0 10px rgba(61,245,242,.55)}
+[data-theme=neon] .ib,[data-theme=neon] .search{border-radius:14px;box-shadow:0 0 0 1px rgba(255,79,179,.3)}
+[data-theme=neon] .ib:hover{color:#fff;box-shadow:0 0 0 1px #FF4FB3,0 0 22px -2px rgba(255,79,179,.75)}
+[data-theme=neon] .ib.solid{background:linear-gradient(135deg,#FF4FB3,#FF8A3D);color:#fff;box-shadow:0 0 26px -2px rgba(255,79,179,.8)}
+[data-theme=neon] .mark-name{font-family:var(--display);font-weight:400;letter-spacing:.06em;color:#fff;text-shadow:0 0 8px #FF4FB3,0 0 22px rgba(255,79,179,.7)}
+[data-theme=neon] .nlabel{color:#FFF4FD;text-shadow:0 0 8px rgba(255,79,179,.8)}
+[data-theme=neon] .toast{background:#FF4FB3;color:#1A0010}
+[data-theme=neon] #sky{background:linear-gradient(180deg,#0E0320 0%,#1E0640 45%,#3A0B52 62%,#0E0320 63%)}
+[data-theme=neon] #sky i{display:block}
+[data-theme=neon] #sky i.s1{inset:auto;left:50%;top:calc(62% - min(30vw,300px)*.62);width:min(30vw,300px);aspect-ratio:1;margin-left:calc(min(30vw,300px)/-2);border-radius:50%;
+  background:linear-gradient(180deg,#FFD23F 0%,#FF8A3D 45%,#FF2E97 100%);-webkit-mask:repeating-linear-gradient(180deg,#000 0 14px,transparent 14px 18px),linear-gradient(#000 55%,transparent 55%);-webkit-mask-composite:source-over;mask:linear-gradient(#000 52%,transparent 52%),repeating-linear-gradient(180deg,#000 0 12px,transparent 12px 17px);mask-composite:add;filter:drop-shadow(0 0 40px rgba(255,46,151,.55));opacity:.9}
+[data-theme=neon] #sky i.s2{inset:auto;left:-50%;right:-50%;top:62%;height:90%;transform-origin:50% 0;transform:perspective(320px) rotateX(62deg);
+  background:repeating-linear-gradient(90deg,rgba(61,245,242,.5) 0 1.5px,transparent 1.5px 80px),repeating-linear-gradient(0deg,rgba(255,79,179,.55) 0 1.5px,transparent 1.5px 80px);
+  -webkit-mask:linear-gradient(#000,transparent 85%);mask:linear-gradient(#000,transparent 85%);animation:grid 3.2s linear infinite}
+@keyframes grid{from{background-position:0 0}to{background-position:0 80px}}
+/* Doğa — sabah ışığı, yumuşak tepeler, kâğıt dokusu, süzülen polenler */
+[data-theme=doga]{--bg:#EEF0E4;--surface:#FBFAF3;--surface2:#F3F2E8;--ink:#1C2A1E;--ink2:#435446;--ink3:#596A5B;--ink4:#D3D8C6;
+  --line:rgba(40,60,30,.08);--line2:rgba(40,60,30,.14);--line3:rgba(40,60,30,.22);--hover:rgba(47,107,63,.07);
+  --glass:rgba(251,250,243,.82);--menu:rgba(251,250,243,.94);--scrim:rgba(238,240,228,.5);--labelbg:rgba(251,250,243,.9);
+  --font:'Nunito',var(--sys);--display:'Fraunces',Georgia,serif;--accent:#2F6B3F;
+  --shadow:0 0 0 .5px rgba(40,60,30,.12),0 16px 36px -14px rgba(60,70,30,.22),0 2px 6px rgba(60,70,30,.05);color-scheme:light}
+[data-theme=doga] .wg{border-radius:26px;background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .35 0 0 0 0 .2 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");box-shadow:0 0 0 .5px rgba(40,60,30,.12),0 22px 44px -24px rgba(60,70,30,.32),0 2px 6px -2px rgba(60,70,30,.06)}
+[data-theme=doga] .wg-h{font-family:var(--font);letter-spacing:.06em;font-weight:700;color:#4E6B52}
+[data-theme=doga] .ib,[data-theme=doga] .search{border-radius:999px}
+[data-theme=doga] .ib.solid{background:#2F6B3F;color:#FBFAF3;box-shadow:0 10px 22px -8px rgba(47,107,63,.55)}
+[data-theme=doga] .mark-name{font-family:var(--display);font-weight:600;font-size:16px;letter-spacing:-.01em}
+[data-theme=doga] .dock,[data-theme=doga] .menu,[data-theme=doga] .pal,[data-theme=doga] .sheet{border-radius:22px}
+[data-theme=doga] .toast{background:#1C2A1E;color:#FBFAF3}
+[data-theme=doga] #sky{background:radial-gradient(70% 55% at 12% -10%,rgba(255,226,150,.55),transparent 65%),linear-gradient(#E9F0E1,#EEF0E4 60%,#E6E8D6)}
+[data-theme=doga] #sky::after{content:'';position:absolute;left:0;right:0;bottom:0;height:34vh;background:
+  radial-gradient(120% 90% at 20% 100%,rgba(122,154,104,.30) 0 40%,transparent 41%),radial-gradient(110% 80% at 85% 100%,rgba(96,132,86,.28) 0 42%,transparent 43%),radial-gradient(140% 70% at 50% 100%,rgba(80,112,72,.22) 0 45%,transparent 46%)}
+[data-theme=doga] #sky i{display:block;inset:-20%;background-image:radial-gradient(3px 3px at 20% 30%,rgba(214,190,90,.55),transparent),radial-gradient(2px 2px at 70% 60%,rgba(160,190,110,.6),transparent),radial-gradient(2.5px 2.5px at 40% 80%,rgba(214,190,90,.45),transparent),radial-gradient(2px 2px at 85% 20%,rgba(160,190,110,.5),transparent);background-size:420px 420px}
+[data-theme=doga] #sky i.s1{animation:drift 60s linear infinite}
+[data-theme=doga] #sky i.s2{background-size:300px 300px;animation:drift 90s linear infinite reverse;opacity:.7}
+@keyframes drift{to{transform:translate3d(-300px,-200px,0)}}
+/* yazı tipi her yerde temaya uysun */
+body,.btn,.mi,.pal-in,input,textarea,button{font-family:var(--font)}
+/* ── Hareket ayarı: tam / sade / kapalı ── */
+[data-motion=reduced] #sky i,[data-motion=reduced] #sky::before{animation-duration:0s!important;animation:none!important}
+[data-motion=off] *,[data-motion=off] *::before,[data-motion=off] *::after{animation:none!important;transition:none!important}
+/* ── Tema stüdyosu ── */
+.ts-bg{position:fixed;inset:0;z-index:180;display:grid;place-items:center;padding:20px;background:var(--scrim);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.ts{width:min(1040px,100%);max-height:calc(100vh - 40px);overflow:auto;padding:26px;border-radius:26px;background:var(--menu);box-shadow:var(--shadow),0 40px 120px -30px rgba(0,0,0,.5);backdrop-filter:blur(30px) saturate(1.4);-webkit-backdrop-filter:blur(30px) saturate(1.4)}
+.ts-h{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.ts-h h2{font-family:var(--display);font-size:26px;font-weight:600;letter-spacing:-.02em;color:var(--ink);flex:1;min-width:200px}
+.ts-h p{font-size:13px;color:var(--ink2);width:100%;margin-top:-6px}
+.ts-g{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.tp{position:relative;display:grid;grid-template-rows:auto auto;border-radius:20px;overflow:hidden;text-align:left;color:var(--ink);background:var(--bg);box-shadow:0 0 0 .5px var(--line2),0 12px 30px -18px rgba(0,0,0,.5);transition:transform .45s var(--spring),box-shadow .2s;font-family:var(--font)}
+.tp:hover{transform:translateY(-4px)}
+.tp.on{box-shadow:0 0 0 2.5px var(--accent),0 16px 40px -18px rgba(0,0,0,.6)}
+.tp-v{position:relative;height:150px;overflow:hidden}
+.tp-sky{position:absolute;inset:0}
+.tp-ui{position:absolute;inset:14px;display:grid;grid-template-rows:auto 1fr auto;gap:10px}
+.tp-top{display:flex;align-items:center;gap:6px}.tp-top i{width:8px;height:8px;border-radius:50%;background:var(--accent)}.tp-top span{height:6px;width:46%;border-radius:4px;background:var(--line3)}
+.tp-w{align-self:start;justify-self:start;padding:9px 12px;border-radius:12px;background:var(--surface);box-shadow:var(--shadow);display:grid;gap:2px}
+.tp-w b{font:600 18px/1 var(--display);color:var(--ink)}.tp-w small{font-size:10.5px;color:var(--ink3)}
+.tp-tiles{display:flex;gap:6px}.tp-tiles i{width:22px;height:22px;border-radius:7px;background:var(--surface);box-shadow:0 0 0 .5px var(--line2)}.tp-tiles i:first-child{background:var(--accent)}
+.tp-n{padding:12px 14px 14px;background:var(--surface);display:grid;gap:2px}
+.tp-n b{font:600 15px/1.2 var(--display);color:var(--ink)}
+.tp-n small{font-size:12px;color:var(--ink3);line-height:1.35}
+.tp[data-theme=cyberpunk] .tp-w,.tp[data-theme=cyberpunk]{border-radius:3px}.tp[data-theme=cyberpunk] .tp-w{box-shadow:0 0 0 1px rgba(0,240,255,.35),inset 3px 0 0 #FCEE0A}
+.tp[data-theme=neon] .tp-w{box-shadow:var(--glow)}.tp[data-theme=neon] .tp-n b{text-shadow:0 0 10px rgba(255,79,179,.7)}
+.tp[data-theme=doga] .tp-w{border-radius:18px}.tp[data-theme=evren] .tp-w{background:rgba(30,34,70,.8);box-shadow:var(--glow)}
+.ts-sec{font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin:22px 2px 10px}
+.ts-mo{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:22px;padding-top:18px;border-top:.5px solid var(--line2)}
+.ts-mo b{font-size:13.5px;font-weight:600;color:var(--ink)}.ts-mo small{font-size:12px;color:var(--ink3);flex-basis:100%}
+.ts-seg{display:flex;gap:4px;padding:3px;border-radius:12px;background:var(--hover)}
+.ts-seg button{height:32px;padding:0 14px;border-radius:9px;font-size:13px;color:var(--ink2)}
+.ts-seg button.on{background:var(--surface);color:var(--ink);box-shadow:0 0 0 .5px var(--line2),0 2px 6px -2px rgba(0,0,0,.15)}
+.ts-x{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;color:var(--ink3)}.ts-x:hover{background:var(--hover);color:var(--ink)}
+@media (max-width:600px){.ts{padding:18px;border-radius:22px}.ts-g{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.tp-v{height:120px}.ts-seg button{height:40px}.ts-x{width:44px;height:44px}.tp-n small{display:none}}
+::view-transition-old(root),::view-transition-new(root){animation:none;mix-blend-mode:normal}
 </style>
 </head>
 <body>
@@ -688,7 +805,7 @@ const $=s=>document.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const hash=s=>{let h=0;for(const c of s)h=(Math.imul(31,h)+c.charCodeAt(0))|0;return Math.abs(h)};
-const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const FINE=matchMedia('(pointer:fine)').matches;
 const EASE='cubic-bezier(.2,.8,.2,1)',OUT='cubic-bezier(.16,1,.3,1)',SPRING='cubic-bezier(.3,1.35,.5,1)';
 const anim=(el,kf,o)=>(!el||REDUCED)?{finished:Promise.resolve(),cancel(){}}:el.animate(kf,o);
@@ -704,19 +821,66 @@ const THEMES={
   evren:    {n:'Evren',     bg:'#05060F',dot:[70,78,120],  hot:[200,210,255],l:'170,180,255',la:[.045,.11,.24],ring:'#05060F',dark:1,sw:['#05060F','#7A50FF','#2A8CFF'],bh:[255,190,110]},
   aurora:   {n:'Aurora',    bg:'#04121A',dot:[40,96,94],   hot:[150,255,220],l:'120,255,210',la:[.05,.12,.26], ring:'#04121A',dark:1,sw:['#04121A','#3CFFAA','#AA5AFF'],bh:[120,255,210]},
   gunbatimi:{n:'Gün batımı',bg:'#FFF3EC',dot:[226,178,170],hot:[190,70,90],  l:'120,40,60',  la:[.09,.18,.3],  ring:'#FFF3EC',dark:0,sw:['#FFE6DC','#FF9A5A','#C2416B']},
+  neon:     {n:'Neon',      bg:'#0E0320',dot:[110,40,140], hot:[61,245,242], l:'255,79,179', la:[.08,.22,.45], ring:'#0E0320',dark:1,sw:['#0E0320','#FF4FB3','#3DF5F2'],bh:[255,79,179],neon:1},
+  doga:     {n:'Doğa',      bg:'#EEF0E4',dot:[176,190,160],hot:[47,107,63],  l:'47,90,50',   la:[.08,.16,.28], ring:'#EEF0E4',dark:0,sw:['#EEF0E4','#2F6B3F','#B5652F'],bh:[214,170,70]},
   kagit:    {n:'Kağıt',     bg:'#F4EFE4',dot:[196,186,165],hot:[110,90,60],  l:'60,50,30',   la:[.085,.16,.28],ring:'#F4EFE4',dark:0,sw:['#F4EFE4','#2A2620']}};
 const THEME_KEYS=Object.keys(THEMES);
+// preview backgrounds for the theme studio cards
+Object.assign(THEMES.light,{pv:'linear-gradient(#FFFFFF,#F4F4F5)'});Object.assign(THEMES.dark,{pv:'linear-gradient(#0D0D0F,#18181B)'});
+Object.assign(THEMES.evren,{pv:'radial-gradient(1px 1px at 20% 30%,#fff,transparent),radial-gradient(1px 1px at 70% 20%,#fff,transparent),radial-gradient(1.5px 1.5px at 40% 70%,#fff,transparent),radial-gradient(60% 50% at 75% 25%,rgba(123,97,255,.4),transparent 70%),radial-gradient(50% 40% at 15% 85%,rgba(40,140,255,.3),transparent 70%),#05060F'});
+Object.assign(THEMES.cyberpunk,{pv:'repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 3px),radial-gradient(60% 50% at 95% 0%,rgba(252,238,10,.2),transparent 70%),radial-gradient(60% 50% at 0% 100%,rgba(0,240,255,.2),transparent 70%),#0A0A10'});
+Object.assign(THEMES.neon,{pv:'radial-gradient(30% 32% at 50% 58%,#FF8A3D,#FF2E97 70%,transparent 72%),repeating-linear-gradient(90deg,rgba(61,245,242,.35) 0 1px,transparent 1px 22px) 0 70%/100% 40% no-repeat,linear-gradient(#0E0320,#3A0B52 66%,#0E0320 66%)'});
+Object.assign(THEMES.doga,{pv:'radial-gradient(120% 60% at 20% 105%,rgba(122,154,104,.45) 0 45%,transparent 46%),radial-gradient(110% 55% at 90% 105%,rgba(96,132,86,.4) 0 45%,transparent 46%),radial-gradient(70% 60% at 10% -10%,rgba(255,226,150,.7),transparent 65%),#EEF0E4'});
+Object.assign(THEMES.aurora,{pv:'radial-gradient(60% 30% at 40% 30%,rgba(60,255,170,.35),transparent 70%),radial-gradient(50% 25% at 70% 45%,rgba(170,90,255,.3),transparent 70%),#04121A'});
+Object.assign(THEMES.gunbatimi,{pv:'radial-gradient(60% 50% at 50% -5%,rgba(255,170,90,.6),transparent 70%),linear-gradient(#FFF3EC,#FBDDE8)'});
+Object.assign(THEMES.kagit,{pv:'radial-gradient(ellipse at center,transparent 55%,rgba(120,100,60,.12)),#F4EFE4'});
 let TH=THEMES[document.documentElement.dataset.theme]||THEMES.light;
-function applyTheme(t){if(!THEMES[t])t='light';const r=document.documentElement;r.dataset.theme=t;r.dataset.family=THEMES[t].dark?'dark':'light';TH=THEMES[t];$('#themeColor').content=TH.bg;mKey='';skyParallax();
+function applyTheme(t){if(!THEMES[t])t='light';loadFont(t);const r=document.documentElement;r.dataset.theme=t;r.dataset.family=THEMES[t].dark?'dark':'light';TH=THEMES[t];$('#themeColor').content=TH.bg;mKey='';skyParallax();
   $('#themeIcon').setAttribute('d',TH.dark?'M8 2.5v1.2M8 12.3v1.2M2.5 8h1.2M12.3 8h1.2M4.1 4.1l.85.85M11.05 11.05l.85.85M11.9 4.1l-.85.85M4.95 11.05l-.85.85M10.6 8A2.6 2.6 0 1 1 5.4 8a2.6 2.6 0 0 1 5.2 0z':'M13.5 9.5A5.5 5.5 0 0 1 6.5 2.5a5.5 5.5 0 1 0 7 7z');
   meshDirty=true;wakeMesh()}
-function setTheme(t){store.set('appshell:theme',t);store.set('notlar:theme',THEMES[t].dark?'dark':'light');applyTheme(t);
+function setTheme(t){setThemeQuiet(t);
   const b=$('#themeBtn').getBoundingClientRect();ripple(b.left+b.width/2,b.top+b.height/2,2.4);anim($('#themeBtn'),[{transform:'rotate(-120deg) scale(.7)'},{transform:'none'}],{duration:640,easing:SPRING})}
 function toggleTheme(){const i=THEME_KEYS.indexOf(document.documentElement.dataset.theme);setTheme(THEME_KEYS[(i+1)%THEME_KEYS.length])}
 function themeMenu(){const b=$('#themeBtn').getBoundingClientRect(),cur=document.documentElement.dataset.theme;
   popMenu(b.right-230,b.bottom+8,`<div class="who"><b>Tema</b>bu cihaz için</div><div class="msep"></div>`+THEME_KEYS.map(k=>{const T=THEMES[k],g=T.sw.length>2?`${T.sw[0]} 0 50%,${T.sw[1]} 50% 75%,${T.sw[2]} 75%`:`${T.sw[0]} 0 50%,${T.sw[1]} 50%`;
     return`<button class="mi" data-th="${k}" role="menuitemradio" aria-checked="${k===cur}"><span class="thsw" style="background:linear-gradient(135deg,${g})"></span>${T.n}${k===cur?'<span class="k">✓</span>':''}</button>`}).join(''),
     e=>{const x=e.target.closest('[data-th]');if(!x)return;hideMenu();setTheme(x.dataset.th)})}
+/* ── Tema evrenleri: yazı tipleri, stüdyo, hareket ayarı ── */
+const FONTS={evren:'Sora:wght@300..700',cyberpunk:'Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono',neon:'Space+Grotesk:wght@300..700&family=Audiowide',doga:'Nunito:wght@400..800&family=Fraunces:opsz,wght@9..144,400..700'};
+const fontLoaded=new Set();
+function loadFont(t){if(!FONTS[t]||fontLoaded.has(t))return;fontLoaded.add(t);const l=document.createElement('link');l.rel='stylesheet';l.href='https://fonts.googleapis.com/css2?family='+FONTS[t]+'&display=swap';document.head.appendChild(l)}
+const MAIN_THEMES=[['evren','Evren','Derin uzay, cam paneller, kayan yıldızlar'],['cyberpunk','Cyberpunk','Gece şehri: sarı ışık, köşe parantezleri, tarama çizgisi'],['neon','Neon','Synthwave güneşi, kayan ızgara, pembe parıltı'],['doga','Doğa','Sabah ışığı, yumuşak tepeler, kâğıt dokusu'],['light','Minimal','Sade, ferah, dikkat dağıtmayan'],['dark','Minimal Gece','Sade ve karanlık']];
+const MORE_THEMES=[['aurora','Aurora','Kuzey ışıkları'],['gunbatimi','Gün batımı','Sıcak pastel'],['kagit','Kâğıt','Mürekkep ve kâğıt']];
+let MOTION=store.get('appshell:motion','full');
+function applyMotion(m){MOTION=m;document.documentElement.dataset.motion=m;store.set('appshell:motion',m);try{localStorage.setItem('appshell:motion',JSON.stringify(m))}catch{}}
+applyMotion(MOTION);
+// theme change with a soft circular reveal from where you clicked (View Transitions, when available)
+function switchTheme(t,x,y,commit=true){const go=()=>{commit?setThemeQuiet(t):applyTheme(t)};
+  if(!document.startViewTransition||MOTION!=='full'||REDUCED){go();return}
+  const r=Math.hypot(Math.max(x,innerWidth-x),Math.max(y,innerHeight-y));const vt=document.startViewTransition(go);
+  vt.ready.then(()=>document.documentElement.animate({clipPath:[`circle(0px at ${x}px ${y}px)`,`circle(${r}px at ${x}px ${y}px)`]},{duration:620,easing:'cubic-bezier(.4,0,.1,1)',pseudoElement:'::view-transition-new(root)'})).catch(()=>{})}
+function setThemeQuiet(t){store.set('appshell:theme',t);store.set('notlar:theme',THEMES[t].dark?'dark':'light');try{localStorage.setItem('appshell:skin',t)}catch{}applyTheme(t)}
+let tsEl=null;
+function themeStudio(){if(tsEl)return;const saved=document.documentElement.dataset.theme;Object.keys(FONTS).forEach(loadFont);
+  const card=([k,n,d])=>{const T=THEMES[k];return`<button class="tp${k===saved?' on':''}" data-theme="${k}" data-family="${T.dark?'dark':'light'}" data-tk="${k}" aria-pressed="${k===saved}" aria-label="${n} teması"><div class="tp-v"><div class="tp-sky" style="background:${T.pv}"></div>
+      <div class="tp-ui"><div class="tp-top"><i></i><span></span></div><div class="tp-w"><b>09:41</b><small>Günün odağı</small></div><div class="tp-tiles"><i></i><i></i><i></i></div></div></div>
+      <div class="tp-n"><b>${n}</b><small>${d}</small></div></button>`};
+  tsEl=document.createElement('div');tsEl.className='ts-bg';tsEl.setAttribute('role','dialog');tsEl.setAttribute('aria-label','Tema stüdyosu');
+  tsEl.innerHTML=`<div class="ts"><div class="ts-h"><h2>Tema evrenleri</h2><button class="ts-x" data-tsx aria-label="Kapat">${XI}</button><p>${FINE?'Üstüne gel, anında önizle; tıkla, seç.':'Dokun, seç.'} Seçimin bu cihazda saklanır ve bütün uygulamalara geçer.</p></div>
+    <div class="ts-g">${MAIN_THEMES.map(card).join('')}</div><div class="ts-sec">Diğer</div><div class="ts-g">${MORE_THEMES.map(card).join('')}</div>
+    <div class="ts-mo"><b>Animasyonlar</b><div class="ts-seg" role="radiogroup" aria-label="Animasyonlar">${[['full','Tam'],['reduced','Sade'],['off','Kapalı']].map(([k,l])=>`<button data-mo="${k}" role="radio" aria-checked="${MOTION===k}" class="${MOTION===k?'on':''}">${l}</button>`).join('')}</div>
+      <small>Sade: arka plan hareketleri durur. Kapalı: hiçbir animasyon oynamaz, galaksi de durur — eski cihazlarda en hızlısı.</small></div></div>`;
+  document.body.appendChild(tsEl);anim(tsEl,[{opacity:0},{opacity:1}],{duration:200,easing:EASE});anim(tsEl.firstChild,[{opacity:0,transform:'translateY(16px) scale(.98)'},{opacity:1,transform:'none'}],{duration:420,easing:OUT});
+  let cur=saved;
+  tsEl.addEventListener('pointerover',e=>{if(!FINE)return;const c=e.target.closest('[data-tk]');if(c&&c.dataset.tk!==document.documentElement.dataset.theme)applyTheme(c.dataset.tk)});
+  tsEl.querySelector('.ts').addEventListener('pointerleave',()=>{if(FINE&&document.documentElement.dataset.theme!==cur)applyTheme(cur)});
+  tsEl.addEventListener('click',e=>{const c=e.target.closest('[data-tk]');
+    if(c){cur=c.dataset.tk;const r=c.getBoundingClientRect();switchTheme(cur,r.left+r.width/2,r.top+r.height/2);tsEl.querySelectorAll('.tp').forEach(x=>{x.classList.toggle('on',x===c);x.setAttribute('aria-pressed',x===c)});toast(`${(MAIN_THEMES.concat(MORE_THEMES).find(x=>x[0]===cur)||[,cur])[1]} teması`);return}
+    const m=e.target.closest('[data-mo]');if(m){applyMotion(m.dataset.mo);tsEl.querySelectorAll('[data-mo]').forEach(x=>{x.classList.toggle('on',x===m);x.setAttribute('aria-checked',x===m)});return}
+    if(e.target===tsEl||e.target.closest('[data-tsx]'))closeStudio()});
+  tsEl.addEventListener('keydown',e=>{if(e.key==='Escape'){e.stopPropagation();closeStudio()}});setTimeout(()=>tsEl.querySelector('.tp.on')?.focus(),60)}
+function closeStudio(){if(!tsEl)return;const el=tsEl;tsEl=null;const want=store.get('appshell:theme',null);if(want&&document.documentElement.dataset.theme!==want)applyTheme(want);anim(el,[{opacity:1},{opacity:0}],{duration:160,easing:EASE}).finished.then(()=>el.remove(),()=>el.remove())}
+
 // star field drifts with the camera (parallax), compositor-only
 function skyParallax(){if(document.documentElement.dataset.theme!=='evren'||typeof cam==='undefined')return;const a=$('#sky .s1'),b=$('#sky .s2'),x=-cam.x*cam.z,y=-cam.y*cam.z;
   a.style.transform=`translate3d(${(x*.06%400).toFixed(1)}px,${(y*.06%400).toFixed(1)}px,0)`;b.style.transform=`translate3d(${(x*.03%270).toFixed(1)}px,${(y*.03%270).toFixed(1)}px,0)`}
@@ -1527,7 +1691,7 @@ function frame(t){
   stepCam(k);if(cam.x!==cam.px||cam.y!==cam.py||cam.z!==cam.pz){camMoved();meshDirty=true}else if(!mKey&&t-lastCamMove>=160)meshDirty=true;
   stepWidgets(k);
   const list=[...nodes.values()],anyDrag=list.some(n=>n.drag),Z=cam.z,LZ=LIFT*Z;
-  galaxyModel();galaxyStep(dt);widgetOrbit(dt);
+  galaxyModel();const mdt=MOTION==='off'?0:dt;galaxyStep(mdt);widgetOrbit(mdt);
   for(const n of list){
     n.hover+=((n.hov||n.drag?1:0)-n.hover)*(1-Math.pow(.85,k));
     const sx=w2sx(n.aw[0]),sy=w2sy(n.aw[1]);n.ax=sx;n.ay=sy;
@@ -1714,7 +1878,7 @@ setInterval(()=>{if(!document.hidden&&!(W.app&&!W.min))paintFocusBar()},1000);
 /* ── Radyal menü: boş alanda sağ tık ya da basılı tut ── */
 let radEl=null;
 const RAD=[['search','Ara',()=>palette()],['pen','Netleştir',()=>{const a=find('p:netlestir');a?openApp(a,nodes.get(a.key)?.el):toast('Netleştir bulunamadı')}],['note','Bugün',()=>openNotes('#today')],
-  ['widget','Widget',()=>widgetGallery()],['moon','Tema',()=>toggleTheme()],['fit','Tümü',()=>fitAll()],['calm','Sakin',()=>calm(true)]];
+  ['widget','Widget',()=>widgetGallery()],['moon','Tema',()=>themeStudio()],['fit','Tümü',()=>fitAll()],['calm','Sakin',()=>calm(true)]];
 const RIC={search:'<circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5l3 3"/>',pen:'<path d="M2.5 13.5l2.8-.6 7.4-7.4a1.4 1.4 0 0 0-2-2L3.3 10.9z"/>',note:'<path d="M3.5 2.5h9v11h-9z"/><path d="M6 5.5h4M6 8h4"/>',widget:'<rect x="2.5" y="2.5" width="4.5" height="4.5" rx="1"/><rect x="9" y="2.5" width="4.5" height="4.5" rx="1"/><rect x="2.5" y="9" width="4.5" height="4.5" rx="1"/><path d="M11.2 9v4.5M9 11.2h4.5"/>',moon:'<path d="M13.5 9.5A5.5 5.5 0 0 1 6.5 2.5a5.5 5.5 0 1 0 7 7z"/>',fit:'<path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/>',calm:'<circle cx="8" cy="8" r="5.5"/><path d="M8 5v3l2 1.5"/>'};
 function radial(x,y){closeRadial(true);hideMenu();const R=Math.min(84,innerWidth/4),n=RAD.length,cx=clamp(x,R+34,innerWidth-R-34),cy=clamp(y,R+34,innerHeight-R-34);
   const el=document.createElement('div');el.className='radial';el.setAttribute('role','menu');el.style.left=cx+'px';el.style.top=cy+'px';
@@ -2376,6 +2540,7 @@ function palette(){
     {ic:UI.graph,l:'Galaksiyi göster',k:'G',run:fitAll},
     {ic:UI.group,l:'Akıllı kümeleme · oto senkron',k:'K',run:smartSheet},
     ...THEME_KEYS.map(k=>({ic:UI.moon,l:'Tema: '+THEMES[k].n,k:k===document.documentElement.dataset.theme?'✓':'',run:()=>setTheme(k)})),
+    {ic:UI.fit,l:'Tema stüdyosu',k:'⇧⌘L',run:()=>themeStudio()},
     {ic:UI.fit,l:'Sakin mod',run:()=>calm(true)},
     ...(TABS.length?[{ic:UI.fit,l:'Açık uygulamalar (değiştirici)',k:'⌥Q',run:()=>switcher(false,0)}]:[]),
     {ic:UI.zoom,l:'Görüntü: otomatik akıcılık'+(PERF.auto?' ✓':''),run:()=>{PERF.auto=true;localStorage.removeItem('appshell:perf');setTier(0);toast('Akıcılık otomatik — gerekirse kaliteyi kendim düşürürüm')}},
@@ -2527,7 +2692,7 @@ addEventListener('drop',async e=>{if(!hasFiles(e))return;e.preventDefault();drag
 $('#addBtn').onclick=e=>{e.stopPropagation();const b=$('#addBtn').getBoundingClientRect();
   popMenu(b.right-210,b.bottom+8,`<button class="mi" data-a="draft">${si(UI.plus)}Yeni taslak<span class="k">⌘N</span></button><button class="mi" data-a="widget">${si(UI.widget)}Widget ekle<span class="k">W</span></button>`,
     ev=>{const x=ev.target.closest('[data-a]');if(!x)return;hideMenu();if(x.dataset.a==='draft'){spawnHint=null;openSheet()}else widgetGallery()})};
-$('#themeBtn').onclick=e=>{e.stopPropagation();themeMenu()};
+$('#themeBtn').onclick=e=>{e.stopPropagation();themeStudio()};
 addEventListener('keydown',e=>{
   if(document.body.classList.contains('locked'))return;if(osKeys(e))return;const mod=e.metaKey||e.ctrlKey,k=e.key.toLowerCase();
   if(mod&&k==='k'){e.preventDefault();palEl?closePal():palette();return}

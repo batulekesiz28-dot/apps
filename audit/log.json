@@ -657,5 +657,75 @@
     "fix": "Düğmeler sadece üstüne gelince yer kaplıyor"
    }
   ]
+ },
+ {
+  "at": "2026-11-14T01:48:37",
+  "change": "Tema evrenleri: Evren, Cyberpunk, Neon, Doğa, Minimal + görsel önizlemeli Tema stüdyosu; temalar artık bütün uygulamalara geçiyor",
+  "scores": {
+   "Hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Saat telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Study Log telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Denetçi telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Öneriler telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Netleştir telefon": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Denetçi",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Doğa temasında 'not' etiketi soluk kalıyordu",
+    "fix": "Doğa için daha koyu mavi bilgi rengi"
+   },
+   {
+    "app": "Netleştir",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Doğa temasında ⌘↵ kısayol yazısı soluktu",
+    "fix": "Saydamlık azaltıldı"
+   },
+   {
+    "app": "Notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Cyberpunk'ın sarı vurgusunda bugünün tarihi beyaz yazıyla okunmazdı",
+    "fix": "Vurgu üstü yazı rengi temaya göre seçiliyor"
+   },
+   {
+    "app": "Saat",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Saat sabit renkliydi, koyu tema ve temaları tanımıyordu",
+    "fix": "Renkler değişkene çevrildi"
+   },
+   {
+    "app": "Hub",
+    "sev": "bilgi",
+    "status": "open",
+    "text": "Tema yazı tipleri ilk açılışta internetten yükleniyor; yavaş bağlantıda kısa süre sistem yazısı görünür"
+   }
+  ]
  }
 ]

@@ -85,16 +85,22 @@ main{max-width:980px;margin:0 auto;padding:10px 22px 60px}
 .tgrid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:22px;align-items:start}
 @media (max-width:860px){.tgrid{grid-template-columns:minmax(0,1fr)}}
 .tcard{padding:22px 22px 26px;display:grid;gap:18px}
-.today{display:grid;gap:8px}
-.today .t{display:flex;align-items:baseline;gap:8px}
+.today{display:grid;gap:8px;text-align:center;justify-items:center}
+.today .t{display:flex;align-items:baseline;gap:8px;justify-content:center;flex-wrap:wrap}
+.today .bar{justify-self:stretch}.today .h{justify-content:center}
 .today b{font-size:22px;font-weight:500;letter-spacing:-.03em}
 .today span{color:var(--ink3);font-size:13px}
-.today .streak{margin-left:auto;font:500 11px/1 var(--mono);color:var(--ink2);padding:6px 9px;border-radius:8px;background:var(--bg2);box-shadow:inset 0 0 0 .5px var(--line2)}
+.today .streak{margin-left:4px;align-self:center;font:500 11px/1 var(--mono);color:var(--ink2);padding:6px 9px;border-radius:8px;background:var(--bg2);box-shadow:inset 0 0 0 .5px var(--line2)}
 .bar{height:6px;border-radius:6px;background:var(--ink4);overflow:hidden;display:flex}
 .bar i{display:block;height:100%;transition:width .8s var(--out)}
 .topic{border:0;outline:0;background:none;font-size:15px;padding:10px 2px;border-bottom:.5px solid var(--line2);width:100%;transition:border-color .2s}
 .topic:focus{border-color:var(--ink)}
 .topic::placeholder{color:var(--ink3)}
+.tps{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}#eTP:empty{display:none}#tps{min-height:28px}
+.tp{display:inline-flex;align-items:center;height:28px;border-radius:9px;box-shadow:inset 0 0 0 .5px var(--line2);background:var(--card);font-size:12.5px;color:var(--ink2);transition:background .15s}
+.tp:hover{background:var(--hover)}.tp.on{background:var(--ink);color:var(--bg);box-shadow:none}
+.tp [data-tp]{padding:0 4px 0 11px;height:100%;max-width:180px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.tp .tpx{width:24px;height:100%;opacity:.45;font-size:14px}.tp .tpx:hover{opacity:1}
 .dial{position:relative;width:min(300px,78vw);aspect-ratio:1;margin:4px auto 0}
 .dial svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
 .dial circle{fill:none}
@@ -148,6 +154,7 @@ main{max-width:980px;margin:0 auto;padding:10px 22px 60px}
 .legend{display:flex;align-items:center;gap:4px;margin-top:12px;font-size:11px;color:var(--ink3);justify-content:flex-end}
 .legend i{width:12px;height:12px;border-radius:4px;background:var(--heat)}
 .dayp{padding:20px;display:grid;gap:12px}
+.dayp>.h:first-child,.dayp .big,.dayp .dg{text-align:center;justify-content:center}
 .dayp .big{font-size:34px;font-weight:300;letter-spacing:-.04em;line-height:1}
 .mt{display:grid;gap:12px;padding:14px;border-radius:16px;background:var(--bg2);box-shadow:inset 0 0 0 .5px var(--line2)}
 .mt:not(.idle){box-shadow:inset 0 0 0 1px var(--c);background:color-mix(in srgb,var(--c) 6%,var(--bg2))}
@@ -165,12 +172,14 @@ main{max-width:980px;margin:0 auto;padding:10px 22px 60px}
 .ggrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;align-items:start}
 @media (max-width:760px){.ggrid{grid-template-columns:minmax(0,1fr)}}
 .gc{padding:22px;display:grid;gap:14px}
-.gv{display:flex;align-items:center;gap:14px}
-.gv b{font-size:40px;font-weight:300;letter-spacing:-.04em;line-height:1;flex:1}
+.gc>.h:first-child{justify-content:center}
+.gv{display:flex;align-items:center;gap:14px;justify-content:center}
+.gv b{font-size:40px;font-weight:300;letter-spacing:-.04em;line-height:1}
 .step{display:flex;gap:6px}
 .step button{width:38px;height:38px;border-radius:12px;box-shadow:inset 0 0 0 .5px var(--line2);font-size:18px;color:var(--ink2);transition:background .2s,transform .4s var(--spring)}
 .step button:hover{background:var(--hover)}.step button:active{transform:scale(.9)}
-.ring{display:flex;align-items:center;gap:14px}
+.ring{display:flex;align-items:center;gap:14px;justify-content:center}
+.gc>.row{justify-content:center}
 .ring svg{width:56px;height:56px;transform:rotate(-90deg);flex:none}
 .ring circle{fill:none;stroke-width:5}
 .ring .a{stroke:var(--ink4)}.ring .b{stroke:var(--ink);stroke-linecap:round;transition:stroke-dashoffset .8s var(--out)}
@@ -292,7 +301,7 @@ const longDay=k=>parse(k).toLocaleDateString('tr-TR',{weekday:'long',day:'numeri
 
 /* ── State ── */
 const DEF={subjects:[{id:'s1',name:'Matematik',color:PAL[0],goalW:0},{id:'s2',name:'İngilizce',color:PAL[4],goalW:0},{id:'s3',name:'Fen',color:PAL[1],goalW:0},{id:'s4',name:'Okuma',color:PAL[2],goalW:0}],
-  goalDay:180,goalWeek:1200,presets:[15,25,45,60,90],run:null,sel:'s1',mode:'up',target:1500,updated:0};
+  goalDay:180,goalWeek:1200,presets:[15,25,45,60,90],topics:{},lastTopic:{},run:null,sel:'s1',mode:'up',target:1500,updated:0};
 let set=JSON.parse(JSON.stringify(DEF));
 const sessions=new Map();            // id → {id,subj,topic,date,start,end,min,src,updated}
 let view='timer',calM=null,selDay=today(),statRange=7,distRange='week';
@@ -302,13 +311,13 @@ const FB={apiKey:'AIzaSyDpJc9g4XDBq32T9Pf1UKbuhzRmnx__mak',authDomain:'apps-f1cf
 const OWNER='batulekesiz28@gmail.com';
 const CLOUD=/^https?:$/.test(location.protocol)&&!new URLSearchParams(location.search).has('local');
 const Local={kind:'local',
-  load(){const d=ls.get('studylog:v1',null);if(d){set={...DEF,...d.set};(d.sessions||[]).forEach(s=>sessions.set(s.id,s))}},
+  load(){const d=ls.get('studylog:v1',null);if(d){set={...structuredClone(DEF),...d.set};(d.sessions||[]).forEach(s=>sessions.set(s.id,s))}},
   save(){ls.set('studylog:v1',{set,sessions:[...sessions.values()]});return Promise.resolve()},
   putSet(){return this.save()},put(){return this.save()},del(){return this.save()}};
 const Cloud={kind:'cloud',doc:null,col:null,unsubs:[],
   start(fs){this.doc=fs.collection('hub').doc('studylog');this.col=this.doc.collection('sessions');
     return new Promise(res=>{let need=2;const ok=()=>{if(--need===0)res()};let f1=true,f2=true;
-      this.unsubs.push(this.doc.onSnapshot(s=>{const d=s.data();if(d&&!s.metadata.hasPendingWrites&&(d.updated||0)>=(set.updated||0)){set={...DEF,...d};if(!f1)render(true)}if(f1){f1=false;ok()}},()=>{if(f1){f1=false;ok()}}));
+      this.unsubs.push(this.doc.onSnapshot(s=>{const d=s.data();if(d&&!s.metadata.hasPendingWrites&&(d.updated||0)>=(set.updated||0)){set={...structuredClone(DEF),...d};if(!f1)render(true)}if(f1){f1=false;ok()}},()=>{if(f1){f1=false;ok()}}));
       this.unsubs.push(this.col.onSnapshot(s=>{let ch=false;s.docChanges().forEach(c=>{const v=c.doc.data();if(c.type==='removed'){ch=sessions.delete(c.doc.id)||ch}else{const cur=sessions.get(v.id);if(!cur||(v.updated||0)>=(cur.updated||0)){sessions.set(v.id,v);ch=true}}});
         if(!f2&&ch)render(true);if(f2){f2=false;ok()}},()=>{if(f2){f2=false;ok()}}));})},
   stop(){this.unsubs.forEach(u=>{try{u()}catch{}});this.unsubs=[]},
@@ -331,12 +340,21 @@ const rangeMin=(a,b)=>list().reduce((t,s)=>t+(s.date>=a&&s.date<=b?s.min:0),0);
 function streak(){const by=new Set(list().filter(s=>s.min>0).map(s=>s.date));let k=today(),n=0;if(!by.has(k))k=addDays(k,-1);while(by.has(k)){n++;k=addDays(k,-1)}
   let best=0,cur=0,prev=null;[...by].sort().forEach(d=>{cur=prev&&addDays(prev,1)===d?cur+1:1;best=Math.max(best,cur);prev=d});return{n,best}}
 
+/* ── Topic memory: once typed, a topic stays and becomes a one-tap chip for that subject ── */
+function rememberTopic(subj,t){t=(t||'').trim();if(!subj)return;set.topics||={};set.lastTopic||={};set.lastTopic[subj]=t;if(!t)return;
+  const a=(set.topics[subj]||[]).filter(x=>x.toLocaleLowerCase('tr')!==t.toLocaleLowerCase('tr'));a.unshift(t);set.topics[subj]=a.slice(0,8)}
+const topicsOf=subj=>(set.topics&&set.topics[subj])||[];
+const lastTopic=subj=>(set.lastTopic&&set.lastTopic[subj])||'';
+const topicChips=(subj,cur)=>topicsOf(subj).map(t=>`<span class="tp${t===cur?' on':''}"><button data-tp="${esc(t)}">${esc(t)}</button><button class="tpx" data-tpx="${esc(t)}" aria-label="Unut">×</button></span>`).join('');
+function forgetTopic(subj,t){set.topics[subj]=topicsOf(subj).filter(x=>x!==t);if(lastTopic(subj)===t)set.lastTopic[subj]='';saveSet()}
+
 /* ── Timer engine ── */
 function startRun(o={}){const subj=o.subj||set.sel||set.subjects[0]?.id;if(!subj){toast('Önce bir ders ekle');return}
   const mode=o.mode||set.mode,target=o.target||set.target;
-  set.run={subj,topic:(o.topic??($('#topic')?.value||'')).trim(),mode,target:mode==='down'?target:0,acc:0,at:Date.now(),on:true,date:today(),start:Date.now()};saveSet(true);render();beep(660,.06)}
+  const topic=(o.topic??($('#topic')?.value||'')).trim();rememberTopic(subj,topic);
+  set.run={subj,topic,mode,target:mode==='down'?target:0,acc:0,at:Date.now(),on:true,date:today(),start:Date.now()};saveSet(true);render();beep(660,.06)}
 function pauseRun(){const r=set.run;if(!r)return;if(r.on){r.acc+=(Date.now()-r.at)/1000;r.on=false}else{r.at=Date.now();r.on=true}saveSet(true);render()}
-function finishRun(auto){const r=set.run;if(!r)return;const sec=Math.min(elapsed(),r.mode==='down'?r.target:1e9),min=Math.round(sec/60);
+function finishRun(auto){const r=set.run;if(!r)return;rememberTopic(r.subj,r.topic);const sec=Math.min(elapsed(),r.mode==='down'?r.target:1e9),min=Math.round(sec/60);
   set.run=null;saveSet(true);
   if(min<1){toast('1 dakikadan kısa, kaydedilmedi');render();return}
   const s={id:uid(),subj:r.subj,topic:r.topic||'',date:r.date||today(),start:r.start,end:Date.now(),min,src:'timer'};putSession(s);render();
@@ -390,7 +408,8 @@ function vTimer(){
      <div class="today"><div class="t"><b class="num" id="todayT">${fm(todayMin())}</b><span>bugün</span>${st.n?`<span class="streak">${st.n} gün seri</span>`:''}</div>
        <div class="bar" id="todayB"></div><div class="h"><span id="todayP"></span></div></div>
      <div><span class="fl">Ders</span><div class="scroll" id="subs">${subs}</div></div>
-     <input class="topic" id="topic" placeholder="Ne çalışıyorsun? (konu, sayfa, test…)" value="${esc(r?r.topic:'')}" autocomplete="off" maxlength="120">
+     <div><input class="topic" id="topic" placeholder="Ne çalışıyorsun? (konu, sayfa, test…)" value="${esc(r?r.topic:lastTopic(set.sel))}" autocomplete="off" maxlength="120">
+       <div class="tps" id="tps">${topicChips(r?r.subj:set.sel,r?r.topic:lastTopic(set.sel))}</div></div>
      <div class="seg" id="mode" ${r?'hidden':''}><button data-m="up" class="${set.mode==='up'?'on':''}">Kronometre</button><button data-m="down" class="${set.mode==='down'?'on':''}">Süreli</button></div>
      <div class="row presets" id="pre" ${r||set.mode!=='down'?'hidden':''}>${set.presets.map(p=>`<button class="chip${set.target===p*60?' on':''}" data-p="${p}">${p} dk</button>`).join('')}<button class="chip" data-p="x">Özel</button></div>
      <div class="dial"><svg viewBox="0 0 300 300"><circle class="tr" cx="150" cy="150" r="138"/><circle class="pg" id="pg" cx="150" cy="150" r="138" stroke-dasharray="867.08" stroke-dashoffset="867.08"/></svg>
@@ -403,6 +422,7 @@ function vTimer(){
    <section class="card sess"><div class="h">Bugünkü oturumlar<span class="sp" id="sessN"></span></div><div id="sessL"></div>
      <button class="btn sec add" data-act="manual"><svg viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></svg>Elle ekle</button></section>
   </div>`}
+function paintTopics(){const el=$('#tps');if(!el)return;const subj=set.run?set.run.subj:set.sel;el.innerHTML=topicChips(subj,$('#topic')?.value.trim())}
 function paintDial(){const r=set.run,tm=$('#tm'),pg=$('#pg'),sub=$('#dsub');if(!tm)return;const C=867.08;
   let frac,txt,label;
   if(r){const e=elapsed(),s=subjOf(r.subj);if(r.mode==='down'){txt=clock(r.target-e);frac=e/r.target;label=`${s.name} · ${fm(r.target/60)}`}
@@ -416,7 +436,10 @@ function paintSessions(){const l=$('#sessL');if(!l)return;const arr=list().filte
 function wireTimer(){paintSessions();paintToday();
   const m=$('#main');
   m.onclick=e=>{const sub=e.target.closest('[data-sub]'),act=e.target.closest('[data-act]'),p=e.target.closest('[data-p]'),md=e.target.closest('[data-m]'),si=e.target.closest('[data-sid]');
-    if(sub){if(set.run){set.run.subj=sub.dataset.sub;saveSet(true)}else{set.sel=sub.dataset.sub;saveSet()}$$('#subs [data-sub]').forEach(x=>x.classList.toggle('on',x===sub));paintDial();return}
+    if(sub){if(set.run){set.run.subj=sub.dataset.sub;saveSet(true)}else{set.sel=sub.dataset.sub;saveSet();$('#topic').value=lastTopic(set.sel)}$$('#subs [data-sub]').forEach(x=>x.classList.toggle('on',x===sub));paintTopics();paintDial();return}
+    const tp=e.target.closest('[data-tp]'),tpx=e.target.closest('[data-tpx]');
+    if(tpx){forgetTopic(set.run?set.run.subj:set.sel,tpx.dataset.tpx);paintTopics();return}
+    if(tp){const t=tp.dataset.tp,subj=set.run?set.run.subj:set.sel;$('#topic').value=t;if(set.run){set.run.topic=t;saveSet(true)}else{rememberTopic(subj,t);saveSet()}paintTopics();return}
     if(md){set.mode=md.dataset.m;saveSet();$$('#mode button').forEach(x=>x.classList.toggle('on',x===md));$('#pre').hidden=set.mode!=='down';paintDial();return}
     if(p){if(p.dataset.p==='x'){customTarget();return}set.target=+p.dataset.p*60;saveSet();$$('#pre [data-p]').forEach(x=>x.classList.toggle('on',x===p));paintDial();return}
     if(si){editSession(sessions.get(si.dataset.sid));return}
@@ -424,6 +447,7 @@ function wireTimer(){paintSessions();paintToday();
     if(a==='start')startRun();else if(a==='pause')pauseRun();else if(a==='finish')finishRun(false);else if(a==='discard')discardRun();
     else if(a==='manual')editSession(null);else if(a==='newsub')subjectSheet(null)};
   const tp=$('#topic');let t=0;tp.oninput=()=>{if(set.run){set.run.topic=tp.value.trim();clearTimeout(t);t=setTimeout(()=>saveSet(true),600)}};
+  tp.onblur=()=>{const subj=set.run?set.run.subj:set.sel,v=tp.value.trim();if(v!==lastTopic(subj)||(v&&!topicsOf(subj).includes(v))){rememberTopic(subj,v);saveSet();setTimeout(paintTopics,220)}};
   tp.onkeydown=e=>{if(e.key==='Enter'){tp.blur();if(!set.run)startRun()}}}
 function customTarget(){sheet('Özel süre',`<div><span class="fl">Dakika</span><input class="in num" id="cm" type="number" min="1" max="600" value="${Math.round(set.target/60)}" inputmode="numeric"></div>`,
   `<button class="btn ghost" data-x>Vazgeç</button><button class="btn pri" id="ok">Ayarla</button>`,s=>{const i=s.querySelector('#cm');setTimeout(()=>i.select(),50);
@@ -432,7 +456,7 @@ function customTarget(){sheet('Özel süre',`<div><span class="fl">Dakika</span>
 
 /* ── Session editor (manual add / edit) ── */
 function editSession(s,day){
-  const isNew=!s;s=s?{...s}:{id:uid(),subj:set.sel||set.subjects[0]?.id,topic:'',date:day||today(),min:30,src:'manual'};
+  const isNew=!s;s=s?{...s}:{id:uid(),subj:set.sel||set.subjects[0]?.id,topic:lastTopic(set.sel),date:day||today(),min:30,src:'manual'};
   const QM=[15,30,45,60,90,120],canTimer=isNew&&s.date===today()&&!set.run;let tab='manual',tmode='up',ttarget=set.target||1500;
   sheet(isNew?(day&&day!==today()?'Bu güne ekle':'Ekle'):'Oturumu düzenle',
    `${canTimer?`<div class="seg" id="eTab" style="margin:0;justify-self:start"><button data-t="manual" class="on">Süre gir</button><button data-t="timer">Sayaçla</button></div>`:''}
@@ -440,18 +464,20 @@ function editSession(s,day){
     <div id="eTimer" hidden><span class="fl">Sayaç</span><div class="row" id="eTM"><button class="chip on" data-tm="up">Kronometre</button>${set.presets.map(p=>`<button class="chip num" data-tm="${p}">${p} dk</button>`).join('')}</div></div>
     <div id="eManual"><span class="fl">Süre</span><div class="row" id="eQ">${QM.map(q=>`<button class="chip num${q===s.min?' on':''}" data-q="${q}">${fs2(q)}</button>`).join('')}</div>
       <div class="two" style="margin-top:10px"><input class="in num" id="eM" type="number" min="1" max="900" value="${s.min}" inputmode="numeric" aria-label="Dakika"><input class="in" id="eD" type="date" value="${s.date}" max="${today()}" aria-label="Tarih"></div></div>
-    <div><span class="fl">Konu</span><input class="in" id="eT" value="${esc(s.topic)}" placeholder="İsteğe bağlı" maxlength="120"></div>`,
+    <div><span class="fl">Konu</span><input class="in" id="eT" value="${esc(s.topic)}" placeholder="İsteğe bağlı" maxlength="120"><div class="tps" id="eTP">${topicChips(s.subj,s.topic)}</div></div>`,
    `${isNew?'':'<button class="btn danger" id="eX">Sil</button>'}<button class="btn ghost" data-x>Vazgeç</button><button class="btn pri" id="eOk">${isNew?'Ekle':'Kaydet'}</button>`,
    sh=>{const M=sh.querySelector('#eM'),OK=sh.querySelector('#eOk');
      const tb=sh.querySelector('#eTab');if(tb)tb.onclick=e=>{const b=e.target.closest('[data-t]');if(!b)return;tab=b.dataset.t;$$('#eTab button',sh).forEach(x=>x.classList.toggle('on',x===b));
        sh.querySelector('#eTimer').hidden=tab!=='timer';sh.querySelector('#eManual').hidden=tab==='timer';OK.innerHTML=tab==='timer'?'<svg viewBox="0 0 16 16"><path d="M5 3.5l8 4.5-8 4.5z"/></svg>Başlat':'Ekle'};
      sh.querySelector('#eTM').onclick=e=>{const b=e.target.closest('[data-tm]');if(!b)return;if(b.dataset.tm==='up')tmode='up';else{tmode='down';ttarget=+b.dataset.tm*60}$$('#eTM .chip',sh).forEach(x=>x.classList.toggle('on',x===b))};
-     sh.querySelector('#eS').onclick=e=>{const b=e.target.closest('[data-sub]');if(!b)return;s.subj=b.dataset.sub;$$('#eS .chip',sh).forEach(x=>x.classList.toggle('on',x===b))};
+     const T=sh.querySelector('#eT'),TP=sh.querySelector('#eTP'),tpaint=()=>TP.innerHTML=topicChips(s.subj,T.value.trim());
+     sh.querySelector('#eS').onclick=e=>{const b=e.target.closest('[data-sub]');if(!b)return;s.subj=b.dataset.sub;$$('#eS .chip',sh).forEach(x=>x.classList.toggle('on',x===b));if(isNew)T.value=lastTopic(s.subj);tpaint()};
+     TP.onclick=e=>{const x=e.target.closest('[data-tpx]'),b=e.target.closest('[data-tp]');if(x){forgetTopic(s.subj,x.dataset.tpx);tpaint();return}if(b){T.value=b.dataset.tp;tpaint()}};T.oninput=tpaint;
      sh.querySelector('#eQ').onclick=e=>{const b=e.target.closest('[data-q]');if(!b)return;M.value=b.dataset.q;$$('#eQ .chip',sh).forEach(x=>x.classList.toggle('on',x===b))};
      M.oninput=()=>$$('#eQ .chip',sh).forEach(x=>x.classList.toggle('on',+x.dataset.q===+M.value));
      sh.querySelector('#eOk').onclick=()=>{if(tab==='timer'){const topic=sh.querySelector('#eT').value.trim();closeSheet();set.sel=s.subj;startRun({subj:s.subj,topic,mode:tmode,target:ttarget});toast(`${subjOf(s.subj).name} sayacı başladı`);return}
        const min=clamp(Math.round(+M.value||0),1,900);if(!s.subj)return toast('Bir ders seç');
-       s.min=min;s.date=sh.querySelector('#eD').value||today();s.topic=sh.querySelector('#eT').value.trim();
+       s.min=min;s.date=sh.querySelector('#eD').value||today();s.topic=sh.querySelector('#eT').value.trim();rememberTopic(s.subj,s.topic);saveSet();
        if(s.start&&s.src==='timer'&&!isNew)s.end=s.start+min*60000;putSession(s);closeSheet();render();toast(isNew?`${subjOf(s.subj).name} · ${fm(min)} eklendi`:'Kaydedildi')};
      const x=sh.querySelector('#eX');if(x)x.onclick=()=>{closeSheet();delSession(s.id)}})}
 
@@ -480,7 +506,7 @@ function vDays(){
      <div class="legend">az<i style="opacity:.14"></i><i style="opacity:.4"></i><i style="opacity:.7"></i><i></i>hedef ●</div></section>
    <section class="card dayp"><div class="h">${esc(longDay(selDay))}</div>
      <div class="big num">${fm(dm)}</div><div class="bar">${set.goalDay?`<i style="width:${Math.min(100,dm/set.goalDay*100)}%;background:var(--ink)"></i>`:''}</div>
-     <div style="font-size:12.5px;color:var(--ink3)">${set.goalDay?(dm>=set.goalDay?'Günlük hedef tamamlandı ✓':`Hedefin %${Math.round(dm/set.goalDay*100)}’i · ${fm(set.goalDay)}`):''}</div>
+     <div class="dg" style="font-size:12.5px;color:var(--ink3)">${set.goalDay?(dm>=set.goalDay?'Günlük hedef tamamlandı ✓':`Hedefin %${Math.round(dm/set.goalDay*100)}’i · ${fm(set.goalDay)}`):''}</div>
      ${selDay===today()?miniTimer():''}
      <div class="sl">${day.length?day.map(sessRow).join(''):'<div class="empty" style="padding-left:10px">Bu gün kayıt yok.</div>'}</div>
      <button class="btn sec add" data-act="addday"><svg viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></svg>Bu güne ekle</button>

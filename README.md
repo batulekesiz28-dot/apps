@@ -41,6 +41,30 @@ Not: `apps/` altındaki yayınlanmış dosyalar repo public olduğu sürece doğ
 
 Taslaklar sandbox'ta çalışır (launcher verisine erişemez, `localStorage` kullanamaz). Yayındaki uygulamalar normal sayfa gibi çalışır.
 
+## Tuval ve widget'lar
+
+Tuval sonsuz. Boş alanı sürükleyerek gezinilir, bırakınca kaymaya devam eder. Trackpad'de iki parmakla kaydırılır.
+
+Yakınlaştırma yolları:
+- `⌘`/`Ctrl` + tekerlek
+- trackpad'de sıkıştırma
+- telefonda iki parmak
+- `+` / `−` tuşları
+- sağ alttaki çubuk
+
+`1` her şeyi ekrana sığdırır, `0` görünümü %100'e döndürür. Kamera konumu her cihazda ayrı saklanır.
+
+Widget'lar `+ → Widget ekle` ya da `W` ile eklenir:
+- Saat
+- Hava durumu (Open-Meteo, şehir değiştirilebilir)
+- Döviz (ECB / Frankfurter, günlük)
+- Hızlı not
+- Bugün (Notlar'daki o güne ait sayfalar ve açık yapılacaklar)
+- Odak sayacı
+- Mini takvim
+
+Konumlar, notlar ve şehir `hub/meta.widgets` içinde saklanır ve senkronlanır. Uygulama konumları dünya koordinatı olarak `hub/meta.pos` içinde tutulur. Eski `layout` alanı otomatik olarak çevrilir.
+
 ## Yerelde denemek
 
 `index.html`'e çift tıklamak `apps.json`'u okuyamaz ve girişsiz, tarayıcıya kayıtlı modda çalışır. Bunun yerine:

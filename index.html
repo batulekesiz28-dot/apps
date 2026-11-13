@@ -49,7 +49,100 @@ canvas{position:fixed;inset:0;pointer-events:none}
 #field{z-index:0}#fx{z-index:1}
 #stage{position:fixed;inset:0;z-index:2}
 @media (hover:hover) and (pointer:fine){#stage{cursor:none}}
+#widgets{position:fixed;inset:0;z-index:3;pointer-events:none}
 #nodes{position:fixed;inset:0;z-index:3;pointer-events:none}
+body.panning,body.panning #stage,body.panning .node,body.panning .wg{cursor:grabbing!important}
+body.far .nlabel{opacity:0}
+body.far .port{display:none}
+
+/* ── Widgets ──────────────────────────────────── */
+.wg{position:absolute;left:0;top:0;transform-origin:0 0;pointer-events:auto;border-radius:20px;background:var(--surface);box-shadow:0 0 0 .5px var(--line2),0 18px 40px -22px rgba(0,0,0,.22),0 2px 6px -2px rgba(0,0,0,.05);user-select:none;-webkit-user-select:none;touch-action:none;contain:layout style;cursor:grab;color:var(--ink)}
+[data-theme=dark] .wg{box-shadow:0 0 0 .5px var(--line3),0 20px 44px -18px rgba(0,0,0,.7)}
+.wg.drag{cursor:grabbing;z-index:5;box-shadow:0 0 0 .5px var(--line3),0 30px 60px -24px rgba(0,0,0,.32)}
+.wg-in{padding:14px 16px 16px;position:relative}
+.wg-h{display:flex;align-items:center;gap:6px;height:16px;margin-bottom:10px;font:500 9.5px/1 var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--ink3)}
+.wg-h .t{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;text-align:left}
+.wg-h button{font:inherit;color:var(--ink3);letter-spacing:inherit;text-transform:inherit;padding:2px 4px;margin:-2px -4px;border-radius:5px}
+.wg-h button:hover{color:var(--ink);background:var(--hover)}
+.wg-x{position:absolute;top:-7px;right:-7px;width:22px;height:22px;border-radius:50%;background:var(--surface);box-shadow:0 0 0 .5px var(--line3),0 4px 10px -4px rgba(0,0,0,.3);display:grid;place-items:center;opacity:0;transform:scale(.5);transition:opacity .2s var(--ease),transform .4s var(--spring);color:var(--ink2);z-index:2}
+.wg-x svg{width:9px;height:9px;stroke:currentColor;stroke-width:1.6;fill:none;stroke-linecap:round}
+.wg:hover .wg-x{opacity:1;transform:none}.wg-x:hover{color:#DC2626}
+@media (hover:none){.wg-x{opacity:.9;transform:none}}
+.wg button,.wg input,.wg textarea,.wg a{cursor:pointer}
+.wg input,.wg textarea{cursor:text}
+.wg .big{font-size:40px;font-weight:300;letter-spacing:-.045em;line-height:1;font-variant-numeric:tabular-nums}
+.wg .sub{color:var(--ink2);font-size:12px;margin-top:6px}
+.wg .muted{color:var(--ink3)}
+.wc-t{display:flex;align-items:baseline;gap:6px}
+.wc-t .ss{font:500 12px/1 var(--mono);color:var(--ink3);width:18px}
+.wc-bar{height:2px;border-radius:2px;background:var(--line2);margin-top:12px;overflow:hidden}.wc-bar i{display:block;height:100%;background:var(--ink);transform-origin:left;transition:transform 1s linear}
+.ww-top{display:flex;align-items:center;gap:12px}
+.ww-ic{width:38px;height:38px;flex:none;color:var(--ink2)}
+.ww-ic svg,.wx-ic{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}
+.ww-days{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:14px;padding-top:12px;border-top:.5px solid var(--line2);text-align:center;font-size:11px;color:var(--ink2)}
+.ww-days b{display:block;font:500 9.5px/1 var(--mono);color:var(--ink3);letter-spacing:.06em;margin-bottom:5px}
+.ww-days svg{width:18px;height:18px;margin:0 auto 4px;display:block;fill:none;stroke:currentColor;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}
+.wg-city{width:100%;font:inherit;font-size:13px;color:var(--ink);background:var(--surface2);border:0;border-radius:8px;padding:6px 8px;outline:0;box-shadow:inset 0 0 0 .5px var(--line3)}
+.wf-row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;padding:8px 0}
+.wf-row+.wf-row{border-top:.5px solid var(--line2)}
+.wf-row .p{font:500 10.5px/1 var(--mono);color:var(--ink2);letter-spacing:.03em}
+.wf-row .v{font-size:19px;font-weight:400;letter-spacing:-.03em;text-align:right;font-variant-numeric:tabular-nums}
+.wf-row .c{display:block;font:500 9.5px/1 var(--mono);text-align:right;margin-top:3px}
+.up{color:#16A34A}.dn{color:#DC2626}
+.wf-row svg{width:100%;height:24px;overflow:visible}
+.wf-row svg path{fill:none;stroke:var(--ink3);stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.wn-ta{display:block;width:100%;height:132px;resize:none;border:0;outline:0;background:none;font:inherit;font-size:13.5px;line-height:1.55;color:var(--ink)}
+.wn-ta::placeholder{color:var(--ink3)}
+.wn-f{font:500 9.5px/1 var(--mono);color:var(--ink3);text-align:right;margin-top:4px;letter-spacing:.04em}
+.wt-l{display:grid;gap:2px;margin:0 -8px}
+.wt-l button{display:flex;align-items:center;gap:9px;text-align:left;padding:6px 8px;border-radius:8px;font-size:13px;min-width:0}
+.wt-l button:hover{background:var(--hover)}
+.wt-l .e{width:16px;text-align:center;flex:none}
+.wt-l .tx{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.wt-l .bx{width:13px;height:13px;border-radius:4px;box-shadow:inset 0 0 0 1.2px var(--ink3);flex:none;margin:0 1.5px}
+.wt-e{color:var(--ink3);font-size:12.5px;padding:6px 0 2px}
+.wt-e button{display:inline-block;margin-top:8px;font-size:12px;color:var(--ink);padding:5px 10px;border-radius:8px;box-shadow:inset 0 0 0 .5px var(--line3)}
+.wt-e button:hover{background:var(--hover)}
+.wo{display:flex;align-items:center;gap:16px}
+.wo-ring{width:76px;height:76px;flex:none;position:relative}
+.wo-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.wo-ring circle{fill:none;stroke-width:3}
+.wo-ring .bg{stroke:var(--line2)}.wo-ring .fg{stroke:var(--ink);stroke-linecap:round;transition:stroke-dashoffset 1s linear}
+.wo-ring span{position:absolute;inset:0;display:grid;place-items:center;font:500 15px/1 var(--mono);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.wo-b{display:grid;gap:6px;flex:1}
+.wo-b button{height:28px;border-radius:9px;font-size:12px;box-shadow:inset 0 0 0 .5px var(--line3)}
+.wo-b button:hover{background:var(--hover)}
+.wo-b button.pri{background:var(--ink);color:var(--bg);box-shadow:none}
+.wo-m{display:flex;gap:2px;margin-top:12px;padding:2px;border-radius:9px;background:var(--surface2);box-shadow:inset 0 0 0 .5px var(--line2)}
+.wo-m button{flex:1;height:22px;border-radius:7px;font-size:11px;color:var(--ink3)}
+.wo-m button.on{background:var(--surface);color:var(--ink);box-shadow:0 0 0 .5px var(--line3),0 1px 3px rgba(0,0,0,.08)}
+.wg-h [data-act=prev],.wg-h [data-act=next]{font:400 15px/1 var(--font);padding:0 6px;height:20px}
+.wk{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;text-align:center}
+.wk b{font:500 9px/1 var(--mono);color:var(--ink3);padding:4px 0 6px}
+.wk button{position:relative;height:26px;border-radius:7px;font-size:11.5px;font-variant-numeric:tabular-nums;color:var(--ink2)}
+.wk button:hover{background:var(--hover)}
+.wk button.o{color:var(--ink4)}
+.wk button.t{background:var(--ink);color:var(--bg);font-weight:600}
+.wk button.h::after{content:'';position:absolute;left:50%;bottom:3px;width:3px;height:3px;margin-left:-1.5px;border-radius:50%;background:currentColor;opacity:.7}
+.wg-sk{height:10px;border-radius:5px;background:var(--line2);margin:8px 0;animation:sk 1.2s ease-in-out infinite alternate}
+@keyframes sk{to{opacity:.4}}
+.wgal{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.wgal button{display:flex;gap:11px;align-items:flex-start;text-align:left;padding:12px;border-radius:13px;box-shadow:inset 0 0 0 .5px var(--line2);transition:background .2s,box-shadow .2s,transform .4s var(--spring)}
+.wgal button:hover{background:var(--hover);box-shadow:inset 0 0 0 .5px var(--line3)}
+.wgal button:active{transform:scale(.97)}
+.wgal .gi{width:30px;height:30px;flex:none;border-radius:9px;display:grid;place-items:center;background:var(--surface2);box-shadow:inset 0 0 0 .5px var(--line2);color:var(--ink2)}
+.wgal .gi svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}
+.wgal b{display:block;font-weight:500;font-size:13px}.wgal span{color:var(--ink3);font-size:11.5px;line-height:1.35}
+body.locked #widgets,body.locked .zbar{visibility:hidden}
+
+/* ── Zoom bar ─────────────────────────────────── */
+.zbar{position:fixed;right:22px;bottom:calc(40px + env(safe-area-inset-bottom));z-index:20;display:flex;align-items:center;gap:1px;height:32px;padding:0 3px;border-radius:11px;background:var(--glass);box-shadow:0 0 0 .5px var(--line2),0 6px 20px -12px rgba(0,0,0,.14);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);user-select:none}
+.zbar button{height:26px;min-width:26px;border-radius:8px;display:grid;place-items:center;color:var(--ink2);transition:background .15s,color .15s}
+.zbar button:hover{background:var(--hover);color:var(--ink)}
+.zbar svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
+.zbar #zPct{font:500 10.5px/1 var(--mono);min-width:44px;letter-spacing:.02em}
+.zbar i{width:.5px;height:14px;background:var(--line3);margin:0 3px}
+@media (max-width:700px){.zbar{bottom:calc(58px + env(safe-area-inset-bottom));right:14px}}
 
 /* ── Floating chrome ──────────────────────────── */
 .top{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;gap:8px;padding:calc(16px + env(safe-area-inset-top)) 22px 16px;pointer-events:none}
@@ -291,7 +384,15 @@ body.locked .top,body.locked #nodes,body.locked .status,body.locked .hint,body.l
 <canvas id="field"></canvas>
 <canvas id="fx"></canvas>
 <div id="stage"></div>
+<div id="widgets"></div>
 <div id="nodes"></div>
+<div class="zbar" id="zbar">
+  <button data-z="out" title="Uzaklaş (−)" aria-label="Uzaklaş"><svg viewBox="0 0 14 14"><path d="M3 7h8"/></svg></button>
+  <button data-z="reset" id="zPct" title="%100 (0)">100%</button>
+  <button data-z="in" title="Yakınlaş (+)" aria-label="Yakınlaş"><svg viewBox="0 0 14 14"><path d="M3 7h8M7 3v8"/></svg></button>
+  <i></i>
+  <button data-z="fit" title="Hepsini göster (1)" aria-label="Hepsini göster"><svg viewBox="0 0 14 14"><path d="M2 5V2h3M9 2h3v3M12 9v3H9M5 12H2V9"/><rect x="5" y="5" width="4" height="4" rx="1"/></svg></button>
+</div>
 
 <header class="top">
   <div class="mark"><div class="mark-glyph"><i></i><i></i><i></i><i></i></div><span class="mark-name" id="brand">AppShell</span></div>
@@ -412,7 +513,8 @@ const UI={open:'<path d="M3 8h10M9 4l4 4-4 4"/>',tab:'<path d="M9.5 2.5h4v4M13.5
   edit:'<path d="M10.5 2.5l3 3L6 13H3v-3z"/>',ship:'<path d="M8 2.5v8M4.5 6L8 2.5 11.5 6M3 13.5h10"/>',dl:'<path d="M8 2.5v8M4.5 7L8 10.5 11.5 7M3 13.5h10"/>',del:'<path d="M3 4.5h10M6.5 4.5v-2h3v2M4.5 4.5l.6 9h5.8l.6-9"/>',
   out:'<path d="M6 2.5H3v11h3M10 5l3 3-3 3M13 8H6"/>',group:'<rect x="2" y="3" width="12" height="10" rx="5" stroke-dasharray="2 2"/><circle cx="6" cy="8" r="1.3"/><circle cx="10" cy="8" r="1.3"/>',home:'<path d="M8 3v4M8 9v4M3 8h4M9 8h4"/>',connect:'<circle cx="4" cy="8" r="2"/><circle cx="12" cy="8" r="2"/><path d="M6 8h4"/>',
   unlinkall:'<circle cx="4" cy="8" r="2"/><circle cx="12" cy="8" r="2"/><path d="M6.5 6.5l3 3M9.5 6.5l-3 3"/>',plus:'<path d="M8 3v10M3 8h10"/>',graph:'<circle cx="4" cy="4" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="7" cy="12.5" r="2"/><path d="M5.9 4.3l4.2.5M5 5.7l1.4 4.9M10.9 6.7l-2.7 4.3"/>',
-  moon:'<path d="M13.5 9.5A5.5 5.5 0 0 1 6.5 2.5a5.5 5.5 0 1 0 7 7z"/>',fs:'<path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/>',key:'<rect x="2" y="4.5" width="12" height="7" rx="1.5"/><path d="M4.5 7h.01M7 7h.01M9.5 7h.01M5 9.5h6"/>'};
+  moon:'<path d="M13.5 9.5A5.5 5.5 0 0 1 6.5 2.5a5.5 5.5 0 1 0 7 7z"/>',fs:'<path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/>',key:'<rect x="2" y="4.5" width="12" height="7" rx="1.5"/><path d="M4.5 7h.01M7 7h.01M9.5 7h.01M5 9.5h6"/>',
+  widget:'<rect x="2.5" y="2.5" width="4.5" height="4.5" rx="1.3"/><rect x="9" y="2.5" width="4.5" height="4.5" rx="1.3"/><rect x="2.5" y="9" width="11" height="4.5" rx="1.3"/>',fit:'<path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/><rect x="6" y="6" width="4" height="4" rx="1"/>',zoom:'<circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5l3 3M5 7h4"/>'};
 const si=p=>`<svg viewBox="0 0 16 16">${p}</svg>`;
 
 /* ── Storage ──────────────────────────────────────────────── */
@@ -426,34 +528,36 @@ const FB={apiKey:'AIzaSyDpJc9g4XDBq32T9Pf1UKbuhzRmnx__mak',authDomain:'apps-f1cf
 const OWNER='batulekesiz28@gmail.com';
 const CLOUD=/^https?:$/.test(location.protocol)&&!new URLSearchParams(location.search).has('local');
 const MAX_BYTES=900000;
-let sync='ok';
+let sync='ok',metaFresh=false;
 const loadScript=src=>new Promise((ok,no)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=no;document.head.appendChild(s)});
 async function loadFirebase(){if(window.firebase?.auth&&window.firebase?.firestore)return;const b='https://www.gstatic.com/firebasejs/10.12.2/';
   await loadScript(b+'firebase-app-compat.js');await Promise.all([loadScript(b+'firebase-auth-compat.js'),loadScript(b+'firebase-firestore-compat.js')])}
 const sig=list=>list.map(d=>[d.id,d.name,d.icon,d.color,d.html?.length]).join('|');
 const Local={kind:'local',
   async load(){try{await DB.open();return(await DB.all()).map(toDraft)}catch{return[]}},
-  put:d=>DB.put(d),del:id=>DB.del(id),saveMeta:()=>{store.set('appshell:layout',layout);store.set('appshell:links',links);store.set('appshell:groups',groups);store.set('appshell:members',members)}};
+  put:d=>DB.put(d),del:id=>DB.del(id),saveMeta:()=>{store.set('appshell:pos',pos);store.set('appshell:links',links);store.set('appshell:groups',groups);store.set('appshell:members',members);store.set('appshell:widgets',widgets)}};
 const Cloud={kind:'cloud',meta:null,col:null,unsubs:[],
   start(fs){this.meta=fs.collection('hub').doc('meta');this.col=this.meta.collection('drafts');
-    return new Promise(res=>{let first=true;
+    return new Promise(done=>{let first=true,need=2;const res=()=>{if(--need===0)done()};let mFirst=true;const mRes=()=>{if(mFirst){mFirst=false;res()}};
       this.unsubs.push(this.col.onSnapshot({includeMetadataChanges:true},snap=>{
         const list=snap.docs.map(d=>toDraft(d.data()));setSync(snap.metadata.hasPendingWrites?'pending':'ok');
         if(sig(list)!==sig(drafts)){drafts=list;if(!first&&booted)syncNodes()}
         if(first){first=false;res()}
       },err=>{setSync('error');toast('Senkron hatası: '+(err.code||err.message));if(first){first=false;res()}}));
-      this.unsubs.push(this.meta.onSnapshot(s=>{const d=s.data()||{};if(d.layout)applyRemoteLayout(d.layout);if(Array.isArray(d.links))applyRemoteLinks(d.links);if(d.groups||d.members)applyRemoteGroups(d.groups||{},d.members||{})},()=>{}));
+      this.unsubs.push(this.meta.onSnapshot({includeMetadataChanges:true},s=>{if(!s.metadata.fromCache)metaFresh=true;const d=s.data()||{};if(d.layout)legacy=d.layout;if(d.pos)applyRemotePos(d.pos);applyRemoteWidgets(d.widgets);if(Array.isArray(d.links))applyRemoteLinks(d.links);if(d.groups||d.members)applyRemoteGroups(d.groups||{},d.members||{});mRes();if(booted)seedWidgets()},()=>mRes()));
     })},
   stop(){this.unsubs.forEach(u=>{try{u()}catch{}});this.unsubs=[]},
   put(d){return this.col.doc(d.id).set(d)},del(id){return this.col.doc(id).delete()},
-  saveMeta(){Local.saveMeta();return this.meta.update({layout,links:links.map(([a,b])=>a+'|'+b),groups,members}).catch(()=>this.meta.set({layout,links:links.map(([a,b])=>a+'|'+b),groups,members},{merge:true}))}};
+  saveMeta(){Local.saveMeta();const m={pos,links:links.map(([a,b])=>a+'|'+b),groups,members};if(widgets)m.widgets=widgets.map(cleanW);return this.meta.update(m).catch(()=>this.meta.set(m,{merge:true}))}};
 let S=Local;
 let metaT=0;const saveMeta=()=>{clearTimeout(metaT);metaT=setTimeout(()=>Promise.resolve(S.saveMeta()).catch(()=>{}),250)};
 function setSync(s){sync=s;const d=$('#sDot');d.classList.toggle('warn',s==='pending');d.classList.toggle('err',s==='error');statusText()}
 
 /* ── App state ────────────────────────────────────────────── */
 let pub=[],drafts=[],query='',manifest={ok:false,why:''},booted=false,justDragged=false;
-let layout=store.get('appshell:layout',{});
+let legacy=store.get('appshell:layout',{});         // old screen-fraction layout (read-only, for migration)
+let pos=store.get('appshell:pos',{});               // appKey → [wx,wy] world coords
+let widgets=store.get('appshell:widgets',null);     // [{id,type,w:[x,y],…}] · null = never set
 let links=store.get('appshell:links',[]);
 let groups=store.get('appshell:groups',{});       // gid → {name,color}
 let members=store.get('appshell:members',{});     // appKey → gid
@@ -482,36 +586,81 @@ async function loadManifest(){
 }
 
 /* ════════════════════════════════════════════════════════════
-   FIELD — elastik nokta ağı. Hareketsizken tamamen uyur.
+   FIELD — sonsuz elastik nokta ağı. Kamera ile kayar, uzaklaşınca seyrekleşir.
    ════════════════════════════════════════════════════════════ */
 const cv=$('#field'),cx=cv.getContext('2d'),fv=$('#fx'),fx=fv.getContext('2d');
-const M={W:0,H:0,dpr:1,gap:30,cols:0,rows:0,ox:0,oy:0,n:0,rx:null,ry:null,dx:null,dy:null,vx:null,vy:null,en:null};
+const M={W:0,H:0,dpr:1,gap:30,gw:0,c0:0,r0:0,cols:0,rows:0,ox:0,oy:0,n:0,rx:null,ry:null,dx:null,dy:null,vx:null,vy:null,en:null};
 const ptr={x:-1e4,y:-1e4,sx:-1e4,sy:-1e4,amp:0,tAmp:0,down:false};
 let ripples=[],introT=0,introStart=0,last=0,raf=0,paused=false,meshAwake=true,meshDirty=true,lastInput=performance.now(),lastDraw=0;
+
+/* ── Camera — world ↔ screen ───────────────────── */
+const WG=30,ZMIN=.3,ZMAX=2.2;
+const cam=(()=>{const c=store.get('appshell:cam',null);const ok=c&&isFinite(c.x)&&isFinite(c.y)&&isFinite(c.z);
+  const z=ok?clamp(c.z,ZMIN,ZMAX):1;return{x:ok?c.x:0,y:ok?c.y:0,z,tz:z,ax:0,ay:0,vx:0,vy:0,pan:false,go:null,px:NaN,py:NaN,pz:NaN}})();
+const w2sx=x=>(x-cam.x)*cam.z+M.W/2,w2sy=y=>(y-cam.y)*cam.z+M.H/2;
+const s2wx=x=>(x-M.W/2)/cam.z+cam.x,s2wy=y=>(y-M.H/2)/cam.z+cam.y;
+let camSaveT=0;const saveCam=()=>{clearTimeout(camSaveT);camSaveT=setTimeout(()=>store.set('appshell:cam',{x:+cam.x.toFixed(1),y:+cam.y.toFixed(1),z:+cam.z.toFixed(3)}),400)};
+function zoomAt(sx,sy,f){cam.go=null;cam.tz=clamp(cam.tz*f,ZMIN,ZMAX);cam.ax=sx;cam.ay=sy;wake()}
+function zoomTo(z,sx=M.W/2,sy=M.H/2){cam.go=null;cam.tz=clamp(z,ZMIN,ZMAX);cam.ax=sx;cam.ay=sy;wake()}
+function flyTo(x,y,z){cam.vx=cam.vy=0;cam.go={x,y,z:clamp(z,ZMIN,ZMAX)};wake()}
+function stepCam(k){
+  if(cam.go){const g=cam.go,f=1-Math.pow(1-.12,k);
+    // interpolate zoom in log space so the motion feels even
+    const lz=Math.log(cam.z)+(Math.log(g.z)-Math.log(cam.z))*f;cam.z=Math.exp(lz);cam.x+=(g.x-cam.x)*f;cam.y+=(g.y-cam.y)*f;cam.tz=cam.z;
+    if(Math.abs(g.x-cam.x)*cam.z<.3&&Math.abs(g.y-cam.y)*cam.z<.3&&Math.abs(g.z-cam.z)<.0015){cam.x=g.x;cam.y=g.y;cam.z=cam.tz=g.z;cam.go=null}return}
+  if(Math.abs(cam.tz-cam.z)>1e-4){const wx=s2wx(cam.ax),wy=s2wy(cam.ay);
+    cam.z=Math.exp(Math.log(cam.z)+(Math.log(cam.tz)-Math.log(cam.z))*(1-Math.pow(1-.3,k)));if(Math.abs(cam.tz-cam.z)<1e-4)cam.z=cam.tz;
+    cam.x=wx-(cam.ax-M.W/2)/cam.z;cam.y=wy-(cam.ay-M.H/2)/cam.z}
+  if(!cam.pan&&Math.abs(cam.vx)+Math.abs(cam.vy)>.03){cam.x-=cam.vx*k/cam.z;cam.y-=cam.vy*k/cam.z;const d=Math.pow(.925,k);cam.vx*=d;cam.vy*=d}
+  else if(!cam.pan){cam.vx=cam.vy=0}
+}
+// Called once per frame when the camera moved: keep everything visually locked to the world.
+function camMoved(){
+  const ox=cam.px,oy=cam.py,oz=cam.pz;cam.px=cam.x;cam.py=cam.y;cam.pz=cam.z;
+  if(!isNaN(ox)){const r=cam.z/oz,tx=v=>((v-M.W/2)/oz+ox-cam.x)*cam.z+M.W/2,ty=v=>((v-M.H/2)/oz+oy-cam.y)*cam.z+M.H/2;
+    for(const n of nodes.values()){n.x=tx(n.x);n.y=ty(n.y);n.vx*=r;n.vy*=r;if(n.drag){n.gx=tx(n.gx);n.gy=ty(n.gy)}}
+    for(const q of ripples){q.x=tx(q.x);q.y=ty(q.y)}
+    if(PK.shown){PK.x=tx(PK.x);PK.y=ty(PK.y)}}
+  layoutMesh();placeWidgets();zoomLabel();document.body.classList.toggle('far',cam.z<.5);saveCam();hidePeekIfMoving();
+}
+let zlT='';function zoomLabel(){const t=Math.round(cam.z*100)+'%';if(t!==zlT){zlT=t;$('#zPct').textContent=t}}
+
 function buildMesh(){
   M.W=innerWidth;M.H=innerHeight;let dpr=Math.min(devicePixelRatio||1,2);
   if(M.W*M.H*dpr*dpr>7e6)dpr=Math.sqrt(7e6/(M.W*M.H)); // pixel budget for big screens
   M.dpr=dpr;
   for(const[c,g]of[[cv,cx],[fv,fx]]){c.width=M.W*dpr|0;c.height=M.H*dpr|0;c.style.width=M.W+'px';c.style.height=M.H+'px';g.setTransform(dpr,0,0,dpr,0,0)}
-  M.gap=M.W<700?26:30;M.cols=Math.floor(M.W/M.gap)+2;M.rows=Math.floor(M.H/M.gap)+2;
-  M.ox=(M.W-(M.cols-1)*M.gap)/2;M.oy=(M.H-(M.rows-1)*M.gap)/2;M.n=M.cols*M.rows;
-  for(const k of['rx','ry','dx','dy','vx','vy','en'])M[k]=new Float32Array(M.n);
-  for(let r=0;r<M.rows;r++)for(let c=0;c<M.cols;c++){const i=r*M.cols+c;M.rx[i]=M.ox+c*M.gap;M.ry[i]=M.oy+r*M.gap}
-  meshDirty=true;wakeMesh();
+  M.gw=0;cam.px=NaN;layoutMesh();cam.px=cam.x;cam.py=cam.y;cam.pz=cam.z;placeWidgets();zoomLabel();wakeMesh();
+}
+// Lays the visible window of the infinite world grid onto the screen. Level of detail: the world
+// spacing doubles/halves so the on-screen spacing stays ~19–40px at every zoom.
+function layoutMesh(){
+  let gw=WG;while(gw*cam.z<19)gw*=2;while(gw*cam.z>40&&gw>7.5)gw/=2;
+  const g=gw*cam.z,cols=Math.ceil(M.W/g)+3,rows=Math.ceil(M.H/g)+3,c0=Math.floor(s2wx(0)/gw)-1,r0=Math.floor(s2wy(0)/gw)-1;
+  const K=['dx','dy','vx','vy','en'];
+  if(gw!==M.gw||cols!==M.cols||rows!==M.rows){M.n=cols*rows;for(const k of['rx','ry',...K])M[k]=new Float32Array(M.n)}
+  else if(c0!==M.c0||r0!==M.r0){const dc=c0-M.c0,dr=r0-M.r0;
+    for(const k of K){const a=M[k],b=new Float32Array(M.n);
+      for(let r=0;r<rows;r++){const sr=r+dr;if(sr<0||sr>=rows)continue;for(let c=0;c<cols;c++){const sc=c+dc;if(sc<0||sc>=cols)continue;b[r*cols+c]=a[sr*cols+sc]}}M[k]=b}}
+  M.gw=gw;M.gap=g;M.cols=cols;M.rows=rows;M.c0=c0;M.r0=r0;
+  const bx=w2sx(c0*gw),by=w2sy(r0*gw);M.ox=bx;M.oy=by;
+  for(let r=0;r<rows;r++){const y=by+r*g;for(let c=0;c<cols;c++){const i=r*cols+c;M.rx[i]=bx+c*g;M.ry[i]=y}}
+  meshDirty=true;
 }
 const nx=i=>M.rx[i]+M.dx[i],ny=i=>M.ry[i]+M.dy[i];
-function nearest(x,y){const c=clamp(Math.round((x-M.ox)/M.gap),0,M.cols-1),r=clamp(Math.round((y-M.oy)/M.gap),0,M.rows-1);return r*M.cols+c}
+function meshIdx(x,y){const c=Math.round((x-M.ox)/M.gap),r=Math.round((y-M.oy)/M.gap);return c<0||r<0||c>=M.cols||r>=M.rows?-1:r*M.cols+c}
 function wakeMesh(){meshAwake=true;wake()}
 function ripple(x,y,s=1){if(REDUCED)return;ripples.push({x,y,t:performance.now(),s});if(ripples.length>6)ripples.shift();wakeMesh()}
 
 function stepMesh(k,now){
-  const{n,rx,ry,dx,dy,vx,vy,en}=M,K=.055,damp=Math.pow(.8,k);
+  const{n,rx,ry,dx,dy,vx,vy,en}=M,K=.055,damp=Math.pow(.8,k),Z=cam.z;
   const att=[];
-  if(ptr.amp>.002)att.push([ptr.sx,ptr.sy,235,.046*ptr.amp,.62]); // black hole: pull + swirl
+  if(ptr.amp>.002&&!cam.pan)att.push([ptr.sx,ptr.sy,235,.046*ptr.amp,.62]); // black hole: pull + swirl
   let drag=null;for(const nd of nodes.values())if(nd.drag){att.push([nd.x,nd.y,150,.035]);drag=nd}
+  if(wDrag)att.push([wDrag.cx,wDrag.cy,170,.03]);
   if(linkDrag)att.push([linkDrag.x,linkDrag.y,120,.02]);
   const rps=[];ripples=ripples.filter(r=>{const age=now-r.t;if(age>1500)return false;rps.push([r.x,r.y,age*.55,(1-age/1500)*r.s]);return true});
-  const tI=drag?drag.ai:-1,tX=drag?(drag.x-nx(tI))*.004:0,tY=drag?(drag.y+TAIL-ny(tI))*.004:0;
+  const tI=drag?meshIdx(w2sx(drag.aw[0]),w2sy(drag.aw[1])):-1,tX=tI>=0?(drag.x-nx(tI))*.004:0,tY=tI>=0?(drag.y+TAIL*Z-ny(tI))*.004:0;
   let maxV=0;
   for(let i=0;i<n;i++){
     const px=rx[i]+dx[i],py=ry[i]+dy[i];let ax=-K*dx[i],ay=-K*dy[i];
@@ -525,18 +674,20 @@ function stepMesh(k,now){
     const m=Math.abs(dx[i])+Math.abs(dy[i]);en[i]=m>14?1:m/14;
   }
   const pointerStill=Math.abs(ptr.x-ptr.sx)+Math.abs(ptr.y-ptr.sy)<.08&&Math.abs(ptr.tAmp-ptr.amp)<.004;
-  return !rps.length&&!drag&&!linkDrag&&maxV<.004&&pointerStill; // settled → sleep
+  return !rps.length&&!drag&&!wDrag&&!linkDrag&&maxV<.004&&pointerStill; // settled → sleep
 }
 function drawMesh(now){
   const{W,H,cols,rows,n,en}=M;cx.clearRect(0,0,W,H);
   let reveal=1;if(introT<1){introT=clamp((now-introStart)/1500,0,1);reveal=1-Math.pow(1-introT,3)}
   const cxm=W/2,cym=H/2,maxR=Math.hypot(W,H)*.6*reveal,full=reveal>=1;
   const vis=i=>full?1:clamp((maxR-Math.hypot(M.rx[i]-cxm,M.ry[i]-cym))/140,0,1);
+  // fade lines a little when zoomed far out so the field stays airy
+  const la=cam.z<.6?.75:1;
   const L=[new Path2D(),new Path2D(),new Path2D()];
   for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){const i=r*cols+c;if(!full&&vis(i)<.5)continue;const x=nx(i),y=ny(i);
     if(c<cols-1){const j=i+1,e=en[i]>en[j]?en[i]:en[j],b=e>.45?2:e>.08?1:0;L[b].moveTo(x,y);L[b].lineTo(nx(j),ny(j))}
     if(r<rows-1){const j=i+cols,e=en[i]>en[j]?en[i]:en[j],b=e>.45?2:e>.08?1:0;L[b].moveTo(x,y);L[b].lineTo(nx(j),ny(j))}}
-  cx.lineWidth=.5;for(let b=0;b<3;b++){cx.strokeStyle=`rgba(${TH.l},${TH.la[b]})`;cx.stroke(L[b])}
+  cx.lineWidth=.5;for(let b=0;b<3;b++){cx.strokeStyle=`rgba(${TH.l},${TH.la[b]*(b?1:la)})`;cx.stroke(L[b])}
   const base=new Path2D(),r0=M.dpr>1?1:1.05,D=TH.dot,Hh=TH.hot;
   for(let i=0;i<n;i++){const v=vis(i);if(v<=0)continue;const e=en[i],x=nx(i),y=ny(i);
     if(e<.06&&v>=1){base.moveTo(x+r0,y);base.arc(x,y,r0,0,6.2832);continue}
@@ -545,59 +696,71 @@ function drawMesh(now){
 }
 
 /* ════════════════════════════════════════════════════════════
-   NODES — ağa bağlı, yüzen uygulamalar
+   NODES — ağa bağlı, yüzen uygulamalar (dünya koordinatlarında)
    ════════════════════════════════════════════════════════════ */
 const nodes=new Map();
 const LIFT=92,TAIL=63;
 const nodeHTML=a=>{const[bg,fg]=COLORS[a.color]||COLORS.gray,ic=ICONS[a.icon];
   return`<span class="bob"><span class="shadow"></span><span class="tile${a.color==='ink'?' dark':''}" style="--bg-t:${bg};--fg-t:${fg}">${ic?`<svg class="glyph" viewBox="0 0 24 24">${ic}</svg>`:`<span class="mono">${esc(mono(a.name))}</span>`}${SE_OK?`<svg class="rim" viewBox="0 0 64 64"><path d="${SE}"/></svg>`:''}</span></span><span class="port" title="Sürükle ve başka bir uygulamaya bağla"></span><span class="nlabel">${esc(a.name)}${a.kind==='draft'?'<i>taslak</i>':''}</span>`};
-function isFree(i,self,minD=118){const x=M.rx[i],y=M.ry[i];for(const n of nodes.values()){if(n===self||n.ai==null)continue;if(Math.hypot(M.rx[n.ai]-x,M.ry[n.ai]-y)<minD)return false}return true}
-function inBounds(i){const x=M.rx[i],y=M.ry[i],sm=M.W<700;return x>(sm?46:80)&&x<M.W-(sm?46:80)&&y>(sm?196:206)&&y<M.H-(sm?64:72)}
-function nearestFree(x,y,self){
-  const i0=nearest(x,y);if(inBounds(i0)&&isFree(i0,self))return i0;
-  for(let ring=1;ring<40;ring++){let best=-1,bd=1e9;const c0=i0%M.cols,r0=(i0/M.cols)|0;
-    for(let r=r0-ring;r<=r0+ring;r++)for(let c=c0-ring;c<=c0+ring;c++){if(r<0||c<0||r>=M.rows||c>=M.cols)continue;if(Math.max(Math.abs(r-r0),Math.abs(c-c0))!==ring)continue;
-      const i=r*M.cols+c;if(!inBounds(i)||!isFree(i,self))continue;const d=Math.hypot(M.rx[i]-x,M.ry[i]-y);if(d<bd){bd=d;best=i}}
-    if(best>=0)return best}
-  return nearest(clamp(x,90,M.W-90),clamp(y,210,M.H-80));
+// anchor (world) → screen, riding on the mesh displacement under it
+function anc(n){const sx=w2sx(n.aw[0]),sy=w2sy(n.aw[1]),i=meshIdx(sx,sy);n.ax=i<0?sx:sx+M.dx[i];n.ay=i<0?sy:sy+M.dy[i]}
+// legacy screen-fraction layouts were taken at camera (0,0,1): world = screen − centre
+const posOf=k=>{const p=pos[k];if(Array.isArray(p)&&isFinite(p[0])&&isFinite(p[1]))return p;const l=legacy[k];
+  if(Array.isArray(l)&&isFinite(l[0])&&isFinite(l[1]))return[l[0]*M.W-M.W/2,l[1]*M.H-M.H/2];return null};
+function isFree(wx,wy,self,minD=118){
+  for(const n of nodes.values()){if(n===self||!n.aw)continue;if(Math.hypot(n.aw[0]-wx,n.aw[1]-wy)<minD)return false}
+  // keep the app's footprint (icon floats LIFT above its anchor) off every widget card
+  for(const r of wRects())if(wx+64>r.x&&wx-64<r.x+r.w&&wy+16>r.y&&wy-LIFT-48<r.y+r.h)return false;
+  return true}
+function nearestFree(wx,wy,self){
+  const c0=Math.round(wx/WG),r0=Math.round(wy/WG);if(isFree(c0*WG,r0*WG,self))return[c0*WG,r0*WG];
+  for(let ring=1;ring<70;ring++){let best=null,bd=1e18;
+    for(let r=r0-ring;r<=r0+ring;r++)for(let c=c0-ring;c<=c0+ring;c++){if(Math.max(Math.abs(r-r0),Math.abs(c-c0))!==ring)continue;
+      const x=c*WG,y=r*WG;if(!isFree(x,y,self))continue;const d=(x-wx)**2+(y-wy)**2;if(d<bd){bd=d;best=[x,y]}}
+    if(best)return best}
+  return[c0*WG,r0*WG];
 }
+const viewCentre=()=>[s2wx(M.W/2),s2wy(M.H/2+50)];
 function placeFor(key,self,hint){
-  const L=layout[key];if(L&&!hint)return nearestFree(L[0]*M.W,L[1]*M.H,self);
+  const L=posOf(key);if(L&&!hint)return nearestFree(L[0],L[1],self);
   if(hint)return nearestFree(hint[0],hint[1],self);
-  const c=[M.W/2,M.H/2+50];
-  for(let i=0;i<500;i++){const ang=i*2.39996+.6,rad=M.W<700?60+i*22:90+Math.sqrt(i)*70;
-    const j=nearest(c[0]+Math.cos(ang)*rad*1.25,c[1]+Math.sin(ang)*rad*.8);if(inBounds(j)&&isFree(j,self))return j}
-  return nearestFree(c[0],c[1],self);
+  const[cxw,cyw]=viewCentre(),sm=M.W<700;
+  for(let i=0;i<500;i++){const ang=i*2.39996+.6,rad=sm?60+i*22:90+Math.sqrt(i)*70;
+    const x=Math.round((cxw+Math.cos(ang)*rad*1.25)/WG)*WG,y=Math.round((cyw+Math.sin(ang)*rad*.8)/WG)*WG;if(isFree(x,y,self))return[x,y]}
+  return nearestFree(cxw,cyw,self);
 }
-function rememberLayout(n,save=true){layout[n.a.key]=[+(M.rx[n.ai]/M.W).toFixed(4),+(M.ry[n.ai]/M.H).toFixed(4)];if(save)saveMeta()}
+function rememberLayout(n,save=true){pos[n.a.key]=[Math.round(n.aw[0]),Math.round(n.aw[1])];if(save)saveMeta()}
 let spawnHint=null;
 function createNode(a,delay=0){
-  const el=document.createElement('button');el.className='node'+(a.kind==='draft'?' draft':'');el.dataset.key=a.key;el.setAttribute('aria-label',a.name);el.title=a.desc||a.name;
+  const el=document.createElement('button');el.className='node'+(a.kind==='draft'?' draft':'');el.dataset.key=a.key;el.setAttribute('aria-label',a.name);
   el.innerHTML=nodeHTML(a);$('#nodes').appendChild(el);
-  const n={a,el,ai:null,x:0,y:0,vx:0,vy:0,rot:0,tx:0,ty:0,ph:[Math.random()*6.28,Math.random()*6.28,Math.random()*6.28,Math.random()*6.28],drag:false,hover:0,hov:false,dim:false,gx:0,gy:0,ps:'',cap:false,capA:0,capR:0,capT:0,sc:1,hs:0};
-  n.ai=placeFor(a.key,n,spawnHint);nodes.set(a.key,n);if(!layout[a.key])rememberLayout(n,false);
-  n.x=nx(n.ai);n.y=ny(n.ai)-LIFT+40;place(n);
+  const n={a,el,aw:null,ax:0,ay:0,x:0,y:0,vx:0,vy:0,rot:0,tx:0,ty:0,ph:[Math.random()*6.28,Math.random()*6.28,Math.random()*6.28,Math.random()*6.28],drag:false,hover:0,hov:false,dim:false,gx:0,gy:0,ps:'',cap:false,capA:0,capR:0,capT:0,sc:1,hs:0};
+  n.aw=placeFor(a.key,n,spawnHint);nodes.set(a.key,n);if(!pos[a.key])rememberLayout(n,false);
+  anc(n);n.x=n.ax;n.y=n.ay-LIFT*cam.z+40;place(n);
   anim(el.querySelector('.bob'),[{transform:'scale(0) rotate(-12deg)',opacity:0},{transform:'scale(1.12) rotate(3deg)',opacity:1,offset:.55},{transform:'none',opacity:1}],{duration:900,delay,easing:EASE,fill:'backwards'});
   anim(el.querySelector('.nlabel'),[{opacity:0,transform:'translateX(-50%) translateY(-6px)'},{opacity:1,transform:'translateX(-50%)'}],{duration:600,delay:delay+250,easing:OUT,fill:'backwards'});
-  setTimeout(()=>ripple(nx(n.ai),ny(n.ai),.8),delay+120);
+  setTimeout(()=>{anc(n);ripple(n.ax,n.ay,.8)},delay+120);
   wireNode(n);return n;
 }
 function updateNode(n,a){const changed=n.a.name!==a.name||n.a.icon!==a.icon||n.a.color!==a.color;n.a=a;if(changed){n.el.innerHTML=nodeHTML(a);n.el.setAttribute('aria-label',a.name);wirePort(n);
   anim(n.el.querySelector('.bob'),[{transform:'scale(.8)'},{transform:'none'}],{duration:600,easing:SPRING})}}
 function removeNode(key,quiet){const n=nodes.get(key);if(!n)return;nodes.delete(key);if(hoverNode===n)hoverNode=null;
-  if(!quiet)ripple(nx(n.ai),ny(n.ai),1.3);
+  if(!quiet)ripple(n.ax,n.ay,1.3);
   anim(n.el,[{opacity:1,filter:'blur(0)'},{opacity:0,filter:'blur(6px)'}],{duration:380,easing:EASE,fill:'forwards'}).finished.then(()=>n.el.remove(),()=>n.el.remove());
-  delete layout[key];delete members[key];const before=links.length;links=links.filter(l=>l[0]!==key&&l[1]!==key);if(before!==links.length&&booted)saveMeta();}
-function place(n){const s=`translate3d(${(n.x-32).toFixed(1)}px,${(n.y-32).toFixed(1)}px,0) rotate(${n.rot.toFixed(2)}deg) scale(${n.sc.toFixed(3)})`;if(s!==n.ps){n.el.style.transform=s;n.ps=s}}
+  delete pos[key];delete members[key];const before=links.length;links=links.filter(l=>l[0]!==key&&l[1]!==key);if(before!==links.length&&booted)saveMeta();}
+function place(n){const s=`translate3d(${(n.x-32).toFixed(1)}px,${(n.y-32).toFixed(1)}px,0) rotate(${n.rot.toFixed(2)}deg) scale(${(n.sc*cam.z).toFixed(3)})`;if(s!==n.ps){n.el.style.transform=s;n.ps=s}}
 function syncNodes(){
   const list=[...pub,...drafts],keys=new Set(list.map(a=>a.key));
   for(const k of[...nodes.keys()])if(!keys.has(k))removeNode(k);
   let d=0;list.forEach(a=>{const n=nodes.get(a.key);if(n)updateNode(n,a);else{createNode(a,booted?0:260+d*90);d++}});
   spawnHint=null;applyFilter();hintText();statusText();wake();
+  // one-time migration: write world positions for anything that only had a legacy layout
+  if(Object.keys(legacy).length&&[...nodes.keys()].some(k=>!store.get('appshell:pos',{})[k]))saveMeta();
 }
-function applyRemoteLayout(l){let moved=false;
-  for(const[k,v]of Object.entries(l)){const n=nodes.get(k);layout[k]=v;if(!n||n.drag)continue;const i=nearestFree(v[0]*M.W,v[1]*M.H,n);if(i!==n.ai){n.ai=i;moved=true}}
-  store.set('appshell:layout',layout);if(moved)wake()}
+function applyRemotePos(p){let moved=false;
+  for(const[k,v]of Object.entries(p)){if(!Array.isArray(v))continue;pos[k]=v;const n=nodes.get(k);if(!n||n.drag)continue;
+    if(n.aw&&n.aw[0]===v[0]&&n.aw[1]===v[1])continue;const a=nearestFree(v[0],v[1],n);if(a[0]!==n.aw[0]||a[1]!==n.aw[1]){n.aw=a;moved=true}}
+  store.set('appshell:pos',pos);if(moved)wake()}
 
 function wirePort(n){n.el.querySelector('.port').addEventListener('pointerdown',e=>{if(e.button!==0)return;e.preventDefault();e.stopPropagation();startLink(n,e,'drag')})}
 function wireNode(n){
@@ -624,7 +787,7 @@ function wireNode(n){
       if(!started){el.focus({preventScroll:true});openApp(n.a,el);return}
       n.drag=false;el.classList.remove('dragging');
       if(e.pointerType!=='mouse'&&Math.hypot(n.gx+ox-sx,n.gy+oy-sy)<10){setTimeout(()=>justDragged=false,0);showMenu(n.x,n.y+40,n.a);wakeMesh();return}
-      const i=nearestFree(n.x,n.y+LIFT,n);n.ai=i;rememberLayout(n);ripple(nx(i),ny(i),1.6);
+      n.aw=nearestFree(s2wx(n.x),s2wy(n.y+LIFT*cam.z),n);rememberLayout(n);anc(n);ripple(n.ax,n.ay,1.6);
       setTimeout(()=>justDragged=false,0);wakeMesh()};
     addEventListener('pointermove',mv,{passive:true});addEventListener('pointerup',up);addEventListener('pointercancel',up);
   });
@@ -653,12 +816,13 @@ function drawLinks(time){
 function drawTethers(time){
   const L=TH.l;
   for(const n of nodes.values()){
-    const ax0=nx(n.ai),ay0=ny(n.ai),bx=n.x,by=n.y+TAIL,a=n.dim?.04:.16+n.hover*.3;
+    const Z=cam.z,ax0=n.ax,ay0=n.ay,bx=n.x,by=n.y+TAIL*Z,a=n.dim?.04:.16+n.hover*.3;
+    if((ax0<-80&&bx<-80)||(ax0>M.W+80&&bx>M.W+80)||(ay0<-80&&by<-80)||(ay0>M.H+80&&by>M.H+80))continue;
     const mx=(ax0+bx)/2-n.vx*5,my=(ay0+by)/2+10+Math.abs(n.vx)*1.5;
     fx.beginPath();fx.moveTo(ax0,ay0);fx.quadraticCurveTo(mx,my,bx,by);
     fx.setLineDash(n.a.kind==='draft'?[2.5,3]:[]);fx.lineWidth=n.drag?1.1:.8;fx.strokeStyle=`rgba(${L},${a})`;fx.stroke();fx.setLineDash([]);
-    fx.beginPath();fx.arc(ax0,ay0,2.6+n.hover*1.2,0,6.2832);fx.fillStyle=TH.ring;fx.fill();fx.lineWidth=.9;fx.strokeStyle=`rgba(${L},${n.dim?.08:.35+n.hover*.4})`;fx.stroke();
-    if(n.drag){const i=nearestFree(n.x,n.y+LIFT,n),px=nx(i),py=ny(i),pulse=4.5+Math.sin(time*7)*1.5;
+    fx.beginPath();fx.arc(ax0,ay0,(2.6+n.hover*1.2)*Math.min(1,.4+Z*.6),0,6.2832);fx.fillStyle=TH.ring;fx.fill();fx.lineWidth=.9;fx.strokeStyle=`rgba(${L},${n.dim?.08:.35+n.hover*.4})`;fx.stroke();
+    if(n.drag){const w=nearestFree(s2wx(n.x),s2wy(n.y+LIFT*Z),n),px=w2sx(w[0]),py=w2sy(w[1]),pulse=4.5+Math.sin(time*7)*1.5;
       fx.beginPath();fx.arc(px,py,pulse,0,6.2832);fx.strokeStyle=`rgba(${L},.45)`;fx.lineWidth=.8;fx.stroke();
       fx.beginPath();fx.arc(px,py,pulse+7,0,6.2832);fx.strokeStyle=`rgba(${L},.12)`;fx.stroke()}
   }
@@ -690,7 +854,7 @@ function highlight(){
   const hk=linkDrag?null:hoverNode?.a.key,nb=hk&&degree(hk)?neighbors(hk):null,s=hk&&nb?hk+[...nb].join():'';
   if(s===hlState)return;hlState=s;for(const n of nodes.values())n.el.classList.toggle('faded',!!nb&&n.a.key!==hk&&!nb.has(n.a.key));
 }
-function nodeAt(x,y,skip){let best=null,bd=56;for(const n of nodes.values()){if(n.a.key===skip||n.dim)continue;const d=Math.hypot(n.x-x,n.y-y);if(d<bd){bd=d;best=n}}return best}
+function nodeAt(x,y,skip){let best=null,bd=56*Math.max(.5,cam.z);for(const n of nodes.values()){if(n.a.key===skip||n.dim)continue;const d=Math.hypot(n.x-x,n.y-y);if(d<bd){bd=d;best=n}}return best}
 function startLink(n,e,mode){
   hideMenu();linkDrag={from:n.a.key,x:e.clientX??n.x,y:e.clientY??n.y,mode,target:null};document.body.classList.add('linking');n.hov=false;
   anim(n.el.querySelector('.bob'),[{transform:'scale(1.12)'},{transform:'scale(1)'}],{duration:500,easing:SPRING});
@@ -708,7 +872,7 @@ function finishLink(t){
   const from=linkDrag.from;cancelLink();if(t.a.key===from)return;
   if(hasLink(from,t.a.key)){toast('Zaten bağlı');return}
   links.push(pairKey(from,t.a.key));saveMeta();statusText();
-  const a=nodes.get(from);ripple(t.x,t.y+TAIL,1.4);if(a)ripple(a.x,a.y+TAIL,1);
+  const a=nodes.get(from);ripple(t.x,t.y+TAIL*cam.z,1.4);if(a)ripple(a.x,a.y+TAIL*cam.z,1);
   [a,t].forEach(n=>n&&anim(n.el.querySelector('.bob'),[{transform:'scale(1)'},{transform:'scale(1.18)',offset:.4},{transform:'none'}],{duration:640,easing:EASE}));
   toast(`${a?.a.name||''} ↔ ${t.a.name} bağlandı`);
 }
@@ -719,8 +883,8 @@ function removeLink(i){const l=links[i];if(!l)return;const g=linkGeo[i];links.sp
 function linkHit(x,y){let best=-1,bd=9;linkGeo.forEach((g,i)=>{if(!g)return;for(let s=1;s<20;s++){const[px,py]=qAt(g,s/20),d=Math.hypot(px-x,py-y);if(d<bd){bd=d;best=i}}});return best}
 function autoLayout(){
   const list=[...nodes.values()];if(list.length<2)return toast('Düzenlenecek kadar uygulama yok');
-  const P=list.map(n=>({n,x:n.x,y:n.y+LIFT,vx:0,vy:0})),idx=new Map(P.map((p,i)=>[p.n.a.key,i]));
-  const cxm=M.W/2,cym=M.H/2+50,sm=M.W<700;
+  const P=list.map(n=>({n,x:n.aw[0],y:n.aw[1],vx:0,vy:0})),idx=new Map(P.map((p,i)=>[p.n.a.key,i]));
+  const cxm=P.reduce((a,p)=>a+p.x,0)/P.length,cym=P.reduce((a,p)=>a+p.y,0)/P.length,sm=M.W<700;
   for(let it=0;it<500;it++){
     for(let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++){const a=P[i],b=P[j],dx=b.x-a.x,dy=b.y-a.y,d2=dx*dx+dy*dy+.01,d=Math.sqrt(d2),f=(sm?9000:26000)/d2;
       a.vx-=dx/d*f;a.vy-=dy/d*f;b.vx+=dx/d*f;b.vy+=dy/d*f}
@@ -728,15 +892,14 @@ function autoLayout(){
       a.vx+=dx/d*f;a.vy+=dy/d*f;b.vx-=dx/d*f;b.vy-=dy/d*f}
     for(let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++){const ga=groupOf(P[i].n.a.key),gb=groupOf(P[j].n.a.key);if(!ga&&!gb)continue;const a=P[i],b=P[j],dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1;
       const f=ga&&ga===gb?(d-(sm?120:170))*.035:-(sm?2500:9000)/(d*d+1);a.vx+=dx/d*f;a.vy+=dy/d*f;b.vx-=dx/d*f;b.vy-=dy/d*f}
-    for(const p of P){p.vx+=(cxm-p.x)*.012;p.vy+=(cym-p.y)*.012;p.x+=clamp(p.vx,-30,30);p.y+=clamp(p.vy,-30,30);p.vx*=.6;p.vy*=.6;
-      p.x=clamp(p.x,90,M.W-90);p.y=clamp(p.y,220,M.H-80)}
+    for(const p of P){p.vx+=(cxm-p.x)*.012;p.vy+=(cym-p.y)*.012;p.x+=clamp(p.vx,-30,30);p.y+=clamp(p.vy,-30,30);p.vx*=.6;p.vy*=.6}
   }
-  const prev=JSON.parse(JSON.stringify(layout));
-  for(const p of P)p.n.ai=null;
+  const prev=JSON.parse(JSON.stringify(pos));
+  for(const p of P)p.n.aw=[1e9,1e9];
   P.sort((a,b)=>degree(b.n.a.key)-degree(a.n.a.key));
-  P.forEach((p,i)=>{p.n.ai=nearestFree(p.x,p.y,p.n);rememberLayout(p.n,false);setTimeout(()=>ripple(nx(p.n.ai),ny(p.n.ai),1),i*70)});
-  saveMeta();wake();
-  toast('Graf düzenlendi',()=>{layout=prev;for(const n of nodes.values())n.ai=null;for(const n of nodes.values())n.ai=placeFor(n.a.key,n);saveMeta();wakeMesh()});
+  P.forEach((p,i)=>{p.n.aw=nearestFree(p.x,p.y,p.n);rememberLayout(p.n,false);setTimeout(()=>{anc(p.n);ripple(p.n.ax,p.n.ay,1)},i*70)});
+  saveMeta();wake();setTimeout(fitAll,120);
+  toast('Graf düzenlendi',()=>{pos=prev;for(const n of nodes.values())n.aw=[1e9,1e9];for(const n of nodes.values())n.aw=placeFor(n.a.key,n);saveMeta();wakeMesh()});
 }
 $('#layoutBtn').onclick=e=>{anim(e.currentTarget.firstElementChild,[{transform:'rotate(0)'},{transform:'rotate(360deg)'}],{duration:700,easing:OUT});autoLayout()};
 
@@ -753,18 +916,19 @@ function drawGroups(){
   for(const n of nodes.values()){const g=groupOf(n.a.key);if(g)(byG[g]||=[]).push(n)}
   const gids=Object.keys(byG);if(!gids.length)return;
   if(gcv.width!==M.W||gcv.height!==M.H){gcv.width=M.W;gcv.height=M.H}
-  const dark=document.documentElement.dataset.theme==='dark',PAD=60;
+  const dark=document.documentElement.dataset.theme==='dark',Z=cam.z,PAD=60*Z;
   fx.save();
   if('letterSpacing' in fx)fx.letterSpacing='1px';
   for(const g of gids){
     const ns=byG[g],col=GCOL[groups[g].color]||GCOL.gray,pts=[];
-    for(const n of ns){pts.push([n.x,n.y]);pts.push([n.x,n.y+46])}
+    for(const n of ns){pts.push([n.x,n.y]);pts.push([n.x,n.y+46*Z])}
     const H=hull(pts);let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const[px,py]of pts){if(px<x0)x0=px;if(py<y0)y0=py;if(px>x1)x1=px;if(py>y1)y1=py}
+    if(x1+PAD<0||x0-PAD>M.W||y1+PAD<0||y0-PAD>M.H)continue;
     const bx=Math.max(0,Math.floor(x0-PAD-2)),by=Math.max(0,Math.floor(y0-PAD-2)),bw=Math.min(M.W,Math.ceil(x1+PAD+2))-bx,bh=Math.min(M.H,Math.ceil(y1+PAD+2))-by;if(bw<=0||bh<=0)continue;
     gx.clearRect(bx,by,bw,bh);gx.fillStyle=gx.strokeStyle=col;gx.lineJoin=gx.lineCap='round';gx.lineWidth=PAD*2;
     gx.beginPath();H.forEach((p,i)=>i?gx.lineTo(p[0],p[1]):gx.moveTo(p[0],p[1]));if(H.length>2)gx.closePath();gx.fill();gx.stroke();
     fx.globalAlpha=dark?.13:.075;fx.drawImage(gcv,bx,by,bw,bh,bx,by,bw,bh);fx.globalAlpha=1;
-    const lx=(x0+x1)/2,ly=y0-PAD+18,name=groups[g].name.toLocaleUpperCase('tr');
+    const lx=(x0+x1)/2,ly=y0-PAD+18*Z,name=groups[g].name.toLocaleUpperCase('tr');
     fx.font='500 10.5px "Geist Mono",ui-monospace,Menlo,monospace';fx.textAlign='center';fx.textBaseline='middle';
     const w=fx.measureText(name).width+22;
     fx.fillStyle=col;fx.globalAlpha=.9;fx.beginPath();fx.arc(lx-w/2+9,ly,3,0,6.2832);fx.fill();fx.globalAlpha=1;
@@ -776,7 +940,7 @@ function drawGroups(){
 function groupAt(x,y){return groupHits.find(h=>x>=h.x&&x<=h.x+h.w&&y>=h.y&&y<=h.y+h.h)?.g||null}
 function assignGroup(key,g){const prev=members[key];if(g)members[key]=g;else delete members[key];
   for(const id of Object.keys(groups))if(!Object.values(members).includes(id)&&id!==g)delete groups[id]; // drop empty groups
-  saveMeta();wake();const n=nodes.get(key);if(n)ripple(n.x,n.y+TAIL,1.2);return prev}
+  saveMeta();wake();const n=nodes.get(key);if(n)ripple(n.x,n.y+TAIL*cam.z,1.2);return prev}
 function groupMenu(x,y,a){
   const cur=groupOf(a.key),ids=Object.keys(groups);
   popMenu(x,y,`<div class="who"><b>${esc(a.name)}</b>grup seç</div><div class="msep"></div>`+
@@ -807,8 +971,8 @@ function groupLabelMenu(x,y,g){
     <button class="mi danger" data-gm="drop">${si(UI.del)}Grubu dağıt</button>`,
     e=>{const b=e.target.closest('[data-gm]');if(!b)return;hideMenu();const k=b.dataset.gm;
       if(k==='edit')groupSheet(g);
-      else if(k==='gather'){const ns=mem.map(m=>nodes.get(m));const cxg=ns.reduce((a,n)=>a+M.rx[n.ai],0)/ns.length,cyg=ns.reduce((a,n)=>a+M.ry[n.ai],0)/ns.length;
-        ns.forEach(n=>n.ai=null);ns.forEach((n,i)=>{const ang=i/ns.length*Math.PI*2,r=ns.length>1?95:0;n.ai=nearestFree(cxg+Math.cos(ang)*r*1.3,cyg+Math.sin(ang)*r,n);rememberLayout(n,false);setTimeout(()=>ripple(nx(n.ai),ny(n.ai),1),i*80)});saveMeta()}
+      else if(k==='gather'){const ns=mem.map(m=>nodes.get(m));const cxg=ns.reduce((a,n)=>a+n.aw[0],0)/ns.length,cyg=ns.reduce((a,n)=>a+n.aw[1],0)/ns.length;
+        ns.forEach(n=>n.aw=[1e9,1e9]);ns.forEach((n,i)=>{const ang=i/ns.length*Math.PI*2,r=ns.length>1?95:0;n.aw=nearestFree(cxg+Math.cos(ang)*r*1.3,cyg+Math.sin(ang)*r,n);rememberLayout(n,false);setTimeout(()=>{anc(n);ripple(n.ax,n.ay,1)},i*80)});saveMeta()}
       else if(k==='drop'){const saved={g:{...groups[g]},m:mem};mem.forEach(m=>delete members[m]);delete groups[g];saveMeta();wake();
         toast('Grup dağıtıldı',()=>{groups[g]=saved.g;saved.m.forEach(m=>members[m]=g);saveMeta();wake()})}});
 }
@@ -850,33 +1014,35 @@ function frame(t){
   const idle=t-lastInput>8000&&!linkDrag;
   if(idle&&t-lastDraw<31){raf=requestAnimationFrame(frame);return}
   lastDraw=t;const dt=Math.min(40,t-(last||t));last=t;const k=dt/16.667,time=t/1000;
-  const list=[...nodes.values()],anyDrag=list.some(n=>n.drag);
-  const BH=FINE&&ptr.amp>.05&&!anyDrag&&!linkDrag&&!palEl&&!sheetEl;
+  stepCam(k);if(cam.x!==cam.px||cam.y!==cam.py||cam.z!==cam.pz){camMoved();meshAwake=true}
+  stepWidgets(k);
+  const list=[...nodes.values()],anyDrag=list.some(n=>n.drag),Z=cam.z,LZ=LIFT*Z;
+  const BH=FINE&&ptr.amp>.05&&!anyDrag&&!linkDrag&&!palEl&&!sheetEl&&!cam.pan&&!wDrag&&!cam.go;
   for(const n of list){
-    const ax0=nx(n.ai),ay0=ny(n.ai);n.hover+=((n.hov||n.drag?1:0)-n.hover)*(1-Math.pow(.85,k));
+    anc(n);const ax0=n.ax,ay0=n.ay;n.hover+=((n.hov||n.drag?1:0)-n.hover)*(1-Math.pow(.85,k));
     if(n.drag){n.tx=n.gx;n.ty=n.gy;n.cap=false;continue}
     // ── black hole: get close → captured, spirals into the cursor; tether snaps it back when stretched too far
-    const dc=Math.hypot(ptr.sx-n.x,ptr.sy-n.y),dr=Math.hypot(ptr.sx-ax0,ptr.sy-(ay0-LIFT));
+    const dc=Math.hypot(ptr.sx-n.x,ptr.sy-n.y),dr=Math.hypot(ptr.sx-ax0,ptr.sy-(ay0-LZ));
     if(BH&&!n.cap&&!n.dim&&dc<92&&time>(n.cool||0)){n.cap=true;n.capT=time;n.capA=Math.atan2(n.y-ptr.sy,n.x-ptr.sx);n.capR=dc;ripple(ptr.sx,ptr.sy,.7)}
-    if(n.cap&&(!BH||n.dim||dr>255)){n.cap=false;n.cool=time+1.2;ripple(ax0,ay0,1.5);n.vx*=1.4;n.vy*=1.4}
+    if(n.cap&&(!BH||n.dim||dr>255*Math.max(1,Z))){n.cap=false;n.cool=time+1.2;ripple(ax0,ay0,1.5);n.vx*=1.4;n.vy*=1.4}
     if(n.cap){const age=time-n.capT,r=n.capR*Math.exp(-age*4.5);n.capA+=(3+5*(1-r/(n.capR||1)))*dt/1000;
       n.tx=ptr.sx+Math.cos(n.capA)*r;n.ty=ptr.sy+Math.sin(n.capA)*r;continue}
     const calm=1-n.hover*.75,sw=REDUCED?0:1;
-    let tx=ax0+(Math.sin(time*.52+n.ph[0])*8+Math.sin(time*1.21+n.ph[1])*2.8)*calm*sw;
-    let ty=ay0-LIFT-n.hover*6+(Math.sin(time*.71+n.ph[2])*6.5+Math.sin(time*1.53+n.ph[3])*2.2)*calm*sw;
+    let tx=ax0+(Math.sin(time*.52+n.ph[0])*8+Math.sin(time*1.21+n.ph[1])*2.8)*calm*sw*Z;
+    let ty=ay0-LZ-n.hover*6*Z+(Math.sin(time*.71+n.ph[2])*6.5+Math.sin(time*1.53+n.ph[3])*2.2)*calm*sw*Z;
     if(ptr.amp>.01&&!n.hov){const ddx=ptr.sx-n.x,ddy=ptr.sy-n.y;if(ddx<200&&ddx>-200&&ddy<200&&ddy>-200){const d=Math.hypot(ddx,ddy);if(d<200){const f=(1-d/200);tx+=ddx*.16*f*f*ptr.amp;ty+=ddy*.16*f*f*ptr.amp}}}
     n.tx=tx;n.ty=ty;
   }
   // group cohesion: members drift gently toward their group's centre
   const gc={};for(const n of list){const g=groupOf(n.a.key);if(!g)continue;(gc[g]||=[0,0,0]);gc[g][0]+=n.tx;gc[g][1]+=n.ty;gc[g][2]++}
-  for(const n of list){const g=groupOf(n.a.key);if(!g||n.drag||gc[g][2]<2)continue;const cxg=gc[g][0]/gc[g][2],cyg=gc[g][1]/gc[g][2],ddx=cxg-n.tx,ddy=cyg-n.ty,d=Math.hypot(ddx,ddy)||1,p=Math.min(18,Math.max(0,d-110)*.05);n.tx+=ddx/d*p;n.ty+=ddy/d*p}
+  for(const n of list){const g=groupOf(n.a.key);if(!g||n.drag||gc[g][2]<2)continue;const cxg=gc[g][0]/gc[g][2],cyg=gc[g][1]/gc[g][2],ddx=cxg-n.tx,ddy=cyg-n.ty,d=Math.hypot(ddx,ddy)||1,p=Math.min(18*Z,Math.max(0,d-110*Z)*.05);n.tx+=ddx/d*p;n.ty+=ddy/d*p}
   for(const[ka,kb]of links){const a=nodes.get(ka),b=nodes.get(kb);if(!a||!b)continue;
     const ddx=b.tx-a.tx,ddy=b.ty-a.ty,d=Math.hypot(ddx,ddy)||1,ux=ddx/d,uy=ddy/d;
-    const pa=b.drag?Math.min(90,Math.max(0,d-150)*.22):Math.min(26,Math.max(0,d-130)*.06);
-    const pb=a.drag?Math.min(90,Math.max(0,d-150)*.22):Math.min(26,Math.max(0,d-130)*.06);
+    const pa=b.drag?Math.min(90*Z,Math.max(0,d-150*Z)*.22):Math.min(26*Z,Math.max(0,d-130*Z)*.06);
+    const pb=a.drag?Math.min(90*Z,Math.max(0,d-150*Z)*.22):Math.min(26*Z,Math.max(0,d-130*Z)*.06);
     if(!a.drag){a.tx+=ux*pa;a.ty+=uy*pa}if(!b.drag){b.tx-=ux*pb;b.ty-=uy*pb}}
-  for(let i=0;i<list.length;i++)for(let j=i+1;j<list.length;j++){const a=list[i],b=list[j];const ddx=b.tx-a.tx,ddy=b.ty-a.ty;if(ddx>96||ddx<-96||ddy>96||ddy<-96)continue;
-    const d=Math.hypot(ddx,ddy)||1;if(d<96){const p=(96-d)*.5,ux=ddx/d,uy=ddy/d;if(!a.drag){a.tx-=ux*p;a.ty-=uy*p}if(!b.drag){b.tx+=ux*p;b.ty+=uy*p}}}
+  const CD=96*Z;for(let i=0;i<list.length;i++)for(let j=i+1;j<list.length;j++){const a=list[i],b=list[j];const ddx=b.tx-a.tx,ddy=b.ty-a.ty;if(ddx>CD||ddx<-CD||ddy>CD||ddy<-CD)continue;
+    const d=Math.hypot(ddx,ddy)||1;if(d<CD){const p=(CD-d)*.5,ux=ddx/d,uy=ddy/d;if(!a.drag){a.tx-=ux*p;a.ty-=uy*p}if(!b.drag){b.tx+=ux*p;b.ty+=uy*p}}}
   for(const n of list){
     const st=n.drag?.32:n.cap?.2:.065,dp=Math.pow(n.drag?.7:n.cap?.78:.86,k);
     n.sc+=((n.cap?.8:1)-n.sc)*(1-Math.pow(.82,k));
@@ -886,7 +1052,7 @@ function frame(t){
   }
   highlight();
   // preview card: shows after ~450ms of hovering (frame-driven, survives the buoy's motion)
-  const hn=hoverNode;if(hn&&!hn.drag&&FINE&&!linkDrag&&!(W.app&&!W.min)){if(!hn.hs)hn.hs=t;else if(!PK.shown&&t-hn.hs>450)showPeek(hn)}
+  const hn=hoverNode;if(hn&&!hn.drag&&FINE&&!linkDrag&&!cam.pan&&!cam.go&&!(W.app&&!W.min)){if(!hn.hs)hn.hs=t;else if(!PK.shown&&t-hn.hs>450)showPeek(hn)}
   ptr.sx+=(ptr.x-ptr.sx)*(1-Math.pow(1-.22,k));ptr.sy+=(ptr.y-ptr.sy)*(1-Math.pow(1-.22,k));ptr.amp+=(ptr.tAmp-ptr.amp)*(1-Math.pow(1-.07,k));
   if(meshAwake||introT<1){const settled=stepMesh(k,t);drawMesh(t);if(settled&&introT>=1)meshAwake=false}
   else if(meshDirty)drawMesh(t);
@@ -900,7 +1066,7 @@ const touchInput=()=>{lastInput=performance.now()};
 document.addEventListener('visibilitychange',()=>setPaused(document.hidden||(!!W.app&&!W.min)));
 
 /* Pointer on empty canvas */
-addEventListener('pointermove',e=>{if(e.pointerType==='mouse'||ptr.down){ptr.x=e.clientX;ptr.y=e.clientY;if(ptr.sx<-1e3){ptr.sx=ptr.x;ptr.sy=ptr.y}ptr.tAmp=1;wakeMesh()}
+addEventListener('pointermove',e=>{if(e.pointerType==='mouse'||ptr.down){ptr.x=e.clientX;ptr.y=e.clientY;if(ptr.sx<-1e3){ptr.sx=ptr.x;ptr.sy=ptr.y}ptr.tAmp=wDrag||e.target.closest?.('.wg,.zbar,.top')?0:1;wakeMesh()}
   if(linkDrag&&linkDrag.mode==='click')updateLink(e.clientX,e.clientY)},{passive:true});
 document.documentElement.addEventListener('pointerleave',()=>{ptr.tAmp=0;wakeMesh()});
 addEventListener('blur',()=>{ptr.tAmp=0;wakeMesh()});
@@ -913,11 +1079,305 @@ $('#stage').addEventListener('pointerdown',e=>{
   if(h>=0){const[ka,kb]=links[h],A=find(ka),Bn=find(kb);
     popMenu(e.clientX,e.clientY,`<div class="who"><b>${esc(A?.name||'')} ↔ ${esc(Bn?.name||'')}</b>bağlantı</div><div class="msep"></div><button class="mi danger" data-m="unl">${si(UI.del)}Bağlantıyı kaldır</button>`,
       ev=>{if(ev.target.closest('[data-m=unl]')){hideMenu();removeLink(h)}});return}
-  hideMenu();ptr.down=true;ptr.x=ptr.sx=e.clientX;ptr.y=ptr.sy=e.clientY;ptr.tAmp=1;ripple(e.clientX,e.clientY,1.2);
-  const up=()=>{ptr.down=false;if(e.pointerType!=='mouse')ptr.tAmp=0;wakeMesh();removeEventListener('pointerup',up)};addEventListener('pointerup',up)});
-$('#stage').addEventListener('dblclick',e=>{spawnHint=[e.clientX,e.clientY+LIFT];openSheet()});
-let rzT=0;addEventListener('resize',()=>{clearTimeout(rzT);rzT=setTimeout(()=>{const was=[...nodes.values()].map(n=>[n,M.rx[n.ai]/M.W,M.ry[n.ai]/M.H]);buildMesh();
-  for(const[n]of was)n.ai=null;for(const[n,fx0,fy0]of was){const L=layout[n.a.key]||[fx0,fy0];n.ai=nearestFree(L[0]*M.W,L[1]*M.H,n)}wake()},120)});
+  hideMenu();startPan(e)});
+
+/* ════════════════════════════════════════════════════════════
+   FREE ROAM — sürükle-kaydır (ataletli), tekerlek/trackpad, iki parmak
+   ════════════════════════════════════════════════════════════ */
+const touches=new Map();let pinch=null;
+function startPan(e){
+  touches.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(touches.size===2){ // two fingers → pinch-zoom + pan
+    const[a,b]=[...touches.values()];pinch={d:Math.hypot(a.x-b.x,a.y-b.y)||1,mx:(a.x+b.x)/2,my:(a.y+b.y)/2};
+    cam.pan=true;cam.go=null;cam.vx=cam.vy=0;ptr.tAmp=0;document.body.classList.add('panning');return}
+  if(touches.size>2)return;
+  cam.go=null;cam.vx=cam.vy=0;cam.tz=cam.z;
+  const P={id:e.pointerId,sx:e.clientX,sy:e.clientY,lx:e.clientX,ly:e.clientY,lt:performance.now(),moved:false,touch:e.pointerType!=='mouse'};
+  if(P.touch){ptr.down=true;ptr.x=ptr.sx=e.clientX;ptr.y=ptr.sy=e.clientY;ptr.tAmp=1;wakeMesh()}
+  const mv=ev=>{
+    const tp=touches.get(ev.pointerId);if(tp){tp.x=ev.clientX;tp.y=ev.clientY}
+    if(pinch&&touches.size===2){const[a,b]=[...touches.values()],d=Math.hypot(a.x-b.x,a.y-b.y)||1,mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
+      const wx=s2wx(pinch.mx),wy=s2wy(pinch.my);cam.z=cam.tz=clamp(cam.z*d/pinch.d,ZMIN,ZMAX);cam.x=wx-(mx-M.W/2)/cam.z;cam.y=wy-(my-M.H/2)/cam.z;
+      pinch.d=d;pinch.mx=mx;pinch.my=my;wake();return}
+    if(ev.pointerId!==P.id)return;
+    if(!P.moved){if(Math.hypot(ev.clientX-P.sx,ev.clientY-P.sy)<4)return;P.moved=true;cam.pan=true;document.body.classList.add('panning');hidePeek(true);if(P.touch){ptr.down=false;ptr.tAmp=0}}
+    const now=performance.now(),dt=Math.max(1,now-P.lt),dx=ev.clientX-P.lx,dy=ev.clientY-P.ly;
+    cam.x-=dx/cam.z;cam.y-=dy/cam.z;
+    const f=16.667/dt;cam.vx=cam.vx*.5+dx*f*.5;cam.vy=cam.vy*.5+dy*f*.5; // smoothed px/frame for the glide
+    P.lx=ev.clientX;P.ly=ev.clientY;P.lt=now;wake()};
+  const up=ev=>{touches.delete(ev.pointerId);
+    if(pinch){if(touches.size<2)pinch=null;if(!touches.size){end()}else{const r=[...touches.values()][0];P.id=[...touches.keys()][0];P.lx=r.x;P.ly=r.y;P.lt=performance.now();P.moved=true}return}
+    if(ev.pointerId!==P.id)return;end()};
+  const end=()=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up);removeEventListener('pointercancel',up);touches.clear();pinch=null;
+    if(performance.now()-P.lt>90){cam.vx=cam.vy=0} // held still before release → no glide
+    if(!P.moved)ripple(P.sx,P.sy,1.2);
+    cam.pan=false;document.body.classList.remove('panning');ptr.down=false;if(P.touch)ptr.tAmp=0;wakeMesh()};
+  addEventListener('pointermove',mv,{passive:true});addEventListener('pointerup',up);addEventListener('pointercancel',up);
+}
+// middle mouse drags the world from anywhere
+addEventListener('pointerdown',e=>{if(e.button===1&&!document.body.classList.contains('locked')&&!(W.app&&!W.min)&&!e.target.closest('.sheet-scrim,.pal-bg,.menu')){e.preventDefault();startPan(e)}},true);
+addEventListener('wheel',e=>{
+  if(document.body.classList.contains('locked')||palEl||sheetEl||(W.app&&!W.min))return;
+  if(e.target.closest?.('.menu,.top,.zbar,.toasts,.dock'))return;
+  const ta=e.target.closest?.('textarea');if(ta&&ta.scrollHeight>ta.clientHeight&&!e.ctrlKey&&!e.metaKey)return; // let notes scroll
+  e.preventDefault();hidePeek(true);
+  const dy=e.deltaMode===1?e.deltaY*33:e.deltaMode===2?e.deltaY*M.H:e.deltaY,dx=e.deltaMode===1?e.deltaX*33:e.deltaX;
+  const mouseWheel=e.deltaMode===1||(dx===0&&e.wheelDeltaY&&e.wheelDeltaY%120===0&&Math.abs(dy)>=40);
+  if(e.ctrlKey||e.metaKey||mouseWheel)zoomAt(e.clientX,e.clientY,Math.exp(-clamp(dy,-120,120)*(e.ctrlKey&&!mouseWheel?.011:.0019)));
+  else{cam.go=null;cam.vx=cam.vy=0;cam.x+=(e.shiftKey&&!dx?dy:dx)/cam.z;cam.y+=(e.shiftKey&&!dx?0:dy)/cam.z;wake()}
+},{passive:false});
+// Safari trackpad pinch
+let gz=1;addEventListener('gesturestart',e=>{e.preventDefault();gz=1});
+addEventListener('gesturechange',e=>{e.preventDefault();if(palEl||sheetEl||(W.app&&!W.min))return;zoomAt(e.clientX,e.clientY,e.scale/gz);gz=e.scale});
+function worldBounds(){let x0=1e18,y0=1e18,x1=-1e18,y1=-1e18,n=0;
+  const add=(a,b,c,d)=>{if(a<x0)x0=a;if(b<y0)y0=b;if(c>x1)x1=c;if(d>y1)y1=d;n++};
+  for(const nd of nodes.values())if(!nd.dim)add(nd.aw[0]-70,nd.aw[1]-LIFT-40,nd.aw[0]+70,nd.aw[1]+14);
+  for(const r of wRects())add(r.x,r.y,r.x+r.w,r.y+r.h);
+  return n?{x0,y0,x1,y1}:null}
+function fitAll(){const b=worldBounds();if(!b)return flyTo(0,0,1);const sm=M.W<700;
+  const z=clamp(Math.min((M.W-(sm?40:140))/(b.x1-b.x0),(M.H-(sm?170:200))/(b.y1-b.y0)),ZMIN,1.15);
+  flyTo((b.x0+b.x1)/2,(b.y0+b.y1)/2-(sm?6:12)/z,z)}
+function hidePeekIfMoving(){if(PK.shown&&(cam.pan||cam.go||Math.abs(cam.tz-cam.z)>1e-3))hidePeek(true)}
+$('#zbar').addEventListener('click',e=>{const b=e.target.closest('[data-z]');if(!b)return;const z=b.dataset.z;
+  if(z==='in')zoomTo(cam.tz*1.25);else if(z==='out')zoomTo(cam.tz/1.25);else if(z==='reset')zoomTo(1);else fitAll()});
+$('#zbar').addEventListener('dblclick',e=>e.stopPropagation());
+$('#stage').addEventListener('dblclick',e=>{spawnHint=[s2wx(e.clientX),s2wy(e.clientY+LIFT*cam.z)];openSheet()});
+let rzT=0;addEventListener('resize',()=>{clearTimeout(rzT);rzT=setTimeout(()=>{buildMesh();wake()},120)});
+
+/* ════════════════════════════════════════════════════════════
+   WIDGETS — tuvalde yaşayan küçük kartlar (dünya koordinatlarında)
+   ════════════════════════════════════════════════════════════ */
+const WEL=new Map();let wDrag=null,wReady=false;
+const XI='<svg viewBox="0 0 10 10"><path d="M2.5 2.5l5 5M7.5 2.5l-5 5"/></svg>';
+const cleanW=w=>{const o={id:w.id,type:w.type,w:[Math.round(w.w[0]),Math.round(w.w[1])]};for(const k of['city','lat','lon','text'])if(w[k]!=null)o[k]=w[k];return o};
+function wRects(){const out=[];for(const r of WEL.values())out.push({x:r.w.w[0],y:r.w.w[1],w:r.ww,h:r.wh||160,id:r.w.id});return out}
+const dayKey=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const plain=h=>{try{return new DOMParser().parseFromString(String(h||''),'text/html').body.textContent.trim()}catch{return''}};
+const MON=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+
+/* ── Notlar data (today + calendar widgets) ── */
+let NOTES=[],notesUnsub=null,notesOn=false;
+function ensureNotes(){if(notesOn)return;notesOn=true;
+  if(S.kind==='cloud'&&window.firebase?.firestore){notesUnsub=firebase.firestore().collection('hub').doc('notes').collection('pages').onSnapshot(s=>{NOTES=s.docs.map(d=>d.data());renderNoteWidgets()},()=>{})}
+  else readLocalNotes()}
+function readLocalNotes(){if(S.kind==='cloud')return;const v=store.get('notlar:v1',[]);NOTES=Array.isArray(v)?v:[];renderNoteWidgets()}
+function stopNotes(){try{notesUnsub?.()}catch{}notesUnsub=null;notesOn=false;NOTES=[]}
+addEventListener('storage',e=>{if(e.key==='notlar:v1'&&notesOn)readLocalNotes()});
+function renderNoteWidgets(){for(const r of WEL.values())if(r.w.type==='today'||r.w.type==='cal')renderW(r)}
+function openNotes(h){const a=find('p:notlar');if(!a)return toast('Notlar uygulaması bulunamadı');
+  if(W.app?.key===a.key){try{W.frame.contentWindow.location.hash=h}catch{}if(W.min)restore();return}
+  openApp({...a,url:a.url+h},nodes.get(a.key)?.el)}
+
+/* ── Weather (Open-Meteo, no key) ── */
+const WX={};
+const WI=(()=>{const cl='M7 18h10a4 4 0 0 0 .5-7.97A5.5 5.5 0 0 0 7 11.5 3.25 3.25 0 0 0 7 18z',cu='M7 15h10a4 4 0 0 0 .5-7.97A5.5 5.5 0 0 0 7 8.5 3.25 3.25 0 0 0 7 15z';
+  return{sun:'<circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6L7 7M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4"/>',
+    moon:'<path d="M18 14.5A7 7 0 0 1 9.5 6a7 7 0 1 0 8.5 8.5z"/>',part:`<path d="M9 2.5v1.3M3.5 8h1.3M5.1 4.1l.9.9M12.9 4.1l-.9.9"/><path d="M5.8 10.6A3.5 3.5 0 0 1 12 6.8"/><path d="${cl}"/>`,
+    cloud:`<path d="${cl}"/>`,rain:`<path d="${cu}"/><path d="M9 18l-1 2.5M13 18l-1 2.5M17 18l-1 2.5"/>`,snow:`<path d="${cu}"/><path d="M9 19h.01M13 19.5h.01M17 19h.01M11 21.8h.01M15 21.8h.01"/>`,
+    storm:`<path d="${cu}"/><path d="M12.5 15.5l-2 3h3l-2 3"/>`,fog:'<path d="M4 9h16M6 13h12M4 17h16"/>'}})();
+const wmo=(c,day=1)=>c===0?[day?'sun':'moon','Açık']:c===1?[day?'part':'moon','Az bulutlu']:c===2?['part','Parçalı bulutlu']:c===3?['cloud','Kapalı']:c<=48?['fog','Sisli']:c<=57?['rain','Çisenti']:c<=67?['rain',c>=65?'Kuvvetli yağmur':'Yağmurlu']:c<=77?['snow','Karlı']:c<=82?['rain','Sağanak']:c<=86?['snow','Kar sağanağı']:['storm','Fırtına'];
+async function wxLoad(r,force){const w=r.w,k=`${(+w.lat).toFixed(2)},${(+w.lon).toFixed(2)}`,c=WX[w.id];
+  if(!force&&c&&c.k===k&&(c.busy||Date.now()-c.t<12e5))return;
+  const cached=store.get('appshell:wx',{})[k];if(!force&&cached&&Date.now()-cached.t<12e5){WX[w.id]={k,t:cached.t,d:cached.d};return renderW(r)}
+  WX[w.id]={...(c?.k===k?c:{}),k,t:Date.now(),busy:true};
+  try{const res=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${w.lat}&longitude=${w.lon}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=5`);
+    if(!res.ok)throw 0;const d=await res.json();WX[w.id]={k,t:Date.now(),d};const all=store.get('appshell:wx',{});all[k]={t:Date.now(),d};store.set('appshell:wx',all)}
+  catch{WX[w.id]={...WX[w.id],busy:false,err:true,t:Date.now()-11e5}}
+  if(WEL.get(w.id)===r)renderW(r)}
+async function wxCity(r,q){q=q.trim();if(!q)return renderW(r);
+  try{const j=await(await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=1&language=tr`)).json();const g=j.results?.[0];
+    if(!g){toast('Şehir bulunamadı');return renderW(r)}
+    Object.assign(r.w,{city:g.name,lat:+g.latitude.toFixed(3),lon:+g.longitude.toFixed(3)});saveMeta();delete WX[r.w.id];renderW(r)}
+  catch{toast('Bağlantı hatası');renderW(r)}}
+
+/* ── FX (ECB reference rates via Frankfurter) ── */
+let FXD=store.get('appshell:fx',null),fxBusy=false;
+async function fxLoad(){if(fxBusy||(FXD&&Date.now()-FXD.t<36e5))return;fxBusy=true;
+  try{const st=new Date(Date.now()-40*864e5);const j=await(await fetch(`https://api.frankfurter.dev/v1/${dayKey(st)}..?base=EUR&symbols=TRY,USD`)).json();
+    const days=Object.keys(j.rates||{}).sort();if(!days.length)throw 0;
+    FXD={t:Date.now(),days,eurtry:days.map(d=>j.rates[d].TRY),eurusd:days.map(d=>j.rates[d].USD)};FXD.usdtry=FXD.eurtry.map((v,i)=>v/FXD.eurusd[i]);store.set('appshell:fx',FXD)}
+  catch{if(!FXD)FXD={t:Date.now()-33e5,err:true}}
+  fxBusy=false;for(const r of WEL.values())if(r.w.type==='fx')renderW(r)}
+function spark(a){const v=a.slice(-30),lo=Math.min(...v),hi=Math.max(...v),s=hi-lo||1;return v.map((x,i)=>`${i?'L':'M'}${(i/(v.length-1)*100).toFixed(1)} ${(22-(x-lo)/s*20).toFixed(1)}`).join('')}
+
+/* ── Focus timer runtime (per device) ── */
+const TM=store.get('appshell:timers',{});const tmSave=()=>store.set('appshell:timers',TM);
+const tmOf=id=>TM[id]||(TM[id]={mode:'focus',dur:1500,left:1500,end:0,on:false});
+const mmss=s=>{s=Math.max(0,Math.ceil(s));return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
+function chime(){try{const a=new(window.AudioContext||window.webkitAudioContext)();[0,.18,.36].forEach((d,i)=>{const o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.value=[880,1108,1318][i];
+  g.gain.setValueAtTime(0,a.currentTime+d);g.gain.linearRampToValueAtTime(.18,a.currentTime+d+.02);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+d+.5);o.connect(g).connect(a.destination);o.start(a.currentTime+d);o.stop(a.currentTime+d+.55)});setTimeout(()=>a.close(),1500)}catch{}}
+
+/* ── Calendar month per widget ── */
+const CM={};
+
+const WT={
+  clock:{n:'Saat',d:'Büyük saat, tarih ve günün ilerleyişi',w:216,
+    ic:'<circle cx="8" cy="8" r="5.5"/><path d="M8 5v3l2 1.5"/>',
+    render:r=>{const tz=(Intl.DateTimeFormat().resolvedOptions().timeZone||'').split('/').pop().replace(/_/g,' ');
+      return`<div class="wg-h"><span class="t">${esc(tz||'Yerel saat')}</span></div><div class="wc-t"><span class="big hm">--:--</span><span class="ss"></span></div><div class="sub dt"></div><div class="wc-bar"><i></i></div>`},
+    tick:r=>{const d=new Date(),q=s=>r.el.querySelector(s);q('.hm').textContent=d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});q('.ss').textContent=String(d.getSeconds()).padStart(2,'0');
+      q('.dt').textContent=d.toLocaleDateString('tr-TR',{weekday:'long',day:'numeric',month:'long'});q('.wc-bar i').style.transform=`scaleX(${((d.getHours()*3600+d.getMinutes()*60+d.getSeconds())/86400).toFixed(4)})`}},
+  weather:{n:'Hava durumu',d:'Şimdiki hava ve 4 günlük tahmin',w:240,
+    ic:'<circle cx="6" cy="6" r="2.2"/><path d="M6 1.5v.8M1.5 6h.8M2.8 2.8l.6.6M9.2 2.8l-.6.6"/><path d="M5.5 13.5h6a2.5 2.5 0 0 0 .3-5A3.3 3.3 0 0 0 5.5 9.5a2 2 0 0 0 0 4z"/>',
+    def:()=>({city:'İstanbul',lat:41.01,lon:28.98}),
+    render:r=>{const c=WX[r.w.id],d=c?.d;if(!d)wxLoad(r);
+      const head=`<div class="wg-h"><button class="t" data-act="city" title="Şehri değiştir">${esc(r.w.city||'Şehir')} ↗</button><span>${d?'şimdi':''}</span></div>`;
+      if(!d)return head+(c?.err?'<div class="sub muted">Hava alınamadı · <button data-act="retry">tekrar dene</button></div>':'<div class="wg-sk" style="width:60%;height:34px"></div><div class="wg-sk"></div><div class="wg-sk" style="width:70%"></div>');
+      const cu=d.current,[ic,tx]=wmo(cu.weather_code,cu.is_day),dl=d.daily,days=[];
+      for(let i=1;i<Math.min(5,dl.time.length);i++){const dt=new Date(dl.time[i]+'T12:00');days.push(`<div><b>${dt.toLocaleDateString('tr-TR',{weekday:'short'}).toUpperCase()}</b><svg viewBox="0 0 24 24">${WI[wmo(dl.weather_code[i])[0]]}</svg>${Math.round(dl.temperature_2m_max[i])}° <span class="muted">${Math.round(dl.temperature_2m_min[i])}°</span></div>`)}
+      return head+`<div class="ww-top"><span class="ww-ic"><svg viewBox="0 0 24 24">${WI[ic]}</svg></span><span class="big">${Math.round(cu.temperature_2m)}°</span></div>
+        <div class="sub">${tx} · Y ${Math.round(dl.temperature_2m_max[0])}° D ${Math.round(dl.temperature_2m_min[0])}°</div><div class="sub muted" style="margin-top:2px">Hissedilen ${Math.round(cu.apparent_temperature)}° · Rüzgâr ${Math.round(cu.wind_speed_10m)} km/s</div>
+        <div class="ww-days">${days.join('')}</div>`},
+    act:(r,a,b)=>{if(a==='retry'){delete WX[r.w.id];renderW(r)}
+      if(a==='city'){const h=b.closest('.wg-h');h.innerHTML='<input class="wg-city" placeholder="Şehir ara… (Enter)" autocomplete="off" spellcheck="false">';const i=h.firstChild;i.value='';i.focus();let done=false;
+        i.onkeydown=e=>{e.stopPropagation();if(e.key==='Enter'){done=true;wxCity(r,i.value)}else if(e.key==='Escape'){done=true;renderW(r)}};i.onblur=()=>{if(!done)renderW(r)}}},
+    tick:r=>{const c=WX[r.w.id];if(c&&!c.busy&&Date.now()-c.t>12e5)wxLoad(r)}},
+  fx:{n:'Döviz',d:'EUR/TRY, USD/TRY ve EUR/USD · 30 gün',w:240,
+    ic:'<path d="M2.5 11l3.5-3.5 2.5 2.5 5-5"/><path d="M10 5h3.5v3.5"/>',
+    render:r=>{fxLoad();const head='<div class="wg-h"><span class="t">Döviz</span><span>'+(FXD?.days?'ECB · '+new Date(FXD.days.at(-1)+'T12:00').toLocaleDateString('tr-TR',{day:'numeric',month:'short'}):'')+'</span></div>';
+      if(!FXD?.days)return head+(FXD?.err?'<div class="sub muted">Kur alınamadı</div>':'<div class="wg-sk"></div><div class="wg-sk"></div><div class="wg-sk"></div>');
+      const row=(l,a,dg)=>{const v=a.at(-1),p=a.at(-2)??v,ch=(v-p)/p*100,cl=ch>0.005?'up':ch<-0.005?'dn':'muted';
+        return`<div class="wf-row"><span class="p">${l}</span><svg viewBox="0 0 100 24" preserveAspectRatio="none"><path d="${spark(a)}"/></svg><span><span class="v">${v.toLocaleString('tr-TR',{minimumFractionDigits:dg,maximumFractionDigits:dg})}</span><span class="c ${cl}">${ch>0?'+':''}${ch.toLocaleString('tr-TR',{maximumFractionDigits:2,minimumFractionDigits:2})}%</span></span></div>`};
+      return head+row('EUR/TRY',FXD.eurtry,2)+row('USD/TRY',FXD.usdtry,2)+row('EUR/USD',FXD.eurusd,4)},
+    tick:()=>{if(FXD&&Date.now()-FXD.t>36e5)fxLoad()}},
+  note:{n:'Hızlı not',d:'Aklına geleni yaz · her cihazda aynı',w:252,
+    ic:'<path d="M3.5 2.5h9v11h-9z"/><path d="M6 5.5h4M6 8h4M6 10.5h2"/>',
+    render:r=>`<div class="wg-h"><span class="t">Hızlı not</span></div><textarea class="wn-ta" maxlength="2000" placeholder="Bir şey yaz…" spellcheck="false">${esc(r.w.text||'')}</textarea><div class="wn-f">${(r.w.text||'').length} / 2000</div>`,
+    mount:r=>{const ta=r.el.querySelector('textarea'),f=r.el.querySelector('.wn-f');let t=0;
+      ta.addEventListener('input',()=>{r.w.text=ta.value.slice(0,2000);f.textContent=r.w.text.length+' / 2000';clearTimeout(t);t=setTimeout(saveMeta,600)});
+      ta.addEventListener('blur',()=>{clearTimeout(t);saveMeta()})}},
+  today:{n:'Bugün',d:"Notlar'daki bugünün planları ve yapılacakları",w:264,
+    ic:'<rect x="2.5" y="3" width="11" height="10.5" rx="2"/><path d="M2.5 6.5h11M5.5 9.5l1.5 1.5 3-3"/>',
+    render:r=>{ensureNotes();const d=new Date(),k=dayKey(d),ps=NOTES.filter(p=>p&&p.date===k).sort((a,b)=>(a.created||0)-(b.created||0)),items=[];
+      for(const p of ps){items.push(`<button data-act="page" data-id="${esc(p.id)}"><span class="e">${esc(p.icon||'📄')}</span><span class="tx">${esc(p.title||'Adsız')}</span></button>`);
+        for(const b of(p.blocks||[]))if(b.t==='todo'&&!b.c){const tx=plain(b.h);if(tx)items.push(`<button data-act="page" data-id="${esc(p.id)}"><span class="bx"></span><span class="tx">${esc(tx)}</span></button>`)}}
+      const more=items.length>7?`<div class="wn-f" style="text-align:left">+${items.length-7} daha</div>`:'';
+      return`<div class="wg-h"><span class="t">Bugün · ${d.getDate()} ${MON[d.getMonth()]}</span><button data-act="cal">takvim</button></div>`+
+        (items.length?`<div class="wt-l">${items.slice(0,7).join('')}</div>${more}`:`<div class="wt-e">Bugün için plan yok.<br><button data-act="new">Günlük sayfa aç</button></div>`)},
+    act:(r,a,b)=>{if(a==='page')openNotes('#p/'+b.dataset.id);else if(a==='cal')openNotes('#cal');else if(a==='new')openNotes('#today')},
+    tick:r=>{const k=dayKey(new Date());if(r.day!==k){r.day=k;if(r.day0)renderW(r);r.day0=1}}},
+  timer:{n:'Odak sayacı',d:'25 dk odak · 5 dk mola',w:240,
+    ic:'<circle cx="8" cy="9" r="5"/><path d="M8 6.5V9M6.5 1.5h3M12 4.5l1-1"/>',
+    render:r=>{const t=tmOf(r.w.id),C=2*Math.PI*34;
+      return`<div class="wg-h"><span class="t">${t.mode==='focus'?'Odak':'Mola'}</span><span class="st">${t.on?'çalışıyor':t.left<t.dur?'duraklatıldı':''}</span></div>
+        <div class="wo"><div class="wo-ring"><svg viewBox="0 0 76 76"><circle class="bg" cx="38" cy="38" r="34"/><circle class="fg" cx="38" cy="38" r="34" stroke-dasharray="${C.toFixed(2)}" stroke-dashoffset="0"/></svg><span class="tm">${mmss(t.left)}</span></div>
+        <div class="wo-b"><button class="pri" data-act="go">${t.on?'Duraklat':t.left<t.dur?'Devam':'Başlat'}</button><button data-act="reset">Sıfırla</button></div></div>
+        <div class="wo-m"><button data-act="m25" class="${t.mode==='focus'?'on':''}">25 dk odak</button><button data-act="m5" class="${t.mode==='break'?'on':''}">5 dk mola</button></div>`},
+    mount:r=>WT.timer.tick(r),
+    act:(r,a)=>{const t=tmOf(r.w.id);
+      if(a==='go'){if(t.on){t.left=(t.end-Date.now())/1000;t.on=false}else{t.end=Date.now()+t.left*1000;t.on=true}}
+      else if(a==='reset'){t.on=false;t.left=t.dur}
+      else if(a==='m25'||a==='m5'){t.mode=a==='m25'?'focus':'break';t.dur=a==='m25'?1500:300;t.left=t.dur;t.on=false}
+      tmSave();renderW(r);WT.timer.tick(r)},
+    tick:r=>{const t=tmOf(r.w.id);if(t.on){t.left=(t.end-Date.now())/1000;
+        if(t.left<=0){const was=t.mode;t.on=false;t.mode=was==='focus'?'break':'focus';t.dur=was==='focus'?300:1500;t.left=t.dur;tmSave();chime();
+          toast(was==='focus'?'Odak bitti — 5 dakika mola ver':'Mola bitti — yeni odak zamanı');renderW(r);const c=r.el.getBoundingClientRect();ripple(c.left+c.width/2,c.top+c.height/2,2);return}}
+      const C=2*Math.PI*34,fg=r.el.querySelector('.fg'),tm=r.el.querySelector('.tm');if(fg)fg.style.strokeDashoffset=(C*(1-t.left/t.dur)).toFixed(2);if(tm)tm.textContent=mmss(t.left);
+      if(t.on)document.title=`${mmss(t.left)} · ${t.mode==='focus'?'Odak':'Mola'}`;else if(document.title.includes(' · Odak')||document.title.includes(' · Mola'))document.title=$('#brand').textContent}},
+  cal:{n:'Mini takvim',d:"Ay görünümü · Notlar'da planlı günler işaretli",w:240,
+    ic:'<rect x="2.5" y="3" width="11" height="10.5" rx="2"/><path d="M2.5 6.5h11M5.5 1.5v3M10.5 1.5v3M5 9h.01M8 9h.01M11 9h.01M5 11.5h.01M8 11.5h.01"/>',
+    render:r=>{ensureNotes();const now=new Date(),m=CM[r.w.id]||(CM[r.w.id]={y:now.getFullYear(),m:now.getMonth()});
+      const first=new Date(m.y,m.m,1),off=(first.getDay()+6)%7,start=new Date(m.y,m.m,1-off),has=new Set(NOTES.filter(p=>p&&p.date).map(p=>p.date)),tk=dayKey(now);let cells='';
+      for(let i=0;i<42;i++){const d=new Date(start.getFullYear(),start.getMonth(),start.getDate()+i),k=dayKey(d);if(i===35&&d.getMonth()!==m.m)break;
+        cells+=`<button data-act="day" class="${d.getMonth()!==m.m?'o ':''}${k===tk?'t ':''}${has.has(k)?'h':''}">${d.getDate()}</button>`}
+      return`<div class="wg-h"><button class="t" data-act="now" style="text-align:left">${MON[m.m]} ${m.y}</button><button data-act="prev" aria-label="Önceki ay">‹</button><button data-act="next" aria-label="Sonraki ay">›</button></div>
+        <div class="wk">${['Pt','Sa','Ça','Pe','Cu','Ct','Pz'].map(x=>`<b>${x}</b>`).join('')}${cells}</div>`},
+    act:(r,a)=>{const m=CM[r.w.id];if(a==='prev'||a==='next'){const d=new Date(m.y,m.m+(a==='next'?1:-1),1);m.y=d.getFullYear();m.m=d.getMonth();renderW(r)}
+      else if(a==='now'){delete CM[r.w.id];renderW(r)}else if(a==='day')openNotes('#cal')},
+    tick:r=>{const k=dayKey(new Date());if(r.day!==k){r.day=k;if(r.day0)renderW(r);r.day0=1}}},
+};
+
+function renderW(r){const T=WT[r.w.type],box=r.el.querySelector('.wg-in');box.innerHTML=T.render(r);T.mount?.(r);T.tick?.(r);
+  const h=r.el.offsetHeight;if(h&&h!==r.wh){const grew=r.wh&&h>r.wh;r.wh=h;
+    // content grew (e.g. forecast arrived) → if it now overlaps a neighbour, glide to the nearest free spot
+    if(grew&&WEL.get(r.w.id)===r&&wDrag?.r!==r&&!wFree(r.w.w[0],r.w.w[1],r.ww,h,r.w.id)){r.w.w=wSpot(r.ww,h,r.w.w,r.w.id);saveMeta();wake()}}}
+function placeW(r){const z=cam.z,sx=w2sx(r.dx),sy=w2sy(r.dy),vis=!(sx>M.W+40||sy>M.H+40||sx+r.ww*z<-40||sy+(r.wh||200)*z<-40);
+  if(vis!==r.vis){r.vis=vis;r.el.style.visibility=vis?'':'hidden'}
+  if(!vis)return;const s=`translate3d(${sx.toFixed(1)}px,${sy.toFixed(1)}px,0) scale(${z.toFixed(4)}) rotate(${r.rot.toFixed(2)}deg)`;if(s!==r.ps){r.el.style.transform=s;r.ps=s}}
+function placeWidgets(){for(const r of WEL.values())placeW(r)}
+function stepWidgets(k){for(const r of WEL.values()){if(wDrag?.r===r)continue;const tx=r.w.w[0],ty=r.w.w[1];
+  if(Math.abs(tx-r.dx)+Math.abs(ty-r.dy)+Math.abs(r.vx)+Math.abs(r.vy)+Math.abs(r.rot)<.02){if(r.dx!==tx||r.dy!==ty){r.dx=tx;r.dy=ty;r.rot=0;placeW(r)}continue}
+  const dp=Math.pow(.74,k);r.vx=(r.vx+(tx-r.dx)*.16*k)*dp;r.vy=(r.vy+(ty-r.dy)*.16*k)*dp;r.dx+=r.vx*k;r.dy+=r.vy*k;r.rot+=(clamp(r.vx*.25,-3,3)-r.rot)*(1-Math.pow(.8,k));placeW(r)}}
+function mountWidget(w,fresh){if(WEL.has(w.id)||!WT[w.type])return WEL.get(w.id);const T=WT[w.type];
+  const el=document.createElement('div');el.className='wg';el.dataset.id=w.id;el.style.width=T.w+'px';el.setAttribute('role','group');el.setAttribute('aria-label',T.n);
+  el.innerHTML=`<button class="wg-x" data-wx aria-label="Widget'ı kaldır" title="Kaldır">${XI}</button><div class="wg-in"></div>`;$('#widgets').appendChild(el);
+  const r={w,el,dx:w.w[0],dy:w.w[1],vx:0,vy:0,rot:0,ww:T.w,wh:0,ps:'',vis:null};WEL.set(w.id,r);renderW(r);placeW(r);wireW(r);
+  if(fresh){r.dy-=36/cam.z;anim(el,[{opacity:0,filter:'blur(8px)'},{opacity:1,filter:'blur(0)'}],{duration:520,easing:OUT})}
+  return r}
+function unmountWidget(r,quiet){WEL.delete(r.w.id);if(wDrag?.r===r)wDrag=null;
+  if(quiet)return r.el.remove();anim(r.el,[{opacity:1,filter:'blur(0)'},{opacity:0,filter:'blur(8px)'}],{duration:320,easing:EASE,fill:'forwards'}).finished.then(()=>r.el.remove(),()=>r.el.remove())}
+function wireW(r){const el=r.el;
+  el.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse'){ptr.tAmp=0;wakeMesh()}});
+  el.addEventListener('click',e=>{const x=e.target.closest('[data-wx]');if(x){removeWidget(r.w.id);return}
+    const b=e.target.closest('[data-act]');if(b&&!r.moved)WT[r.w.type].act?.(r,b.dataset.act,b)});
+  el.addEventListener('pointerdown',e=>{
+    if(e.button!==0||linkDrag)return;if(e.target.closest('button,input,textarea,a,select,[data-nodrag]'))return;
+    e.preventDefault();hideMenu();hidePeek(true);r.moved=false;
+    const sx=e.clientX,sy=e.clientY,ox=s2wx(sx)-r.dx,oy=s2wy(sy)-r.dy,touch=e.pointerType!=='mouse';let started=false;
+    const timer=touch?setTimeout(()=>begin(e),280):0;
+    function begin(ev){if(started)return;started=true;r.moved=true;wDrag={r,cx:ev.clientX,cy:ev.clientY};el.classList.add('drag');try{el.setPointerCapture(e.pointerId)}catch{}
+      if(touch&&navigator.vibrate)navigator.vibrate(8);wakeMesh()}
+    const mv=ev=>{if(!started){if(Math.hypot(ev.clientX-sx,ev.clientY-sy)<5)return;clearTimeout(timer);
+        if(touch){off();startPan(ev);return} // quick swipe on a card pans the canvas
+        begin(ev)}
+      const nx0=s2wx(ev.clientX)-ox,ny0=s2wy(ev.clientY)-oy;r.vx=nx0-r.dx;r.rot+=(clamp(r.vx*cam.z*.35,-4,4)-r.rot)*.25;r.dx=nx0;r.dy=ny0;r.w.w=[nx0,ny0];
+      wDrag.cx=ev.clientX;wDrag.cy=ev.clientY;placeW(r);wakeMesh()};
+    const off=()=>{clearTimeout(timer);removeEventListener('pointermove',mv);removeEventListener('pointerup',up);removeEventListener('pointercancel',up)};
+    const up=()=>{off();if(!started)return;el.classList.remove('drag');wDrag=null;r.vx=r.vy=0;
+      const p=wSpot(r.ww,r.wh,[r.dx,r.dy],r.w.id);r.w.w=p;shoveNodes(r);saveMeta();
+      ripple(w2sx(p[0]+r.ww/2),w2sy(p[1]+r.wh),1.3);setTimeout(()=>r.moved=false,0);wakeMesh()};
+    addEventListener('pointermove',mv,{passive:true});addEventListener('pointerup',up);addEventListener('pointercancel',up)});
+}
+// Free spot for a w×h card, nearest to a top-left hint (snapped to the world grid).
+function wFree(x,y,w,h,self){const M2=24;
+  for(const q of WEL.values()){if(q.w.id===self)continue;const a=q.w.w;if(x<a[0]+q.ww+M2&&x+w+M2>a[0]&&y<a[1]+(q.wh||160)+M2&&y+h+M2>a[1])return false}
+  for(const n of nodes.values()){if(!n.aw)continue;const ax=n.aw[0],ay=n.aw[1];if(x<ax+70&&x+w>ax-70&&y<ay+16&&y+h>ay-LIFT-44)return false}
+  return true}
+function wSpot(w,h,hint,self){const c0=Math.round(hint[0]/WG),r0=Math.round(hint[1]/WG);if(wFree(c0*WG,r0*WG,w,h,self))return[c0*WG,r0*WG];
+  for(let ring=1;ring<80;ring++){let best=null,bd=1e18;
+    for(let r=r0-ring;r<=r0+ring;r++)for(let c=c0-ring;c<=c0+ring;c++){if(Math.max(Math.abs(r-r0),Math.abs(c-c0))!==ring)continue;const x=c*WG,y=r*WG;
+      if(!wFree(x,y,w,h,self))continue;const d=(x-hint[0])**2+((y-hint[1])*1.4)**2;if(d<bd){bd=d;best=[x,y]}}
+    if(best)return best}
+  return[c0*WG,r0*WG]}
+// apps sitting under a freshly dropped card float away to the nearest free point
+function shoveNodes(r){const[x,y]=r.w.w;for(const n of nodes.values()){const ax=n.aw[0],ay=n.aw[1];
+  if(x<ax+64&&x+r.ww>ax-64&&y<ay+16&&y+r.wh>ay-LIFT-48){n.aw=[1e9,1e9];n.aw=nearestFree(ax,ay,n);rememberLayout(n,false)}}}
+function addWidget(type,hint){if(!WT[type])return;if(widgets===null)widgets=[];
+  const w={id:'w'+uid(),type,w:[0,0],...(WT[type].def?.()||{})};
+  const r=mountWidget(w,false);const[cxw,cyw]=hint||viewCentre();const p=wSpot(r.ww,r.wh,[cxw-r.ww/2,cyw-r.wh/2-40],w.id);
+  w.w=p;r.dx=p[0];r.dy=p[1]-40/cam.z;r.vis=null;placeW(r);anim(r.el,[{opacity:0,filter:'blur(8px)'},{opacity:1,filter:'blur(0)'}],{duration:520,easing:OUT});
+  widgets.push(w);shoveNodes(r);saveMeta();setTimeout(()=>ripple(w2sx(p[0]+r.ww/2),w2sy(p[1]+r.wh/2),1.5),160);
+  const sx=w2sx(p[0]),sy=w2sy(p[1]);if(sx<0||sy<60||sx+r.ww*cam.z>M.W||sy+r.wh*cam.z>M.H-40)flyTo(p[0]+r.ww/2,p[1]+r.wh/2,cam.z);
+  wake();return r}
+function removeWidget(id){const r=WEL.get(id);if(!r)return;const w=r.w,i=widgets.indexOf(w);
+  unmountWidget(r);widgets=widgets.filter(x=>x!==w);saveMeta();const c=r.el.getBoundingClientRect();ripple(c.left+c.width/2,c.top+c.height/2,1.2);
+  if(w.type==='timer'){delete TM[w.id];tmSave()}
+  toast(`${WT[w.type].n} kaldırıldı`,()=>{if(WEL.has(w.id))return;widgets.splice(Math.max(0,i),0,w);mountWidget(w,true);saveMeta()})}
+function applyRemoteWidgets(arr){
+  if(!Array.isArray(arr))return;const ids=new Set(arr.map(w=>w&&w.id));
+  if(wReady)for(const r of[...WEL.values()])if(!ids.has(r.w.id))unmountWidget(r);
+  const next=[];
+  for(const w of arr){if(!w||!w.id||!WT[w.type]||!Array.isArray(w.w))continue;const r=WEL.get(w.id);
+    if(!r){const nw={...w,w:[...w.w]};next.push(nw);if(wReady)mountWidget(nw,true);continue}
+    next.push(r.w);if(wDrag?.r!==r)r.w.w=[...w.w];
+    let re=false;for(const k of['city','lat','lon'])if(w[k]!==r.w[k]){r.w[k]=w[k];re=true}
+    const ta=r.el.querySelector('textarea');if(w.text!==r.w.text&&document.activeElement!==ta){r.w.text=w.text;if(ta){ta.value=w.text||'';r.el.querySelector('.wn-f').textContent=(w.text||'').length+' / 2000'}}
+    if(re){delete WX[r.w.id];renderW(r)}}
+  widgets=next;store.set('appshell:widgets',widgets);wake()}
+function mountWidgets(){wReady=true;for(const w of widgets||[])mountWidget(w,true)}
+function clearWidgets(){for(const r of[...WEL.values()])unmountWidget(r,true);wReady=false;stopNotes()}
+// first run: put a few useful cards next to the apps
+function seedWidgets(){if(widgets!==null||!wReady)return;if(S.kind==='cloud'&&!metaFresh)return;widgets=[];
+  const b=worldBounds(),hx=b?b.x1+40:viewCentre()[0]-120,hy=b?b.y0:viewCentre()[1]-120;
+  ['clock','weather','today'].forEach((t,i)=>{const w={id:'w'+uid(),type:t,w:[0,0],...(WT[t].def?.()||{})};const r=mountWidget(w,false);
+    w.w=wSpot(r.ww,r.wh,[hx,hy+i*10],w.id);r.dx=w.w[0];r.dy=w.w[1]-30;r.vis=null;placeW(r);widgets.push(w);
+    anim(r.el,[{opacity:0,filter:'blur(8px)'},{opacity:1,filter:'blur(0)'}],{duration:700,delay:300+i*140,easing:OUT,fill:'backwards'})});
+  saveMeta()}
+function widgetGallery(){
+  sheet('Widget ekle',`<div class="wgal">${Object.entries(WT).map(([k,T])=>`<button data-wt="${k}"><span class="gi"><svg viewBox="0 0 16 16">${T.ic}</svg></span><span><b>${T.n}</b><span>${T.d}</span></span></button>`).join('')}</div>`,'',
+    s=>s.querySelector('.wgal').addEventListener('click',e=>{const b=e.target.closest('[data-wt]');if(!b)return;closeSheet();setTimeout(()=>addWidget(b.dataset.wt),120)}))}
+setInterval(()=>{if(document.hidden)return;const fs=W.app&&!W.min;for(const r of WEL.values()){const T=WT[r.w.type];if(!T.tick)continue;if(r.w.type==='timer'||(!fs&&r.vis))T.tick(r)}},1000);
+addEventListener('focus',()=>{if(notesOn)readLocalNotes()});
 
 /* ── Filter / hint / status ───────────────────────────────── */
 function applyFilter(){const q=query.trim().toLocaleLowerCase('tr');
@@ -952,7 +1412,7 @@ function openApp(a,el){
   W.app=a;W.min=false;$('#dock').hidden=true;
   const m=miniIcon(a);$('#wMini').setAttribute('style',m.style);$('#wMini').innerHTML=m.html;
   $('#wName').textContent=a.name;$('#wSrc').textContent=a.kind==='draft'?'taslak':'';$('#wTab').hidden=a.kind==='draft';$('#wFs').hidden=!document.fullscreenEnabled;
-  const n=nodes.get(a.key);if(n)ripple(nx(n.ai),ny(n.ai),1.4);
+  const n=nodes.get(a.key);if(n)ripple(n.ax,n.ay,1.4);
   loadFrame(a);$('#scrim').hidden=false;W.el.hidden=false;chrome(true);showPill(2600);
   anim($('#scrim'),[{opacity:0},{opacity:1}],{duration:420,easing:EASE});
   const r=iconRect(el),vw=innerWidth,vh=innerHeight;
@@ -982,7 +1442,8 @@ async function closeWin(){
     a=anim(W.el,[{transform:'none',opacity:1,borderRadius:'0px'},{transform:`translate(${r.left}px,${r.top+r.height/2-vh*s/2}px) scale(${s})`,borderRadius:`${16/s}px`,opacity:0}],{duration:460,easing:'cubic-bezier(.4,0,.1,1)',fill:'forwards'})}
   else a=anim(W.el,[{opacity:1},{opacity:0,transform:'scale(.97)'}],{duration:240,easing:EASE,fill:'forwards'});
   await a.finished.catch(()=>{});
-  if(W.app?.key===key){hideWin(false);const n=nodes.get(key);if(n){ripple(nx(n.ai),ny(n.ai),1.1);anim(n.el.querySelector('.bob'),[{transform:'scale(.86)'},{transform:'scale(1.06)',offset:.5},{transform:'none'}],{duration:620,easing:EASE})}}
+  if(notesOn)readLocalNotes();
+  if(W.app?.key===key){hideWin(false);const n=nodes.get(key);if(n){ripple(n.ax,n.ay,1.1);anim(n.el.querySelector('.bob'),[{transform:'scale(.86)'},{transform:'scale(1.06)',offset:.5},{transform:'none'}],{duration:620,easing:EASE})}}
 }
 function hideWin(keepScrim){W.el.getAnimations().forEach(x=>x.cancel());$('#scrim').getAnimations().forEach(x=>x.cancel());
   W.el.hidden=true;W.el.style.visibility='';if(!keepScrim)$('#scrim').hidden=true;chrome(false);W.frame.src='about:blank';if(W.blob){URL.revokeObjectURL(W.blob);W.blob=null}
@@ -1026,10 +1487,10 @@ function showMenu(x,y,a){
       if(k==='open')openApp(a,n?.el);else if(k==='tab')window.open(a.url,'_blank','noopener');
       else if(k==='link')copy(new URL(a.url,location.href).href,'Adres kopyalandı');
       else if(k==='edit')openSheet(a);else if(k==='ship')shipSheet(a);else if(k==='dl')download(a.html,slugify(a.name)+'.html');
-      else if(k==='home'&&n){n.ai=nearestFree(M.W/2,M.H/2+50,n);rememberLayout(n);ripple(nx(n.ai),ny(n.ai),1.6)}
+      else if(k==='home'&&n){const[cw,ch]=viewCentre();n.aw=[1e9,1e9];n.aw=nearestFree(cw,ch,n);rememberLayout(n);anc(n);ripple(n.ax,n.ay,1.6)}
       else if(k==='connect'&&n)startLink(n,{clientX:n.x+60,clientY:n.y},'click');
       else if(k==='group')groupMenu(x,y,a);
-      else if(k==='unlinkall'){const removed=links.filter(l=>l[0]===a.key||l[1]===a.key);links=links.filter(l=>l[0]!==a.key&&l[1]!==a.key);saveMeta();statusText();if(n)ripple(n.x,n.y+TAIL,1.3);
+      else if(k==='unlinkall'){const removed=links.filter(l=>l[0]===a.key||l[1]===a.key);links=links.filter(l=>l[0]!==a.key&&l[1]!==a.key);saveMeta();statusText();if(n)ripple(n.x,n.y+TAIL*cam.z,1.3);
         toast('Bağlantılar kaldırıldı',()=>{removed.forEach(l=>{if(!hasLink(l[0],l[1]))links.push(l)});saveMeta();statusText();wake()});wake()}
       else if(k==='del')removeDraft(a)});
 }
@@ -1050,6 +1511,9 @@ function palette(){
   const inp=bg.querySelector('input'),list=bg.querySelector('.pal-l');let items=[],sel=0;
   const cmds=()=>[
     {ic:UI.plus,l:'Yeni taslak',k:'⌘N',run:()=>openSheet()},
+    {ic:UI.widget,l:'Widget ekle',k:'W',run:widgetGallery},
+    {ic:UI.fit,l:'Hepsini göster',k:'1',run:fitAll},
+    {ic:UI.zoom,l:'Yakınlaştırmayı sıfırla (%100)',k:'0',run:()=>zoomTo(1)},
     {ic:UI.graph,l:'Grafiği düzenle',k:'G',run:autoLayout},
     {ic:UI.moon,l:document.documentElement.dataset.theme==='dark'?'Açık temaya geç':'Karanlık temaya geç',k:'⇧⌘L',run:toggleTheme},
     {ic:UI.fs,l:document.fullscreenElement?'Tam ekrandan çık':'Tarayıcı tam ekranı',k:'F',run:toggleFS},
@@ -1102,7 +1566,10 @@ function shortcuts(){
     <span>Grafiği düzenle</span><span>${K('G')}</span><span>Tema değiştir</span><span>${K('⇧','⌘','L')}</span>
     <span>Tarayıcı tam ekranı</span><span>${K('F')}</span><span>Uygulamayı kapat</span><span>${K('⇧','Esc')}</span>
     <span>Bağlantı kur</span><span>${K('⇧')} + sürükle</span><span>Kısayollar</span><span>${K('?')}</span>
-    <span>Boş alana çift tıkla</span><span>yeni taslak</span><span>HTML'i ekrana bırak</span><span>taslak ekle</span></div>`,'');
+    <span>Boş alana çift tıkla</span><span>yeni taslak</span><span>HTML'i ekrana bırak</span><span>taslak ekle</span>
+    <span>Gezin</span><span>boş alanı sürükle · ok tuşları</span><span>Yakınlaş / uzaklaş</span><span>${K('⌘')} + tekerlek · ${K('+')} ${K('−')}</span>
+    <span>Hepsini göster</span><span>${K('1')}</span><span>%100</span><span>${K('0')}</span>
+    <span>Widget ekle</span><span>${K('W')}</span><span>Telefonda</span><span>iki parmakla yakınlaş</span></div>`,'');
 }
 $('#helpBtn').onclick=shortcuts;
 function openSheet(a){
@@ -1152,10 +1619,10 @@ function shipSheet(a){
    s=>{s.querySelector('#cJ').onclick=()=>copy(entry,'JSON kopyalandı');s.querySelector('#dH').onclick=()=>download(a.html,'index.html')});
 }
 async function removeDraft(a){
-  const raw=rawDraft(a),pos=layout[a.key],lks=links.filter(l=>l[0]===a.key||l[1]===a.key);
+  const raw=rawDraft(a),p0=pos[a.key],lks=links.filter(l=>l[0]===a.key||l[1]===a.key);
   drafts=drafts.filter(d=>d.key!==a.key);removeNode(a.key);saveMeta();hintText();statusText();
   S.del(a.id).catch(e=>toast('Silinemedi: '+(e.code||e.message)));
-  toast(`${a.name} silindi`,async()=>{const d=toDraft(raw);drafts.push(d);if(pos)layout[d.key]=pos;lks.forEach(l=>{if(!hasLink(l[0],l[1]))links.push(l)});
+  toast(`${a.name} silindi`,async()=>{const d=toDraft(raw);drafts.push(d);if(p0)pos[d.key]=p0;lks.forEach(l=>{if(!hasLink(l[0],l[1]))links.push(l)});
     syncNodes();saveMeta();await S.put(rawDraft(d)).catch(()=>{})});
 }
 
@@ -1182,14 +1649,16 @@ addEventListener('drop',async e=>{if(!hasFiles(e))return;e.preventDefault();drag
   const added=[];let big=0;
   for(const f of files){const html=await f.text();if(tooBig(html)){big++;continue}const d=toDraft({id:uid(),name:nameFrom(f.name),icon:'',html,order:drafts.length});
     d.color=colorKeys[hash(d.name)%colorKeys.length];drafts.push(d);added.push(d)}
-  added.forEach((d,i)=>{spawnHint=[e.clientX+i*40,e.clientY+LIFT];createNode(d,i*120)});spawnHint=null;
+  added.forEach((d,i)=>{spawnHint=[s2wx(e.clientX+i*40),s2wy(e.clientY+LIFT*cam.z)];createNode(d,i*120)});spawnHint=null;
   for(const d of added){const n=nodes.get(d.key);if(n)rememberLayout(n,false)}saveMeta();
   hintText();statusText();wake();
   await Promise.all(added.map(d=>S.put(rawDraft(d)))).catch(e=>toast('Kaydedilemedi: '+(e.code||e.message)));
   if(added.length)toast(added.length>1?`${added.length} taslak eklendi`:'Taslak eklendi');if(big)toast(`${big} dosya 900 KB'tan büyük, eklenmedi`)});
 
 /* ── Keyboard ─────────────────────────────────────────────── */
-$('#addBtn').onclick=()=>{spawnHint=null;openSheet()};
+$('#addBtn').onclick=e=>{e.stopPropagation();const b=$('#addBtn').getBoundingClientRect();
+  popMenu(b.right-210,b.bottom+8,`<button class="mi" data-a="draft">${si(UI.plus)}Yeni taslak<span class="k">⌘N</span></button><button class="mi" data-a="widget">${si(UI.widget)}Widget ekle<span class="k">W</span></button>`,
+    ev=>{const x=ev.target.closest('[data-a]');if(!x)return;hideMenu();if(x.dataset.a==='draft'){spawnHint=null;openSheet()}else widgetGallery()})};
 $('#themeBtn').onclick=toggleTheme;
 addEventListener('keydown',e=>{
   if(document.body.classList.contains('locked'))return;const mod=e.metaKey||e.ctrlKey,k=e.key.toLowerCase();
@@ -1202,6 +1671,13 @@ addEventListener('keydown',e=>{
   else if(k==='/'){e.preventDefault();palette()}
   else if(k==='g'&&!W.app){autoLayout()}
   else if(k==='f'){toggleFS()}
+  else if(W.app&&!W.min){}
+  else if(e.key==='+'||e.key==='='){zoomTo(cam.tz*1.25)}
+  else if(e.key==='-'||e.key==='_'){zoomTo(cam.tz/1.25)}
+  else if(e.key==='0'){zoomTo(1)}
+  else if(e.key==='1'){fitAll()}
+  else if(k==='w'){widgetGallery()}
+  else if(e.key.startsWith('Arrow')){e.preventDefault();const d=e.shiftKey?320:110;cam.go=null;cam.vx=e.key==='ArrowLeft'?d/9:e.key==='ArrowRight'?-d/9:0;cam.vy=e.key==='ArrowUp'?d/9:e.key==='ArrowDown'?-d/9:0;wake()}
 });
 const clk=()=>{$('#clock').textContent=new Date().toLocaleString('tr-TR',{weekday:'short',hour:'2-digit',minute:'2-digit'})};clk();setInterval(clk,15000);
 
@@ -1235,19 +1711,19 @@ applyTheme(document.documentElement.dataset.theme==='dark'?'dark':'light');
 buildMesh();introStart=performance.now();wake();
 (async()=>{
   const mp=loadManifest();
-  if(!CLOUD){S=Local;drafts=await Local.load();await mp;syncNodes();booted=true;return}
+  if(!CLOUD){S=Local;drafts=await Local.load();await mp;mountWidgets();syncNodes();booted=true;seedWidgets();return}
   gate('loading');
   try{await loadFirebase()}catch{return gate('error','Firebase yüklenemedi. İnternet bağlantını kontrol et.')}
   if(!firebase.apps.length)firebase.initializeApp(FB);
   const fs=firebase.firestore();try{await fs.enablePersistence({synchronizeTabs:true})}catch{}
   firebase.auth().getRedirectResult().catch(e=>gate('error',authMsg(e)));
   firebase.auth().onAuthStateChanged(async u=>{
-    if(!u){Cloud.stop();S=Local;drafts=[];if(W.app)hideWin(false);closeSheet(true);closePal();hideMenu();clearNodes();booted=false;$('#me').hidden=true;return gate('signin')}
+    if(!u){Cloud.stop();S=Local;drafts=[];if(W.app)hideWin(false);closeSheet(true);closePal();hideMenu();clearNodes();clearWidgets();booted=false;$('#me').hidden=true;return gate('signin')}
     if((u.email||'').toLowerCase()!==OWNER){Cloud.stop();return gate('denied',`<b>${esc(u.email)}</b> bu alana erişemez.`)}
     gate('loading','Yükleniyor…');await mp;S=Cloud;await Cloud.start(fs);
     const me=$('#me');me.hidden=false;me.innerHTML=u.photoURL?`<img src="${esc(u.photoURL)}" alt="" referrerpolicy="no-referrer">`:esc(mono(u.displayName||u.email));
     await ungate();introStart=performance.now();introT=0;wakeMesh();
-    syncNodes();booted=true;migrateLocal();
+    mountWidgets();syncNodes();booted=true;seedWidgets();migrateLocal();
   });
 })();
 </script>

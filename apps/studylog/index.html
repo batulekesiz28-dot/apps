@@ -625,8 +625,8 @@ function toast(msg,undo){const t=document.createElement('div');t.className='toas
 
 /* ── Theme ── */
 function setTheme(t){document.documentElement.dataset.theme=t;$('meta[name=theme-color]').content=t==='dark'?'#0E0E10':'#FFFFFF';if(view==='days')render()}
-$('#themeBtn').onclick=()=>{const t=document.documentElement.dataset.theme==='dark'?'light':'dark';ls.set('notlar:theme',t);ls.set('appshell:theme',t);setTheme(t)};
-addEventListener('storage',e=>{if(e.key==='notlar:theme'||e.key==='appshell:theme')setTheme(ls.get(e.key,'light'))});
+$('#themeBtn').onclick=()=>{const t=document.documentElement.dataset.theme==='dark'?'light':'dark';ls.set('notlar:theme',t);setTheme(t)};
+addEventListener('storage',e=>{if(e.key==='notlar:theme')setTheme(ls.get(e.key,'light'))});
 
 /* ── Gate & boot ── */
 function gate(state,msg){const g=$('#gate');g.hidden=false;$('#gSpin').hidden=state!=='loading';$('#gBtn').hidden=!(state==='signin'||state==='error');$('#gOut').hidden=state!=='denied';

@@ -181,5 +181,52 @@
     "fix": "Gerekirse kaydırma sırasında ağ daha seyrek çizilebilir."
    }
   ]
+ },
+ {
+  "at": "2026-11-13T20:30:00+03:00",
+  "change": "7 tema: Aydınlık, Gece, Cyberpunk, Evren, Aurora, Gün batımı, Kağıt",
+  "scores": {
+   "Hub · Cyberpunk": {
+    "before": 100,
+    "after": 100
+   },
+   "Hub · Evren": {
+    "before": 100,
+    "after": 100
+   },
+   "Hub · Aurora": {
+    "before": 100,
+    "after": 100
+   },
+   "Hub · Gün batımı": {
+    "before": 100,
+    "after": 100
+   },
+   "Hub · Kağıt": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Hub",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Her tema telefon ve bilgisayarda ayrı ayrı denetlendi; tüm yazılar okunur kontrastta (100/100)."
+   },
+   {
+    "app": "Hub",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Arka plan efektleri (yıldızlar, aurora, tarama çizgileri) sadece GPU katmanında hareket ediyor; akıcılığı düşürmüyor."
+   },
+   {
+    "app": "Notlar · Study Log · Denetçi",
+    "sev": "info",
+    "status": "open",
+    "text": "Diğer uygulamalar şimdilik seçilen temanın açık/koyu karşılığını kullanıyor; kendi tema renkleri yok.",
+    "fix": "İstenirse her uygulamaya da aynı 7 tema eklenebilir."
+   }
+  ]
  }
 ]

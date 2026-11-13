@@ -23,7 +23,7 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#FFFFFF;--surface:#FFFFFF;--surface2:#FAFAFA;--ink:#18181B;--ink2:#52525B;--ink3:#A1A1AA;--ink4:#D4D4D8;
+  --bg:#FFFFFF;--surface:#FFFFFF;--surface2:#FAFAFA;--ink:#18181B;--ink2:#52525B;--ink3:#6E6E77;--ink4:#D4D4D8;
   --line:rgba(0,0,0,.06);--line2:rgba(0,0,0,.09);--line3:rgba(0,0,0,.14);--hover:rgba(0,0,0,.05);
   --glass:rgba(255,255,255,.74);--menu:rgba(255,255,255,.84);--scrim:rgba(255,255,255,.45);--labelbg:rgba(255,255,255,.9);
   --font:'Geist',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;--mono:'Geist Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -32,7 +32,7 @@
   --se:none;color-scheme:light;
 }
 [data-theme=dark]{
-  --bg:#0D0D0F;--surface:#18181B;--surface2:#1F1F23;--ink:#EDEDEF;--ink2:#A1A1AA;--ink3:#6B6B74;--ink4:#3F3F46;
+  --bg:#0D0D0F;--surface:#18181B;--surface2:#1F1F23;--ink:#EDEDEF;--ink2:#A1A1AA;--ink3:#8B8B94;--ink4:#3F3F46;
   --line:rgba(255,255,255,.06);--line2:rgba(255,255,255,.1);--line3:rgba(255,255,255,.16);--hover:rgba(255,255,255,.07);
   --glass:rgba(26,26,29,.74);--menu:rgba(30,30,34,.88);--scrim:rgba(8,8,10,.55);--labelbg:rgba(13,13,15,.86);
   --shadow:0 0 0 .5px rgba(255,255,255,.1),0 16px 40px -10px rgba(0,0,0,.6);color-scheme:dark;
@@ -60,9 +60,9 @@ body.far .port{display:none}
 [data-theme=dark] .wg{box-shadow:0 0 0 .5px var(--line3),0 20px 44px -18px rgba(0,0,0,.7)}
 .wg.drag{cursor:grabbing;z-index:5;box-shadow:0 0 0 .5px var(--line3),0 30px 60px -24px rgba(0,0,0,.32)}
 .wg-in{padding:14px 16px 16px;position:relative}
-.wg-h{display:flex;align-items:center;gap:6px;height:16px;margin-bottom:10px;font:500 9.5px/1 var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--ink3)}
+.wg-h{display:flex;align-items:center;gap:6px;height:18px;margin-bottom:10px;font:500 10.5px/1 var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--ink3)}
 .wg-h .t{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;text-align:left}
-.wg-h button{font:inherit;color:var(--ink3);letter-spacing:inherit;text-transform:inherit;padding:2px 4px;margin:-2px -4px;border-radius:5px}
+.wg-h button{font:inherit;color:var(--ink3);letter-spacing:inherit;text-transform:inherit;min-height:26px;padding:4px 7px;margin:-4px -7px;border-radius:7px}
 .wg-h button:hover{color:var(--ink);background:var(--hover)}
 .wg-x{position:absolute;top:-7px;right:-7px;width:22px;height:22px;border-radius:50%;background:var(--surface);box-shadow:0 0 0 .5px var(--line3),0 4px 10px -4px rgba(0,0,0,.3);display:grid;place-items:center;opacity:0;transform:scale(.5);transition:opacity .2s var(--ease),transform .4s var(--spring);color:var(--ink2);z-index:2}
 .wg-x svg{width:9px;height:9px;stroke:currentColor;stroke-width:1.6;fill:none;stroke-linecap:round}
@@ -149,7 +149,7 @@ body.locked #widgets,body.locked .zbar{visibility:hidden}
 .zbar svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
 .zbar #zPct{font:500 10.5px/1 var(--mono);min-width:44px;letter-spacing:.02em}
 .zbar i{width:.5px;height:14px;background:var(--line3);margin:0 3px}
-@media (max-width:700px){.zbar{bottom:calc(58px + env(safe-area-inset-bottom));right:14px}}
+@media (max-width:700px){.zbar{bottom:calc(58px + env(safe-area-inset-bottom));right:14px;height:44px;padding:0 4px}.zbar button{height:38px;min-width:38px}.status{font-size:11.5px}.nlabel{font-size:12px}.wg-h{font-size:11.5px}}
 
 /* ── Floating chrome ──────────────────────────── */
 .top{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;gap:8px;padding:calc(16px + env(safe-area-inset-top)) 22px 16px;pointer-events:none}
@@ -164,7 +164,7 @@ body.locked #widgets,body.locked .zbar{visibility:hidden}
 .search:hover{box-shadow:0 0 0 .5px var(--line3),0 8px 24px -12px rgba(0,0,0,.18);color:var(--ink2)}
 .search:active{transform:scale(.98)}
 .search span:first-of-type{flex:1;text-align:left}
-.kbd{font:500 10px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radius:4px;box-shadow:inset 0 0 0 .5px var(--line3)}
+.kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radius:4px;box-shadow:inset 0 0 0 .5px var(--line3)}
 .ib{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;color:var(--ink2);background:var(--glass);box-shadow:0 0 0 .5px var(--line2),0 6px 20px -12px rgba(0,0,0,.14);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);transition:transform .45s var(--spring),box-shadow .2s,color .2s}
 .ib:hover{color:var(--ink);box-shadow:0 0 0 .5px var(--line3),0 8px 24px -12px rgba(0,0,0,.2)}
 .ib:active{transform:scale(.9);transition-duration:.08s}
@@ -385,6 +385,8 @@ body.locked .top,body.locked #nodes,body.locked .status,body.locked .hint,body.l
 @media (hover:none){.hot{display:none}}
 @media (hover:hover){.grab{display:none}}
 @media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important;animation-duration:.01ms!important}}
+/* Denetçi: telefonda dokunma alanları ve okunur yazı */
+@media (max-width:700px){.status,.zbar #zPct{font-size:11.5px}.node .nlabel{font-size:12px}.ib{width:40px;height:40px}.search{height:40px}}
 </style>
 </head>
 <body>
@@ -1271,7 +1273,7 @@ const WT={
     def:()=>({city:'İstanbul',lat:41.01,lon:28.98}),
     render:r=>{const c=WX[r.w.id],d=c?.d;if(!d)wxLoad(r);
       const head=`<div class="wg-h"><button class="t" data-act="city" title="Şehri değiştir">${esc(r.w.city||'Şehir')} ↗</button><span>${d?'şimdi':''}</span></div>`;
-      if(!d)return head+(c?.err?'<div class="sub muted">Hava alınamadı · <button data-act="retry">tekrar dene</button></div>':'<div class="wg-sk" style="width:60%;height:34px"></div><div class="wg-sk"></div><div class="wg-sk" style="width:70%"></div>');
+      if(!d)return head+(c?.err?'<div class="sub muted">Hava alınamadı · <button data-act="retry" style="min-height:26px;padding:4px 8px;border-radius:7px;box-shadow:inset 0 0 0 .5px var(--line3)">tekrar dene</button></div>':'<div class="wg-sk" style="width:60%;height:34px"></div><div class="wg-sk"></div><div class="wg-sk" style="width:70%"></div>');
       const cu=d.current,[ic,tx]=wmo(cu.weather_code,cu.is_day),dl=d.daily,days=[];
       for(let i=1;i<Math.min(5,dl.time.length);i++){const dt=new Date(dl.time[i]+'T12:00');days.push(`<div><b>${dt.toLocaleDateString('tr-TR',{weekday:'short'}).toUpperCase()}</b><svg viewBox="0 0 24 24">${WI[wmo(dl.weather_code[i])[0]]}</svg>${Math.round(dl.temperature_2m_max[i])}° <span class="muted">${Math.round(dl.temperature_2m_min[i])}°</span></div>`)}
       return head+`<div class="ww-top"><span class="ww-ic"><svg viewBox="0 0 24 24">${WI[ic]}</svg></span><span class="big">${Math.round(cu.temperature_2m)}°</span></div>

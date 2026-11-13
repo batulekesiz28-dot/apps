@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Denetçi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>try{const t=JSON.parse(localStorage.getItem('appshell:theme'))||JSON.parse(localStorage.getItem('notlar:theme'));document.documentElement.dataset.theme=t||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch{document.documentElement.dataset.theme='light'}</script>
+<script src="../../audit/engine.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#FFFFFF;--bg2:#FAFAF9;--card:#FFFFFF;--ink:#18181B;--ink2:#52525B;--ink3:#6E6E77;--ink4:#E4E4E7;--line:rgba(0,0,0,.06);--line2:rgba(0,0,0,.1);--hover:rgba(0,0,0,.04);
+  --font:'Geist',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;--mono:'Geist Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --out:cubic-bezier(.16,1,.3,1);--spring:cubic-bezier(.3,1.4,.5,1);--ok:#15803D;--warn:#B45309;--err:#DC2626;--info:#2563EB;color-scheme:light}
+[data-theme=dark]{--bg:#0E0E10;--bg2:#141416;--card:#18181B;--ink:#EDEDEF;--ink2:#A1A1AA;--ink3:#8B8B94;--ink4:#2A2A2F;--line:rgba(255,255,255,.06);--line2:rgba(255,255,255,.1);--hover:rgba(255,255,255,.05);--ok:#4ADE80;--warn:#FBBF24;--err:#F87171;--info:#60A5FA;color-scheme:dark}
+html,body{background:var(--bg)}
+body{font-family:var(--font);color:var(--ink);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+[hidden]{display:none!important}
+.num{font-variant-numeric:tabular-nums}
+main{max-width:1040px;margin:0 auto;padding:calc(22px + env(safe-area-inset-top)) 22px 80px}
+header{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:26px}
+.ttl{flex:1;min-width:220px}
+.ttl h1{font-size:28px;font-weight:500;letter-spacing:-.03em;display:flex;align-items:center;gap:10px}
+.ttl h1 i{width:28px;height:28px;border-radius:9px;background:var(--ink);display:grid;place-items:center}
+.ttl h1 i svg{width:15px;height:15px;stroke:var(--bg);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.ttl p{color:var(--ink2);font-size:13.5px;margin-top:6px;max-width:560px}
+.btn{height:42px;padding:0 18px;border-radius:13px;font-weight:500;display:inline-flex;align-items:center;gap:8px;transition:transform .4s var(--spring),background .2s,opacity .2s}
+.btn:active{transform:scale(.96)}.btn[disabled]{opacity:.5;cursor:default}
+.btn.pri{background:var(--ink);color:var(--bg)}
+.btn.sec{box-shadow:inset 0 0 0 .5px var(--line2);background:var(--card)}.btn.sec:hover{background:var(--hover)}
+.btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.big{display:flex;align-items:center;gap:14px}
+.ring{width:72px;height:72px;position:relative;flex:none}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:6}.ring .a{stroke:var(--ink4)}.ring .b{stroke-linecap:round;transition:stroke-dashoffset 1s var(--out)}
+.ring b{position:absolute;inset:0;display:grid;place-items:center;font-size:20px;font-weight:500;letter-spacing:-.03em}
+.big small{display:block;color:var(--ink3);font-size:12px}
+.h{font:500 11px/1 var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px;margin:28px 0 12px}
+.h .sp{margin-left:auto}
+.seg{display:inline-flex;padding:3px;border-radius:11px;background:var(--bg2);box-shadow:inset 0 0 0 .5px var(--line2)}
+.seg button{height:30px;padding:0 13px;border-radius:8px;font:500 12px var(--font);letter-spacing:0;text-transform:none;color:var(--ink2)}
+.seg button.on{background:var(--card);color:var(--ink);box-shadow:0 0 0 .5px var(--line2),0 1px 4px rgba(0,0,0,.08)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:14px}
+.card{background:var(--card);border-radius:20px;box-shadow:0 0 0 .5px var(--line2),0 10px 30px -22px rgba(0,0,0,.25)}
+.app{padding:18px;display:grid;gap:14px;align-content:start;animation:in .5s var(--out) both}
+@keyframes in{from{opacity:0;transform:translateY(8px)}}
+.app-h{display:flex;align-items:center;gap:12px}
+.app-h b{font-size:16px;font-weight:500;flex:1}
+.score{font:500 22px/1 var(--font);letter-spacing:-.03em}
+.cats{display:grid;gap:7px}
+.cat{display:grid;grid-template-columns:110px minmax(0,1fr) 34px;gap:10px;align-items:center;font-size:12.5px;color:var(--ink2)}
+.cat .bar{height:5px;border-radius:5px;background:var(--ink4);overflow:hidden}.cat .bar i{display:block;height:100%;border-radius:5px;transition:width .9s var(--out)}
+.cat span:last-child{font:500 12px var(--mono);text-align:right}
+.fl{display:grid;gap:6px}
+details{border-radius:12px;box-shadow:inset 0 0 0 .5px var(--line2);overflow:hidden}
+summary{list-style:none;display:flex;gap:9px;align-items:center;padding:10px 12px;cursor:pointer;font-size:13px;min-height:44px}
+summary::-webkit-details-marker{display:none}
+summary:hover{background:var(--hover)}
+.sev{font:600 10.5px/1 var(--mono);letter-spacing:.04em;padding:4px 6px;border-radius:6px;flex:none;text-transform:uppercase}
+.sev.error{color:var(--err);background:color-mix(in srgb,var(--err) 12%,transparent)}
+.sev.warn{color:var(--warn);background:color-mix(in srgb,var(--warn) 14%,transparent)}
+.sev.info{color:var(--info);background:color-mix(in srgb,var(--info) 12%,transparent)}
+.sev.fixed{color:var(--ok);background:color-mix(in srgb,var(--ok) 12%,transparent)}
+summary .t{flex:1;min-width:0}
+summary .c{font:500 12px var(--mono);color:var(--ink3)}
+.fd{padding:0 12px 12px 12px;font-size:13px;color:var(--ink2);display:grid;gap:6px}
+.fd .fix{color:var(--ink)}.fd .fix::before{content:'Öneri  ';font:600 10.5px var(--mono);letter-spacing:.06em;color:var(--ok)}
+.fd code{font:12px var(--mono);color:var(--ink3);word-break:break-word}
+.clean{display:flex;align-items:center;gap:8px;color:var(--ok);font-size:13px;padding:6px 2px}
+.empty{color:var(--ink3);font-size:13.5px;padding:18px 0}
+.prog{height:3px;border-radius:3px;background:var(--ink4);overflow:hidden;margin-top:14px}.prog i{display:block;height:100%;background:var(--ink);width:0;transition:width .4s var(--out)}
+.log{display:grid;gap:12px}
+.entry{padding:18px 20px;display:grid;gap:10px}
+.entry-h{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.entry-h b{font-size:15px;font-weight:500;flex:1;min-width:200px}
+.entry-h time{font:500 11.5px var(--mono);color:var(--ink3)}
+.sc{display:flex;gap:8px;flex-wrap:wrap}
+.sc span{font:500 12px var(--mono);padding:5px 9px;border-radius:8px;background:var(--bg2);box-shadow:inset 0 0 0 .5px var(--line2);color:var(--ink2)}
+.sc span b{color:var(--ok);font-weight:600}
+.it{display:flex;gap:9px;align-items:flex-start;font-size:13px;color:var(--ink2)}.it .sev{margin-top:2px}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:11px 16px;border-radius:13px;font-size:13px;z-index:50;box-shadow:0 14px 34px -12px rgba(0,0,0,.4)}
+#lab{position:fixed;left:-20000px;top:0;border:0;background:#fff}
+@media (max-width:600px){main{padding:calc(16px + env(safe-area-inset-top)) 14px 60px}.cat{grid-template-columns:96px minmax(0,1fr) 34px}.h,.sev{font-size:11.5px}.seg button{height:38px}#copy{height:40px!important}}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="ttl"><h1><i><svg viewBox="0 0 16 16"><path d="M8 1.5l5.5 2v4c0 3.4-2.3 6-5.5 7-3.2-1-5.5-3.6-5.5-7v-4z"/><path d="M5.5 8l1.8 1.8L10.8 6"/></svg></i>Denetçi</h1>
+      <p>Her uygulamayı senin gözünden telefon ve bilgisayar boyutunda açıp tarar: okunabilirlik, dokunma alanları, taşmalar, tutarlılık, hız. Claude her değişiklikten önce aynı denetimi çalıştırır; bulunanlar ve düzeltilenler aşağıdaki günlükte.</p></div>
+    <div class="big"><div class="ring" id="tot"></div><div><small>genel puan</small><span id="totT" class="num" style="font-size:13px;color:var(--ink2)">—</span></div></div>
+    <button class="btn pri" id="run"><svg viewBox="0 0 16 16"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2.5v3h-3"/></svg>Şimdi denetle</button>
+  </header>
+  <div class="prog" id="prog" hidden><i></i></div>
+  <div class="h">Uygulamalar<span class="sp"></span><span class="seg" id="dev"><button data-d="mobile" class="on">Telefon</button><button data-d="desktop">Bilgisayar</button></span></div>
+  <div class="grid" id="apps"><div class="empty">Henüz canlı denetim yapılmadı. “Şimdi denetle”ye bas.</div></div>
+  <div class="h">Açık konular<span class="sp"></span><button class="btn sec" id="copy" style="height:34px;font-size:12.5px;letter-spacing:0;text-transform:none;font-family:var(--font)">Claude’a gönder (kopyala)</button></div>
+  <div id="open" class="fl"></div>
+  <div class="h">Günlük — Claude ne yaptı, Denetçi ne buldu</div>
+  <div class="log" id="log"><div class="empty">Yükleniyor…</div></div>
+</main>
+<iframe id="lab" title="Denetim alanı" aria-hidden="true" tabindex="-1"></iframe>
+<script>
+'use strict';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ls={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+const CATS={a11y:'Erişilebilirlik',ux:'Kullanılabilirlik',look:'Estetik',perf:'Hız'};
+const SEV={error:'hata',warn:'uyarı',info:'not',fixed:'düzeltildi'};
+const col=v=>v>=90?'var(--ok)':v>=75?'var(--warn)':'var(--err)';
+let res=ls.get('denetci:last',null),dev='mobile',LOG=[];
+const LOCAL=new URLSearchParams(location.search).has('local')?'?local':'';
+
+function ring(el,v){const C=2*Math.PI*30;el.innerHTML=`<svg viewBox="0 0 72 72"><circle class="a" cx="36" cy="36" r="30"/><circle class="b" cx="36" cy="36" r="30" stroke="${v==null?'var(--ink4)':col(v)}" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C*(1-(v||0)/100)).toFixed(1)}"/></svg><b class="num">${v==null?'—':v}</b>`}
+
+/* ── Live audit: load each app in an off-screen frame at phone and desktop size ── */
+async function targets(){const j=await(await fetch('../../apps.json',{cache:'no-cache'})).json();
+  return[{slug:'hub',name:'Hub',url:'../../'+LOCAL},...j.apps.filter(a=>a.slug!=='denetci').map(a=>({slug:a.slug,name:a.name,url:`../../apps/${a.slug}/${LOCAL}`}))]}
+function loadIn(url,w,h){return new Promise(res=>{const f=$('#lab');f.style.width=w+'px';f.style.height=h+'px';let done=false;
+  const fin=()=>{if(done)return;done=true;res(f)};f.onload=()=>{const d=f.contentDocument;let n=0;
+    const wait=()=>{const g=d?.getElementById('gate');if((!g||g.hidden)||n++>40)setTimeout(fin,900);else setTimeout(wait,200)};wait()};
+  f.src=url+(url.includes('?')?'&':'?')+'audit='+Date.now();setTimeout(fin,15000)})}
+async function runAll(){const b=$('#run');b.disabled=true;b.lastChild.textContent='Denetleniyor…';const P=$('#prog');P.hidden=false;
+  const list=await targets(),out={},steps=list.length*2;let k=0;
+  for(const d of['mobile','desktop'])for(const t of list){const f=await loadIn(t.url,d==='mobile'?390:1366,d==='mobile'?844:860);
+    try{const r=window.Audit.run(f.contentDocument,{mobile:d==='mobile'});(out[t.slug]||={name:t.name})[d]=r}catch(e){(out[t.slug]||={name:t.name})[d]={error:String(e),score:{total:null},findings:[]}}
+    P.firstChild.style.width=(++k/steps*100)+'%'}
+  $('#lab').src='about:blank';res={at:Date.now(),apps:out};ls.set('denetci:last',res);paint();
+  b.disabled=false;b.lastChild.textContent='Şimdi denetle';setTimeout(()=>P.hidden=true,600);toast('Denetim bitti')}
+
+function paint(){
+  const A=$('#apps');if(!res){ring($('#tot'),null);return}
+  const apps=Object.entries(res.apps);let sum=0,n=0;
+  A.innerHTML=apps.map(([slug,a],i)=>{const r=a[dev];if(!r)return'';const s=r.score||{};if(s.total!=null){sum+=s.total;n++}
+    const f=r.findings||[];
+    return`<section class="card app" style="animation-delay:${i*60}ms"><div class="app-h"><b>${esc(a.name)}</b><span class="score num" style="color:${col(s.total)}">${s.total??'—'}</span></div>
+      <div class="cats">${Object.entries(CATS).map(([c,l])=>`<div class="cat"><span>${l}</span><span class="bar"><i style="width:${s[c]??0}%;background:${col(s[c])}"></i></span><span class="num">${s[c]??'—'}</span></div>`).join('')}</div>
+      <div class="fl">${r.error?`<div class="empty">Açılamadı: ${esc(r.error)}</div>`:f.length?f.map(x=>`<details><summary><span class="sev ${x.sev}">${SEV[x.sev]}</span><span class="t">${esc(x.title)}</span><span class="c">${x.count>1?'×'+x.count:''}</span></summary>
+        <div class="fd"><div>${esc(x.detail)}</div><div class="fix">${esc(x.fix)}</div>${x.samples?.length?`<code>${x.samples.map(esc).join(' · ')}</code>`:''}</div></details>`).join(''):'<div class="clean">✓ Sorun bulunamadı</div>'}</div></section>`}).join('');
+  const tv=n?Math.round(sum/n):null;ring($('#tot'),tv);$('#totT').textContent=`${dev==='mobile'?'telefon':'bilgisayar'} · ${new Date(res.at).toLocaleString('tr-TR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}`;
+  paintOpen()}
+function openItems(){const items=[];
+  if(res)for(const[slug,a]of Object.entries(res.apps))for(const d of['mobile','desktop'])for(const f of(a[d]?.findings||[]))if(f.sev!=='info')items.push({app:a.name,dev:d,...f});
+  for(const e of LOG)for(const it of e.items||[])if(it.status==='open'&&!items.some(x=>x.title===it.text))items.push({app:it.app,dev:'',sev:it.sev||'warn',title:it.text,fix:it.fix||'',samples:[]});
+  return items}
+function paintOpen(){const it=openItems(),el=$('#open');
+  el.innerHTML=it.length?it.map(x=>`<details><summary><span class="sev ${x.sev}">${SEV[x.sev]}</span><span class="t">${esc(x.app)} · ${esc(x.title)}</span><span class="c">${x.dev==='mobile'?'telefon':x.dev==='desktop'?'bilgisayar':''}</span></summary><div class="fd">${x.detail?`<div>${esc(x.detail)}</div>`:''}${x.fix?`<div class="fix">${esc(x.fix)}</div>`:''}${x.samples?.length?`<code>${x.samples.map(esc).join(' · ')}</code>`:''}</div></details>`).join('')
+    :'<div class="clean">✓ Açık konu yok</div>'}
+$('#copy').onclick=async()=>{const it=openItems();if(!it.length)return toast('Gönderilecek açık konu yok');
+  const txt='Denetçi şu sorunları buldu, düzelt ve günlüğe yaz:\n'+it.map(x=>`- [${SEV[x.sev]}] ${x.app}${x.dev?` (${x.dev==='mobile'?'telefon':'bilgisayar'})`:''}: ${x.title}${x.samples?.length?' — '+x.samples.slice(0,2).join(', '):''}`).join('\n');
+  try{await navigator.clipboard.writeText(txt)}catch{const t=document.createElement('textarea');t.value=txt;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove()}
+  toast('Kopyalandı — sohbete yapıştır')};
+
+/* ── Change log written by Claude after each change ── */
+async function loadLog(){try{LOG=await(await fetch('../../audit/log.json',{cache:'no-cache'})).json()}catch{LOG=[]}
+  $('#log').innerHTML=LOG.length?LOG.slice().reverse().map(e=>`<article class="card entry"><div class="entry-h"><b>${esc(e.change)}</b><time>${esc(new Date(e.at).toLocaleString('tr-TR',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'}))}</time></div>
+    ${e.scores?`<div class="sc">${Object.entries(e.scores).map(([k,v])=>`<span>${esc(k)} ${v.before} → <b>${v.after}</b></span>`).join('')}</div>`:''}
+    ${(e.items||[]).map(it=>`<div class="it"><span class="sev ${it.status==='fixed'?'fixed':it.sev||'warn'}">${it.status==='fixed'?'düzeltildi':'açık'}</span><span>${it.app?`<b style="font-weight:500;color:var(--ink)">${esc(it.app)}</b> · `:''}${esc(it.text)}</span></div>`).join('')}</article>`).join('')
+    :'<div class="empty">Henüz kayıt yok.</div>';paintOpen()}
+
+$('#dev').onclick=e=>{const b=e.target.closest('[data-d]');if(!b)return;dev=b.dataset.d;[...$('#dev').children].forEach(x=>x.classList.toggle('on',x===b));paint()};
+$('#run').onclick=runAll;
+function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2400)}
+paint();loadLog();
+</script>
+</body>
+</html>

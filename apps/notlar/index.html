@@ -10,7 +10,7 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#FBFBFA;--panel:#F6F6F4;--card:#FFFFFF;--ink:#1F1F1D;--ink2:#5E5D5A;--ink3:#9A9995;--ink4:#CFCEC9;
+  --bg:#FBFBFA;--panel:#F6F6F4;--card:#FFFFFF;--ink:#1F1F1D;--ink2:#5E5D5A;--ink3:#6F6E69;--ink4:#CFCEC9;
   --line:rgba(20,20,10,.07);--line2:rgba(20,20,10,.11);--hover:rgba(20,20,10,.045);--hover2:rgba(20,20,10,.07);
   --sel:rgba(35,131,226,.16);--accent:#2383E2;--tint:#F3F2EF;--warn:#D9480F;
   --font:'Geist',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;--serif:'Newsreader',Georgia,'Times New Roman',serif;--mono:'Geist Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -19,7 +19,7 @@
   color-scheme:light;
 }
 [data-theme=dark]{
-  --bg:#191918;--panel:#1F1F1E;--card:#232322;--ink:#ECEBE8;--ink2:#A6A5A0;--ink3:#706F6B;--ink4:#474744;
+  --bg:#191918;--panel:#1F1F1E;--card:#232322;--ink:#ECEBE8;--ink2:#A6A5A0;--ink3:#8E8D88;--ink4:#474744;
   --line:rgba(255,255,255,.07);--line2:rgba(255,255,255,.11);--hover:rgba(255,255,255,.05);--hover2:rgba(255,255,255,.08);
   --sel:rgba(35,131,226,.3);--tint:#262625;
   --shadow:0 0 0 .5px rgba(255,255,255,.1),0 16px 40px -10px rgba(0,0,0,.55);
@@ -55,11 +55,11 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
 .ni .t{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ni.on{background:var(--hover2);color:var(--ink);font-weight:500}
 .ni.on .ic{color:var(--ink)}
-.ni .more{opacity:0;width:20px;height:20px;border-radius:5px;display:grid;place-items:center;color:var(--ink3);transition:opacity .15s}
+.ni .more{opacity:0;width:24px;height:24px;border-radius:5px;display:grid;place-items:center;color:var(--ink3);transition:opacity .15s}
 .ni:hover .more{opacity:1}.ni .more:hover{background:var(--hover2);color:var(--ink)}
 .ni .cnt{font:500 10.5px var(--mono);color:var(--ink3)}
 .grp{display:flex;align-items:center;justify-content:space-between;padding:18px 8px 4px;font:500 10.5px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
-.grp button{width:20px;height:20px;border-radius:5px;display:grid;place-items:center;opacity:.7}
+.grp button{width:24px;height:24px;border-radius:5px;display:grid;place-items:center;opacity:.7}
 .grp button:hover{background:var(--hover2);opacity:1}
 .empty-s{padding:6px 10px;font-size:12.5px;color:var(--ink3)}
 .side-f{display:flex;gap:4px;padding:8px 10px 12px;border-top:.5px solid var(--line)}
@@ -323,6 +323,8 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
   .kv{grid-template-columns:110px 1fr}
 }
 @media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important;animation-duration:.01ms!important}}
+/* Denetçi: telefonda dokunma alanları ve okunur yazı */
+@media (max-width:760px){.ni{height:40px;font-size:14px}.grp{font-size:11.5px}.grp button,.ni .more{width:32px;height:32px;opacity:1}kbd,.kbd{font-size:11.5px}.cnt,#saved{font-size:11.5px}#openPal,#newBtn{min-height:40px;min-width:40px}}
 </style>
 </head>
 <body>

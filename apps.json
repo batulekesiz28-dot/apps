@@ -21,6 +21,13 @@
    "icon": "chart",
    "color": "green",
    "desc": "Çalışma sayacı, günlük saatler, hedefler ve takip"
+  },
+  {
+   "slug": "denetci",
+   "name": "Denetçi",
+   "icon": "spark",
+   "color": "violet",
+   "desc": "Her değişikliği senin gözünden denetler: erişim, kullanım, estetik, hız"
   }
  ]
 }

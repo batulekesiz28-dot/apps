@@ -12,7 +12,7 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#FFFFFF;--bg2:#FAFAF9;--card:#FFFFFF;--ink:#18181B;--ink2:#52525B;--ink3:#A1A1AA;--ink4:#E4E4E7;
+  --bg:#FFFFFF;--bg2:#FAFAF9;--card:#FFFFFF;--ink:#18181B;--ink2:#52525B;--ink3:#6E6E77;--ink4:#E4E4E7;
   --line:rgba(0,0,0,.06);--line2:rgba(0,0,0,.1);--hover:rgba(0,0,0,.04);
   --font:'Geist',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;--mono:'Geist Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
   --out:cubic-bezier(.16,1,.3,1);--ease:cubic-bezier(.2,.8,.2,1);--spring:cubic-bezier(.3,1.4,.5,1);
@@ -20,7 +20,7 @@
   --acc:#18181B;color-scheme:light;
 }
 [data-theme=dark]{
-  --bg:#0E0E10;--bg2:#141416;--card:#18181B;--ink:#EDEDEF;--ink2:#A1A1AA;--ink3:#6B6B74;--ink4:#2A2A2F;
+  --bg:#0E0E10;--bg2:#141416;--card:#18181B;--ink:#EDEDEF;--ink2:#A1A1AA;--ink3:#8B8B94;--ink4:#2A2A2F;
   --line:rgba(255,255,255,.06);--line2:rgba(255,255,255,.1);--hover:rgba(255,255,255,.05);
   --shadow:0 0 0 .5px rgba(255,255,255,.1),0 18px 44px -14px rgba(0,0,0,.7);color-scheme:dark;
 }
@@ -54,6 +54,7 @@ body.running .brand i::after{background:var(--bg);animation:pulse 1.6s ease-in-o
   .tabs{position:fixed;top:auto;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:30;background:color-mix(in srgb,var(--card) 88%,transparent);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:var(--shadow);border-radius:16px;padding:4px}
   .tabs button{height:38px;padding:0 15px;border-radius:12px}.tabs .ind{top:4px;bottom:4px;border-radius:12px}
   main{padding-bottom:110px!important}
+  .ib{width:40px;height:40px}.cd .dv{font-size:11.5px}.cg .wd{font-size:11.5px}.h{font-size:11.5px}
 }
 
 main{max-width:980px;margin:0 auto;padding:10px 22px 60px}
@@ -143,14 +144,14 @@ main{max-width:980px;margin:0 auto;padding:10px 22px 60px}
 .calh b{font-size:18px;font-weight:500;letter-spacing:-.02em;margin-right:auto}
 .calh span{color:var(--ink3);font-size:13px;margin-right:8px}
 .cg{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
-.cg .wd{font:500 10px/1 var(--mono);color:var(--ink3);text-align:center;padding:4px 0 6px;letter-spacing:.06em}
+.cg .wd{font:500 11px/1 var(--mono);color:var(--ink3);text-align:center;padding:4px 0 6px;letter-spacing:.06em}
 .cd{position:relative;aspect-ratio:1/.92;border-radius:12px;padding:7px 8px;text-align:left;display:flex;flex-direction:column;justify-content:space-between;background:var(--bg2);box-shadow:inset 0 0 0 .5px var(--line);transition:transform .4s var(--spring),box-shadow .2s;overflow:hidden}
 .cd:hover{box-shadow:inset 0 0 0 .5px var(--line2)}
 .cd:active{transform:scale(.95)}
 .cd .dn{font-size:12px;color:var(--ink2);position:relative;z-index:1}
 .cd .dv{font:500 10.5px/1 var(--mono);position:relative;z-index:1;color:var(--ink)}
 .cd .fill{position:absolute;inset:0;background:var(--heat);opacity:var(--o,0);transition:opacity .4s}
-.cd.o{opacity:.35}
+.cd.o{background:transparent}.cd.o .dn{color:var(--ink3)}
 .cd.t .dn{font-weight:700;color:var(--ink)}
 .cd.sel{box-shadow:inset 0 0 0 1.5px var(--ink)}
 .cd.goal::after{content:'';position:absolute;top:7px;right:7px;width:6px;height:6px;border-radius:50%;background:var(--ink);z-index:1}
@@ -249,6 +250,8 @@ main{max-width:980px;margin:0 auto;padding:10px 22px 60px}
 @keyframes sp{to{transform:rotate(360deg)}}
 .lnk{font-size:12.5px;color:var(--ink3);text-decoration:underline}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* Denetçi: telefonda dokunma alanları ve okunur yazı */
+@media (max-width:680px){.chip{height:40px}.seg button{height:36px}.cg .wd,.cd .dv,.h,.legend,.fl{font-size:11.5px}.ib{width:40px;height:40px}}
 </style>
 </head>
 <body>
@@ -416,7 +419,7 @@ function timerCard(){
      <div class="today"><div class="t"><b class="num" id="todayT">${fm(dayTot(selDay))}</b><span>${esc(dl)}</span>${st.n?`<span class="streak">${st.n} gün seri</span>`:''}</div>
        <div class="bar" id="todayB"></div><div class="h"><span id="todayP"></span></div></div>
      <div><span class="fl">Ders</span><div class="scroll" id="subs">${subs}</div></div>
-     <div><input class="topic" id="topic" placeholder="Ne çalışıyorsun? (konu, sayfa, test…)" value="${esc(r?r.topic:lastTopic(set.sel))}" autocomplete="off" maxlength="120">
+     <div><input class="topic" id="topic" aria-label="Konu" placeholder="Ne çalışıyorsun? (konu, sayfa, test…)" value="${esc(r?r.topic:lastTopic(set.sel))}" autocomplete="off" maxlength="120">
        <div class="tps" id="tps">${topicChips(r?r.subj:set.sel,r?r.topic:lastTopic(set.sel))}</div></div>
      <div class="seg" id="mode" ${r?'hidden':''}><button data-m="up" class="${set.mode==='up'?'on':''}">Kronometre</button><button data-m="down" class="${set.mode==='down'?'on':''}">Süreli</button></div>
      <div class="row presets" id="pre" ${r||set.mode!=='down'?'hidden':''}>${set.presets.map(p=>`<button class="chip${set.target===p*60?' on':''}" data-p="${p}">${p} dk</button>`).join('')}<button class="chip" data-p="x">Özel</button></div>

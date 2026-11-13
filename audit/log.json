@@ -1,0 +1,103 @@
+[
+ {
+  "at": "2026-11-13T19:55:00+03:00",
+  "change": "Denetçi kuruldu · tüm uygulamalar ilk kez denetlendi ve düzeltildi",
+  "scores": {
+   "Hub telefon": {
+    "before": 91,
+    "after": 100
+   },
+   "Hub bilgisayar": {
+    "before": 85,
+    "after": 100
+   },
+   "Notlar telefon": {
+    "before": 82,
+    "after": 96
+   },
+   "Notlar bilgisayar": {
+    "before": 85,
+    "after": 100
+   },
+   "Study Log telefon": {
+    "before": 87,
+    "after": 100
+   },
+   "Study Log bilgisayar": {
+    "before": 88,
+    "after": 100
+   },
+   "Saat": {
+    "before": 92,
+    "after": 100
+   },
+   "Denetçi": {
+    "before": 96,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Tüm uygulamalar",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Açık gri yazılar okunması zordu (kontrast 2.6:1). Ton koyulaştırıldı, artık 4.6:1 ve üstü; karanlık temada da."
+   },
+   {
+    "app": "Hub",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Widget başlıklarındaki “takvim”, şehir ve “tekrar dene” düğmeleri 24px’ten küçüktü; büyütüldü."
+   },
+   {
+    "app": "Hub",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Telefonda üst düğmeler, yakınlaştırma çubuğu ve uygulama adları küçüktü; 40px düğme, 12px yazı yapıldı."
+   },
+   {
+    "app": "Notlar",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Kenar çubuğundaki “⋯” ve “+” düğmeleri 20px’ti; 24px (telefonda 32px) yapıldı."
+   },
+   {
+    "app": "Notlar",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Telefonda menü satırları 30px’ti; 40px yapıldı."
+   },
+   {
+    "app": "Study Log",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Takvimde önceki/sonraki ayın günleri okunmuyordu; soluk opaklık yerine okunur gri kullanıldı."
+   },
+   {
+    "app": "Study Log",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Telefonda ders düğmeleri, segment düğmeleri ve gün başlıkları küçüktü; büyütüldü. Konu alanına ekran okuyucu etiketi eklendi."
+   },
+   {
+    "app": "Saat",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Şehir adları açık gri ve 10.5px’ti; koyulaştırıldı ve 11.5px yapıldı."
+   },
+   {
+    "app": "Denetçi",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Denetçi kendini de denetledi: telefonda başlıklar ve segment düğmeleri küçüktü, büyütüldü."
+   },
+   {
+    "app": "Notlar",
+    "sev": "warn",
+    "status": "open",
+    "text": "Telefonda birkaç küçük yazı (gün başlığı, “Önümüzdeki 7 gün”) ve 3–4 küçük düğme kaldı.",
+    "fix": "Telefon için 12px alt sınır ve 40px düğme."
+   }
+  ]
+ }
+]

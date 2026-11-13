@@ -376,5 +376,81 @@
     "fix": "Telefon için 12px alt sınır ve 40px düğme."
    }
   ]
+ },
+ {
+  "at": "2026-11-13T22:22:59",
+  "change": "Sekmeli çoklu uygulama (OS gibi geçiş) + ciddi akıcılık optimizasyonu",
+  "scores": {
+   "Hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Hub bilgisayar": {
+    "before": 100,
+    "after": 100
+   },
+   "Sekme çubuğu telefon": {
+    "before": 94,
+    "after": 98
+   },
+   "Sekme çubuğu bilgisayar": {
+    "before": 95,
+    "after": 100
+   },
+   "Değiştirici telefon": {
+    "before": 94,
+    "after": 98
+   }
+  },
+  "items": [
+   {
+    "app": "Hub",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Değiştirici ekranı renk seçici ile aynı sınıf adını kullanıyordu, kartlar üst üste biniyordu",
+    "fix": "Sınıf adları ayrıldı"
+   },
+   {
+    "app": "Hub",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Pasif sekmenin kapat düğmesi 0px'e eziliyordu",
+    "fix": "Gizliyken tamamen kaldırılıyor, görünürken 24px"
+   },
+   {
+    "app": "Hub",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Telefonda üst çubuk düğmeleri 31px'e sıkışıyordu, ilk sekme dışarı taşıyordu",
+    "fix": "Düğmeler 40px, telefonda gereksiz 2 düğme gizli, sekme adları kısaltıldı"
+   },
+   {
+    "app": "Hub",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Alt çubuktaki 'Açık' yazısı 10px'ti",
+    "fix": "12px"
+   },
+   {
+    "app": "Hub",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Kasma: her karede tüm ekran tuvali baştan kopyalanıyordu, 120Hz ekranlarda iki kat çizim yapılıyordu",
+    "fix": "Sadece değişen bölge çiziliyor, en fazla 60fps, boştayken 30/4fps, parıltı katmanı daha az pikselle, yavaş cihazda kalite kendiliğinden düşüyor"
+   },
+   {
+    "app": "Hub",
+    "sev": "warn",
+    "status": "open",
+    "text": "Telefonda uygulama içi üst tutamaç 24px yüksek (40px önerilir)",
+    "fix": "Bilerek küçük: uygulamaların üst menüsünü örtmesin diye"
+   },
+   {
+    "app": "Notlar",
+    "sev": "warn",
+    "status": "open",
+    "text": "Telefonda küçük yazı ve düğmeler (önceki kayıttan devam)"
+   }
+  ]
  }
 ]

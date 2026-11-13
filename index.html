@@ -472,6 +472,64 @@ body.locked .top,body.locked #nodes,body.locked .status,body.locked .hint,body.l
 @media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important;animation-duration:.01ms!important}}
 /* Denetçi: telefonda dokunma alanları ve okunur yazı */
 @media (max-width:700px){.status,.zbar #zPct{font-size:11.5px}.node .nlabel{font-size:12px}.ib{width:40px;height:40px}.search{height:40px}}
+
+/* ── tabs: several apps open at once ── */
+.pill{max-width:calc(100vw - 16px);padding:0 4px}
+.pill .tabs{display:flex;align-items:center;gap:2px;overflow-x:auto;scrollbar-width:none;max-width:min(62vw,720px);padding:0 1px}
+.pill .tabs::-webkit-scrollbar{display:none}
+.tb{position:relative;display:flex;align-items:center;flex-shrink:0;border-radius:9px;transition:background .15s}
+.tb:hover{background:var(--hover)}
+.tb.on{background:var(--hover2,var(--hover));box-shadow:inset 0 0 0 .5px var(--line3)}
+.pill .tb-o{width:auto;height:30px;display:flex;align-items:center;gap:6px;padding:0 6px;border-radius:9px;color:var(--ink2);font-size:12.5px;font-weight:550}
+.tb.on .tb-o{color:var(--ink)}
+.tb .tn{max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tb:not(.on) .tn{max-width:72px}
+.tb.zz .mini{opacity:.5;filter:grayscale(.6)}
+.pill .tb-x{width:24px;height:24px;margin-right:3px;border-radius:6px;color:var(--ink3);opacity:0}
+.tb:not(.on):not(:hover):not(:focus-within) .tb-x{display:none}
+.tb:hover .tb-x,.tb.on .tb-x,.tb-x:focus-visible{opacity:1}
+.pill .tb-x:hover{color:#DC2626;background:transparent}
+.tb-x svg,.dk-x svg,.as-x svg{width:9px;height:9px;stroke:currentColor;stroke-width:1.6;fill:none;stroke-linecap:round}
+.dock{gap:4px;padding:0 5px;max-width:calc(100vw - 24px);height:44px}
+.dock .dk-l{font:500 12px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--ink3);padding:0 6px 0 4px}
+.dk{display:flex;align-items:center;border-radius:10px;flex-shrink:1;min-width:0}
+.dk:hover{background:var(--hover)}
+.dock .dk-o{display:flex;align-items:center;gap:7px;height:34px;padding:0 4px 0 6px;min-width:0;color:var(--ink);font-size:12px;font-weight:500}
+.dock .dk-o:hover{background:transparent}
+.dk .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px}
+.dk.zz .mini{opacity:.5;filter:grayscale(.6)}
+.dock .dk-x,.dock .dk-sw{width:28px;height:28px;padding:0;display:grid;place-items:center;border-radius:8px;color:var(--ink3)}
+.dock .dk-x:hover{color:#DC2626}
+.dk-sw svg,.pill [data-w=sw] svg{fill:none;stroke:currentColor;stroke-width:1.3}
+.dk-sw svg{width:15px;height:15px}
+.as-bg{position:fixed;inset:0;z-index:120;display:grid;place-items:center;background:var(--scrim);padding:20px}
+.as{width:min(760px,100%);max-height:calc(100vh - 40px);overflow:auto;padding:18px;border-radius:22px;background:var(--menu);box-shadow:var(--shadow);backdrop-filter:blur(26px) saturate(1.5);-webkit-backdrop-filter:blur(26px) saturate(1.5)}
+.as-h{font-size:13px;font-weight:600;color:var(--ink);margin:2px 4px 14px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.as-h span{font-weight:400;font-size:12px;color:var(--ink3)}
+.as-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px}
+.as-w{position:relative}
+.as-c{width:100%;display:grid;justify-items:center;gap:8px;padding:18px 10px 14px;border-radius:16px;background:var(--surface);box-shadow:0 0 0 .5px var(--line2);color:var(--ink);transition:transform .25s var(--spring),box-shadow .15s}
+.as-c:hover{transform:translateY(-2px)}
+.as-c.sel{box-shadow:0 0 0 2px var(--ink)}
+.as-c.cur b::after{content:' •';color:var(--ink3)}
+.as-c b{font-size:13px;font-weight:600;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.as-c small{font-size:12px;color:var(--ink3)}
+.as-ic{width:52px;height:52px;border-radius:15px;display:grid;place-items:center}
+.as-ic svg{width:26px;height:26px}
+.as-c.home .as-ic{background:var(--hover);color:var(--ink)}
+.as-c.home .as-ic svg{fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.as-x{position:absolute;top:6px;right:6px;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;color:var(--ink3)}
+.as-x:hover{color:#DC2626;background:var(--hover)}
+.grab{width:120px;height:24px;touch-action:none}
+@media (hover:none){
+  .tb:not(.on) .tn{display:none}
+  .pill{height:48px}.pill button{width:40px;height:40px;flex-shrink:0}.pill [data-w=tab],.pill [data-w=fs]{display:none}.pill .tb-o{height:40px;padding:0 8px}.pill .tb-x{width:40px;height:40px;opacity:1}.tb .tb-x{display:none!important}.tb .tn{max-width:64px}
+  .pill .tabs{max-width:calc(100vw - 230px)}
+  .dock .dk-x,.dock .dk-sw{width:40px;height:40px}.dock .dk-o{height:40px}.dock{height:48px}
+  .dk .t{max-width:72px}.dock .dk-l{display:none}
+  .as-x{width:40px;height:40px;top:2px;right:2px}
+  .as-g{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
 </style>
 </head>
 <body>
@@ -512,18 +570,19 @@ body.locked .top,body.locked #nodes,body.locked .status,body.locked .hint,body.l
 <div class="scrim" id="scrim" hidden></div>
 <section class="win" id="win" hidden>
   <div class="prog" id="prog"></div>
-  <iframe class="frame" id="frame" title="Uygulama" allow="fullscreen; clipboard-write"></iframe>
 </section>
 <div class="hot" id="hot" hidden></div>
 <button class="grab" id="grab" hidden aria-label="Kontrolleri göster"></button>
 <div class="pill hide" id="pill" hidden>
-  <span class="mini" id="wMini"></span><span class="pname" id="wName"></span><span class="src" id="wSrc"></span>
+  <button data-w="home" title="Ana ekran · Alt+H" aria-label="Ana ekran"><svg viewBox="0 0 16 16"><path d="M2.5 7.5L8 3l5.5 4.5M4.5 6.5v6.5h7V6.5"/></svg></button>
   <span class="psep"></span>
+  <div class="tabs" id="tabs" role="tablist" aria-label="Açık uygulamalar"></div>
+  <span class="psep"></span>
+  <button data-w="sw" title="Tüm açık uygulamalar · Alt+Q" aria-label="Uygulama değiştirici"><svg viewBox="0 0 16 16"><rect x="2.5" y="3.5" width="5" height="9" rx="1.5"/><rect x="9.5" y="3.5" width="4" height="9" rx="1.5"/></svg></button>
   <button data-w="reload" title="Yenile"><svg viewBox="0 0 16 16"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2.5v3h-3"/></svg></button>
   <button data-w="tab" id="wTab" title="Yeni sekmede aç"><svg viewBox="0 0 16 16"><path d="M9.5 2.5h4v4M13.5 2.5L7.5 8.5M12 9.5v3.5H3V4h3.5"/></svg></button>
   <button data-w="fs" id="wFs" title="Tarayıcı tam ekranı (F)"><svg viewBox="0 0 16 16"><path id="fsIcon" d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg></button>
-  <button data-w="min" title="Küçült"><svg viewBox="0 0 16 16"><path d="M3.5 11h9"/></svg></button>
-  <button data-w="close" title="Kapat (⇧Esc)"><svg viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
+  <button data-w="close" title="Bu uygulamayı kapat · ⇧Esc" aria-label="Bu uygulamayı kapat"><svg viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
 </div>
 
 <div class="gate" id="gate" hidden>
@@ -660,7 +719,7 @@ const Cloud={kind:'cloud',meta:null,col:null,unsubs:[],
   put(d){return this.col.doc(d.id).set(d)},del(id){return this.col.doc(id).delete()},
   saveMeta(){Local.saveMeta();const m={pos,links:links.map(([a,b])=>a+'|'+b),groups,members,orbits,autoCl,wstar:wstar||null};if(widgets)m.widgets=widgets.map(cleanW);return this.meta.update(m).catch(()=>this.meta.set(m,{merge:true}))}};
 let S=Local;
-let metaT=0;const saveMeta=()=>{clearTimeout(metaT);metaT=setTimeout(()=>Promise.resolve(S.saveMeta()).catch(()=>{}),250)};
+let metaT=0;const saveMeta=()=>{GX.poke=true;clearTimeout(metaT);metaT=setTimeout(()=>Promise.resolve(S.saveMeta()).catch(()=>{}),250)};
 function setSync(s){sync=s;const d=$('#sDot');d.classList.toggle('warn',s==='pending');d.classList.toggle('err',s==='error');statusText()}
 
 /* ── App state ────────────────────────────────────────────── */
@@ -739,11 +798,14 @@ function camMoved(){
 let clT=0,clOn=false;function camLayers(){if(!clOn){clOn=true;$('#widgets').classList.add('moving')}clearTimeout(clT);clT=setTimeout(()=>{clOn=false;$('#widgets').classList.remove('moving')},220)}
 let zlT='';function zoomLabel(){const t=Math.round(cam.z*100)+'%';if(t!==zlT){zlT=t;$('#zPct').textContent=t}}
 
+// Performance tiers: 0 full · 1 lighter canvases · 2 light + 30fps. Raised automatically when frames drop.
+let TIER=+(localStorage.getItem('appshell:tier')||0)||0;const PERF={auto:localStorage.getItem('appshell:perf')!=='fixed',win:[],fx:true};
 function buildMesh(){
-  M.W=innerWidth;M.H=innerHeight;let dpr=Math.min(devicePixelRatio||1,2);
-  if(M.W*M.H*dpr*dpr>7e6)dpr=Math.sqrt(7e6/(M.W*M.H)); // pixel budget for big screens
-  M.dpr=dpr;
-  for(const[c,g]of[[cv,cx],[fv,fx]]){c.width=M.W*dpr|0;c.height=M.H*dpr|0;c.style.width=M.W+'px';c.style.height=M.H+'px';g.setTransform(dpr,0,0,dpr,0,0)}
+  M.W=innerWidth;M.H=innerHeight;const cap=[2,1.5,1][TIER],bud=[6e6,4e6,2.5e6][TIER];let dpr=Math.min(devicePixelRatio||1,cap);
+  if(M.W*M.H*dpr*dpr>bud)dpr=Math.max(1,Math.sqrt(bud/(M.W*M.H))); // pixel budget for big screens
+  M.dpr=dpr;M.fd=Math.min(dpr,TIER?1:1.5); // glow layer needs far fewer pixels than the grid
+  for(const[c,g,d]of[[cv,cx,dpr],[fv,fx,M.fd]]){c.width=M.W*d|0;c.height=M.H*d|0;c.style.width=M.W+'px';c.style.height=M.H+'px';g.setTransform(d,0,0,d,0,0)}
+  M.lastR=null;M.full=true;PERF.fx=true;
   M.gw=0;cam.px=NaN;layoutMesh();cam.px=cam.x;cam.py=cam.y;cam.pz=cam.z;placeWidgets();zoomLabel();wakeMesh();
 }
 // Lays the visible window of the infinite world grid onto the screen. Level of detail: the world
@@ -834,19 +896,25 @@ function paintMesh(ctx,rest,R,vis){
 const mcv=document.createElement('canvas'),mcx=mcv.getContext('2d');let mKey='',lastCamMove=0;
 function drawMesh(now){
   const{W,H,n,dx,dy,en,rx,ry}=M;
-  if(M.flat&&!M.warp&&introT>=1&&typeof DOMMatrix!=='undefined'){cx.clearRect(0,0,W,H);return drawFlat()}
+  if(M.flat&&!M.warp&&introT>=1&&typeof DOMMatrix!=='undefined'){cx.clearRect(0,0,W,H);M.full=true;M.lastR=null;return drawFlat()}
   if(introT<1){introT=clamp((now-introStart)/1500,0,1);const reveal=1-Math.pow(1-introT,3),cxm=W/2,cym=H/2,maxR=Math.hypot(W,H)*.6*reveal;
     cx.clearRect(0,0,W,H);paintMesh(cx,false,null,reveal>=1?null:i=>clamp((maxR-Math.hypot(rx[i]-cxm,ry[i]-cym))/140,0,1));meshDirty=false;return}
   // camera moving: a cache would be stale next frame, so paint directly
-  if(now-lastCamMove<160){cx.clearRect(0,0,W,H);paintMesh(cx,false,null,null);mKey='';meshDirty=false;return}
+  if(now-lastCamMove<160){cx.clearRect(0,0,W,H);paintMesh(cx,false,null,null);mKey='';M.full=true;meshDirty=false;return}
   const key=cam.x+','+cam.y+','+cam.z+','+W+','+H+','+M.dpr+','+TH.l+TH.dot;
-  if(key!==mKey){mcv.width=cv.width;mcv.height=cv.height;mcx.setTransform(M.dpr,0,0,M.dpr,0,0);mcx.clearRect(0,0,W,H);paintMesh(mcx,true,null,null);mKey=key}
+  if(key!==mKey){mcv.width=cv.width;mcv.height=cv.height;mcx.setTransform(M.dpr,0,0,M.dpr,0,0);mcx.clearRect(0,0,W,H);paintMesh(mcx,true,null,null);mKey=key;M.full=true}
   let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
   for(let i=0;i<n;i++){if(en[i]===0&&dx[i]===0&&dy[i]===0)continue;if(Math.abs(dx[i])+Math.abs(dy[i])<.02&&en[i]<.01)continue;
     const x=rx[i],y=ry[i];if(x<x0)x0=x;if(y<y0)y0=y;if(x>x1)x1=x;if(y>y1)y1=y}
-  cx.setTransform(1,0,0,1,0,0);cx.clearRect(0,0,cv.width,cv.height);cx.drawImage(mcv,0,0);cx.setTransform(M.dpr,0,0,M.dpr,0,0);
-  if(x1>=x0){const pad=M.gap*1.6+16,R=[x0-pad,y0-pad,x1+pad,y1+pad];
-    cx.save();cx.beginPath();cx.rect(R[0],R[1],R[2]-R[0],R[3]-R[1]);cx.clip();cx.clearRect(R[0],R[1],R[2]-R[0],R[3]-R[1]);
+  const R=x1>=x0?[x0-M.gap*1.6-16,y0-M.gap*1.6-16,x1+M.gap*1.6+16,y1+M.gap*1.6+16]:null,P=M.lastR,d=M.dpr;M.lastR=R;
+  cx.setTransform(1,0,0,1,0,0);
+  if(M.full){cx.clearRect(0,0,cv.width,cv.height);cx.drawImage(mcv,0,0);M.full=false}
+  else{ // restore only where the ripple was or is — copying the whole screen each frame was the main cost
+    const U=P&&R?[Math.min(P[0],R[0]),Math.min(P[1],R[1]),Math.max(P[2],R[2]),Math.max(P[3],R[3])]:P||R;
+    if(U){const ux=Math.max(0,Math.floor(U[0]*d)-2),uy=Math.max(0,Math.floor(U[1]*d)-2),uw=Math.min(cv.width,Math.ceil(U[2]*d)+2)-ux,uh=Math.min(cv.height,Math.ceil(U[3]*d)+2)-uy;
+      if(uw>0&&uh>0){cx.clearRect(ux,uy,uw,uh);cx.drawImage(mcv,ux,uy,uw,uh,ux,uy,uw,uh)}}}
+  cx.setTransform(d,0,0,d,0,0);
+  if(R){cx.save();cx.beginPath();cx.rect(R[0],R[1],R[2]-R[0],R[3]-R[1]);cx.clip();cx.clearRect(R[0],R[1],R[2]-R[0],R[3]-R[1]);
     paintMesh(cx,false,[R[0]-M.gap,R[1]-M.gap,R[2]+M.gap,R[3]+M.gap],null);cx.restore()}
   meshDirty=false;
 }
@@ -1217,7 +1285,8 @@ function showPeek(n){
   $('#pkN').textContent=a.name;$('#pkD').textContent=a.desc||(a.kind==='draft'?'Bu tarayıcıdan eklenmiş taslak':'');$('#pkD').hidden=!$('#pkD').textContent;
   const g=groupOf(a.key),dg=degree(a.key);
   $('#pkM').innerHTML=`<i>${a.kind==='draft'?'taslak':'yayında'}</i>${dg?`<i>${dg} bağlantı</i>`:''}${g?`<i><em style="background:${GCOL[groups[g].color]||GCOL.gray}"></em>${esc(groups[g].name)}</i>`:''}`;
-  if(PK.key!==a.key){PK.key=a.key;$('#pkL').classList.remove('done');
+  PK.el.querySelector('.pk-frame').style.display=TIER>=1?'none':''; // live preview loads a whole app: skip on lighter tiers
+  if(PK.key!==a.key&&TIER<1){PK.key=a.key;$('#pkL').classList.remove('done');
     if(a.kind==='draft'){PK.f.setAttribute('sandbox','allow-scripts');PK.f.removeAttribute('src');PK.f.srcdoc=a.html}
     else{PK.f.removeAttribute('srcdoc');PK.f.removeAttribute('sandbox');PK.f.src=a.url}}
   PK.n=n;PK.el.hidden=false;
@@ -1247,7 +1316,8 @@ const GX={T:(Date.now()/1000)%100000,ts:1,sys:[],loose:[],RS:0,RG:400,key:''};
 let sunHover=null;
 const hashU=s=>(hash(s)%10007)/10007;
 const hexA=(h,a)=>{const n=parseInt(h.slice(1),16);return`rgba(${n>>16&255},${n>>8&255},${n&255},${a})`};
-function galaxyModel(){
+let gxTick=0;function galaxyModel(){
+  if(!GX.poke&&(++gxTick%20)&&GX.key)return;GX.poke=false;
   const key=[...nodes.keys()].join()+'|'+JSON.stringify(members)+'|'+JSON.stringify(groups)+'|'+JSON.stringify(orbits);if(key===GX.key)return;GX.key=key;
   const by={},loose=[],nm=(a,b)=>a.a.name.localeCompare(b.a.name,'tr');
   const other=[];
@@ -1320,7 +1390,9 @@ function drawSun(x,y,R,col,time,ph,dark,Z){
   ring(0,Math.PI)}
 /* ── Widget star: cards ride slow rings around their own star, to the right of the galaxy ── */
 const WS={T:0,ts:1,x:0,y:0,rings:[],hov:0};
-function widgetRings(){const list=(widgets||[]).filter(w=>WEL.has(w.id));const rings=[];let r=330,i=0;
+let wrKey='';function widgetRings(){let k=WEL.size+':'+(widgets||[]).length;for(const w of widgets||[])k+=w.id[0]+w.id.slice(-3);
+  if(k===wrKey&&WS.rings){if(starDrag?.id==='_w'){WS.x=starDrag.x;WS.y=starDrag.y}else if(wstar){WS.x=wstar[0];WS.y=wstar[1]}else{WS.x=GX.RG+WS.R+160;WS.y=0}return}wrKey=k;
+  const list=(widgets||[]).filter(w=>WEL.has(w.id));const rings=[];let r=330,i=0;
   while(i<list.length){const cap=Math.max(3,Math.floor(2*Math.PI*r/350));rings.push({r,ws:list.slice(i,i+cap)});i+=cap;r+=330}
   WS.rings=rings;const outer=rings.length?rings[rings.length-1].r+190:200;WS.R=outer;
   if(starDrag?.id==='_w'){WS.x=starDrag.x;WS.y=starDrag.y}else if(wstar){WS.x=wstar[0];WS.y=wstar[1]}else{WS.x=GX.RG+outer+160;WS.y=0}}
@@ -1362,8 +1434,11 @@ function relocateWidgets(){return;if(!wReady||!booted)return;const RG=GX.RG+40;l
 
 function frame(t){
   raf=0;if(paused)return;
-  const idle=t-lastInput>8000&&!linkDrag&&!galaxyOnScreen();
-  if(idle&&t-lastDraw<31){raf=requestAnimationFrame(frame);return}
+  // pacing: ≤60fps even on 120Hz screens; 30fps once the hands are off; ~4fps when nothing at all moves
+  const busy=t-lastInput<2500||linkDrag||cam.go||cam.pan||wDrag||starDrag||meshAwake||introT<1,still=!busy&&t-lastInput>8000&&!galaxyOnScreen();
+  const gap=still?240:(!busy||TIER>=2)?31:14;
+  if(t-lastDraw<gap){raf=requestAnimationFrame(frame);return}
+  if(busy&&lastDraw&&PERF.auto&&TIER<2&&!document.hidden)perfSample(t-lastDraw);
   lastDraw=t;const dt=Math.min(40,t-(last||t));last=t;const k=dt/16.667,time=t/1000;
   stepCam(k);if(cam.x!==cam.px||cam.y!==cam.py||cam.z!==cam.pz){camMoved();meshDirty=true}else if(!mKey&&t-lastCamMove>=160)meshDirty=true;
   stepWidgets(k);
@@ -1386,11 +1461,19 @@ function frame(t){
   ptr.sx+=(ptr.x-ptr.sx)*(1-Math.pow(1-.22,k));ptr.sy+=(ptr.y-ptr.sy)*(1-Math.pow(1-.22,k));ptr.amp+=(ptr.tAmp-ptr.amp)*(1-Math.pow(1-.07,k));
   if(meshAwake||introT<1){const settled=stepMesh(k,t);drawMesh(t);if(settled&&introT>=1)meshAwake=false}
   else if(meshDirty)drawMesh(t);
-  fx.clearRect(0,0,M.W,M.H);
-  drawGalaxy(time);drawWidgetStar(time);drawRubber(time);followPeek(k);
+  // glow layer: skip entirely when neither the galaxy nor the widget star is on screen
+  const gOn=onScr(0,0,(GX.RG||400)+260)||GX.sys.some(s=>onScr(s.x,s.y,s.R+80)),wOn=WEL.size&&onScr(WS.x,WS.y,(WS.R||300)+120);
+  if(gOn||wOn||linkDrag||PERF.fx){fx.clearRect(0,0,M.W,M.H);PERF.fx=!!(gOn||wOn||linkDrag)}
+  if(gOn)drawGalaxy(time);else groupHits=[];if(wOn)drawWidgetStar(time);drawRubber(time);followPeek(k);
   raf=requestAnimationFrame(frame);
 }
 const wake=()=>{if(!raf&&!paused)raf=requestAnimationFrame(frame)};
+function onScr(wx,wy,wr){const x=w2sx(wx),y=w2sy(wy),r=wr*cam.z;return x+r>0&&x-r<M.W&&y+r>0&&y-r<M.H}
+// adaptive quality: if more than a third of recent active frames take >24ms, step down one tier (remembered per device)
+function perfSample(dt){if(performance.now()<6000||dt>250)return; // ignore start-up loading and tab stalls
+  const w=PERF.win;w.push(dt);if(w.length<90)return;const slow=w.filter(v=>v>24).length;PERF.win=[];PERF.bad=slow>30?(PERF.bad||0)+1:0;
+  if(PERF.bad>=2){PERF.bad=0;setTier(TIER+1);toast(TIER>=2?'Akıcılık için hafif moda geçtim':'Akıcılık için görüntü kalitesini biraz düşürdüm')}}
+function setTier(t){TIER=clamp(t,0,2);try{localStorage.setItem('appshell:tier',TIER)}catch{}buildMesh();mKey='';patKey='';wakeMesh()}
 function setPaused(p){paused=p;if(p){cancelAnimationFrame(raf);raf=0}else{last=0;wake()}}
 const touchInput=()=>{lastInput=performance.now()};
 ['pointermove','pointerdown','keydown','wheel'].forEach(ev=>addEventListener(ev,touchInput,{passive:true,capture:true}));
@@ -1505,7 +1588,7 @@ const fmMin=m=>{m=Math.round(m);return m<60?m+' dk':Math.floor(m/60)+' sa'+(m%60
 addEventListener('storage',e=>{if(e.key==='notlar:v1'&&notesOn)readLocalNotes()});
 function renderNoteWidgets(){for(const r of WEL.values())if(r.w.type==='today'||r.w.type==='cal'||r.w.type==='streak')renderW(r)}
 function openNotes(h){const a=find('p:notlar');if(!a)return toast('Notlar uygulaması bulunamadı');
-  if(W.app?.key===a.key){try{W.frame.contentWindow.location.hash=h}catch{}if(W.min)restore();return}
+  const t=tabOf(a.key);if(t?.fr){try{t.fr.contentWindow.location.hash=h}catch{}return switchTo(a.key)}
   openApp({...a,url:a.url+h},nodes.get(a.key)?.el)}
 
 /* ── Weather (Open-Meteo, no key) ── */
@@ -1838,9 +1921,12 @@ function statusText(){const cloud=S.kind==='cloud';if(!cloud)$('#sDot').classLis
   const lc=links.filter(l=>nodes.has(l[0])&&nodes.has(l[1])).length;$('#sTxt').textContent=`${a} · ${drafts.length} taslak · ${lc} bağlantı · ${b}`}
 
 /* ════════════════════════════════════════════════════════════
-   FULLSCREEN APP
+   APPS AS TABS — several apps stay alive at once, switch like an OS
+   W.app = the tab in front · W.min = hub is in front while tabs stay open
    ════════════════════════════════════════════════════════════ */
-const W={el:$('#win'),frame:$('#frame'),app:null,blob:null,min:false};
+const TABS=[],MAXLIVE=FINE?8:4;
+const W={el:$('#win'),app:null,min:false};
+const tabOf=k=>TABS.find(t=>t.key===k),curTab=()=>W.app?tabOf(W.app.key):null,mru=()=>[...TABS].sort((a,b)=>b.t-a.t);
 function iconRect(el){const t=el?.isConnected&&el.querySelector('.tile');if(!t)return null;const r=t.getBoundingClientRect();return r.width?r:null}
 let pillT=0;
 function showPill(ms=2400){const p=$('#pill');p.classList.remove('hide');clearTimeout(pillT);if(ms)pillT=setTimeout(hidePill,ms)}
@@ -1849,72 +1935,152 @@ $('#hot').addEventListener('pointerenter',()=>showPill(0));
 $('#hot').addEventListener('pointerleave',()=>{clearTimeout(pillT);pillT=setTimeout(hidePill,900)});
 $('#pill').addEventListener('pointerenter',()=>clearTimeout(pillT));
 $('#pill').addEventListener('pointerleave',()=>{clearTimeout(pillT);pillT=setTimeout(hidePill,900)});
-$('#grab').addEventListener('click',()=>showPill(3500));
 function chrome(on){for(const id of['#hot','#pill','#grab'])$(id).hidden=!on}
-function openApp(a,el){
-  if(!a||justDragged||linkDrag)return;hidePeek(true);
-  if(W.app&&W.app.key===a.key&&W.min){restore();return}
-  if(W.app)hideWin(true);
-  W.app=a;W.min=false;$('#dock').hidden=true;
-  const m=miniIcon(a);$('#wMini').setAttribute('style',m.style);$('#wMini').innerHTML=m.html;
-  $('#wName').textContent=a.name;$('#wSrc').textContent=a.kind==='draft'?'taslak':'';$('#wTab').hidden=a.kind==='draft';$('#wFs').hidden=!document.fullscreenEnabled;
-  const n=nodes.get(a.key);if(n)ripple(n.ax,n.ay,1.4);
-  loadFrame(a);$('#scrim').hidden=false;W.el.hidden=false;chrome(true);showPill(2600);
-  anim($('#scrim'),[{opacity:0},{opacity:1}],{duration:420,easing:EASE});
-  const r=iconRect(el),vw=innerWidth,vh=innerHeight;
-  if(r){const s=r.width/vw;
-    anim(W.el,[{transform:`translate(${r.left}px,${r.top+r.height/2-vh*s/2}px) scale(${s})`,borderRadius:`${16/s}px`},{transform:'none',borderRadius:'0px'}],{duration:640,easing:OUT});
-    anim(W.el,[{opacity:0},{opacity:1}],{duration:200,easing:'linear'})}
-  else anim(W.el,[{opacity:0,transform:'scale(.97)'},{opacity:1,transform:'none'}],{duration:460,easing:OUT});
-  anim($('#pill'),[{transform:'translateX(-50%) translateY(-60px)',opacity:0},{transform:'translateX(-50%)',opacity:1}],{duration:700,delay:260,easing:SPRING,fill:'backwards'});
-  setTimeout(()=>{if(W.app&&!W.min)setPaused(true)},680);
-}
-function loadFrame(a){const f=W.frame;if(W.blob){URL.revokeObjectURL(W.blob);W.blob=null}
-  if(a.kind==='draft'){f.setAttribute('sandbox','allow-scripts allow-forms allow-modals allow-popups allow-downloads allow-pointer-lock');W.blob=URL.createObjectURL(new Blob([a.html],{type:'text/html'}));f.src=W.blob}
-  else{f.removeAttribute('sandbox');f.src=a.url}progress()}
+
+function mountFrame(t){const f=document.createElement('iframe'),a=t.app;f.className='frame';f.title=a.name;f.setAttribute('allow','fullscreen; clipboard-write');f.hidden=true;
+  if(a.kind==='draft'){f.setAttribute('sandbox','allow-scripts allow-forms allow-modals allow-popups allow-downloads allow-pointer-lock');t.blob=URL.createObjectURL(new Blob([a.html],{type:'text/html'}));f.src=t.blob}
+  else f.src=a.url;
+  t.loading=true;f.addEventListener('load',()=>frameLoaded(t,f));W.el.appendChild(f);t.fr=f}
+function dropFrame(t){if(t.fr){t.fr.remove();t.fr=null}if(t.blob){URL.revokeObjectURL(t.blob);t.blob=null}t.loading=false}
+// keep memory in check: the least recently used background apps go to sleep (reloaded when you come back)
+function sleepExtra(){const live=mru().filter(t=>t.fr);for(const t of live.slice(MAXLIVE))if(t!==curTab())dropFrame(t)}
 let progA=null;
 function progress(){const p=$('#prog');progA?.cancel();p.style.opacity=1;
   progA=anim(p,[{transform:'scaleX(0)'},{transform:'scaleX(.35)',offset:.2},{transform:'scaleX(.85)'}],{duration:2600,easing:'cubic-bezier(.1,.6,.2,1)',fill:'forwards'})}
-W.frame.addEventListener('load',()=>{if(W.frame.src==='about:blank'||!W.app)return;const p=$('#prog');progA?.cancel();
-  anim(p,[{transform:'scaleX(.85)',opacity:1},{transform:'scaleX(1)',opacity:1,offset:.5},{transform:'scaleX(1)',opacity:0}],{duration:520,easing:EASE,fill:'forwards'}).finished.then(()=>p.style.opacity=0,()=>{});
-  try{const w=W.frame.contentWindow;w.addEventListener('keydown',ev=>{if(ev.key==='Escape'&&ev.shiftKey){ev.preventDefault();closeWin()}});
-    w.addEventListener('pointermove',ev=>{if(ev.clientY<8)showPill(0);else if(!$('#pill').classList.contains('hide')&&ev.clientY>80){clearTimeout(pillT);pillT=setTimeout(hidePill,700)}},{passive:true})}catch{}});
-async function closeWin(){
-  if(!W.app)return;setPaused(false);const key=W.app.key,el=nodes.get(key)?.el,r=iconRect(el),vw=innerWidth,vh=innerHeight;
-  if(document.fullscreenElement)document.exitFullscreen?.().catch(()=>{});
-  $('#pill').classList.add('hide');
-  anim($('#scrim'),[{opacity:1},{opacity:0}],{duration:380,easing:EASE,fill:'forwards'});let a;
-  if(r){const s=r.width/vw;
-    a=anim(W.el,[{transform:'none',opacity:1,borderRadius:'0px'},{transform:`translate(${r.left}px,${r.top+r.height/2-vh*s/2}px) scale(${s})`,borderRadius:`${16/s}px`,opacity:0}],{duration:460,easing:'cubic-bezier(.4,0,.1,1)',fill:'forwards'})}
-  else a=anim(W.el,[{opacity:1},{opacity:0,transform:'scale(.97)'}],{duration:240,easing:EASE,fill:'forwards'});
-  await a.finished.catch(()=>{});
-  if(notesOn)readLocalNotes();
-  if(W.app?.key===key){hideWin(false);const n=nodes.get(key);if(n){ripple(n.ax,n.ay,1.1);anim(n.el.querySelector('.bob'),[{transform:'scale(.86)'},{transform:'scale(1.06)',offset:.5},{transform:'none'}],{duration:620,easing:EASE})}}
+function progressDone(){const p=$('#prog');progA?.cancel();progA=null;if(+p.style.opacity!==1)return;
+  anim(p,[{transform:'scaleX(.85)',opacity:1},{transform:'scaleX(1)',opacity:1,offset:.5},{transform:'scaleX(1)',opacity:0}],{duration:520,easing:EASE,fill:'forwards'}).finished.then(()=>p.style.opacity=0,()=>{})}
+function frameLoaded(t,f){if(t.fr!==f)return;t.loading=false;if(curTab()===t&&!W.min)progressDone();
+  try{const w=f.contentWindow;w.addEventListener('keydown',e=>{osKeys(e)},true);w.addEventListener('keyup',osKeyUp,true);
+    w.addEventListener('pointermove',ev=>{if(ev.clientY<8)showPill(0);else if(!$('#pill').classList.contains('hide')&&ev.clientY>80){clearTimeout(pillT);pillT=setTimeout(hidePill,700)}},{passive:true});
+    edgeSwipe(w)}catch{}}
+
+function openApp(a,el){
+  if(!a||justDragged||linkDrag)return;hidePeek(true);
+  let t=tabOf(a.key);
+  if(!t){t={key:a.key,app:a,fr:null,blob:null,t:0,loading:false};TABS.push(t)}
+  else if(a.url&&a.url!==t.app.url&&t.fr&&a.kind!=='draft'){t.app=a;try{t.fr.contentWindow.location.replace(new URL(a.url,location.href).href)}catch{t.fr.src=a.url}}
+  switchTo(a.key,el);
 }
-function hideWin(keepScrim){W.el.getAnimations().forEach(x=>x.cancel());$('#scrim').getAnimations().forEach(x=>x.cancel());
-  W.el.hidden=true;W.el.style.visibility='';if(!keepScrim)$('#scrim').hidden=true;chrome(false);W.frame.src='about:blank';if(W.blob){URL.revokeObjectURL(W.blob);W.blob=null}
-  W.app=null;W.min=false;$('#dock').hidden=true;setPaused(document.hidden)}
-async function minimize(){
-  if(!W.app)return;setPaused(false);const d=$('#dock'),m=miniIcon(W.app);chrome(false);
-  d.innerHTML=`<span class="mini" style="${m.style}">${m.html}</span><span class="t">${esc(W.app.name)}</span><button data-d="open">Aç</button><button data-d="close">Kapat</button>`;
-  d.hidden=false;const dr=d.getBoundingClientRect(),s=dr.width/innerWidth;
-  anim($('#scrim'),[{opacity:1},{opacity:0}],{duration:320,easing:EASE,fill:'forwards'});
-  await anim(W.el,[{transform:'none',opacity:1},{transform:`translate(${dr.left}px,${dr.top}px) scale(${s})`,opacity:0}],{duration:460,easing:'cubic-bezier(.5,0,.1,1)',fill:'forwards'}).finished.catch(()=>{});
-  W.el.style.visibility='hidden';$('#scrim').hidden=true;W.min=true;
-  anim(d,[{transform:'translateX(-50%) translateY(14px) scale(.9)',opacity:0},{transform:'translateX(-50%)',opacity:1}],{duration:560,easing:SPRING});
+function switchTo(key,el){
+  const t=tabOf(key);if(!t)return;const prev=curTab(),fromHub=!W.app||W.min||W.el.hidden;
+  t.t=performance.now();if(!t.fr)mountFrame(t);
+  W.app=t.app;W.min=false;closeSwitcher();
+  for(const o of TABS)if(o.fr)o.fr.hidden=o!==t;
+  sleepExtra();renderTabs();$('#dock').hidden=true;
+  if(t.loading)progress();else{progA?.cancel();$('#prog').style.opacity=0}
+  const n=nodes.get(key);
+  if(fromHub){
+    W.el.getAnimations().forEach(x=>x.cancel());$('#scrim').getAnimations().forEach(x=>x.cancel());
+    W.el.hidden=false;W.el.style.visibility='';$('#scrim').hidden=false;chrome(true);showPill(2600);if(n)ripple(n.ax,n.ay,1.4);
+    anim($('#scrim'),[{opacity:0},{opacity:1}],{duration:380,easing:EASE});
+    const r=iconRect(el||n?.el),vw=innerWidth,vh=innerHeight;
+    if(r){const s=r.width/vw;
+      anim(W.el,[{transform:`translate(${r.left}px,${r.top+r.height/2-vh*s/2}px) scale(${s})`,borderRadius:`${16/s}px`},{transform:'none',borderRadius:'0px'}],{duration:600,easing:OUT});
+      anim(W.el,[{opacity:0},{opacity:1}],{duration:200,easing:'linear'})}
+    else anim(W.el,[{opacity:0,transform:'scale(.97)'},{opacity:1,transform:'none'}],{duration:380,easing:OUT});
+    setTimeout(()=>{if(W.app&&!W.min)setPaused(true)},640);
+  }else if(prev!==t){const dir=TABS.indexOf(t)>TABS.indexOf(prev)?1:-1;
+    anim(t.fr,[{opacity:0,transform:`translateX(${dir*36}px)`},{opacity:1,transform:'none'}],{duration:280,easing:OUT});showPill(1600)}
+  if(FINE)setTimeout(()=>{try{t.fr?.contentWindow?.focus()}catch{}},fromHub?620:30);
 }
-function restore(){if(!W.min)return;W.min=false;const d=$('#dock'),dr=d.getBoundingClientRect();d.hidden=true;
-  W.el.getAnimations().forEach(x=>x.cancel());W.el.style.visibility='';$('#scrim').hidden=false;$('#scrim').getAnimations().forEach(x=>x.cancel());chrome(true);showPill(2000);
-  anim($('#scrim'),[{opacity:0},{opacity:1}],{duration:320,easing:EASE});const s=dr.width/innerWidth;
-  anim(W.el,[{transform:`translate(${dr.left}px,${dr.top}px) scale(${s})`,opacity:0},{transform:'none',opacity:1}],{duration:580,easing:OUT});
-  setTimeout(()=>{if(W.app&&!W.min)setPaused(true)},600)}
+function goHome(){
+  if(!W.app||W.min)return;setPaused(false);closeSwitcher();chrome(false);
+  if(document.fullscreenElement&&!FINE)document.exitFullscreen?.().catch(()=>{});
+  W.min=true;renderDock();const d=$('#dock');d.hidden=false;
+  const c=d.querySelector(`[data-t="${CSS.escape(W.app.key)}"]`)||d,dr=c.getBoundingClientRect(),s=Math.max(.04,dr.width/innerWidth);
+  anim($('#scrim'),[{opacity:1},{opacity:0}],{duration:300,easing:EASE,fill:'forwards'});
+  anim(W.el,[{transform:'none',opacity:1},{transform:`translate(${dr.left}px,${dr.top}px) scale(${s})`,opacity:0}],{duration:420,easing:'cubic-bezier(.5,0,.1,1)',fill:'forwards'}).finished.then(()=>{if(!W.min)return;W.el.style.visibility='hidden';$('#scrim').hidden=true},()=>{});
+  anim(d,[{transform:'translateX(-50%) translateY(14px) scale(.94)',opacity:0},{transform:'translateX(-50%)',opacity:1}],{duration:520,easing:SPRING});
+}
+function restore(){const t=curTab()||mru()[0];if(t)switchTo(t.key)}
+async function closeTab(key){
+  const t=tabOf(key);if(!t)return;const front=W.app?.key===key&&!W.min,rest=mru().filter(o=>o!==t);
+  if(front&&rest.length){TABS.splice(TABS.indexOf(t),1);switchTo(rest[0].key);dropFrame(t)}
+  else if(front){ // last app: fly back into its icon
+    setPaused(false);const el=nodes.get(key)?.el,r=iconRect(el),vw=innerWidth,vh=innerHeight;
+    if(document.fullscreenElement&&!FINE)document.exitFullscreen?.().catch(()=>{});
+    $('#pill').classList.add('hide');anim($('#scrim'),[{opacity:1},{opacity:0}],{duration:360,easing:EASE,fill:'forwards'});let a;
+    if(r){const s=r.width/vw;a=anim(W.el,[{transform:'none',opacity:1,borderRadius:'0px'},{transform:`translate(${r.left}px,${r.top+r.height/2-vh*s/2}px) scale(${s})`,borderRadius:`${16/s}px`,opacity:0}],{duration:440,easing:'cubic-bezier(.4,0,.1,1)',fill:'forwards'})}
+    else a=anim(W.el,[{opacity:1},{opacity:0,transform:'scale(.97)'}],{duration:240,easing:EASE,fill:'forwards'});
+    await a.finished.catch(()=>{});if(!tabOf(key))return;
+    TABS.splice(TABS.indexOf(t),1);dropFrame(t);hideAll();
+    const n=nodes.get(key);if(n){ripple(n.ax,n.ay,1.1);anim(n.el.querySelector('.bob'),[{transform:'scale(.86)'},{transform:'scale(1.06)',offset:.5},{transform:'none'}],{duration:620,easing:EASE})}}
+  else{TABS.splice(TABS.indexOf(t),1);dropFrame(t);
+    if(!TABS.length)hideAll();else{if(W.app?.key===key)W.app=rest[0].app;renderTabs();renderDock();if(SW)drawSwitcher()}}
+  if(key==='p:notlar'&&notesOn)readLocalNotes();
+}
+const closeWin=()=>{if(W.app&&!W.min)closeTab(W.app.key)};
+function hideAll(){W.el.getAnimations().forEach(x=>x.cancel());$('#scrim').getAnimations().forEach(x=>x.cancel());
+  W.el.hidden=true;W.el.style.visibility='';$('#scrim').hidden=true;chrome(false);W.app=null;W.min=false;$('#dock').hidden=true;closeSwitcher();renderTabs();setPaused(document.hidden)}
+function closeAll(){for(const t of TABS.splice(0))dropFrame(t);hideAll()}
+const hideWin=()=>closeAll();
+
+function renderTabs(){const cur=curTab();
+  $('#tabs').innerHTML=TABS.map((t,i)=>{const m=miniIcon(t.app),on=t===cur;
+    return `<div class="tb${on?' on':''}${t.fr?'':' zz'}"><button class="tb-o" data-t="${esc(t.key)}" role="tab" aria-selected="${on}" title="${esc(t.app.name)}${i<9?` · Alt+${i+1}`:''}"><span class="mini" style="${m.style}">${m.html}</span><span class="tn">${esc(t.app.name)}</span></button><button class="tb-x" data-x="${esc(t.key)}" aria-label="${esc(t.app.name)} uygulamasını kapat" title="Kapat">${XI}</button></div>`}).join('');
+  $('#tabs').querySelector('.on')?.scrollIntoView({block:'nearest',inline:'nearest'});
+  if(cur){$('#wTab').hidden=cur.app.kind==='draft';$('#wFs').hidden=!document.fullscreenEnabled}}
+function renderDock(){const d=$('#dock');
+  d.innerHTML=`<span class="dk-l">Açık</span>`+mru().map(t=>{const m=miniIcon(t.app);
+    return `<div class="dk${t.fr?'':' zz'}"><button class="dk-o" data-t="${esc(t.key)}" title="${esc(t.app.name)}"><span class="mini" style="${m.style}">${m.html}</span><span class="t">${esc(t.app.name)}</span></button><button class="dk-x" data-x="${esc(t.key)}" aria-label="${esc(t.app.name)} uygulamasını kapat" title="Kapat">${XI}</button></div>`}).join('')+
+    `<button class="dk-sw" data-sw aria-label="Uygulama değiştirici" title="Değiştirici · Alt+Q"><svg viewBox="0 0 16 16"><rect x="2.5" y="3.5" width="5" height="9" rx="1.5"/><rect x="9.5" y="3.5" width="4" height="9" rx="1.5"/></svg></button>`}
+function onTabClick(e){const x=e.target.closest('[data-x]');if(x){e.stopPropagation();closeTab(x.dataset.x);return}
+  if(e.target.closest('[data-sw]')){switcher(false,0);return}
+  const b=e.target.closest('[data-t]');if(b)switchTo(b.dataset.t)}
+$('#tabs').addEventListener('click',onTabClick);$('#dock').addEventListener('click',onTabClick);
+$('#tabs').addEventListener('auxclick',e=>{const b=e.target.closest('[data-t]');if(e.button===1&&b){e.preventDefault();closeTab(b.dataset.t)}});
+
+/* ── Switcher (Alt+Q, like Alt+Tab) ── */
+let SW=null;
+function switcher(alt,step){
+  if(!TABS.length)return toast('Açık uygulama yok — bir uygulama açınca burada görünür');
+  if(!SW){const list=mru().map(t=>({t})).concat([{home:1}]),front=W.app&&!W.min;
+    SW={alt,list,sel:alt?(front&&list.length>2?1:0):0,el:document.createElement('div')};
+    SW.el.className='as-bg';SW.el.setAttribute('role','dialog');SW.el.setAttribute('aria-label','Açık uygulamalar');document.body.appendChild(SW.el);
+    SW.el.addEventListener('click',e=>{const x=e.target.closest('[data-x]');if(x){e.stopPropagation();closeTab(x.dataset.x);return}
+      const c=e.target.closest('[data-i]');if(c){SW.sel=+c.dataset.i;switcherPick()}else if(e.target===SW.el)closeSwitcher()});
+    drawSwitcher();anim(SW.el,[{opacity:0},{opacity:1}],{duration:160,easing:EASE});anim(SW.el.firstChild,[{opacity:0,transform:'scale(.96)'},{opacity:1,transform:'none'}],{duration:320,easing:OUT})}
+  else{SW.sel=(SW.sel+step+SW.list.length)%SW.list.length;drawSwitcher()}}
+function drawSwitcher(){if(!SW)return;const front=curTab();SW.list=SW.list.filter(it=>it.home||TABS.includes(it.t));SW.sel=Math.min(SW.sel,SW.list.length-1);
+  SW.el.innerHTML=`<div class="as"><div class="as-h">Açık uygulamalar <span>${FINE?'Alt basılıyken Q ile gez · bırakınca açılır':'Dokunarak geç'}</span></div><div class="as-g">`+SW.list.map((it,i)=>{
+    if(it.home)return `<button class="as-c home${i===SW.sel?' sel':''}" data-i="${i}"><span class="as-ic"><svg viewBox="0 0 24 24"><path d="M4 11l8-6.5 8 6.5M6.5 9.5V19h11V9.5"/></svg></span><b>Ana ekran</b><small>Alt+H</small></button>`;
+    const t=it.t,m=miniIcon(t.app),k=TABS.indexOf(t);
+    return `<div class="as-w"><button class="as-c${i===SW.sel?' sel':''}${t===front&&!W.min?' cur':''}" data-i="${i}"><span class="as-ic mini" style="${m.style}">${m.html}</span><b>${esc(t.app.name)}</b><small>${t.fr?(k<9?'Alt+'+(k+1):'açık'):'uykuda · dokununca yüklenir'}</small></button><button class="as-x" data-x="${esc(t.key)}" aria-label="${esc(t.app.name)} uygulamasını kapat" title="Kapat">${XI}</button></div>`}).join('')+`</div></div>`}
+function switcherPick(){if(!SW)return;const it=SW.list[SW.sel];closeSwitcher();if(!it)return;if(it.home)goHome();else switchTo(it.t.key)}
+function closeSwitcher(){if(!SW)return;const el=SW.el;SW=null;anim(el,[{opacity:1},{opacity:0}],{duration:140,easing:EASE}).finished.then(()=>el.remove(),()=>el.remove())}
+// shared by the hub and every open app (same-origin frames forward their keys here)
+function osKeys(e){
+  if(e.altKey&&!e.ctrlKey&&!e.metaKey){const c=e.code;
+    if(c==='KeyQ'||c==='Backquote'){e.preventDefault();switcher(true,e.shiftKey?-1:1);return true}
+    if(/^Digit[1-9]$/.test(c)){const t=TABS[+c.slice(5)-1];if(t){e.preventDefault();closeSwitcher();switchTo(t.key);return true}return false}
+    if(c==='KeyH'||c==='Digit0'){if(W.app&&!W.min){e.preventDefault();goHome()}return true}
+    if(c==='KeyW'&&W.app&&!W.min){e.preventDefault();closeWin();return true}}
+  if(SW){if(e.key==='Escape'){e.preventDefault();closeSwitcher();return true}
+    if(e.key==='Enter'){e.preventDefault();switcherPick();return true}
+    if(e.key==='ArrowRight'||e.key==='ArrowLeft'||e.key==='Tab'){e.preventDefault();switcher(SW.alt,e.key==='ArrowLeft'||e.shiftKey?-1:1);return true}}
+  if(e.key==='Escape'&&e.shiftKey&&W.app&&!W.min){e.preventDefault();closeWin();return true}
+  return false}
+function osKeyUp(e){if(SW?.alt&&(e.key==='Alt'||!e.altKey))switcherPick()}
+addEventListener('keyup',osKeyUp,true);
+addEventListener('blur',()=>{if(SW?.alt)SW.alt=false});
+
+/* ── Touch: swipe the handle (or an app's screen edge) to change apps ── */
+function swipeOn(el,pick){let sx=0,sy=0,id=null,t0=0;
+  el.addEventListener('touchstart',e=>{const p=e.changedTouches[0];if(!pick(p))return;id=p.identifier;sx=p.clientX;sy=p.clientY;t0=Date.now()},{passive:true});
+  el.addEventListener('touchend',e=>{if(id==null)return;const p=[...e.changedTouches].find(q=>q.identifier===id);if(!p)return;id=null;
+    const dx=p.clientX-sx,dy=p.clientY-sy;if(Date.now()-t0>700)return;
+    if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5)stepTab(dx<0?1:-1);else if(dy>50&&Math.abs(dy)>Math.abs(dx))switcher(false,0)},{passive:true})}
+function stepTab(d){if(TABS.length<2)return showPill(1800);const i=TABS.indexOf(curTab());switchTo(TABS[(i+d+TABS.length)%TABS.length].key)}
+function edgeSwipe(w){if(FINE)return;swipeOn(w.document,p=>p.clientX<16||p.clientX>w.innerWidth-16)}
+swipeOn($('#grab'),()=>true);
+$('#grab').addEventListener('click',()=>showPill(3500));
+
 function toggleFS(){if(!document.fullscreenEnabled)return toast('Bu tarayıcı tam ekranı desteklemiyor — ana ekrana ekleyerek dene');
   if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});else document.documentElement.requestFullscreen().catch(()=>{})}
 document.addEventListener('fullscreenchange',()=>$('#fsIcon').setAttribute('d',document.fullscreenElement?'M6 2.5V6H2.5M13.5 6H10V2.5M10 13.5V10h3.5M2.5 10H6v3.5':'M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10'));
-$('#dock').addEventListener('click',e=>{const b=e.target.closest('[data-d]');if(!b)return;if(b.dataset.d==='open')restore();else hideWin(false)});
-$('#pill').addEventListener('click',e=>{const b=e.target.closest('[data-w]');if(!b)return;const w=b.dataset.w;
-  if(w==='close')closeWin();else if(w==='min')minimize();else if(w==='fs')toggleFS();
-  else if(w==='reload'&&W.app)loadFrame(W.app);else if(w==='tab'&&W.app?.url)window.open(W.app.url,'_blank','noopener')});
+$('#pill').addEventListener('click',e=>{const b=e.target.closest('[data-w]');if(!b)return;const w=b.dataset.w,t=curTab();
+  if(w==='close')closeWin();else if(w==='home')goHome();else if(w==='fs')toggleFS();else if(w==='sw')switcher(false,0);
+  else if(w==='reload'&&t){dropFrame(t);switchTo(t.key)}else if(w==='tab'&&t?.app.url)window.open(t.app.url,'_blank','noopener')});
 
 /* ── Menus ────────────────────────────────────────────────── */
 let menuEl=null;
@@ -1963,6 +2129,10 @@ function palette(){
     {ic:UI.graph,l:'Galaksiyi göster',k:'G',run:fitAll},
     {ic:UI.group,l:'Akıllı kümeleme · oto senkron',k:'K',run:smartSheet},
     ...THEME_KEYS.map(k=>({ic:UI.moon,l:'Tema: '+THEMES[k].n,k:k===document.documentElement.dataset.theme?'✓':'',run:()=>setTheme(k)})),
+    ...(TABS.length?[{ic:UI.fit,l:'Açık uygulamalar (değiştirici)',k:'⌥Q',run:()=>switcher(false,0)}]:[]),
+    {ic:UI.zoom,l:'Görüntü: otomatik akıcılık'+(PERF.auto?' ✓':''),run:()=>{PERF.auto=true;localStorage.removeItem('appshell:perf');setTier(0);toast('Akıcılık otomatik — gerekirse kaliteyi kendim düşürürüm')}},
+    {ic:UI.zoom,l:'Görüntü: yüksek kalite'+(!PERF.auto&&!TIER?' ✓':''),run:()=>{PERF.auto=false;localStorage.setItem('appshell:perf','fixed');setTier(0)}},
+    {ic:UI.zoom,l:'Görüntü: hafif mod (eski cihazlar)'+(!PERF.auto&&TIER===2?' ✓':''),run:()=>{PERF.auto=false;localStorage.setItem('appshell:perf','fixed');setTier(2)}},
     {ic:UI.fs,l:document.fullscreenElement?'Tam ekrandan çık':'Tarayıcı tam ekranı',k:'F',run:toggleFS},
     {ic:UI.key,l:'Klavye kısayolları',k:'?',run:shortcuts},
     ...(S.kind==='cloud'?[{ic:UI.out,l:'Çıkış yap',run:()=>firebase.auth().signOut()}]:[]),
@@ -2012,6 +2182,8 @@ function shortcuts(){
     <span>Ara / komut paleti</span><span>${K('⌘','K')}</span><span>Yeni taslak</span><span>${K('⌘','N')}</span>
     <span>Galaksiyi göster</span><span>${K('G')}</span><span>Tema değiştir</span><span>${K('⇧','⌘','L')}</span>
     <span>Tarayıcı tam ekranı</span><span>${K('F')}</span><span>Uygulamayı kapat</span><span>${K('⇧','Esc')}</span>
+    <span>Uygulamalar arası geç</span><span>${K('Alt','Q')}</span><span>N. uygulamaya git</span><span>${K('Alt','1–9')}</span>
+    <span>Ana ekrana dön</span><span>${K('Alt','H')}</span><span>Bu uygulamayı kapat</span><span>${K('Alt','W')}</span>
     <span>Bağlantı kur</span><span>${K('⇧')} + sürükle</span><span>Kısayollar</span><span>${K('?')}</span>
     <span>Boş alana çift tıkla</span><span>yeni taslak</span><span>HTML'i ekrana bırak</span><span>taslak ekle</span>
     <span>Gezin</span><span>boş alanı sürükle · ok tuşları</span><span>Yakınlaş / uzaklaş</span><span>${K('⌘')} + tekerlek · ${K('+')} ${K('−')}</span>
@@ -2108,16 +2280,16 @@ $('#addBtn').onclick=e=>{e.stopPropagation();const b=$('#addBtn').getBoundingCli
     ev=>{const x=ev.target.closest('[data-a]');if(!x)return;hideMenu();if(x.dataset.a==='draft'){spawnHint=null;openSheet()}else widgetGallery()})};
 $('#themeBtn').onclick=e=>{e.stopPropagation();themeMenu()};
 addEventListener('keydown',e=>{
-  if(document.body.classList.contains('locked'))return;const mod=e.metaKey||e.ctrlKey,k=e.key.toLowerCase();
+  if(document.body.classList.contains('locked'))return;if(osKeys(e))return;const mod=e.metaKey||e.ctrlKey,k=e.key.toLowerCase();
   if(mod&&k==='k'){e.preventDefault();palEl?closePal():palette();return}
   if(mod&&k==='n'&&!e.shiftKey){e.preventDefault();openSheet();return}
   if(mod&&e.shiftKey&&k==='l'){e.preventDefault();toggleTheme();return}
-  if(e.key==='Escape'){if(palEl)closePal();else if(linkDrag)cancelLink();else if(menuEl)hideMenu();else if(sheetEl)closeSheet();else if(W.app&&!W.min)closeWin();return}
+  if(e.key==='Escape'){if(palEl)closePal();else if(linkDrag)cancelLink();else if(menuEl)hideMenu();else if(sheetEl)closeSheet();else if(W.app&&!W.min)goHome();return}
   if(typing(e)||mod||e.altKey||sheetEl||palEl)return;
   if(e.key==='?'){e.preventDefault();shortcuts()}
   else if(k==='/'){e.preventDefault();palette()}
-  else if(k==='g'&&!W.app){fitAll()}
-  else if(k==='k'&&!W.app){smartSheet()}
+  else if(k==='g'&&!(W.app&&!W.min)){fitAll()}
+  else if(k==='k'&&!(W.app&&!W.min)){smartSheet()}
   else if(k==='f'){toggleFS()}
   else if(W.app&&!W.min){}
   else if(e.key==='+'||e.key==='='){zoomTo(cam.tz*1.25)}
@@ -2166,7 +2338,7 @@ buildMesh();introStart=performance.now();wake();
   const fs=firebase.firestore();try{await fs.enablePersistence({synchronizeTabs:true})}catch{}
   firebase.auth().getRedirectResult().catch(e=>gate('error',authMsg(e)));
   firebase.auth().onAuthStateChanged(async u=>{
-    if(!u){Cloud.stop();S=Local;drafts=[];if(W.app)hideWin(false);closeSheet(true);closePal();hideMenu();clearNodes();clearWidgets();booted=false;$('#me').hidden=true;return gate('signin')}
+    if(!u){Cloud.stop();S=Local;drafts=[];closeAll();closeSheet(true);closePal();hideMenu();clearNodes();clearWidgets();booted=false;$('#me').hidden=true;return gate('signin')}
     if((u.email||'').toLowerCase()!==OWNER){Cloud.stop();return gate('denied',`<b>${esc(u.email)}</b> bu alana erişemez.`)}
     gate('loading','Yükleniyor…');await mp;S=Cloud;await Cloud.start(fs);
     const me=$('#me');me.hidden=false;me.innerHTML=u.photoURL?`<img src="${esc(u.photoURL)}" alt="" referrerpolicy="no-referrer">`:esc(mono(u.displayName||u.email));

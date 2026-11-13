@@ -1,6 +1,6 @@
 {
  "updated": "2026-11-13",
- "method": "Ünlü uygulamaların (Duolingo, Momentum, Arc, Obsidian, Anki, Pomofocus, Toggl) yaklaşımları ve Reddit / forum tartışmaları tarandı; her öneri kaynağıyla birlikte, hub'a uyarlanmış haliyle yazıldı.",
+ "method": "İki tür öneri var. “Eksik” olanlar: her uygulamamızın özelliklerini tek tek çıkarıp o alanda en iyi yapan uygulamalarla (Notion, Obsidian, Bear, Pomofocus, Session, Toggl, Bluebook, World Time Buddy, Todoist) karşılaştırdım; neyi atladığımızı, kimin en iyi yaptığını ve bizde nasıl olacağını yazdım. Diğerleri: Reddit / forum tartışmalarından çıkan genel fikirler. Hepsi kaynaklı ve kendi cümlelerimle.",
  "ideas": [
   {
    "id": "freeze",
@@ -44,7 +44,8 @@
      "t": "Duolingo streak kilometre taşları (7/30/100/365)",
      "u": "https://duolingo.deconstructoroffun.com/mechanics/streaks"
     }
-   ]
+   ],
+   "status": "done"
   },
   {
    "id": "activetask",
@@ -64,7 +65,8 @@
      "t": "Tomatillo Timer — aktif görevi ana ekranda gösterme",
      "u": "https://itnext.io/i-built-a-study-timer-to-improve-my-focus-2aeda64606bf"
     }
-   ]
+   ],
+   "status": "done"
   },
   {
    "id": "insights",
@@ -84,7 +86,8 @@
      "t": "En iyi Pomodoro / çalışma sayacı uygulamaları 2026",
      "u": "https://www.alphonsolabs.com/best-pomodoro-timer-apps-study-2026/amp/"
     }
-   ]
+   ],
+   "status": "done"
   },
   {
    "id": "breakmusic",
@@ -188,7 +191,8 @@
      "t": "Obsidian forum — klasörler grafikte alan olarak",
      "u": "https://forum.obsidian.md/t/graph-view-show-folders-like-puddles-of-water/72463/2"
     }
-   ]
+   ],
+   "status": "done"
   },
   {
    "id": "export",
@@ -256,7 +260,8 @@
      "t": "Web Highlights — En iyi yeni sekme eklentileri",
      "u": "https://web-highlights.com/blog/the-best-new-tab-chrome-extensions-for-2024/"
     }
-   ]
+   ],
+   "status": "done"
   },
   {
    "id": "integr",
@@ -272,7 +277,8 @@
      "t": "Fast Company — Chrome panosu eklentileri",
      "u": "https://www.fastcompany.com/91467399/chrome-dashboard-extensions-new-tab-start-page"
     }
-   ]
+   ],
+   "status": "done"
   },
   {
    "id": "tour",
@@ -289,6 +295,366 @@
      "u": "https://www.tooltivity.com/extensions/compare/new-tab-calendar-with-chatgpt-vs-presentboard-vs-momentum"
     }
    ]
+  },
+  {
+   "id": "notesTable",
+   "app": "Notlar",
+   "area": "Bloklar",
+   "title": "Tablo bloğu",
+   "gap": "Notlar’da tablo yok. Karşılaştırma, ders programı ya da fiyat listesi gibi şeyleri madde madde yazmak zorunda kalıyorsun.",
+   "best": [
+    {
+     "n": "Notion",
+     "how": "/table ile basit tablo açılıyor, Tab ile hücreden hücreye geçiliyor, başlık satırı ve sütunu açılabiliyor, satır-sütun sürüklenerek taşınıyor; ihtiyaç büyürse tek tıkla veritabanına çevriliyor."
+    },
+    {
+     "n": "Apple Notes",
+     "how": "Tablo var ama kullanıcılar sütun genişliğini ayarlayamamaktan ve hücre içi biçimin kısıtlı olmasından şikâyetçi — yani sade olsun ama genişlik ayarlanabilsin."
+    }
+   ],
+   "why": "Forumlarda GoodNotes, Samsung Notes ve Day One kullanıcıları tabloyu yıllardır en temel eksik olarak istiyor; Notion bile basit tabloyu sonradan eklemek zorunda kaldı.",
+   "what": "/tablo bloğu: Tab / Shift+Tab ile gezinme, son hücrede Tab yeni satır, başlık satırı aç-kapa, satır/sütun ekle-sil menüsü, sütun genişliği sürüklenebilir. Formül yok, sade kalsın.",
+   "effort": "M",
+   "impact": 3,
+   "sources": [
+    {
+     "t": "Notion — basit tablo mu veritabanı mı",
+     "u": "https://www.notion.com/guides/simple-tables-vs-databases"
+    },
+    {
+     "t": "Thomas Frank — Notion simple tables",
+     "u": "https://thomasjfrank.com/notion-simple-tables/"
+    },
+    {
+     "t": "GoodNotes önerileri — tablo isteği",
+     "u": "https://feedback.goodnotes.com/forums/191274-customer-suggestions-for-goodnotes-apple/suggestions/44822932-tables-in-notebooks-whiteboard"
+    },
+    {
+     "t": "Apple Community — Notes tablosunda eksikler",
+     "u": "https://discussions.apple.com/thread/255653083"
+    }
+   ],
+   "kind": "gap"
+  },
+  {
+   "id": "notesToggle",
+   "app": "Notlar",
+   "area": "Bloklar",
+   "title": "Katlanır başlıklar",
+   "gap": "Uzun bir sayfada (ör. SAT konu özeti) bölümleri katlayamıyorsun; her şey hep açık duruyor.",
+   "best": [
+    {
+     "n": "Notion",
+     "how": "H1/H2/H3 başlıkları katlanabilir yapılabiliyor; katlanınca altındaki her şey gizleniyor ama başlık içindekiler listesinde kalıyor. “>” + boşluk ile hızlıca açılıyor."
+    },
+    {
+     "n": "Anytype",
+     "how": "Kullanıcılar bu özelliği yıllarca istedi; ekip her bloğa katlama yerine yalnızca başlıklara ekledi ve bunun pratikte yettiğini söyledi."
+    }
+   ],
+   "why": "Uzun ders notlarında kaybolmayı önlüyor; Notion’dan gelenlerin en çok aradığı özelliklerden biri.",
+   "what": "Başlıkların soluna küçük ok; tıklayınca bir sonraki aynı/üst seviye başlığa kadar olan bloklar katlanır. Katlı/açık durumu sayfayla kaydedilir, telefonda da çalışır.",
+   "effort": "S",
+   "impact": 2,
+   "sources": [
+    {
+     "t": "Notion sürüm notu — başlık toggle’ları",
+     "u": "https://www.notion.com/releases/2021-12-23"
+    },
+    {
+     "t": "Anytype topluluğu — toggle başlık isteği",
+     "u": "https://community.anytype.io/t/make-toggle-a-feature-of-every-block/1001?page=5"
+    },
+    {
+     "t": "Thomas Frank — toggle blokları",
+     "u": "https://thomasjfrank.com/?p=11331"
+    }
+   ],
+   "kind": "gap"
+  },
+  {
+   "id": "notesBacklinks",
+   "app": "Notlar",
+   "area": "Bağlantılar",
+   "title": "Bu sayfaya bağlananlar",
+   "gap": "Alt sayfa oluşturabiliyorsun ama bir sayfaya hangi sayfaların işaret ettiğini göremiyorsun.",
+   "best": [
+    {
+     "n": "Obsidian",
+     "how": "Her notun altında iki liste var: ona bağlanan notlar ve adı geçtiği halde bağlanmamış notlar. İkincisinde tek tıkla bağlantıya çevirme düğmesi var."
+    }
+   ],
+   "why": "Bilgi yönetimi yazarları bağlanmamış anmaları, not ağını en az emekle zenginleştirmenin yolu olarak öneriyor; notlar arası ilişkiler kendiliğinden görünür oluyor.",
+   "what": "Sayfa sonunda “Bu sayfaya bağlananlar” ve “Adı geçen ama bağlı olmayan” bölümü; her satırda bağlam cümlesi ve “Bağla” düğmesi. Hub’daki küme önerilerini de besleyebilir.",
+   "effort": "M",
+   "impact": 2,
+   "sources": [
+    {
+     "t": "Obsidian yardım — Backlinks",
+     "u": "https://help.obsidian.md/Plugins/Backlinks"
+    },
+    {
+     "t": "dsebastien — Unlinked mentions",
+     "u": "https://notes.dsebastien.net/30+Areas/33+Permanent+notes/33.02+Content/Obsidian+Unlinked+Mentions"
+    }
+   ],
+   "kind": "gap"
+  },
+  {
+   "id": "notesHistory",
+   "app": "Notlar",
+   "area": "Güvenlik",
+   "title": "Sayfa geçmişi ve geri yükleme",
+   "gap": "Yanlışlıkla bir bölümü silersen ya da üstüne yazarsan geri dönüş yolu yok.",
+   "best": [
+    {
+     "n": "Notion",
+     "how": "Düzenleme sürerken belli aralıklarla ve bitirdikten kısa süre sonra otomatik sürüm alıyor; eski sürümü önizleyip tamamen geri yükleyebiliyor ya da sadece işine yarayan blokları kopyalayabiliyorsun."
+    }
+   ],
+   "why": "Telefon ve bilgisayar aynı anda açıkken çakışmalarda ya da yanlış silmede tek güvence bu.",
+   "what": "Her sayfa için düzenlerken 10 dakikada bir anlık görüntü (son 20 tanesi tutulur). “Geçmiş” panelinde zaman çizelgesi, önizleme ve “Bu sürümü geri yükle”.",
+   "effort": "M",
+   "impact": 2,
+   "sources": [
+    {
+     "t": "Notion yardım — sil ve geri yükle",
+     "u": "https://www.notion.com/help/duplicate-delete-and-restore-content"
+    },
+    {
+     "t": "Thomas Frank — Edit history & trash",
+     "u": "https://thomasjfrank.com/learn-notion/edit-history-trash/"
+    }
+   ],
+   "kind": "gap"
+  },
+  {
+   "id": "notesImages",
+   "app": "Notlar",
+   "area": "Bloklar",
+   "title": "Görsel yapıştırma",
+   "gap": "Notlar’a ekran görüntüsü ya da fotoğraf koyamıyorsun.",
+   "best": [
+    {
+     "n": "Bear",
+     "how": "Bir cihazda kopyala, öbüründe yapıştır; sürükle-bırak; görseller notun içinde, metinle akıyor."
+    },
+    {
+     "n": "Apple Notes",
+     "how": "Görseller satır içinde önizleniyor; tüm notlardaki ekleri tek pencerede görebiliyorsun."
+    }
+   ],
+   "why": "SAT çalışırken soru ekran görüntüsünü nota koymak en sık ihtiyaç.",
+   "what": "Yapıştır / sürükle → görsel otomatik küçültülür (ör. 1600 px WebP) ve bloğa gömülür. Dikkat: Firestore’da belge başına 1 MB sınırı var; büyük görseller için Firebase Storage gerekir.",
+   "effort": "M",
+   "impact": 3,
+   "sources": [
+    {
+     "t": "Bear blog — görsellerle çalışmak",
+     "u": "https://blog.bear.app/2026/04/bear-beyond-text-working-with-images-pdfs-and-more/"
+    },
+    {
+     "t": "Apple — Notes’a ek eklemek",
+     "u": "https://support.apple.com/guide/notes/attach-photos-links-and-more-not95edd2813/4.7/mac"
+    }
+   ],
+   "kind": "gap"
+  },
+  {
+   "id": "slPomodoro",
+   "app": "Study Log",
+   "area": "Sayaç",
+   "title": "Pomodoro döngüsü",
+   "gap": "Sayaçta kronometre ve tek seferlik süreli mod var; odak–mola döngüsü yok, her molada elle yeniden başlatıyorsun.",
+   "best": [
+    {
+     "n": "Pomofocus",
+     "how": "Göreve tahmini pomodoro sayısı veriliyor; kısa mola, uzun mola ve kaç pomodoroda bir uzun mola ayarlanıyor; bir sonraki aşama kendiliğinden başlayabiliyor."
+    },
+    {
+     "n": "Reclaim",
+     "how": "Tamamlanan / başlanan pomodoro oranını ve gün içindeki mola sayısını gösteriyor."
+    }
+   ],
+   "why": "App Store yorumlarında kullanıcıların en sık şikâyeti, bir sonraki turu elle başlatmayı unutmak; otomatik geçiş istiyorlar.",
+   "what": "Süreli moda “Pomodoro” seçeneği: 25/5, dört turda bir 15 dk uzun mola, otomatik geçiş, görev başına pomodoro sayacı. Molalar kayda girmez, sadece odak dakikaları yazılır.",
+   "effort": "S",
+   "impact": 3,
+   "sources": [
+    {
+     "t": "Pomofocus",
+     "u": "https://pomofocus.io/"
+    },
+    {
+     "t": "Reclaim — Pomodoro ayarları",
+     "u": "https://help.reclaim.ai/en/articles/12611123"
+    },
+    {
+     "t": "FocusPomo App Store yorumları",
+     "u": "https://apps.apple.com/ca/app/id1528322796"
+    }
+   ],
+   "kind": "gap"
+  },
+  {
+   "id": "slReflect",
+   "app": "Study Log",
+   "area": "Sayaç",
+   "title": "Oturum sonu tek satırlık değerlendirme",
+   "gap": "Oturum bittiğinde süre kaydediliyor ama ne öğrendiğin ya da ne kadar odaklı olduğun kaydedilmiyor.",
+   "best": [
+    {
+     "n": "Session",
+     "how": "Başlarken niyet yazdırıyor, bitince “ne öğrendin, dağıldın mı?” diye soruyor; kullanıcılar en çok bu küçük ritüeli övüyor."
+    }
+   ],
+   "why": "Süre tek başına kaliteyi göstermiyor; odak puanı saat ısı haritasıyla birleşince “en verimli saatler” gerçekten verimli saatler olur.",
+   "what": "Bitir’e basınca tek satır “Ne öğrendin?” ve 3 seçenekli odak (dağınık / normal / akış). Takip’te odak ortalaması ve ısı haritasında odak katmanı.",
+   "effort": "S",
+   "impact": 2,
+   "sources": [
+    {
+     "t": "Product Hunt — Session yorumları",
+     "u": "https://www.producthunt.com/products/session-1?page=1"
+    },
+    {
+     "t": "My Productive Mac — Session",
+     "u": "https://myproductivemac.com/blog/tag/Session"
+    },
+    {
+     "t": "Session kullanıcı yorumları",
+     "u": "https://appshunter.io/ios/app/1521432881/reviews/11"
+    }
+   ],
+   "kind": "gap"
+  },
+  {
+   "id": "slExport",
+   "app": "Study Log",
+   "area": "Veri",
+   "title": "CSV olarak dışa aktar",
+   "gap": "Çalışma kayıtlarını Excel’e ya da başka bir yere alamıyorsun.",
+   "best": [
+    {
+     "n": "Toggl Track",
+     "how": "Detaylı rapordan tarih filtresiyle CSV indiriliyor; kullanıcılar bunu Excel / Google Sheets’te pivot tabloyla istedikleri rapora çeviriyor."
+    }
+   ],
+   "why": "Verinin sende olduğunu bilmek güven veriyor; koç/öğretmenle paylaşmak da kolaylaşıyor.",
+   "what": "Takip sekmesine “CSV indir”: tarih, ders, konu, görev, dakika, başlangıç–bitiş. Aralık seçilebilir (hafta / ay / tümü).",
+   "effort": "S",
+   "impact": 1,
+   "sources": [
+    {
+     "t": "Toggl — veri dışa aktarma",
+     "u": "https://support.toggl.com/en/articles/2564936-exporting-data"
+    },
+    {
+     "t": "Toggl topluluğu — pivot ile özel rapor",
+     "u": "https://community.toggl.com/t/create-custom-reports-with-excel-and-google-sheets/53"
+    }
+   ],
+   "kind": "gap"
+  },
+  {
+   "id": "satMock",
+   "app": "SAT Bank",
+   "area": "Deneme",
+   "title": "Gerçek sınav gibi adaptif deneme",
+   "gap": "Bankada soru çözme, eleme, süre ve tekrar var ama gerçek sınavın iki modüllü adaptif yapısını taklit eden bir deneme modu yok.",
+   "best": [
+    {
+     "n": "Bluebook (College Board)",
+     "how": "Her bölüm iki modül: ilki karışık zorlukta, performansına göre ikinci modül zor ya da kolay geliyor. R&W modülü 27 soru / 32 dk, Math modülü 22 soru / 35 dk; sadece içinde bulunduğun modülde geri dönebiliyorsun."
+    },
+    {
+     "n": "Acely",
+     "how": "Deneme sonunda hangi ikinci modüle düştüğünü ve soru soru hız analizini gösteriyor."
+    }
+   ],
+   "why": "Hazırlık yazıları, sınavı zor hissettiren şeyin bilgi değil, süreli ve adaptif koşulda yeterince deneme yapmamak olduğunu söylüyor.",
+   "what": "“Deneme modu”: bankadan karışık zorlukta 1. modül → doğru sayısına göre zor/kolay 2. modül; modül süresi, modül bitince geri dönememe, sonunda modül rotası + soru başına süre raporu.",
+   "effort": "L",
+   "impact": 3,
+   "sources": [
+    {
+     "t": "College Board — Bluebook pratik testleri",
+     "u": "https://satsuite.collegeboard.org/practice/bluebook"
+    },
+    {
+     "t": "Applerouth — adaptif SAT rehberi",
+     "u": "https://www.applerouth.com/blog/the-complete-guide-to-the-digital-adaptive-sat"
+    },
+    {
+     "t": "Acely — Bluebook ve gerçek sınav",
+     "u": "https://acely.com/blog/bluebook-sat-practice-tests-vs-actual-exam-easier-or-harder"
+    }
+   ],
+   "kind": "gap"
+  },
+  {
+   "id": "saatPlanner",
+   "app": "Saat",
+   "area": "Planlama",
+   "title": "Saat şeridi ile toplantı saati bul",
+   "gap": "Saat uygulaması dört şehrin sadece şimdiki saatini gösteriyor; “Milano’da 10:00 olunca LA’de kaç?” sorusuna cevap vermiyor.",
+   "best": [
+    {
+     "n": "World Time Buddy",
+     "how": "Her şehir için saat cetveli var; kaydırıcıyı bir saate çekince tüm şehirlerde aynı anı görüyorsun. İş saatleri renkle ayrılıyor, seçilen saati link olarak paylaşabiliyorsun."
+    }
+   ],
+   "why": "İtalya ve ABD ile yazışırken en sık sorulan şey bu; kafadan hesap yaz/kış saati geçişlerinde yanılıyor.",
+   "what": "Saat’e 24 saatlik şerit: kaydırınca İstanbul / Milano / Londra / LA aynı anda değişir; iş saatleri yeşil, gece gri; tarih seçilebilir; “bu saati kopyala”.",
+   "effort": "S",
+   "impact": 2,
+   "sources": [
+    {
+     "t": "EarthSims — saat dilimi araçları",
+     "u": "https://www.earthsims.com/digital-nomad-tools/remote-work-time-zone-tools/"
+    },
+    {
+     "t": "Linux Magazine — WorldTimeBuddy",
+     "u": "https://www.linux-magazine.com/Online/Blogs/Productivity-Sauce/Handle-Multiple-Time-Zones-with-WorldTimeBuddy-for-Chrome-and-Chromium"
+    },
+    {
+     "t": "OnceHub — toplantı planlayıcılar",
+     "u": "https://www.oncehub.com/blog/9-meeting-planner-world-clock-tools-for-global-teams"
+    }
+   ],
+   "kind": "gap"
+  },
+  {
+   "id": "hubQuickAdd",
+   "app": "Hub",
+   "area": "Komut paleti",
+   "title": "Doğal dille hızlı ekleme",
+   "gap": "⌘K uygulama açıyor ve komut çalıştırıyor ama “yarın 9’da SAT denemesi” yazınca bir şey oluşturmuyor.",
+   "best": [
+    {
+     "n": "Todoist Quick Add",
+     "how": "Tek satırdan tarih, saat, proje, etiket ve önceliği ayrıştırıyor; form doldurmuyorsun."
+    },
+    {
+     "n": "Raycast eklentileri",
+     "how": "Aynı hızlı eklemeyi her yerden bir kısayolla yapıyor."
+    }
+   ],
+   "why": "Yakalanmayan fikir kayboluyor; hub her zaman açık olduğu için doğal giriş kapısı.",
+   "what": "⌘K’da “yarın 9’da SAT deneme #SAT” → Notlar’da o güne görev ya da Study Log’da plan. Türkçe tarih ayrıştırma: yarın, cuma, 3 kasım, 14:30.",
+   "effort": "M",
+   "impact": 2,
+   "sources": [
+    {
+     "t": "Todoist — Task Quick Add",
+     "u": "https://www.todoist.com/help/articles/use-task-quick-add-in-todoist-va4Lhpzz"
+    },
+    {
+     "t": "Todoist doğal dil rehberi",
+     "u": "https://www.usecarly.com/blog/how-to-use-natural-language-in-todoist/"
+    }
+   ],
+   "kind": "gap"
   }
  ]
 }

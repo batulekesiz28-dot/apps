@@ -38,7 +38,13 @@ header{display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap;margin-bottom:2
 .sp{flex:1}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr));gap:14px}
 .card{background:var(--card);border-radius:20px;box-shadow:0 0 0 .5px var(--line2),0 10px 30px -22px rgba(0,0,0,.25);padding:18px 18px 16px;display:grid;gap:10px;align-content:start;animation:in .5s var(--out) both;transition:opacity .3s}
-.card.no{opacity:.55}
+.card.no{opacity:.55}.card.dn{opacity:.62}
+.tag.gap{color:#B91C1C;background:color-mix(in srgb,#DC2626 9%,transparent);box-shadow:none}[data-theme=dark] .tag.gap{color:#FCA5A5}
+.gapl{font-size:13.5px;color:var(--ink);padding-left:10px;border-left:2px solid #DC2626}
+.best{display:grid;gap:8px;padding:10px 12px;border-radius:12px;background:var(--bg2);box-shadow:inset 0 0 0 .5px var(--line)}
+.best b.h{font:600 11.5px var(--mono);letter-spacing:.06em;color:var(--acc)}
+.best div{font-size:13.5px;color:var(--ink2)}.best div strong{color:var(--ink);font-weight:600}
+.done-l{font:600 12px var(--mono);color:var(--ok);padding:8px 0 2px}
 @keyframes in{from{opacity:0;transform:translateY(8px)}}
 .tags{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .tag{font:500 11.5px/1 var(--mono);padding:5px 8px;border-radius:7px;background:var(--bg2);box-shadow:inset 0 0 0 .5px var(--line2);color:var(--ink2)}
@@ -70,7 +76,7 @@ header{display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap;margin-bottom:2
 <main>
   <header>
     <div class="ttl"><h1><i><svg viewBox="0 0 16 16"><path d="M8 1.8l1.6 3.9 4.1.3-3.1 2.7 1 4L8 10.5 4.4 12.7l1-4L2.3 6l4.1-.3z"/></svg></i>Öneriler</h1>
-      <p>Hub'ı nasıl daha iyi yapabiliriz? Dünyaca bilinen uygulamaların çözümleri ve Reddit, forum, kullanıcı yorumlarında insanların gerçekten istedikleri araştırıldı; her öneri kaynağıyla birlikte burada. Beğendiklerine “İstiyorum” de, Claude'a gönder.</p>
+      <p>Her uygulamamızı o alanda en iyi yapanlarla karşılaştırdım: “Atladıklarımız” neyi kaçırdığımızı ve kimin en iyi yaptığını gösterir. Dünyaca bilinen uygulamaların çözümleri ve Reddit, forum, kullanıcı yorumlarında insanların gerçekten istedikleri araştırıldı; her öneri kaynağıyla birlikte burada. Beğendiklerine “İstiyorum” de, Claude'a gönder.</p>
       <div class="meta" id="meta"></div></div>
     <button class="btn pri" id="send"><svg viewBox="0 0 16 16"><path d="M2.5 8h11M9 3.5L13.5 8 9 12.5"/></svg>İstediklerimi Claude'a gönder</button>
   </header>
@@ -98,20 +104,22 @@ function save(){ls.set('oneriler:state',state);if(doc)doc.set({state},{merge:tru
 async function load(){try{DATA=await(await fetch('../../audit/ideas.json',{cache:'no-cache'})).json()}catch{DATA={ideas:[]}}
   $('#meta').textContent=`${DATA.ideas.length} öneri · araştırma ${DATA.updated?new Date(DATA.updated).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'}):''}`;paint()}
 function paint(){if(!DATA)return;const I=DATA.ideas,apps=[...new Set(I.map(i=>i.app))];
-  const cnt=k=>k==='all'?I.length:k==='want'?I.filter(i=>state[i.id]==='want').length:I.filter(i=>i.app===k).length;
-  $('#filters').innerHTML=[['all','Tümü'],['want','İstediklerim'],...apps.map(a=>[a,a])].map(([k,l])=>`<button class="chip${filter===k?' on':''}" data-f="${esc(k)}">${esc(l)}<span class="n">${cnt(k)}</span></button>`).join('');
-  const list=I.filter(i=>filter==='all'||(filter==='want'?state[i.id]==='want':i.app===filter))
-    .sort((a,b)=>((state[a.id]==='no')-(state[b.id]==='no'))||(b.impact-a.impact));
-  $('#list').innerHTML=list.length?list.map((i,n)=>{const s=state[i.id];return`<article class="card${s==='no'?' no':''}" style="animation-delay:${Math.min(n,8)*40}ms">
-    <div class="tags"><span class="tag">${esc(i.app)} · ${esc(i.area)}</span><span class="tag">${EFF[i.effort]||''}</span><span class="tag imp">${'●'.repeat(i.impact)}${'○'.repeat(3-i.impact)} etki</span>${s?`<span class="st ${s}">${ST[s]}</span>`:''}</div>
-    <h2>${esc(i.title)}</h2><div class="why">${esc(i.why)}</div><div class="what"><b>BİZDE NASIL OLUR</b>${esc(i.what)}</div>
+  const cnt=k=>k==='all'?I.length:k==='want'?I.filter(i=>state[i.id]==='want').length:k==='gap'?I.filter(i=>i.kind==='gap'&&i.status!=='done').length:k==='done'?I.filter(i=>i.status==='done').length:I.filter(i=>i.app===k).length;
+  $('#filters').innerHTML=[['all','Tümü'],['gap','Atladıklarımız'],['want','İstediklerim'],['done','Yapılanlar'],...apps.map(a=>[a,a])].map(([k,l])=>`<button class="chip${filter===k?' on':''}" data-f="${esc(k)}">${esc(l)}<span class="n">${cnt(k)}</span></button>`).join('');
+  const list=I.filter(i=>filter==='all'||(filter==='want'?state[i.id]==='want':filter==='gap'?i.kind==='gap'&&i.status!=='done':filter==='done'?i.status==='done':i.app===filter))
+    .sort((a,b)=>((a.status==='done')-(b.status==='done'))||((state[a.id]==='no')-(state[b.id]==='no'))||((b.kind==='gap')-(a.kind==='gap'))||(b.impact-a.impact));
+  $('#list').innerHTML=list.length?list.map((i,n)=>{const dn=i.status==='done',s=dn?'done':state[i.id];return`<article class="card${s==='no'?' no':''}${dn?' dn':''}" style="animation-delay:${Math.min(n,8)*40}ms">
+    <div class="tags">${i.kind==='gap'?'<span class="tag gap">EKSİK</span>':''}<span class="tag">${esc(i.app)} · ${esc(i.area)}</span><span class="tag">${EFF[i.effort]||''}</span><span class="tag imp">${'●'.repeat(i.impact)}${'○'.repeat(3-i.impact)} etki</span>${s?`<span class="st ${s}">${ST[s]}</span>`:''}</div>
+    <h2>${esc(i.title)}</h2>${i.gap?`<div class="gapl">${esc(i.gap)}</div>`:''}
+    ${i.best?`<div class="best"><b class="h">EN İYİ KİM YAPIYOR</b>${i.best.map(b=>`<div><strong>${esc(b.n)}</strong> — ${esc(b.how)}</div>`).join('')}</div>`:''}
+    <div class="why">${esc(i.why)}</div><div class="what"><b>BİZDE NASIL OLUR</b>${esc(i.what)}</div>
     <div class="src">${i.sources.map(x=>`<a href="${esc(x.u)}" target="_blank" rel="noopener">${esc(x.t)}</a>`).join('')}</div>
-    <div class="acts">${['want','later','no'].map(k=>`<button data-id="${esc(i.id)}" data-s="${k}" class="${s===k?'on':''}">${k==='want'?'İstiyorum':k==='later'?'Sonra':'Hayır'}</button>`).join('')}</div></article>`}).join('')
+    ${dn?'<div class="done-l">✓ Yapıldı — hub’da kullanılabilir</div>':`<div class="acts">${['want','later','no'].map(k=>`<button data-id="${esc(i.id)}" data-s="${k}" class="${s===k?'on':''}">${k==='want'?'İstiyorum':k==='later'?'Sonra':'Hayır'}</button>`).join('')}</div>`}</article>`}).join('')
     :'<div class="empty">Bu filtrede öneri yok.</div>'}
 document.addEventListener('click',e=>{const f=e.target.closest('[data-f]'),b=e.target.closest('[data-s]');
   if(f){filter=f.dataset.f;paint()}
   else if(b){const id=b.dataset.id,s=b.dataset.s;state[id]=state[id]===s?undefined:s;if(!state[id])delete state[id];save();paint()}});
-$('#send').onclick=async()=>{const w=(DATA?.ideas||[]).filter(i=>state[i.id]==='want');if(!w.length)return toast('Önce birkaç öneriye “İstiyorum” de');
+$('#send').onclick=async()=>{const w=(DATA?.ideas||[]).filter(i=>state[i.id]==='want'&&i.status!=='done');if(!w.length)return toast('Önce birkaç öneriye “İstiyorum” de');
   const txt='Öneriler uygulamasından şunları istiyorum, yap ve Denetçi\'den geçir:\n'+w.map(i=>`- ${i.app}: ${i.title} — ${i.what}`).join('\n');
   try{await navigator.clipboard.writeText(txt)}catch{const t=document.createElement('textarea');t.value=txt;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove()}
   toast('Kopyalandı — sohbete yapıştır')};

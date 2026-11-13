@@ -22,4 +22,5 @@ Yazı/renk ölçüleri: metin için en az 12px (telefon), dokunma alanı ≥ 24p
 
 ## Öneriler uygulaması
 - Veri: `audit/ideas.json` (`{updated, method, ideas:[{id,app,area,title,why,what,effort,impact,sources:[{t,u}]}]}`).
+- İki tür öneri: `"kind":"gap"` olanlarda `gap` (bizde eksik olan) ve `best:[{n,how}]` (o işi en iyi yapan uygulamalar ve nasıl yaptıkları) alanları var. Öncelik bu tür: her uygulamanın özelliklerini çıkar, o alanın en iyileriyle karşılaştır, atladığımızı yaz.
 - Kullanıcı yeni araştırma isterse ya da büyük bir özellik eklendiğinde: ünlü uygulamaları ve Reddit/forum tartışmalarını web'de araştır, kaynaklı ve kendi cümlelerinle (alıntı yapmadan) yeni öneriler ekle; yapılanları `"status":"done"` olarak işaretle.

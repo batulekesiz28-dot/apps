@@ -452,5 +452,84 @@
     "text": "Telefonda küçük yazı ve düğmeler (önceki kayıttan devam)"
    }
   ]
+ },
+ {
+  "at": "2026-11-13T22:39:42",
+  "change": "Öneriler'den 6 özellik (kilometre taşları, aktif görev, içgörüler, bulutsu kümeler, Günün odağı, RSS + Google Takvim) + Öneriler artık 'Atladıklarımız' karşılaştırması yapıyor",
+  "scores": {
+   "Study Log Takip telefon": {
+    "before": 93,
+    "after": 100
+   },
+   "Study Log Takip bilgisayar": {
+    "before": 95,
+    "after": 100
+   },
+   "Hub (yeni widget'lar) bilgisayar": {
+    "before": 89,
+    "after": 100
+   },
+   "Hub (yeni widget'lar) telefon": {
+    "before": 92,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Study Log",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Rozetteki beyaz rakam turuncu zeminde okunmuyordu",
+    "fix": "Koyu kahve rakam"
+   },
+   {
+    "app": "Study Log",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Telefonda görev ekleme kutusu 32px'ti",
+    "fix": "40px"
+   },
+   {
+    "app": "Study Log",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Isı haritası etiketleri ve seri rozeti 10.5–11px'ti",
+    "fix": "12px"
+   },
+   {
+    "app": "Hub",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Odak çubuğundaki turuncu 'Bugün' yazısı yeterince koyu değildi",
+    "fix": "Koyu amber, koyu temada açık sarı"
+   },
+   {
+    "app": "Hub",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Widget başlığındaki küçük düğmeler uzaklaşınca 24px altına iniyordu",
+    "fix": "En az 28px, telefonda 44px"
+   },
+   {
+    "app": "Hub",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Telefonda odak çubuğunda hedef yazısı '…' diye kesiliyordu",
+    "fix": "Telefonda düğmeler ✓ / ✕ simgesine dönüyor"
+   },
+   {
+    "app": "Hub",
+    "sev": "info",
+    "status": "open",
+    "text": "Google Takvim için proje ayarlarında Calendar API açık olmalı; izin saatte bir yenileniyor",
+    "fix": "Widget kapalıysa açma bağlantısını kendisi gösteriyor"
+   },
+   {
+    "app": "Notlar",
+    "sev": "warn",
+    "status": "open",
+    "text": "Telefonda küçük yazı ve düğmeler (önceki kayıttan devam)"
+   }
+  ]
  }
 ]

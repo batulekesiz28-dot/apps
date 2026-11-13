@@ -94,6 +94,10 @@ canvas{position:fixed;inset:0;pointer-events:none}
 body.panning,body.panning #stage,body.panning .node,body.panning .wg{cursor:grabbing!important}
 body.far .nlabel{opacity:0}
 body.far .port{display:none}
+/* far away, apps shrink to coloured dots so the galaxy reads as clusters */
+body.dots .tile{clip-path:none;border-radius:50%;background:var(--fg-t,#71717A);transform:scale(.3)!important;box-shadow:0 0 0 6px color-mix(in srgb,var(--fg-t,#71717A) 18%,transparent)}
+body.dots .tile>*{opacity:0}
+.tile>*{transition:opacity .3s}
 
 /* ── Widgets ──────────────────────────────────── */
 .wg{position:absolute;left:0;top:0;transform-origin:0 0;pointer-events:auto;border-radius:20px;background:var(--surface);box-shadow:0 0 0 .5px var(--line2),0 18px 40px -22px rgba(0,0,0,.22),0 2px 6px -2px rgba(0,0,0,.05);user-select:none;-webkit-user-select:none;touch-action:none;contain:layout style;cursor:grab;color:var(--ink)}
@@ -473,6 +477,37 @@ body.locked .top,body.locked #nodes,body.locked .status,body.locked .hint,body.l
 /* Denetçi: telefonda dokunma alanları ve okunur yazı */
 @media (max-width:700px){.status,.zbar #zPct{font-size:11.5px}.node .nlabel{font-size:12px}.ib{width:40px;height:40px}.search{height:40px}}
 
+/* focus / rss / calendar widgets */
+.fc-t{font-size:17px;font-weight:600;letter-spacing:-.015em;line-height:1.3;color:var(--ink)}
+.fc-t.done{text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--ink) 40%,transparent);color:var(--ink2)}
+.fc-q{display:flex;align-items:center;gap:6px;margin-top:12px;flex-wrap:wrap}.fc-q .sub{margin-right:4px}
+.fc-b{height:30px;padding:0 12px;border-radius:9px;font-size:12.5px;font-weight:550;color:var(--ink);box-shadow:inset 0 0 0 .5px var(--line3);background:var(--surface)}
+.fc-b.ok{background:var(--ink);color:var(--bg);box-shadow:none}
+.fc-b:hover{filter:brightness(1.08)}
+.fc-h{display:flex;gap:4px;margin-top:12px}.fc-h i{width:8px;height:8px;border-radius:50%;background:var(--line3)}.fc-h i.ok{background:#16A34A}.fc-h i.no{background:#DC2626;opacity:.7}
+.wg-h button{min-width:28px;min-height:28px;border-radius:7px;color:var(--ink3);font-size:13px}.wg-h button:hover{background:var(--hover);color:var(--ink)}
+.rs-l,.gc-l{display:grid;gap:2px;margin:0 -6px}
+.rs-i,.gc-e{display:grid;gap:3px;padding:7px 6px;border-radius:9px;color:var(--ink);text-decoration:none}
+.rs-i:hover,.gc-e:hover{background:var(--hover)}
+.rs-i b{font-size:13px;font-weight:550;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.rs-i span{font-size:12px;color:var(--ink3)}
+.rs-ta{resize:none;font-size:12.5px;line-height:1.5}
+.rs-p{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}.rs-p button{height:26px;padding:0 9px;border-radius:8px;font-size:12px;color:var(--ink2);box-shadow:inset 0 0 0 .5px var(--line3)}.rs-p button:hover{background:var(--hover)}
+.gc-d{font:500 11px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);padding:10px 6px 4px}
+.gc-e{grid-template-columns:62px minmax(0,1fr);align-items:baseline}.gc-e span{font-size:12px;color:var(--ink3)}.gc-e b{font-size:13px;font-weight:550;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wg a{color:inherit}
+.focusbar{position:fixed;top:calc(70px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:30;display:flex;align-items:center;gap:8px;max-width:min(560px,calc(100vw - 24px));height:36px;padding:0 6px 0 14px;border-radius:12px;background:var(--menu);box-shadow:var(--shadow);backdrop-filter:blur(20px) saturate(1.5);-webkit-backdrop-filter:blur(20px) saturate(1.5);cursor:pointer;font-size:13px;color:var(--ink)}
+.focusbar .fb-l{font:600 12px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:#92400E;flex-shrink:0}[data-family=dark] .focusbar .fb-l{color:#FCD34D}
+.focusbar .fb-t{font-weight:550;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.focusbar.done .fb-t{text-decoration:line-through;color:var(--ink2)}
+.focusbar .fb-ok{color:#16A34A;font-weight:700;padding-right:8px}
+.focusbar .fb-q{color:var(--ink3);flex-shrink:0}
+.focusbar button{height:26px;min-width:26px;padding:0 9px;border-radius:8px;font-size:12px;font-weight:550;color:var(--ink2);flex-shrink:0;box-shadow:inset 0 0 0 .5px var(--line3)}
+.focusbar button:hover{background:var(--hover);color:var(--ink)}
+body.locked .focusbar{display:none}
+.focusbar .sm{display:none}.focusbar .fb-t{flex:1}
+@media (max-width:600px){.focusbar .fb-q,.focusbar .lg{display:none}.focusbar .sm{display:inline}.focusbar{top:calc(66px + env(safe-area-inset-top))}}
+@media (hover:none){.focusbar{height:42px}.focusbar button{height:36px;min-width:36px}.wg-h button{min-width:44px;min-height:44px}.fc-b{height:44px}.rs-p button{height:36px}}
 /* ── tabs: several apps open at once ── */
 .pill{max-width:calc(100vw - 16px);padding:0 4px}
 .pill .tabs{display:flex;align-items:center;gap:2px;overflow-x:auto;scrollbar-width:none;max-width:min(62vw,720px);padding:0 1px}
@@ -566,6 +601,7 @@ body.locked .top,body.locked #nodes,body.locked .status,body.locked .hint,body.l
   <span class="sp" id="clock"></span><span class="help" id="helpBtn" title="Kısayollar">? kısayollar</span>
 </footer>
 
+<div class="focusbar" id="focusBar" hidden role="button" tabindex="0" aria-label="Günün odağı"></div>
 <div class="dock" id="dock" hidden></div>
 <div class="scrim" id="scrim" hidden></div>
 <section class="win" id="win" hidden>
@@ -793,7 +829,7 @@ function camMoved(){
     for(const n of nodes.values()){n.x=tx(n.x);n.y=ty(n.y);n.vx*=r;n.vy*=r;if(n.drag){n.gx=tx(n.gx);n.gy=ty(n.gy)}}
     for(const q of ripples){q.x=tx(q.x);q.y=ty(q.y)}
     if(PK.shown){PK.x=tx(PK.x);PK.y=ty(PK.y)}}
-  lastCamMove=performance.now();skyParallax();layoutMesh();placeWidgets();zoomLabel();camLayers();document.body.classList.toggle('far',cam.z<.5);saveCam();hidePeekIfMoving();
+  lastCamMove=performance.now();skyParallax();layoutMesh();placeWidgets();zoomLabel();camLayers();document.body.classList.toggle('far',cam.z<.5);document.body.classList.toggle('dots',cam.z<.42);saveCam();hidePeekIfMoving();
 }
 let clT=0,clOn=false;function camLayers(){if(!clOn){clOn=true;$('#widgets').classList.add('moving')}clearTimeout(clT);clT=setTimeout(()=>{clOn=false;$('#widgets').classList.remove('moving')},220)}
 let zlT='';function zoomLabel(){const t=Math.round(cam.z*100)+'%';if(t!==zlT){zlT=t;$('#zPct').textContent=t}}
@@ -1361,15 +1397,21 @@ function drawGalaxy(time){
   drawBH(cx0,cy0,Z,time,dark);
   for(const s of GX.sys){const x=w2sx(s.x),y=w2sy(s.y),grp=s.virt?{name:'Diğer',color:'gray'}:groups[s.g];if(!grp)continue;const col=GCOL[grp.color]||GCOL.gray;
     if(x+(s.R+60)*Z<0||x-(s.R+60)*Z>M.W||y+(s.R+60)*Z<0||y-(s.R+60)*Z>M.H)continue;
-    const hot=sunHover===s.g;
+    const hot=sunHover===s.g;nebula(x,y,(s.R+30)*Z,col,s.ph,dark,time);
     for(const r of s.orbits){fx.strokeStyle=hot?hexA(col,.35):`rgba(${L},.1)`;fx.beginPath();fx.arc(x,y,r*Z,0,6.2832);fx.stroke()}
     const R=Math.max(7,18*Z)*(hot?1.12:1);drawSun(x,y,R,col,time,s.ph,dark,Z);
-    const name=(grp.name||'').toLocaleUpperCase('tr'),fs=Math.round(Math.max(10.5,12*Math.min(1.15,Z)));
+    // zoomed out: the system's name grows so clusters read like regions on a map
+    const name=(grp.name||'').toLocaleUpperCase('tr'),fs=Math.round(Z<.6?Math.min(24,12+(.6-Z)*34):Math.max(10.5,12*Math.min(1.15,Z)));
     fx.font=`600 ${fs}px "Geist Mono",ui-monospace,Menlo,monospace`;if('letterSpacing' in fx)fx.letterSpacing='1.5px';fx.textAlign='center';fx.textBaseline='top';
     const ly=y+R+8,w=fx.measureText(name).width;fx.fillStyle=dark?'rgba(13,13,15,.7)':'rgba(255,255,255,.82)';fx.beginPath();fx.roundRect?.(x-w/2-7,ly-3,w+14,fs+7,6);fx.fill();
     fx.fillStyle=dark?'rgba(255,255,255,.9)':col;fx.fillText(name,x,ly);
     groupHits.push({g:s.g,x:Math.min(x-R,x-w/2-7),y:y-R,w:Math.max(R*2,w+14),h:R*2+fs+18})}
   fx.restore()}
+// Soft nebula behind a star system: a few offset lobes in the cluster colour, very faint
+function nebula(x,y,R,col,ph,dark,time){if(R<20)return;const a=dark?.13:.075,br=1+Math.sin(time*.4+ph)*.03;
+  for(let i=0;i<3;i++){const an=ph*1.7+i*2.1,d=R*(.18+.1*i),cx=x+Math.cos(an)*d,cy=y+Math.sin(an)*d*.8,r=R*(i?.78:1.05)*br;
+    const g=fx.createRadialGradient(cx,cy,0,cx,cy,r);g.addColorStop(0,hexA(col,a*(i?.8:1)));g.addColorStop(.55,hexA(col,a*.45));g.addColorStop(1,hexA(col,0));
+    fx.fillStyle=g;fx.beginPath();fx.arc(cx,cy,r,0,6.2832);fx.fill()}}
 // A living star: breathing glow, flickering corona, two tilted rings that sweep in front of and behind the core.
 function drawSun(x,y,R,col,time,ph,dark,Z){
   const br=1+Math.sin(time*1.3+ph)*.05,G=R*5.2*br;
@@ -1565,7 +1607,7 @@ let rzT=0;addEventListener('resize',()=>{clearTimeout(rzT);rzT=setTimeout(()=>{b
    ════════════════════════════════════════════════════════════ */
 const WEL=new Map();let wDrag=null,wReady=false;
 const XI='<svg viewBox="0 0 10 10"><path d="M2.5 2.5l5 5M7.5 2.5l-5 5"/></svg>';
-const cleanW=w=>{const o={id:w.id,type:w.type,w:[Math.round(w.w[0]),Math.round(w.w[1])]};for(const k of['city','lat','lon','text','links','title','date','start','habits'])if(w[k]!=null)o[k]=JSON.parse(JSON.stringify(w[k]));return o};
+const cleanW=w=>{const o={id:w.id,type:w.type,w:[Math.round(w.w[0]),Math.round(w.w[1])]};for(const k of['city','lat','lon','text','links','title','date','start','habits','focus','fhist','feeds'])if(w[k]!=null)o[k]=JSON.parse(JSON.stringify(w[k]));return o};
 function wRects(){const out=[];for(const r of WEL.values())out.push({x:r.w.w[0],y:r.w.w[1],w:r.ww,h:r.wh||160,id:r.w.id});return out}
 const dayKey=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 const plain=h=>{try{return new DOMParser().parseFromString(String(h||''),'text/html').body.textContent.trim()}catch{return''}};
@@ -1675,7 +1717,7 @@ const WT={
     def:()=>({city:'İstanbul',lat:41.01,lon:28.98}),
     render:r=>{const c=WX[r.w.id],d=c?.d;if(!d)wxLoad(r);
       const head=`<div class="wg-h"><button class="t" data-act="city" title="Şehri değiştir">${esc(r.w.city||'Şehir')} ↗</button><span>${d?'şimdi':''}</span></div>`;
-      if(!d)return head+(c?.err?'<div class="sub muted">Hava alınamadı · <button data-act="retry" style="min-height:26px;padding:4px 8px;border-radius:7px;box-shadow:inset 0 0 0 .5px var(--line3)">tekrar dene</button></div>':'<div class="wg-sk" style="width:60%;height:34px"></div><div class="wg-sk"></div><div class="wg-sk" style="width:70%"></div>');
+      if(!d)return head+(c?.err?'<div class="sub muted">Hava alınamadı · <button data-act="retry" style="min-height:30px;padding:4px 10px;border-radius:7px;box-shadow:inset 0 0 0 .5px var(--line3)">tekrar dene</button></div>':'<div class="wg-sk" style="width:60%;height:34px"></div><div class="wg-sk"></div><div class="wg-sk" style="width:70%"></div>');
       const cu=d.current,[ic,tx]=wmo(cu.weather_code,cu.is_day),dl=d.daily,days=[];
       for(let i=1;i<Math.min(5,dl.time.length);i++){const dt=new Date(dl.time[i]+'T12:00');days.push(`<div><b>${dt.toLocaleDateString('tr-TR',{weekday:'short'}).toUpperCase()}</b><svg viewBox="0 0 24 24">${WI[wmo(dl.weather_code[i])[0]]}</svg>${Math.round(dl.temperature_2m_max[i])}° <span class="muted">${Math.round(dl.temperature_2m_min[i])}°</span></div>`)}
       return head+`<div class="ww-top"><span class="ww-ic"><svg viewBox="0 0 24 24">${WI[ic]}</svg></span><span class="big">${Math.round(cu.temperature_2m)}°</span></div>
@@ -1699,6 +1741,51 @@ const WT={
     mount:r=>{const ta=r.el.querySelector('textarea'),f=r.el.querySelector('.wn-f');let t=0;
       ta.addEventListener('input',()=>{r.w.text=ta.value.slice(0,2000);f.textContent=r.w.text.length+' / 2000';clearTimeout(t);t=setTimeout(saveMeta,600)});
       ta.addEventListener('blur',()=>{clearTimeout(t);saveMeta()})}},
+  focus:{n:'Günün odağı',d:'Sabah tek cümlelik hedef · gün boyu en üstte durur, akşam “oldu mu?” diye sorar',w:256,
+    ic:'<circle cx="8" cy="8" r="5.5"/><circle cx="8" cy="8" r="2.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2"/>',
+    render:r=>{const f=focusOf(r.w),k=dayKey(new Date()),h=(r.w.fhist||[]).filter(x=>x.day!==k).slice(-7);
+      const dots=h.length?`<div class="fc-h" title="Son günler">${h.map(x=>`<i class="${x.ok===true?'ok':x.ok===false?'no':''}" title="${esc(x.day)} · ${esc(x.text)}"></i>`).join('')}</div>`:'';
+      if(!f||r.edit)return`<div class="wg-h"><span class="t">Günün odağı</span></div><input class="wg-city fc-in" maxlength="90" placeholder="Bugün tek bir şey: …" value="${esc(f?.text||'')}" aria-label="Bugünün odağı"><div class="sub muted" style="margin-top:8px">Enter’a bas · gün boyu en üstte durur</div>${dots}`;
+      const ask=f.ok==null&&new Date().getHours()>=18;
+      return`<div class="wg-h"><span class="t">Günün odağı</span><button data-act="edit" aria-label="Değiştir" title="Değiştir">✎</button></div>
+        <div class="fc-t${f.ok===true?' done':''}">${esc(f.text)}</div>
+        ${f.ok===true?'<div class="sub" style="margin-top:8px;color:#15803D">Oldu ✓ Güzel iş.</div>':f.ok===false?'<div class="sub muted" style="margin-top:8px">Bugün olmadı — yarın yeni gün.</div>'
+          :`<div class="fc-q">${ask?'<span class="sub">Oldu mu?</span>':''}<button class="fc-b ok" data-act="ok">${ask?'Oldu':'Bitti ✓'}</button>${ask?'<button class="fc-b" data-act="no">Olmadı</button>':''}</div>`}${dots}`},
+    mount:r=>{const i=r.el.querySelector('.fc-in');if(!i)return;i.onkeydown=e=>{e.stopPropagation();if(e.key==='Enter'&&i.value.trim()){setFocus(r,i.value.trim());r.edit=false;renderW(r)}if(e.key==='Escape'&&r.edit){r.edit=false;renderW(r)}};if(r.edit)setTimeout(()=>i.focus(),30)},
+    act:(r,a)=>{if(a==='edit'){r.edit=true;renderW(r);return}const f=focusOf(r.w);if(!f)return;f.ok=a==='ok';saveMeta();renderW(r);paintFocusBar();if(f.ok){toast('Günün odağı tamam ✓')}},
+    tick:r=>{const k=dayKey(new Date()),h=new Date().getHours();const s=k+(h>=18?'e':'m');if(r.fs!==s){r.fs=s;if(r.fs0)renderW(r);r.fs0=1;paintFocusBar()}}},
+  rss:{n:'Haberler (RSS)',d:'Sevdiğin sitelerin son başlıkları · anahtar gerekmez',w:290,
+    ic:'<path d="M3.5 3.5a9 9 0 0 1 9 9M3.5 7.5a5 5 0 0 1 5 5"/><circle cx="4.5" cy="11.5" r="1"/>',
+    def:()=>({feeds:['https://feeds.bbci.co.uk/turkce/rss.xml']}),
+    render:r=>{const feeds=r.w.feeds||[];if(r.edit)return`<div class="wg-h"><span class="t">Kaynaklar</span><button data-act="save" aria-label="Kaydet">✓</button></div>
+        <textarea class="wg-city rs-ta" rows="4" placeholder="Her satıra bir RSS adresi" aria-label="RSS adresleri">${esc(feeds.join('\n'))}</textarea>
+        <div class="rs-p">${RSS_PRESETS.map(([n,u])=>`<button data-rp="${esc(u)}">${esc(n)}</button>`).join('')}</div>`;
+      const it=RSS.items(feeds);
+      return`<div class="wg-h"><span class="t">Haberler</span><button data-act="ref" aria-label="Yenile" title="Yenile">↻</button><button data-act="edit" aria-label="Kaynakları düzenle" title="Kaynaklar">✎</button></div>
+        ${!feeds.length?'<div class="sub muted">Kaynak ekle ✎</div>':it===null?'<div class="sub muted">Yükleniyor…</div>':!it.length?`<div class="sub muted">${RSS.err?'Haberler alınamadı (bağlantı ya da kaynak).':'Başlık yok.'}</div>`
+          :`<div class="rs-l">${it.slice(0,6).map(x=>`<a class="rs-i" href="${esc(x.link)}" target="_blank" rel="noopener"><b>${esc(x.title)}</b><span>${esc(x.src)} · ${ago(x.t)}</span></a>`).join('')}</div>`}`},
+    mount:r=>{const ta=r.el.querySelector('.rs-ta');if(ta){ta.onkeydown=e=>e.stopPropagation();r.el.querySelector('.rs-p').onclick=e=>{const b=e.target.closest('[data-rp]');if(!b)return;e.stopPropagation();const v=ta.value.trim();if(!v.includes(b.dataset.rp))ta.value=(v?v+'\n':'')+b.dataset.rp}}
+      else if(RSS.items(r.w.feeds||[])===null)RSS.load(r.w.feeds||[]).then(()=>renderW(r))},
+    act:(r,a)=>{if(a==='edit'){r.edit=true;renderW(r);return}
+      if(a==='save'){const v=r.el.querySelector('.rs-ta').value.split(/\s+/).map(x=>x.trim()).filter(x=>/^https?:\/\//.test(x));r.w.feeds=[...new Set(v)].slice(0,8);r.edit=false;saveMeta();renderW(r);return}
+      if(a==='ref'){RSS.load(r.w.feeds||[],true).then(()=>renderW(r))}},
+    tick:r=>{if(!r.edit&&Date.now()-(RSS.at[(r.w.feeds||[]).join()]||0)>15*6e4&&!RSS.busy)RSS.load(r.w.feeds||[]).then(()=>renderW(r))}},
+  gcal:{n:'Google Takvim',d:'Önümüzdeki 7 günün etkinlikleri · Google ile izin verirsin',w:270,
+    ic:'<rect x="2.5" y="3.5" width="11" height="10" rx="2"/><path d="M2.5 6.5h11M5.5 2v3M10.5 2v3"/><path d="M5.5 9.5h2"/>',
+    render:r=>{const st=GCAL.state;
+      const head=`<div class="wg-h"><span class="t">Takvim</span>${st==='ok'?'<button data-act="ref" aria-label="Yenile" title="Yenile">↻</button>':''}</div>`;
+      if(S.kind!=='cloud')return head+'<div class="sub muted">Google Takvim için hub’a Google ile giriş yapmış olman gerekiyor.</div>';
+      if(st==='need')return head+`<div class="sub muted" style="margin-bottom:10px">Etkinliklerini görmek için takvime yalnızca okuma izni ver.</div><button class="fc-b ok" data-act="link">Takvimi bağla</button>`;
+      if(st==='load')return head+'<div class="sub muted">Yükleniyor…</div>';
+      if(st==='api')return head+`<div class="sub muted">Bu proje için Google Calendar API kapalı. <a href="https://console.cloud.google.com/apis/library/calendar-json.googleapis.com?project=apps-f1cfd" target="_blank" rel="noopener">Buradan aç</a>, sonra yenile.</div><button class="fc-b" data-act="link" style="margin-top:10px">Tekrar dene</button>`;
+      if(st==='err')return head+`<div class="sub muted">Takvim alınamadı.</div><button class="fc-b" data-act="link" style="margin-top:10px">Tekrar bağla</button>`;
+      const ev=GCAL.ev||[];if(!ev.length)return head+'<div class="sub muted">Önümüzdeki 7 gün boş.</div>';
+      let last='',out='';for(const e of ev.slice(0,7)){const d=e.s.slice(0,10),lab=dayLabel(d);if(lab!==last){out+=`<div class="gc-d">${esc(lab)}</div>`;last=lab}
+        out+=`<a class="gc-e" href="${esc(e.u||'https://calendar.google.com')}" target="_blank" rel="noopener"><span class="num">${e.all?'gün boyu':esc(e.s.slice(11,16))}</span><b>${esc(e.t)}</b></a>`}
+      return head+`<div class="gc-l">${out}</div>`},
+    mount:r=>{if(GCAL.state==='idle'&&S.kind==='cloud')GCAL.fetch(false).then(()=>renderAllType('gcal'))},
+    act:(r,a)=>{if(a==='link'||a==='ref')GCAL.fetch(a==='link').then(()=>renderAllType('gcal'))},
+    tick:r=>{if(GCAL.state==='ok'&&Date.now()-GCAL.at>10*6e4)GCAL.fetch(false).then(()=>renderAllType('gcal'))}},
   today:{n:'Bugün',d:"Notlar'daki bugünün planları ve yapılacakları",w:264,
     ic:'<rect x="2.5" y="3" width="11" height="10.5" rx="2"/><path d="M2.5 6.5h11M5.5 9.5l1.5 1.5 3-3"/>',
     render:r=>{ensureNotes();const d=new Date(),k=dayKey(d),ps=NOTES.filter(p=>p&&p.date===k).sort((a,b)=>(a.created||0)-(b.created||0)),items=[];
@@ -1812,7 +1899,55 @@ const WT={
     act:(r,a)=>{if(['brown','pink','white'].includes(a)){if(NOISE.type===a&&NOISE.owner===r.w.id)noiseStop();else noisePlay(a,r.w.id)}renderW(r)}},
 };
 
-function renderW(r){const T=WT[r.w.type],box=r.el.querySelector('.wg-in');box.innerHTML=T.render(r);T.mount?.(r);T.tick?.(r);
+/* ── Günün odağı: one sentence a day, pinned to the top of the hub ── */
+const focusOf=w=>{const k=dayKey(new Date());return w.focus&&w.focus.day===k?w.focus:null};
+function setFocus(r,text){const k=dayKey(new Date()),old=r.w.focus;if(old&&old.day!==k){r.w.fhist=[...(r.w.fhist||[]),{day:old.day,text:old.text,ok:old.ok??null}].slice(-14)}
+  r.w.focus={day:k,text,ok:old&&old.day===k?old.ok:null};saveMeta();paintFocusBar()}
+function focusWidget(){for(const r of WEL.values())if(r.w.type==='focus')return r;return null}
+function paintFocusBar(){const b=$('#focusBar');if(!b)return;const r=focusWidget(),f=r&&focusOf(r.w);
+  if(!f){b.hidden=true;return}const ask=f.ok==null&&new Date().getHours()>=18;
+  b.hidden=false;b.className='focusbar'+(f.ok===true?' done':'');
+  b.innerHTML=`<span class="fb-l">Bugün</span><span class="fb-t">${esc(f.text)}</span>${f.ok===true?'<span class="fb-ok">✓</span>':ask?'<span class="fb-q">oldu mu?</span><button data-fb="ok" aria-label="Oldu"><span class="lg">Oldu</span><span class="sm">✓</span></button><button data-fb="no" aria-label="Olmadı"><span class="lg">Olmadı</span><span class="sm">✕</span></button>':'<button data-fb="ok" aria-label="Bitti olarak işaretle" title="Bitti">✓</button>'}`}
+$('#focusBar').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.id==='focusBar'){e.preventDefault();const r=focusWidget();if(r)flyToWidget(r)}});
+$('#focusBar').addEventListener('click',e=>{const b=e.target.closest('[data-fb]'),r=focusWidget();if(!r)return;if(!b){flyToWidget(r);return}const f=focusOf(r.w);if(!f)return;f.ok=b.dataset.fb==='ok';saveMeta();renderW(r);paintFocusBar();if(f.ok)toast('Günün odağı tamam ✓')});
+function flyToWidget(r){flyTo(r.dx+r.ww/2,r.dy+(r.wh||160)/2,Math.max(cam.z,.9))}
+function renderAllType(t){for(const r of WEL.values())if(r.w.type===t)renderW(r)}
+const ago=t=>{if(!t)return'';const m=Math.round((Date.now()-t)/6e4);return m<1?'şimdi':m<60?m+' dk':m<1440?Math.round(m/60)+' sa':Math.round(m/1440)+' gün'};
+const dayLabel=d=>{const t=dayKey(new Date()),y=dayKey(new Date(Date.now()+864e5));return d===t?'Bugün':d===y?'Yarın':new Date(d+'T00:00').toLocaleDateString('tr-TR',{weekday:'long',day:'numeric',month:'short'})};
+
+/* ── RSS: direct if the site allows CORS, otherwise through a public JSON/raw relay (no key) ── */
+const RSS_PRESETS=[['BBC Türkçe','https://feeds.bbci.co.uk/turkce/rss.xml'],['Webtekno','https://www.webtekno.com/rss.xml'],['The Verge','https://www.theverge.com/rss/index.xml'],['Hacker News','https://hnrss.org/frontpage'],['NASA','https://www.nasa.gov/news-release/feed/'],['Khan Academy blog','https://blog.khanacademy.org/feed/']];
+const RSS={cache:{},at:{},busy:false,err:false,
+  items(feeds){const k=feeds.join();return k in this.cache?this.cache[k]:null},
+  async one(url){const host=(()=>{try{return new URL(url).hostname.replace(/^www\./,'')}catch{return url}})();
+    const parse=txt=>{const x=new DOMParser().parseFromString(txt,'text/xml'),nodes=[...x.querySelectorAll('item,entry')];const src=x.querySelector('channel>title,feed>title')?.textContent.trim()||host;
+      return nodes.slice(0,12).map(n=>{const g=s=>n.querySelector(s)?.textContent?.trim()||'';const l=n.querySelector('link');const link=l?.getAttribute('href')||l?.textContent?.trim()||'';
+        return{title:g('title'),link,t:Date.parse(g('pubDate')||g('updated')||g('published'))||0,src:src.slice(0,28)}}).filter(i=>i.title&&/^https?:/.test(i.link))};
+    try{const r=await fetch(url,{cache:'no-store'});if(r.ok)return parse(await r.text())}catch{}
+    try{const r=await fetch('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(url));const j=await r.json();if(j.status==='ok')return j.items.slice(0,12).map(i=>({title:i.title,link:i.link,t:Date.parse(i.pubDate.replace(' ','T')+'Z')||0,src:(j.feed?.title||host).slice(0,28)}))}catch{}
+    const r=await fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(url));if(!r.ok)throw new Error('rss');return parse(await r.text())},
+  async load(feeds,force){const k=feeds.join();if(this.busy&&!force)return;this.busy=true;
+    const res=await Promise.allSettled(feeds.map(u=>this.one(u)));this.busy=false;this.at[k]=Date.now();
+    const all=res.flatMap(x=>x.status==='fulfilled'?x.value:[]);this.err=!all.length&&res.some(x=>x.status==='rejected');
+    this.cache[k]=all.sort((a,b)=>b.t-a.t)}};
+
+/* ── Google Calendar: read-only token from the same Google sign-in (asks once per hour) ── */
+const GCAL={state:'idle',ev:null,at:0,
+  token(){try{const t=JSON.parse(sessionStorage.getItem('gcal:t')||'null');return t&&t.exp>Date.now()?t.v:null}catch{return null}},
+  async fetch(interactive){if(S.kind!=='cloud')return;let tok=this.token();
+    if(!tok){if(!interactive){this.state='need';return}
+      try{const p=new firebase.auth.GoogleAuthProvider();p.addScope('https://www.googleapis.com/auth/calendar.readonly');const u=firebase.auth().currentUser;if(u?.email)p.setCustomParameters({login_hint:u.email});
+        const res=await u.reauthenticateWithPopup(p);tok=res.credential?.accessToken;if(!tok)throw 0;sessionStorage.setItem('gcal:t',JSON.stringify({v:tok,exp:Date.now()+55*6e4}))}
+      catch(e){this.state=e?.code==='auth/popup-closed-by-user'?'need':'err';return}}
+    this.state=this.ev?'ok':'load';renderAllType('gcal');
+    try{const now=new Date(),to=new Date(Date.now()+7*864e5);
+      const r=await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events?singleEvents=true&orderBy=startTime&maxResults=20&timeMin=${now.toISOString()}&timeMax=${to.toISOString()}`,{headers:{Authorization:'Bearer '+tok}});
+      if(r.status===401){sessionStorage.removeItem('gcal:t');this.state='need';return}
+      const j=await r.json();if(r.status===403&&/accessNotConfigured|has not been used|disabled/i.test(JSON.stringify(j))){this.state='api';return}if(!r.ok)throw 0;
+      this.ev=(j.items||[]).filter(e=>e.status!=='cancelled').map(e=>{const all=!!e.start?.date,s=all?e.start.date+'T00:00':(e.start?.dateTime?toLocalISO(new Date(e.start.dateTime)):'');return{t:e.summary||'(başlıksız)',s,all,u:e.htmlLink}}).filter(e=>e.s);
+      this.state='ok';this.at=Date.now()}catch{this.state='err'}}};
+const toLocalISO=d=>{const p=n=>String(n).padStart(2,'0');return`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`};
+function renderW(r){const T=WT[r.w.type],box=r.el.querySelector('.wg-in');box.innerHTML=T.render(r);T.mount?.(r);T.tick?.(r);if(r.w.type==='focus')paintFocusBar();
   const h=r.el.offsetHeight;if(h&&h!==r.wh){const grew=r.wh&&h>r.wh;r.wh=h;
     // content grew (e.g. forecast arrived) → if it now overlaps a neighbour, glide to the nearest free spot
     if(grew&&WEL.get(r.w.id)===r&&wDrag?.r!==r&&!wFree(r.w.w[0],r.w.w[1],r.ww,h,r.w.id)){r.w.w=wSpot(r.ww,h,r.w.w,r.w.id);saveMeta();wake()}}}
@@ -1829,7 +1964,7 @@ function mountWidget(w,fresh){if(WEL.has(w.id)||!WT[w.type])return WEL.get(w.id)
   const r={w,el,dx:w.w[0],dy:w.w[1],vx:0,vy:0,rot:0,ww:T.w,wh:0,ps:'',vis:null};WEL.set(w.id,r);renderW(r);placeW(r);wireW(r);
   if(fresh){r.dy-=36/cam.z;anim(el,[{opacity:0,filter:'blur(8px)'},{opacity:1,filter:'blur(0)'}],{duration:520,easing:OUT})}
   return r}
-function unmountWidget(r,quiet){WEL.delete(r.w.id);if(r.el.matches(':hover'))WS.hov=Math.max(0,WS.hov-1);if(wDrag?.r===r)wDrag=null;
+function unmountWidget(r,quiet){WEL.delete(r.w.id);if(r.w.type==='focus')setTimeout(paintFocusBar,0);if(r.el.matches(':hover'))WS.hov=Math.max(0,WS.hov-1);if(wDrag?.r===r)wDrag=null;
   if(quiet)return r.el.remove();anim(r.el,[{opacity:1,filter:'blur(0)'},{opacity:0,filter:'blur(8px)'}],{duration:320,easing:EASE,fill:'forwards'}).finished.then(()=>r.el.remove(),()=>r.el.remove())}
 function wireW(r){const el=r.el;
   el.addEventListener('pointerenter',e=>{WS.hov++;if(e.pointerType==='mouse'){ptr.tAmp=0;wakeMesh()}});el.addEventListener('pointerleave',()=>{WS.hov=Math.max(0,WS.hov-1)});

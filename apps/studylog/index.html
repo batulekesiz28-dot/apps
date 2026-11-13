@@ -149,6 +149,14 @@ main{max-width:980px;margin:0 auto;padding:10px 22px 60px}
 .legend i{width:12px;height:12px;border-radius:4px;background:var(--heat)}
 .dayp{padding:20px;display:grid;gap:12px}
 .dayp .big{font-size:34px;font-weight:300;letter-spacing:-.04em;line-height:1}
+.mt{display:grid;gap:12px;padding:14px;border-radius:16px;background:var(--bg2);box-shadow:inset 0 0 0 .5px var(--line2)}
+.mt:not(.idle){box-shadow:inset 0 0 0 1px var(--c);background:color-mix(in srgb,var(--c) 6%,var(--bg2))}
+.mt-l{display:flex;gap:10px;align-items:center;font-size:13px;color:var(--ink2)}.mt-l b{color:var(--ink);font-weight:500}.mt-l small{color:var(--ink3);font-size:11.5px}
+.mt-l i{width:9px;height:9px;border-radius:50%;background:var(--c);flex:none;animation:pulse 1.6s ease-in-out infinite}
+.mt-t{font-size:40px;font-weight:200;letter-spacing:-.045em;line-height:1}
+.mt-b{display:flex;gap:8px;align-items:center}.mt-b .btn{height:40px}.mt-b .btn.pri{flex:1}
+.mt-hint{font-size:12px;color:var(--ink3);margin-right:auto}
+.mt.idle .mt-b .btn.pri{flex:none}
 .spark7{display:grid;grid-template-columns:repeat(14,1fr);gap:4px;align-items:end;height:70px;margin-top:4px}
 .spark7 i{display:block;border-radius:3px;background:var(--ink4);min-height:3px;transition:height .6s var(--out)}
 .spark7 i.on{background:var(--ink)}
@@ -324,8 +332,9 @@ function streak(){const by=new Set(list().filter(s=>s.min>0).map(s=>s.date));let
   let best=0,cur=0,prev=null;[...by].sort().forEach(d=>{cur=prev&&addDays(prev,1)===d?cur+1:1;best=Math.max(best,cur);prev=d});return{n,best}}
 
 /* ── Timer engine ── */
-function startRun(){const subj=set.sel||set.subjects[0]?.id;if(!subj){toast('Önce bir ders ekle');return}
-  set.run={subj,topic:($('#topic')?.value||'').trim(),mode:set.mode,target:set.mode==='down'?set.target:0,acc:0,at:Date.now(),on:true,date:today(),start:Date.now()};saveSet(true);render();beep(660,.06)}
+function startRun(o={}){const subj=o.subj||set.sel||set.subjects[0]?.id;if(!subj){toast('Önce bir ders ekle');return}
+  const mode=o.mode||set.mode,target=o.target||set.target;
+  set.run={subj,topic:(o.topic??($('#topic')?.value||'')).trim(),mode,target:mode==='down'?target:0,acc:0,at:Date.now(),on:true,date:today(),start:Date.now()};saveSet(true);render();beep(660,.06)}
 function pauseRun(){const r=set.run;if(!r)return;if(r.on){r.acc+=(Date.now()-r.at)/1000;r.on=false}else{r.at=Date.now();r.on=true}saveSet(true);render()}
 function finishRun(auto){const r=set.run;if(!r)return;const sec=Math.min(elapsed(),r.mode==='down'?r.target:1e9),min=Math.round(sec/60);
   set.run=null;saveSet(true);
@@ -340,6 +349,7 @@ function tick(){
   const r=set.run;document.body.classList.toggle('running',!!(r&&r.on));
   if(r&&r.mode==='down'&&elapsed()>=r.target){finishRun(true);return}
   if(view==='timer')paintDial();
+  const mt=$('#mtT');if(mt&&r)mt.textContent=clock(r.mode==='down'?r.target-elapsed():elapsed());
   const ts=$('#todayT');if(ts){const m=todayMin();ts.textContent=fm(m);const b=$('#todayB');if(b)paintTodayBar(b)}
   document.title=r?`${clock(r.mode==='down'?r.target-elapsed():elapsed())} · ${subjOf(r.subj).name}`:'Study Log';
 }
@@ -423,24 +433,36 @@ function customTarget(){sheet('Özel süre',`<div><span class="fl">Dakika</span>
 /* ── Session editor (manual add / edit) ── */
 function editSession(s,day){
   const isNew=!s;s=s?{...s}:{id:uid(),subj:set.sel||set.subjects[0]?.id,topic:'',date:day||today(),min:30,src:'manual'};
-  const QM=[15,30,45,60,90,120];
-  sheet(isNew?'Elle ekle':'Oturumu düzenle',
-   `<div><span class="fl">Ders</span><div class="row" id="eS">${set.subjects.map(x=>chipSub(x,x.id===s.subj)).join('')}</div></div>
-    <div><span class="fl">Süre</span><div class="row" id="eQ">${QM.map(q=>`<button class="chip num${q===s.min?' on':''}" data-q="${q}">${fs2(q)}</button>`).join('')}</div>
+  const QM=[15,30,45,60,90,120],canTimer=isNew&&s.date===today()&&!set.run;let tab='manual',tmode='up',ttarget=set.target||1500;
+  sheet(isNew?(day&&day!==today()?'Bu güne ekle':'Ekle'):'Oturumu düzenle',
+   `${canTimer?`<div class="seg" id="eTab" style="margin:0;justify-self:start"><button data-t="manual" class="on">Süre gir</button><button data-t="timer">Sayaçla</button></div>`:''}
+    <div><span class="fl">Ders</span><div class="row" id="eS">${set.subjects.map(x=>chipSub(x,x.id===s.subj)).join('')}</div></div>
+    <div id="eTimer" hidden><span class="fl">Sayaç</span><div class="row" id="eTM"><button class="chip on" data-tm="up">Kronometre</button>${set.presets.map(p=>`<button class="chip num" data-tm="${p}">${p} dk</button>`).join('')}</div></div>
+    <div id="eManual"><span class="fl">Süre</span><div class="row" id="eQ">${QM.map(q=>`<button class="chip num${q===s.min?' on':''}" data-q="${q}">${fs2(q)}</button>`).join('')}</div>
       <div class="two" style="margin-top:10px"><input class="in num" id="eM" type="number" min="1" max="900" value="${s.min}" inputmode="numeric" aria-label="Dakika"><input class="in" id="eD" type="date" value="${s.date}" max="${today()}" aria-label="Tarih"></div></div>
     <div><span class="fl">Konu</span><input class="in" id="eT" value="${esc(s.topic)}" placeholder="İsteğe bağlı" maxlength="120"></div>`,
    `${isNew?'':'<button class="btn danger" id="eX">Sil</button>'}<button class="btn ghost" data-x>Vazgeç</button><button class="btn pri" id="eOk">${isNew?'Ekle':'Kaydet'}</button>`,
-   sh=>{const M=sh.querySelector('#eM');
+   sh=>{const M=sh.querySelector('#eM'),OK=sh.querySelector('#eOk');
+     const tb=sh.querySelector('#eTab');if(tb)tb.onclick=e=>{const b=e.target.closest('[data-t]');if(!b)return;tab=b.dataset.t;$$('#eTab button',sh).forEach(x=>x.classList.toggle('on',x===b));
+       sh.querySelector('#eTimer').hidden=tab!=='timer';sh.querySelector('#eManual').hidden=tab==='timer';OK.innerHTML=tab==='timer'?'<svg viewBox="0 0 16 16"><path d="M5 3.5l8 4.5-8 4.5z"/></svg>Başlat':'Ekle'};
+     sh.querySelector('#eTM').onclick=e=>{const b=e.target.closest('[data-tm]');if(!b)return;if(b.dataset.tm==='up')tmode='up';else{tmode='down';ttarget=+b.dataset.tm*60}$$('#eTM .chip',sh).forEach(x=>x.classList.toggle('on',x===b))};
      sh.querySelector('#eS').onclick=e=>{const b=e.target.closest('[data-sub]');if(!b)return;s.subj=b.dataset.sub;$$('#eS .chip',sh).forEach(x=>x.classList.toggle('on',x===b))};
      sh.querySelector('#eQ').onclick=e=>{const b=e.target.closest('[data-q]');if(!b)return;M.value=b.dataset.q;$$('#eQ .chip',sh).forEach(x=>x.classList.toggle('on',x===b))};
      M.oninput=()=>$$('#eQ .chip',sh).forEach(x=>x.classList.toggle('on',+x.dataset.q===+M.value));
-     sh.querySelector('#eOk').onclick=()=>{const min=clamp(Math.round(+M.value||0),1,900);if(!s.subj)return toast('Bir ders seç');
+     sh.querySelector('#eOk').onclick=()=>{if(tab==='timer'){const topic=sh.querySelector('#eT').value.trim();closeSheet();set.sel=s.subj;startRun({subj:s.subj,topic,mode:tmode,target:ttarget});toast(`${subjOf(s.subj).name} sayacı başladı`);return}
+       const min=clamp(Math.round(+M.value||0),1,900);if(!s.subj)return toast('Bir ders seç');
        s.min=min;s.date=sh.querySelector('#eD').value||today();s.topic=sh.querySelector('#eT').value.trim();
        if(s.start&&s.src==='timer'&&!isNew)s.end=s.start+min*60000;putSession(s);closeSheet();render();toast(isNew?`${subjOf(s.subj).name} · ${fm(min)} eklendi`:'Kaydedildi')};
      const x=sh.querySelector('#eX');if(x)x.onclick=()=>{closeSheet();delSession(s.id)}})}
 
 /* ── Days ── */
 function heat(m){const g=set.goalDay||120;return m<=0?0:clamp(.14+.86*(m/g),.14,1)}
+function miniTimer(){const r=set.run;
+  if(r){const sb=subjOf(r.subj);return`<div class="mt" style="--c:${sb.color}"><div class="mt-l"><i></i><span><b>${esc(sb.name)}</b>${r.topic?` · ${esc(r.topic)}`:''}<br><small>${r.mode==='down'?'süreli · '+fm(r.target/60):'kronometre'}${r.on?'':' · duraklatıldı'}</small></span></div>
+    <div class="mt-t num" id="mtT">${clock(r.mode==='down'?r.target-elapsed():elapsed())}</div>
+    <div class="mt-b"><button class="btn sec" data-act="discard" aria-label="İptal"><svg viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8"/></svg></button><button class="btn pri" data-act="pause">${r.on?'Duraklat':'Devam'}</button><button class="btn sec" data-act="finish" aria-label="Bitir"><svg viewBox="0 0 16 16"><path d="M3.5 8.5l3 3 6-7"/></svg></button></div></div>`}
+  return`<div class="mt idle"><div class="scroll" id="mtS">${set.subjects.map(x=>chipSub(x,x.id===set.sel)).join('')}</div>
+    <div class="mt-b"><span class="mt-hint">${set.mode==='down'?'Süreli · '+fm(set.target/60):'Kronometre'}</span><button class="btn pri" data-act="start"><svg viewBox="0 0 16 16"><path d="M5 3.5l8 4.5-8 4.5z"/></svg>Sayacı başlat</button></div></div>`}
 function vDays(){
   const now=new Date();if(!calM)calM={y:now.getFullYear(),m:now.getMonth()};
   const first=new Date(calM.y,calM.m,1),off=(first.getDay()+6)%7,tk=today(),acc=getComputedStyle(document.body).getPropertyValue('--ink');
@@ -450,7 +472,7 @@ function vDays(){
     cells+=`<button class="cd${d.getMonth()!==calM.m?' o':''}${k===tk?' t':''}${k===selDay?' sel':''}${m>=set.goalDay&&set.goalDay?' goal':''}${o>.55?' hot':''}" data-day="${k}" ${k>tk?'disabled style="opacity:.25"':''}><span class="fill" style="--o:${o}"></span><span class="dn">${d.getDate()}</span><span class="dv num">${m?fs2(m):''}</span></button>`}
   // last 14 days strip
   const strip=[];let mx=1;for(let i=13;i>=0;i--){const k=addDays(tk,-i),m=minsOn(k);strip.push([k,m]);mx=Math.max(mx,m)}
-  const day=list().filter(s=>s.date===selDay).sort((a,b)=>(a.start||0)-(b.start||0)),dm=minsOn(selDay);
+  const day=list().filter(s=>s.date===selDay).sort((a,b)=>(a.start||0)-(b.start||0)),dm=minsOn(selDay)+(set.run&&set.run.date===selDay?liveMin():0);
   return`<div class="view dgrid" style="--heat:${acc.trim()||'#18181B'}">
    <section class="card cal"><div class="calh"><b>${MON[calM.m]} ${calM.y}</b><span class="num">${fm(mTot)}</span>
      <button class="ib" data-cal="-1" aria-label="Önceki ay"><svg viewBox="0 0 16 16"><path d="M10 3.5L5.5 8l4.5 4.5"/></svg></button><button class="ib" data-cal="0" aria-label="Bu ay"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="2"/></svg></button><button class="ib" data-cal="1" aria-label="Sonraki ay"><svg viewBox="0 0 16 16"><path d="M6 3.5L10.5 8 6 12.5"/></svg></button></div>
@@ -459,12 +481,16 @@ function vDays(){
    <section class="card dayp"><div class="h">${esc(longDay(selDay))}</div>
      <div class="big num">${fm(dm)}</div><div class="bar">${set.goalDay?`<i style="width:${Math.min(100,dm/set.goalDay*100)}%;background:var(--ink)"></i>`:''}</div>
      <div style="font-size:12.5px;color:var(--ink3)">${set.goalDay?(dm>=set.goalDay?'Günlük hedef tamamlandı ✓':`Hedefin %${Math.round(dm/set.goalDay*100)}’i · ${fm(set.goalDay)}`):''}</div>
+     ${selDay===today()?miniTimer():''}
      <div class="sl">${day.length?day.map(sessRow).join(''):'<div class="empty" style="padding-left:10px">Bu gün kayıt yok.</div>'}</div>
      <button class="btn sec add" data-act="addday"><svg viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></svg>Bu güne ekle</button>
      <div class="h" style="margin-top:8px">Son 14 gün</div>
      <div class="spark7">${strip.map(([k,m])=>`<i class="${k===selDay?'on':''}" title="${esc(longDay(k))} · ${fm(m)}" style="height:${Math.max(4,m/mx*100)}%"></i>`).join('')}</div></section>
   </div>`}
-document.addEventListener('click',e=>{if(view!=='days')return;const c=e.target.closest('[data-cal]'),d=e.target.closest('[data-day]'),si=e.target.closest('[data-sid]'),a=e.target.closest('[data-act=addday]');
+document.addEventListener('click',e=>{if(view!=='days'||e.target.closest('.scrim'))return;const ta=e.target.closest('.mt [data-act]'),ts=e.target.closest('.mt [data-sub]');
+  if(ts){set.sel=ts.dataset.sub;saveSet();render();return}
+  if(ta){const a=ta.dataset.act;if(a==='start')startRun({topic:''});else if(a==='pause')pauseRun();else if(a==='finish')finishRun(false);else if(a==='discard')discardRun();return}
+  const c=e.target.closest('[data-cal]'),d=e.target.closest('[data-day]'),si=e.target.closest('[data-sid]'),a=e.target.closest('[data-act=addday]');
   if(c){const v=+c.dataset.cal;if(!v){const n=new Date();calM={y:n.getFullYear(),m:n.getMonth()}}else{const n=new Date(calM.y,calM.m+v,1);calM={y:n.getFullYear(),m:n.getMonth()}}render()}
   else if(d){selDay=d.dataset.day;render()}else if(si)editSession(sessions.get(si.dataset.sid));else if(a)editSession(null,selDay)});
 

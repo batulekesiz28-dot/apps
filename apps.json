@@ -1,19 +1,26 @@
 {
-  "title": "AppShell",
-  "apps": [
-    {
-      "slug": "notlar",
-      "name": "Notlar",
-      "icon": "note",
-      "color": "amber",
-      "desc": "Notlar, şablonlar ve takvim"
-    },
-    {
-      "slug": "saat",
-      "name": "Saat",
-      "icon": "clock",
-      "color": "ink",
-      "desc": "Minimal dünya saati"
-    }
-  ]
+ "title": "AppShell",
+ "apps": [
+  {
+   "slug": "notlar",
+   "name": "Notlar",
+   "icon": "note",
+   "color": "amber",
+   "desc": "Notlar, şablonlar ve takvim"
+  },
+  {
+   "slug": "saat",
+   "name": "Saat",
+   "icon": "clock",
+   "color": "ink",
+   "desc": "Minimal dünya saati"
+  },
+  {
+   "slug": "studylog",
+   "name": "Study Log",
+   "icon": "chart",
+   "color": "green",
+   "desc": "Çalışma sayacı, günlük saatler, hedefler ve takip"
+  }
+ ]
 }

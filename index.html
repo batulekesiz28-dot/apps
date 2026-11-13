@@ -100,6 +100,9 @@ body.far .port{display:none}
 .wt-l .e{width:16px;text-align:center;flex:none}
 .wt-l .tx{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .wt-l .bx{width:13px;height:13px;border-radius:4px;box-shadow:inset 0 0 0 1.2px var(--ink3);flex:none;margin:0 1.5px}
+.wt-s{display:grid;gap:7px;width:100%;text-align:left;padding:10px 12px;margin:0 0 10px;border-radius:12px;background:var(--surface2);box-shadow:inset 0 0 0 .5px var(--line2);font-size:12.5px;color:var(--ink2);transition:background .15s}
+.wt-s:hover{background:var(--hover)}.wt-s b{color:var(--ink);font-weight:600}
+.wt-b{height:4px;border-radius:4px;background:var(--line2);overflow:hidden}.wt-b i{display:block;height:100%;background:#1F9D55;border-radius:4px}
 .wt-e{color:var(--ink3);font-size:12.5px;padding:6px 0 2px}
 .wt-e button{display:inline-block;margin-top:8px;font-size:12px;color:var(--ink);padding:5px 10px;border-radius:8px;box-shadow:inset 0 0 0 .5px var(--line3)}
 .wt-e button:hover{background:var(--hover)}
@@ -1189,12 +1192,19 @@ const plain=h=>{try{return new DOMParser().parseFromString(String(h||''),'text/h
 const MON=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
 
 /* ── Notlar data (today + calendar widgets) ── */
-let NOTES=[],notesUnsub=null,notesOn=false;
+let NOTES=[],notesUnsub=null,notesOn=false,STUDY={sess:[],goal:0,run:null},studyUnsubs=[];
 function ensureNotes(){if(notesOn)return;notesOn=true;
-  if(S.kind==='cloud'&&window.firebase?.firestore){notesUnsub=firebase.firestore().collection('hub').doc('notes').collection('pages').onSnapshot(s=>{NOTES=s.docs.map(d=>d.data());renderNoteWidgets()},()=>{})}
+  if(S.kind==='cloud'&&window.firebase?.firestore){const f=firebase.firestore();notesUnsub=f.collection('hub').doc('notes').collection('pages').onSnapshot(s=>{NOTES=s.docs.map(d=>d.data());renderNoteWidgets()},()=>{});
+    // Study Log: today's minutes for the "Bugün" card
+    const st=f.collection('hub').doc('studylog'),y=dayKey(new Date(Date.now()-864e5));
+    studyUnsubs.push(st.onSnapshot(d=>{const v=d.data()||{};STUDY.goal=v.goalDay||0;STUDY.run=v.run||null;STUDY.subj=v.subjects||[];renderNoteWidgets()},()=>{}));
+    studyUnsubs.push(st.collection('sessions').where('date','>=',y).onSnapshot(s=>{STUDY.sess=s.docs.map(d=>d.data());renderNoteWidgets()},()=>{}))}
   else readLocalNotes()}
-function readLocalNotes(){if(S.kind==='cloud')return;const v=store.get('notlar:v1',[]);NOTES=Array.isArray(v)?v:[];renderNoteWidgets()}
-function stopNotes(){try{notesUnsub?.()}catch{}notesUnsub=null;notesOn=false;NOTES=[]}
+function readLocalNotes(){if(S.kind==='cloud')return;const v=store.get('notlar:v1',[]);NOTES=Array.isArray(v)?v:[];
+  const sl=store.get('studylog:v1',null);if(sl){STUDY.sess=sl.sessions||[];STUDY.goal=sl.set?.goalDay||0;STUDY.run=sl.set?.run||null;STUDY.subj=sl.set?.subjects||[]}renderNoteWidgets()}
+function stopNotes(){try{notesUnsub?.()}catch{}studyUnsubs.forEach(u=>{try{u()}catch{}});studyUnsubs=[];notesUnsub=null;notesOn=false;NOTES=[];STUDY={sess:[],goal:0,run:null}}
+function studyToday(){const k=dayKey(new Date());let m=STUDY.sess.reduce((a,s)=>a+(s.date===k?s.min||0:0),0);const r=STUDY.run;if(r&&r.date===k)m+=(r.acc+(r.on?(Date.now()-r.at)/1000:0))/60;return m}
+const fmMin=m=>{m=Math.round(m);return m<60?m+' dk':Math.floor(m/60)+' sa'+(m%60?' '+m%60+' dk':'')};
 addEventListener('storage',e=>{if(e.key==='notlar:v1'&&notesOn)readLocalNotes()});
 function renderNoteWidgets(){for(const r of WEL.values())if(r.w.type==='today'||r.w.type==='cal')renderW(r)}
 function openNotes(h){const a=find('p:notlar');if(!a)return toast('Notlar uygulaması bulunamadı');
@@ -1285,10 +1295,13 @@ const WT={
       for(const p of ps){items.push(`<button data-act="page" data-id="${esc(p.id)}"><span class="e">${esc(p.icon||'📄')}</span><span class="tx">${esc(p.title||'Adsız')}</span></button>`);
         for(const b of(p.blocks||[]))if(b.t==='todo'&&!b.c){const tx=plain(b.h);if(tx)items.push(`<button data-act="page" data-id="${esc(p.id)}"><span class="bx"></span><span class="tx">${esc(tx)}</span></button>`)}}
       const more=items.length>7?`<div class="wn-f" style="text-align:left">+${items.length-7} daha</div>`:'';
-      return`<div class="wg-h"><span class="t">Bugün · ${d.getDate()} ${MON[d.getMonth()]}</span><button data-act="cal">takvim</button></div>`+
+      const sm=studyToday(),sg=STUDY.goal,sr=STUDY.run,hasSL=!!find('p:studylog');
+      const study=hasSL?`<button class="wt-s" data-act="study"><span class="tx">${sr?(sr.on?'● Çalışıyorsun · ':'Duraklatıldı · '):'Çalışma · '}<b>${fmMin(sm)}</b>${sg?` / ${fmMin(sg)}`:''}</span>${sg?`<span class="wt-b"><i style="width:${Math.min(100,sm/sg*100)}%"></i></span>`:''}</button>`:'';
+      return`<div class="wg-h"><span class="t">Bugün · ${d.getDate()} ${MON[d.getMonth()]}</span><button data-act="cal">takvim</button></div>`+study+
         (items.length?`<div class="wt-l">${items.slice(0,7).join('')}</div>${more}`:`<div class="wt-e">Bugün için plan yok.<br><button data-act="new">Günlük sayfa aç</button></div>`)},
-    act:(r,a,b)=>{if(a==='page')openNotes('#p/'+b.dataset.id);else if(a==='cal')openNotes('#cal');else if(a==='new')openNotes('#today')},
-    tick:r=>{const k=dayKey(new Date());if(r.day!==k){r.day=k;if(r.day0)renderW(r);r.day0=1}}},
+    act:(r,a,b)=>{if(a==='page')openNotes('#p/'+b.dataset.id);else if(a==='cal')openNotes('#cal');else if(a==='new')openNotes('#today');else if(a==='study'){const s=find('p:studylog');if(s)openApp(s,nodes.get(s.key)?.el)}},
+    tick:r=>{const k=dayKey(new Date());if(r.day!==k){r.day=k;if(r.day0)renderW(r);r.day0=1}
+      if(STUDY.run?.on){const b=r.el.querySelector('.wt-s b');if(b)b.textContent=fmMin(studyToday())}}},
   timer:{n:'Odak sayacı',d:'25 dk odak · 5 dk mola',w:240,
     ic:'<circle cx="8" cy="9" r="5"/><path d="M8 6.5V9M6.5 1.5h3M12 4.5l1-1"/>',
     render:r=>{const t=tmOf(r.w.id),C=2*Math.PI*34;

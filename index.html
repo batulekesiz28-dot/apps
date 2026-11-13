@@ -48,7 +48,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 canvas{position:fixed;inset:0;pointer-events:none}
 #field{z-index:0}#fx{z-index:1}
 #stage{position:fixed;inset:0;z-index:2}
-@media (hover:hover) and (pointer:fine){#stage{cursor:none}}
 #widgets{position:fixed;inset:0;z-index:3;pointer-events:none}
 #widgets.moving .wg,.wg.drag{will-change:transform}
 #nodes{position:fixed;inset:0;z-index:3;pointer-events:none}
@@ -590,7 +589,7 @@ async function loadManifest(){
    FIELD — sonsuz elastik nokta ağı. Kamera ile kayar, uzaklaşınca seyrekleşir.
    ════════════════════════════════════════════════════════════ */
 const cv=$('#field'),cx=cv.getContext('2d'),fv=$('#fx'),fx=fv.getContext('2d');
-const M={W:0,H:0,dpr:1,gap:30,gw:0,c0:0,r0:0,cols:0,rows:0,ox:0,oy:0,n:0,rx:null,ry:null,dx:null,dy:null,vx:null,vy:null,en:null};
+const M={flat:false,W:0,H:0,dpr:1,gap:30,gw:0,c0:0,r0:0,cols:0,rows:0,ox:0,oy:0,n:0,rx:null,ry:null,dx:null,dy:null,vx:null,vy:null,en:null};
 const ptr={x:-1e4,y:-1e4,sx:-1e4,sy:-1e4,amp:0,tAmp:0,down:false};
 let fxBox=[0,0,1e5,1e5],ripples=[],introT=0,introStart=0,last=0,raf=0,paused=false,meshAwake=true,meshDirty=true,lastInput=performance.now(),lastDraw=0;
 
@@ -640,7 +639,7 @@ function layoutMesh(){
   let gw=WG;while(gw*cam.z<19)gw*=2;while(gw*cam.z>40&&gw>7.5)gw/=2;
   const g=gw*cam.z,cols=Math.ceil(M.W/g)+3,rows=Math.ceil(M.H/g)+3,c0=Math.floor(s2wx(0)/gw)-1,r0=Math.floor(s2wy(0)/gw)-1;
   const K=['dx','dy','vx','vy','en'];
-  if(gw!==M.gw||cols!==M.cols||rows!==M.rows){M.n=cols*rows;for(const k of['rx','ry',...K])M[k]=new Float32Array(M.n)}
+  if(gw!==M.gw||cols!==M.cols||rows!==M.rows){M.n=cols*rows;for(const k of['rx','ry',...K])M[k]=new Float32Array(M.n);M.flat=true}
   else if(c0!==M.c0||r0!==M.r0){const dc=c0-M.c0,dr=r0-M.r0;
     for(const k of K){const a=M[k],b=new Float32Array(M.n);
       for(let r=0;r<rows;r++){const sr=r+dr;if(sr<0||sr>=rows)continue;for(let c=0;c<cols;c++){const sc=c+dc;if(sc<0||sc>=cols)continue;b[r*cols+c]=a[sr*cols+sc]}}M[k]=b}}
@@ -657,15 +656,20 @@ function ripple(x,y,s=1){if(REDUCED)return;ripples.push({x,y,t:performance.now()
 function stepMesh(k,now){
   const{n,rx,ry,dx,dy,vx,vy,en}=M,K=.055,damp=Math.pow(.8,k),Z=cam.z;
   const att=[];
-  if(ptr.amp>.002&&!cam.pan)att.push([ptr.sx,ptr.sy,150,.05*ptr.amp,.62]); // black hole: pull + swirl
+  if(ptr.amp>.002&&!cam.pan)att.push([ptr.sx,ptr.sy,170,.034*ptr.amp]); // gentle magnetic pull
   let drag=null;for(const nd of nodes.values())if(nd.drag){att.push([nd.x,nd.y,150,.035]);drag=nd}
   if(wDrag)att.push([wDrag.cx,wDrag.cy,170,.03]);
   if(linkDrag)att.push([linkDrag.x,linkDrag.y,120,.02]);
   const rps=[];ripples=ripples.filter(r=>{const age=now-r.t;if(age>1500)return false;rps.push([r.x,r.y,age*.55,(1-age/1500)*r.s]);return true});
   const tI=drag?meshIdx(w2sx(drag.aw[0]),w2sy(drag.aw[1])):-1,tX=tI>=0?(drag.x-nx(tI))*.004:0,tY=tI>=0?(drag.y+TAIL*Z-ny(tI))*.004:0;
-  let maxV=0;
+  // active region: only points near a force — or still moving — get simulated
+  let A0=1e9,A1=1e9,A2=-1e9,A3=-1e9;const ab=(x,y,r)=>{if(x-r<A0)A0=x-r;if(y-r<A1)A1=y-r;if(x+r>A2)A2=x+r;if(y+r>A3)A3=y+r};
+  for(const A of att)ab(A[0],A[1],A[2]+4);for(const Q of rps)ab(Q[0],Q[1],Q[2]+40);if(tI>=0)ab(rx[tI],ry[tI],8);
+  let maxV=0,maxD=0;
   for(let i=0;i<n;i++){
-    const px=rx[i]+dx[i],py=ry[i]+dy[i];let ax=-K*dx[i],ay=-K*dy[i];
+    const ox=rx[i],oy=ry[i];
+    if((ox<A0||ox>A2||oy<A1||oy>A3)&&Math.abs(dx[i])+Math.abs(dy[i])+Math.abs(vx[i])+Math.abs(vy[i])<.01){if(en[i]){dx[i]=dy[i]=vx[i]=vy[i]=en[i]=0}continue}
+    const px=ox+dx[i],py=oy+dy[i];let ax=-K*dx[i],ay=-K*dy[i];
     if(i===tI){ax+=tX;ay+=tY}
     for(let a=0;a<att.length;a++){const A=att[a],ddx=A[0]-px,ddy=A[1]-py;if(ddx>A[2]||ddx<-A[2]||ddy>A[2]||ddy<-A[2])continue;
       const d2=ddx*ddx+ddy*ddy;if(d2>A[2]*A[2])continue;const f=1-Math.sqrt(d2)/A[2],s=f*f*A[3];ax+=ddx*s;ay+=ddy*s;if(A[4]){ax-=ddy*s*A[4];ay+=ddx*s*A[4]}}
@@ -673,13 +677,24 @@ function stepMesh(k,now){
       const dd=Math.sqrt(ex*ex+ey*ey)||1,w=Math.abs(dd-Q[2]);if(w<34){const imp=(1-w/34)*Q[3]*.9;ax+=ex/dd*imp;ay+=ey/dd*imp}}
     const v=(vx[i]+ax*k)*damp,u=(vy[i]+ay*k)*damp;vx[i]=v;vy[i]=u;dx[i]+=v*k;dy[i]+=u*k;
     const av=Math.abs(v)+Math.abs(u);if(av>maxV)maxV=av;
-    const m=Math.abs(dx[i])+Math.abs(dy[i]);en[i]=m>14?1:m/14;
+    const m=Math.abs(dx[i])+Math.abs(dy[i]);en[i]=m>14?1:m/14;if(m>maxD)maxD=m;
   }
+  M.flat=maxD<.05;
   const pointerStill=Math.abs(ptr.x-ptr.sx)+Math.abs(ptr.y-ptr.sy)<.08&&Math.abs(ptr.tAmp-ptr.amp)<.004;
   return !rps.length&&!drag&&!wDrag&&!linkDrag&&maxV<.004&&pointerStill; // settled → sleep
 }
+// Flat (undisturbed) mesh = one pattern fill instead of thousands of strokes — the common case while panning/zooming.
+const ptc=document.createElement('canvas'),ptx=ptc.getContext('2d');let patKey='',pat=null;
+function drawFlat(){
+  const dpr=M.dpr,T=Math.max(6,Math.round(M.gap*dpr)),la=cam.z<.6?.75:1,key=T+'|'+TH.l+TH.la[0]+TH.dot+la+dpr;
+  if(key!==patKey){ptc.width=ptc.height=T;ptx.clearRect(0,0,T,T);const c=T/2,lw=.5*dpr;
+    ptx.fillStyle=`rgba(${TH.l},${TH.la[0]*la})`;ptx.fillRect(0,c-lw/2,T,lw);ptx.fillRect(c-lw/2,0,lw,c-lw/2);ptx.fillRect(c-lw/2,c+lw/2,lw,T-c-lw/2);
+    ptx.fillStyle=`rgb(${TH.dot})`;ptx.beginPath();ptx.arc(c,c,(dpr>1?1:1.05)*dpr,0,6.2832);ptx.fill();pat=cx.createPattern(ptc,'repeat');patKey=key}
+  const sc=M.gap*dpr/T;pat.setTransform(new DOMMatrix([sc,0,0,sc,M.ox*dpr-T*sc/2,M.oy*dpr-T*sc/2]));
+  cx.save();cx.setTransform(1,0,0,1,0,0);cx.fillStyle=pat;cx.fillRect(0,0,cv.width,cv.height);cx.restore();meshDirty=false}
 function drawMesh(now){
   const{W,H,cols,rows,n,en}=M;cx.clearRect(0,0,W,H);
+  if(M.flat&&introT>=1&&pat!==undefined&&typeof DOMMatrix!=='undefined')return drawFlat();
   let reveal=1;if(introT<1){introT=clamp((now-introStart)/1500,0,1);reveal=1-Math.pow(1-introT,3)}
   const cxm=W/2,cym=H/2,maxR=Math.hypot(W,H)*.6*reveal,full=reveal>=1;
   const vis=i=>full?1:clamp((maxR-Math.hypot(M.rx[i]-cxm,M.ry[i]-cym))/140,0,1);
@@ -739,7 +754,7 @@ let spawnHint=null;
 function createNode(a,delay=0){
   const el=document.createElement('button');el.className='node'+(a.kind==='draft'?' draft':'');el.dataset.key=a.key;el.setAttribute('aria-label',a.name);
   el.innerHTML=nodeHTML(a);$('#nodes').appendChild(el);
-  const n={a,el,aw:null,ax:0,ay:0,x:0,y:0,vx:0,vy:0,rot:0,tx:0,ty:0,ph:[Math.random()*6.28,Math.random()*6.28,Math.random()*6.28,Math.random()*6.28],drag:false,hover:0,hov:false,dim:false,gx:0,gy:0,ps:'',cap:false,capA:0,capR:0,capT:0,sc:1,hs:0};
+  const n={a,el,aw:null,ax:0,ay:0,x:0,y:0,vx:0,vy:0,rot:0,tx:0,ty:0,ph:[Math.random()*6.28,Math.random()*6.28,Math.random()*6.28,Math.random()*6.28],drag:false,hover:0,hov:false,dim:false,gx:0,gy:0,ps:'',sc:1,hs:0};
   n.aw=placeFor(a.key,n,spawnHint);nodes.set(a.key,n);if(!pos[a.key])rememberLayout(n,false);
   anc(n);n.x=n.ax;n.y=n.ay-LIFT*cam.z+40;place(n);
   anim(el.querySelector('.bob'),[{transform:'scale(0) rotate(-12deg)',opacity:0},{transform:'scale(1.12) rotate(3deg)',opacity:1,offset:.55},{transform:'none',opacity:1}],{duration:900,delay,easing:EASE,fill:'backwards'});
@@ -753,7 +768,7 @@ function removeNode(key,quiet){const n=nodes.get(key);if(!n)return;nodes.delete(
   if(!quiet)ripple(n.ax,n.ay,1.3);
   anim(n.el,[{opacity:1,filter:'blur(0)'},{opacity:0,filter:'blur(6px)'}],{duration:380,easing:EASE,fill:'forwards'}).finished.then(()=>n.el.remove(),()=>n.el.remove());
   delete pos[key];delete members[key];const before=links.length;links=links.filter(l=>l[0]!==key&&l[1]!==key);if(before!==links.length&&booted)saveMeta();}
-function place(n){const s=`translate3d(${(n.x-32).toFixed(1)}px,${(n.y-32).toFixed(1)}px,0) rotate(${n.rot.toFixed(2)}deg) scale(${(n.sc*cam.z).toFixed(3)})`;if(s!==n.ps){n.el.style.transform=s;n.ps=s}}
+function place(n){const off=n.x<-140||n.x>M.W+140||n.y<-160||n.y>M.H+160;if(off!==n.off){n.off=off;n.el.style.visibility=off?'hidden':''}if(off)return;const s=`translate3d(${(n.x-32).toFixed(1)}px,${(n.y-32).toFixed(1)}px,0) rotate(${n.rot.toFixed(2)}deg) scale(${(n.sc*cam.z).toFixed(3)})`;if(s!==n.ps){n.el.style.transform=s;n.ps=s}}
 function syncNodes(){
   const list=[...pub,...drafts],keys=new Set(list.map(a=>a.key));
   for(const k of[...nodes.keys()])if(!keys.has(k))removeNode(k);
@@ -831,21 +846,6 @@ function drawTethers(time){
       fx.beginPath();fx.arc(px,py,pulse,0,6.2832);fx.strokeStyle=`rgba(${L},.45)`;fx.lineWidth=.8;fx.stroke();
       fx.beginPath();fx.arc(px,py,pulse+7,0,6.2832);fx.strokeStyle=`rgba(${L},.12)`;fx.stroke()}
   }
-}
-function drawHole(time,list){
-  if(!FINE||ptr.amp<.03||W.app&&!W.min)return;
-  const x=ptr.sx,y=ptr.sy,a=ptr.amp,dark=document.documentElement.dataset.theme==='dark',L=TH.l;
-  let caught=0;for(const n of list)if(n.cap)caught++;
-  const R=17+caught*4+Math.sin(time*2.2)*1.2;
-  const g=fx.createRadialGradient(x,y,0,x,y,R*2.2);
-  g.addColorStop(0,dark?`rgba(0,0,0,${.9*a})`:`rgba(24,24,27,${.16*a})`);g.addColorStop(.35,dark?`rgba(0,0,0,${.45*a})`:`rgba(24,24,27,${.05*a})`);g.addColorStop(1,'rgba(0,0,0,0)');
-  fx.fillStyle=g;fx.beginPath();fx.arc(x,y,R*2.2,0,6.2832);fx.fill();
-  // accretion ring: three rotating arcs
-  fx.lineWidth=1;fx.lineCap='round';
-  for(let i=0;i<3;i++){const s=time*(1.6+i*.5)+i*2.1;fx.strokeStyle=`rgba(${L},${(.35-i*.08)*a})`;fx.beginPath();fx.arc(x,y,R+i*5,s,s+1.1+i*.3);fx.stroke()}
-  // event horizon core
-  fx.fillStyle=dark?'#000':'#18181B';fx.beginPath();fx.arc(x,y,3.2+caught*.6,0,6.2832);fx.fill();
-  if(dark){fx.strokeStyle=`rgba(255,255,255,${.5*a})`;fx.lineWidth=.8;fx.beginPath();fx.arc(x,y,3.8+caught*.6,0,6.2832);fx.stroke()}
 }
 function drawRubber(time){
   if(!linkDrag)return;const a=nodes.get(linkDrag.from);if(!a)return;const t=linkDrag.target?nodes.get(linkDrag.target):null;
@@ -1022,20 +1022,12 @@ function frame(t){
   stepCam(k);if(cam.x!==cam.px||cam.y!==cam.py||cam.z!==cam.pz){camMoved();meshDirty=true}
   stepWidgets(k);
   const list=[...nodes.values()],anyDrag=list.some(n=>n.drag),Z=cam.z,LZ=LIFT*Z;
-  const BH=FINE&&ptr.amp>.05&&!anyDrag&&!linkDrag&&!palEl&&!sheetEl&&!cam.pan&&!wDrag&&!cam.go;
   for(const n of list){
     anc(n);const ax0=n.ax,ay0=n.ay;n.hover+=((n.hov||n.drag?1:0)-n.hover)*(1-Math.pow(.85,k));
-    if(n.drag){n.tx=n.gx;n.ty=n.gy;n.cap=false;continue}
-    // ── black hole: get close → captured, spirals into the cursor; tether snaps it back when stretched too far
-    const dc=Math.hypot(ptr.sx-n.x,ptr.sy-n.y),dr=Math.hypot(ptr.sx-ax0,ptr.sy-(ay0-LZ));
-    if(BH&&!n.cap&&!n.dim&&dc<46*Math.max(.7,Z)&&time>(n.cool||0)){n.cap=true;n.capT=time;n.capA=Math.atan2(n.y-ptr.sy,n.x-ptr.sx);n.capR=dc;ripple(ptr.sx,ptr.sy,.7)}
-    if(n.cap&&(!BH||n.dim||dr>190*Math.max(1,Z))){n.cap=false;n.cool=time+1.2;ripple(ax0,ay0,1.5);n.vx*=1.4;n.vy*=1.4}
-    if(n.cap){const age=time-n.capT,r=n.capR*Math.exp(-age*4.5);n.capA+=(3+5*(1-r/(n.capR||1)))*dt/1000;
-      n.tx=ptr.sx+Math.cos(n.capA)*r;n.ty=ptr.sy+Math.sin(n.capA)*r;continue}
+    if(n.drag){n.tx=n.gx;n.ty=n.gy;continue}
     const calm=1-n.hover*.75,sw=REDUCED?0:1;
     let tx=ax0+(Math.sin(time*.52+n.ph[0])*8+Math.sin(time*1.21+n.ph[1])*2.8)*calm*sw*Z;
     let ty=ay0-LZ-n.hover*6*Z+(Math.sin(time*.71+n.ph[2])*6.5+Math.sin(time*1.53+n.ph[3])*2.2)*calm*sw*Z;
-    if(ptr.amp>.01&&!n.hov){const ddx=ptr.sx-n.x,ddy=ptr.sy-n.y;if(ddx<95&&ddx>-95&&ddy<95&&ddy>-95){const d=Math.hypot(ddx,ddy);if(d<95){const f=(1-d/95);tx+=ddx*.12*f*f*ptr.amp;ty+=ddy*.12*f*f*ptr.amp}}}
     n.tx=tx;n.ty=ty;
   }
   // group cohesion: members drift gently toward their group's centre
@@ -1049,8 +1041,7 @@ function frame(t){
   const CD=96*Z;for(let i=0;i<list.length;i++)for(let j=i+1;j<list.length;j++){const a=list[i],b=list[j];const ddx=b.tx-a.tx,ddy=b.ty-a.ty;if(ddx>CD||ddx<-CD||ddy>CD||ddy<-CD)continue;
     const d=Math.hypot(ddx,ddy)||1;if(d<CD){const p=(CD-d)*.5,ux=ddx/d,uy=ddy/d;if(!a.drag){a.tx-=ux*p;a.ty-=uy*p}if(!b.drag){b.tx+=ux*p;b.ty+=uy*p}}}
   for(const n of list){
-    const st=n.drag?.32:n.cap?.2:.065,dp=Math.pow(n.drag?.7:n.cap?.78:.86,k);
-    n.sc+=((n.cap?.8:1)-n.sc)*(1-Math.pow(.82,k));
+    const st=n.drag?.32:.065,dp=Math.pow(n.drag?.7:.86,k);
     n.vx=(n.vx+(n.tx-n.x)*st*k)*dp;n.vy=(n.vy+(n.ty-n.y)*st*k)*dp;n.x+=n.vx*k;n.y+=n.vy*k;
     const swRot=REDUCED?0:Math.sin(time*.6+n.ph[1])*2.4*(1-n.hover*.8);
     n.rot+=(clamp(n.vx*(n.drag?1.4:.9),-16,16)+swRot-n.rot)*(1-Math.pow(.8,k));place(n);
@@ -1064,10 +1055,10 @@ function frame(t){
   // fx canvas: only clear/redraw the region that actually holds ink (last frame ∪ this frame)
   let b0=1e9,b1=1e9,b2=-1e9,b3=-1e9;const gb=(x,y,p)=>{if(x-p<b0)b0=x-p;if(y-p<b1)b1=y-p;if(x+p>b2)b2=x+p;if(y+p>b3)b3=y+p};
   const PN=80+70*Z;for(const n of list){gb(n.x,n.y,PN);gb(n.ax,n.ay,PN)}
-  if(FINE&&ptr.amp>.03)gb(ptr.sx,ptr.sy,95);if(linkDrag)gb(linkDrag.x,linkDrag.y,40);
+  if(linkDrag)gb(linkDrag.x,linkDrag.y,40);
   const nb=b2>b0?[Math.max(0,b0|0),Math.max(0,b1|0),Math.min(M.W,Math.ceil(b2)),Math.min(M.H,Math.ceil(b3))]:null,pb=fxBox;
   if(pb)fx.clearRect(pb[0],pb[1],pb[2]-pb[0],pb[3]-pb[1]);if(nb)fx.clearRect(nb[0],nb[1],nb[2]-nb[0],nb[3]-nb[1]);fxBox=nb;
-  drawGroups(time);drawLinks(time);drawTethers(time);drawRubber(time);drawHole(time,list);followPeek(k);
+  drawGroups(time);drawLinks(time);drawTethers(time);drawRubber(time);followPeek(k);
   raf=requestAnimationFrame(frame);
 }
 const wake=()=>{if(!raf&&!paused)raf=requestAnimationFrame(frame)};

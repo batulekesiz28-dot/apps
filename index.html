@@ -120,6 +120,27 @@ body.linking,body.linking .node,body.linking #stage{cursor:crosshair}
 .node:hover .nlabel{color:var(--ink)}
 .nlabel i{font-style:normal;font:500 9px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-left:5px}
 
+/* ── Peek (hover preview) ─────────────────────── */
+.peek{position:fixed;left:0;top:0;z-index:15;width:300px;border-radius:15px;background:var(--surface);box-shadow:var(--shadow),0 24px 60px -20px rgba(0,0,0,.22);overflow:hidden;pointer-events:none;will-change:transform,opacity;opacity:0}
+.pk-frame{position:relative;height:188px;overflow:hidden;background:var(--surface2);border-bottom:.5px solid var(--line2)}
+.pk-frame iframe{position:absolute;left:0;top:0;width:1200px;height:752px;border:0;transform:scale(.25);transform-origin:0 0;background:var(--surface);pointer-events:none}
+.pk-load{position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,var(--hover) 50%,transparent 70%) var(--surface2);background-size:200% 100%;animation:shimmer 1.2s linear infinite;transition:opacity .35s var(--ease)}
+.pk-load.done{opacity:0}
+@keyframes shimmer{from{background-position:120% 0}to{background-position:-80% 0}}
+.pk-b{padding:12px 14px 13px}
+.pk-b b{display:block;font-size:13.5px;font-weight:600;letter-spacing:-.01em}
+.pk-b span{display:block;font-size:12px;color:var(--ink2);margin-top:2px;line-height:1.45}
+.pk-meta{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+.pk-meta i{font-style:normal;display:inline-flex;align-items:center;gap:5px;height:20px;padding:0 7px;border-radius:6px;font:500 10px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--ink3);box-shadow:inset 0 0 0 .5px var(--line3)}
+.pk-meta i em{width:6px;height:6px;border-radius:50%;font-style:normal}
+#stage.ongroup{cursor:pointer}
+.gsw{display:flex;gap:8px;flex-wrap:wrap}
+.gsw button{width:26px;height:26px;border-radius:50%;transition:transform .35s var(--spring),box-shadow .2s}
+.gsw button:hover{transform:scale(1.12)}
+.gsw button.on{box-shadow:0 0 0 2px var(--surface),0 0 0 3.5px var(--ink)}
+.mi .gdot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin:0 2.5px}
+@media (hover:none){.peek{display:none}}
+
 /* ── Fullscreen app ───────────────────────────── */
 .scrim{position:fixed;inset:0;z-index:40;background:var(--bg)}
 .win{position:fixed;inset:0;z-index:50;background:var(--surface);overflow:hidden;transform-origin:0 0;contain:strict}
@@ -284,6 +305,7 @@ body.locked .top,body.locked #nodes,body.locked .status,body.locked .hint,body.l
 </header>
 
 <div class="hint" id="hint" hidden></div>
+<div class="peek" id="peek" hidden inert><div class="pk-frame"><iframe id="pkf" tabindex="-1" aria-hidden="true" title=""></iframe><div class="pk-load" id="pkL"></div></div><div class="pk-b"><b id="pkN"></b><span id="pkD"></span><div class="pk-meta" id="pkM"></div></div></div>
 <footer class="status">
   <span class="dot" id="sDot"></span><span id="sTxt">yükleniyor</span>
   <span class="sp" id="clock"></span><span class="help" id="helpBtn" title="Kısayollar">? kısayollar</span>
@@ -387,7 +409,7 @@ const miniIcon=a=>{const[bg,fg]=COLORS[a.color]||COLORS.gray;const ic=ICONS[a.ic
   return{style:`background:${bg};color:${fg}`,html:ic?`<svg viewBox="0 0 24 24">${ic}</svg>`:`<span style="font-size:9px;font-weight:600">${esc(mono(a.name))}</span>`}};
 const UI={open:'<path d="M3 8h10M9 4l4 4-4 4"/>',tab:'<path d="M9.5 2.5h4v4M13.5 2.5L7.5 8.5M12 9.5v3.5H3V4h3.5"/>',link:'<path d="M6.5 9.5l3-3M7 4.5l1-1a2.5 2.5 0 0 1 3.5 3.5l-1 1M9 11.5l-1 1A2.5 2.5 0 0 1 4.5 9l1-1"/>',
   edit:'<path d="M10.5 2.5l3 3L6 13H3v-3z"/>',ship:'<path d="M8 2.5v8M4.5 6L8 2.5 11.5 6M3 13.5h10"/>',dl:'<path d="M8 2.5v8M4.5 7L8 10.5 11.5 7M3 13.5h10"/>',del:'<path d="M3 4.5h10M6.5 4.5v-2h3v2M4.5 4.5l.6 9h5.8l.6-9"/>',
-  out:'<path d="M6 2.5H3v11h3M10 5l3 3-3 3M13 8H6"/>',home:'<path d="M8 3v4M8 9v4M3 8h4M9 8h4"/>',connect:'<circle cx="4" cy="8" r="2"/><circle cx="12" cy="8" r="2"/><path d="M6 8h4"/>',
+  out:'<path d="M6 2.5H3v11h3M10 5l3 3-3 3M13 8H6"/>',group:'<rect x="2" y="3" width="12" height="10" rx="5" stroke-dasharray="2 2"/><circle cx="6" cy="8" r="1.3"/><circle cx="10" cy="8" r="1.3"/>',home:'<path d="M8 3v4M8 9v4M3 8h4M9 8h4"/>',connect:'<circle cx="4" cy="8" r="2"/><circle cx="12" cy="8" r="2"/><path d="M6 8h4"/>',
   unlinkall:'<circle cx="4" cy="8" r="2"/><circle cx="12" cy="8" r="2"/><path d="M6.5 6.5l3 3M9.5 6.5l-3 3"/>',plus:'<path d="M8 3v10M3 8h10"/>',graph:'<circle cx="4" cy="4" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="7" cy="12.5" r="2"/><path d="M5.9 4.3l4.2.5M5 5.7l1.4 4.9M10.9 6.7l-2.7 4.3"/>',
   moon:'<path d="M13.5 9.5A5.5 5.5 0 0 1 6.5 2.5a5.5 5.5 0 1 0 7 7z"/>',fs:'<path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/>',key:'<rect x="2" y="4.5" width="12" height="7" rx="1.5"/><path d="M4.5 7h.01M7 7h.01M9.5 7h.01M5 9.5h6"/>'};
 const si=p=>`<svg viewBox="0 0 16 16">${p}</svg>`;
@@ -410,7 +432,7 @@ async function loadFirebase(){if(window.firebase?.auth&&window.firebase?.firesto
 const sig=list=>list.map(d=>[d.id,d.name,d.icon,d.color,d.html?.length]).join('|');
 const Local={kind:'local',
   async load(){try{await DB.open();return(await DB.all()).map(toDraft)}catch{return[]}},
-  put:d=>DB.put(d),del:id=>DB.del(id),saveMeta:()=>{store.set('appshell:layout',layout);store.set('appshell:links',links)}};
+  put:d=>DB.put(d),del:id=>DB.del(id),saveMeta:()=>{store.set('appshell:layout',layout);store.set('appshell:links',links);store.set('appshell:groups',groups);store.set('appshell:members',members)}};
 const Cloud={kind:'cloud',meta:null,col:null,unsubs:[],
   start(fs){this.meta=fs.collection('hub').doc('meta');this.col=this.meta.collection('drafts');
     return new Promise(res=>{let first=true;
@@ -419,11 +441,11 @@ const Cloud={kind:'cloud',meta:null,col:null,unsubs:[],
         if(sig(list)!==sig(drafts)){drafts=list;if(!first&&booted)syncNodes()}
         if(first){first=false;res()}
       },err=>{setSync('error');toast('Senkron hatası: '+(err.code||err.message));if(first){first=false;res()}}));
-      this.unsubs.push(this.meta.onSnapshot(s=>{const d=s.data()||{};if(d.layout)applyRemoteLayout(d.layout);if(Array.isArray(d.links))applyRemoteLinks(d.links)},()=>{}));
+      this.unsubs.push(this.meta.onSnapshot(s=>{const d=s.data()||{};if(d.layout)applyRemoteLayout(d.layout);if(Array.isArray(d.links))applyRemoteLinks(d.links);if(d.groups||d.members)applyRemoteGroups(d.groups||{},d.members||{})},()=>{}));
     })},
   stop(){this.unsubs.forEach(u=>{try{u()}catch{}});this.unsubs=[]},
   put(d){return this.col.doc(d.id).set(d)},del(id){return this.col.doc(id).delete()},
-  saveMeta(){store.set('appshell:layout',layout);store.set('appshell:links',links);return this.meta.set({layout,links:links.map(([a,b])=>a+'|'+b)},{merge:true})}};
+  saveMeta(){Local.saveMeta();return this.meta.update({layout,links:links.map(([a,b])=>a+'|'+b),groups,members}).catch(()=>this.meta.set({layout,links:links.map(([a,b])=>a+'|'+b),groups,members},{merge:true}))}};
 let S=Local;
 let metaT=0;const saveMeta=()=>{clearTimeout(metaT);metaT=setTimeout(()=>Promise.resolve(S.saveMeta()).catch(()=>{}),250)};
 function setSync(s){sync=s;const d=$('#sDot');d.classList.toggle('warn',s==='pending');d.classList.toggle('err',s==='error');statusText()}
@@ -432,6 +454,12 @@ function setSync(s){sync=s;const d=$('#sDot');d.classList.toggle('warn',s==='pen
 let pub=[],drafts=[],query='',manifest={ok:false,why:''},booted=false,justDragged=false;
 let layout=store.get('appshell:layout',{});
 let links=store.get('appshell:links',[]);
+let groups=store.get('appshell:groups',{});       // gid → {name,color}
+let members=store.get('appshell:members',{});     // appKey → gid
+const GCOL={blue:'#2F6FEB',green:'#1F9D55',amber:'#D97706',rose:'#E11D48',violet:'#7C3AED',teal:'#0D9488',gray:'#71717A'};
+function applyRemoteGroups(g,m){if(JSON.stringify(g)===JSON.stringify(groups)&&JSON.stringify(m)===JSON.stringify(members))return;
+  groups=g;members=m;store.set('appshell:groups',groups);store.set('appshell:members',members);wake()}
+const groupOf=k=>{const g=members[k];return g&&groups[g]?g:null};
 let linkDrag=null,hoverLink=-1,hoverNode=null;
 const toPub=a=>({key:'p:'+a.slug,kind:'pub',slug:a.slug,name:a.name||a.slug,icon:a.icon||'',color:a.color||'gray',desc:a.desc||'',url:a.url||a.file||`apps/${a.slug}/`});
 const toDraft=d=>({key:'d:'+d.id,kind:'draft',id:d.id,name:d.name,icon:d.icon||'',color:d.color||colorKeys[hash(d.id)%colorKeys.length],html:d.html,order:d.order??0});
@@ -558,7 +586,7 @@ function updateNode(n,a){const changed=n.a.name!==a.name||n.a.icon!==a.icon||n.a
 function removeNode(key,quiet){const n=nodes.get(key);if(!n)return;nodes.delete(key);if(hoverNode===n)hoverNode=null;
   if(!quiet)ripple(nx(n.ai),ny(n.ai),1.3);
   anim(n.el,[{opacity:1,filter:'blur(0)'},{opacity:0,filter:'blur(6px)'}],{duration:380,easing:EASE,fill:'forwards'}).finished.then(()=>n.el.remove(),()=>n.el.remove());
-  delete layout[key];const before=links.length;links=links.filter(l=>l[0]!==key&&l[1]!==key);if(before!==links.length&&booted)saveMeta();}
+  delete layout[key];delete members[key];const before=links.length;links=links.filter(l=>l[0]!==key&&l[1]!==key);if(before!==links.length&&booted)saveMeta();}
 function place(n){const s=`translate3d(${(n.x-32).toFixed(1)}px,${(n.y-32).toFixed(1)}px,0) rotate(${n.rot.toFixed(2)}deg)`;if(s!==n.ps){n.el.style.transform=s;n.ps=s}}
 function syncNodes(){
   const list=[...pub,...drafts],keys=new Set(list.map(a=>a.key));
@@ -573,13 +601,14 @@ function applyRemoteLayout(l){let moved=false;
 function wirePort(n){n.el.querySelector('.port').addEventListener('pointerdown',e=>{if(e.button!==0)return;e.preventDefault();e.stopPropagation();startLink(n,e,'drag')})}
 function wireNode(n){
   const el=n.el,tile=()=>el.querySelector('.tile');wirePort(n);
-  el.addEventListener('pointerenter',()=>{n.hov=true;hoverNode=n;wake()});
-  el.addEventListener('pointerleave',()=>{n.hov=false;if(hoverNode===n)hoverNode=null;el.classList.remove('tilting');const t=tile();t.style.setProperty('--rx','0deg');t.style.setProperty('--ry','0deg')});
+  el.addEventListener('pointerenter',()=>{n.hov=true;hoverNode=n;schedulePeek(n);wake()});
+  el.addEventListener('pointerleave',()=>{n.hov=false;if(hoverNode===n)hoverNode=null;hidePeek();el.classList.remove('tilting');const t=tile();t.style.setProperty('--rx','0deg');t.style.setProperty('--ry','0deg')});
   el.addEventListener('pointermove',e=>{if(!FINE||n.drag)return;const t=tile(),r=t.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
     el.classList.add('tilting');t.style.setProperty('--ry',((x-.5)*16).toFixed(1)+'deg');t.style.setProperty('--rx',((.5-y)*16).toFixed(1)+'deg');
     t.style.setProperty('--hx',(x*100|0)+'%');t.style.setProperty('--hy',(y*100|0)+'%')});
   el.addEventListener('pointerdown',e=>{
     if(e.button!==0)return;
+    hidePeek(true);
     if(linkDrag){e.preventDefault();e.stopPropagation();if(linkDrag.mode==='click')finishLink(n);return}
     if(e.shiftKey){e.preventDefault();startLink(n,e,'drag');return}
     e.preventDefault();
@@ -681,6 +710,8 @@ function autoLayout(){
       a.vx-=dx/d*f;a.vy-=dy/d*f;b.vx+=dx/d*f;b.vy+=dy/d*f}
     for(const[ka,kb]of links){const a=P[idx.get(ka)],b=P[idx.get(kb)];if(!a||!b)continue;const dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1,f=(d-(sm?120:190))*.04;
       a.vx+=dx/d*f;a.vy+=dy/d*f;b.vx-=dx/d*f;b.vy-=dy/d*f}
+    for(let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++){const ga=groupOf(P[i].n.a.key),gb=groupOf(P[j].n.a.key);if(!ga&&!gb)continue;const a=P[i],b=P[j],dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1;
+      const f=ga&&ga===gb?(d-(sm?120:170))*.035:-(sm?2500:9000)/(d*d+1);a.vx+=dx/d*f;a.vy+=dy/d*f;b.vx-=dx/d*f;b.vy-=dy/d*f}
     for(const p of P){p.vx+=(cxm-p.x)*.012;p.vy+=(cym-p.y)*.012;p.x+=clamp(p.vx,-30,30);p.y+=clamp(p.vy,-30,30);p.vx*=.6;p.vy*=.6;
       p.x=clamp(p.x,90,M.W-90);p.y=clamp(p.y,220,M.H-80)}
   }
@@ -692,6 +723,108 @@ function autoLayout(){
   toast('Graf düzenlendi',()=>{layout=prev;for(const n of nodes.values())n.ai=null;for(const n of nodes.values())n.ai=placeFor(n.a.key,n);saveMeta();wakeMesh()});
 }
 $('#layoutBtn').onclick=e=>{anim(e.currentTarget.firstElementChild,[{transform:'rotate(0)'},{transform:'rotate(360deg)'}],{duration:700,easing:OUT});autoLayout()};
+
+/* ════════════════════════════════════════════════════════════
+   GROUPS — yumuşak, organik küme alanları
+   ════════════════════════════════════════════════════════════ */
+const gcv=document.createElement('canvas'),gx=gcv.getContext('2d');let groupHits=[];
+function hull(P){if(P.length<3)return P.slice();P=P.slice().sort((a,b)=>a[0]-b[0]||a[1]-b[1]);const cr=(o,a,b)=>(a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]);
+  const lo=[],up=[];for(const p of P){while(lo.length>=2&&cr(lo[lo.length-2],lo[lo.length-1],p)<=0)lo.pop();lo.push(p)}
+  for(let i=P.length-1;i>=0;i--){const p=P[i];while(up.length>=2&&cr(up[up.length-2],up[up.length-1],p)<=0)up.pop();up.push(p)}
+  up.pop();lo.pop();return lo.concat(up)}
+function drawGroups(){
+  groupHits=[];const byG={};
+  for(const n of nodes.values()){const g=groupOf(n.a.key);if(g)(byG[g]||=[]).push(n)}
+  const gids=Object.keys(byG);if(!gids.length)return;
+  if(gcv.width!==M.W||gcv.height!==M.H){gcv.width=M.W;gcv.height=M.H}
+  const dark=document.documentElement.dataset.theme==='dark',PAD=60;
+  fx.save();
+  if('letterSpacing' in fx)fx.letterSpacing='1px';
+  for(const g of gids){
+    const ns=byG[g],col=GCOL[groups[g].color]||GCOL.gray,pts=[];
+    for(const n of ns){pts.push([n.x,n.y]);pts.push([n.x,n.y+46])}
+    const H=hull(pts);let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const[px,py]of pts){if(px<x0)x0=px;if(py<y0)y0=py;if(px>x1)x1=px;if(py>y1)y1=py}
+    const bx=Math.max(0,Math.floor(x0-PAD-2)),by=Math.max(0,Math.floor(y0-PAD-2)),bw=Math.min(M.W,Math.ceil(x1+PAD+2))-bx,bh=Math.min(M.H,Math.ceil(y1+PAD+2))-by;if(bw<=0||bh<=0)continue;
+    gx.clearRect(bx,by,bw,bh);gx.fillStyle=gx.strokeStyle=col;gx.lineJoin=gx.lineCap='round';gx.lineWidth=PAD*2;
+    gx.beginPath();H.forEach((p,i)=>i?gx.lineTo(p[0],p[1]):gx.moveTo(p[0],p[1]));if(H.length>2)gx.closePath();gx.fill();gx.stroke();
+    fx.globalAlpha=dark?.13:.075;fx.drawImage(gcv,bx,by,bw,bh,bx,by,bw,bh);fx.globalAlpha=1;
+    const lx=(x0+x1)/2,ly=y0-PAD+18,name=groups[g].name.toLocaleUpperCase('tr');
+    fx.font='500 10.5px "Geist Mono",ui-monospace,Menlo,monospace';fx.textAlign='center';fx.textBaseline='middle';
+    const w=fx.measureText(name).width+22;
+    fx.fillStyle=col;fx.globalAlpha=.9;fx.beginPath();fx.arc(lx-w/2+9,ly,3,0,6.2832);fx.fill();fx.globalAlpha=1;
+    fx.fillStyle=dark?'rgba(255,255,255,.72)':col;fx.fillText(name,lx+6,ly);
+    groupHits.push({g,x:lx-w/2,y:ly-11,w:w+8,h:22});
+  }
+  fx.restore();
+}
+function groupAt(x,y){return groupHits.find(h=>x>=h.x&&x<=h.x+h.w&&y>=h.y&&y<=h.y+h.h)?.g||null}
+function assignGroup(key,g){const prev=members[key];if(g)members[key]=g;else delete members[key];
+  for(const id of Object.keys(groups))if(!Object.values(members).includes(id)&&id!==g)delete groups[id]; // drop empty groups
+  saveMeta();wake();const n=nodes.get(key);if(n)ripple(n.x,n.y+TAIL,1.2);return prev}
+function groupMenu(x,y,a){
+  const cur=groupOf(a.key),ids=Object.keys(groups);
+  popMenu(x,y,`<div class="who"><b>${esc(a.name)}</b>grup seç</div><div class="msep"></div>`+
+    ids.map(id=>`<button class="mi" data-g="${id}"><span class="gdot" style="background:${GCOL[groups[id].color]||GCOL.gray}"></span>${esc(groups[id].name)}${id===cur?'<span class="k">✓</span>':''}</button>`).join('')+
+    `${ids.length?'<div class="msep"></div>':''}<button class="mi" data-g="+">${si(UI.plus)}Yeni grup…</button>${cur?`<button class="mi" data-g="-">${si(UI.unlinkall)}Gruptan çıkar</button>`:''}`,
+    e=>{const b=e.target.closest('[data-g]');if(!b)return;hideMenu();const g=b.dataset.g;
+      if(g==='+')groupSheet(null,a.key);else if(g==='-'){const gobj={...groups[cur]};const prev=assignGroup(a.key,null);toast(`${a.name} gruptan çıkarıldı`,()=>{if(prev&&!groups[prev])groups[prev]=gobj;assignGroup(a.key,prev)})}
+      else{assignGroup(a.key,g);toast(`${a.name} → ${groups[g].name}`)}});
+}
+function groupSheet(gid,assignKey){
+  const g=gid?groups[gid]:null;let color=g?.color||Object.keys(GCOL)[Object.keys(groups).length%6];
+  sheet(g?'Grubu düzenle':'Yeni grup',
+    `<div class="f"><label class="fl" for="gN">Ad</label><input class="in" id="gN" value="${esc(g?.name||'')}" placeholder="İş, Aile, Okul…" autocomplete="off"></div>
+     <div class="f"><span class="fl">Renk</span><div class="gsw" id="gC">${Object.entries(GCOL).map(([k,v])=>`<button data-c="${k}" class="${k===color?'on':''}" style="background:${v}" title="${k}"></button>`).join('')}</div></div>`,
+    `<span class="grow"></span><button class="btn ghost" data-x2>İptal</button><button class="btn solid" id="gS">${g?'Kaydet':'Oluştur'}</button>`,
+    s=>{const N=s.querySelector('#gN');setTimeout(()=>N.focus(),60);s.querySelector('[data-x2]').onclick=()=>closeSheet();
+      s.querySelector('#gC').onclick=e=>{const b=e.target.closest('[data-c]');if(!b)return;color=b.dataset.c;$$('#gC button',s).forEach(x=>x.classList.toggle('on',x===b))};
+      const save=()=>{const name=N.value.trim();if(!name){N.focus();return toast('Bir ad gir')}
+        const id=gid||('g'+uid());groups[id]={name,color};closeSheet();
+        if(assignKey){assignGroup(assignKey,id);toast(`${find(assignKey)?.name||''} → ${name}`)}else{saveMeta();wake();toast('Grup güncellendi')}};
+      s.querySelector('#gS').onclick=save;N.onkeydown=e=>{if(e.key==='Enter')save()}});
+}
+function groupLabelMenu(x,y,g){
+  const mem=Object.keys(members).filter(k=>members[k]===g&&nodes.has(k));
+  popMenu(x,y,`<div class="who"><b>${esc(groups[g].name)}</b>${mem.length} uygulama</div><div class="msep"></div>
+    <button class="mi" data-gm="edit">${si(UI.edit)}Adı ve rengi düzenle</button>
+    <button class="mi" data-gm="gather">${si(UI.graph)}Bir araya topla</button>
+    <button class="mi danger" data-gm="drop">${si(UI.del)}Grubu dağıt</button>`,
+    e=>{const b=e.target.closest('[data-gm]');if(!b)return;hideMenu();const k=b.dataset.gm;
+      if(k==='edit')groupSheet(g);
+      else if(k==='gather'){const ns=mem.map(m=>nodes.get(m));const cxg=ns.reduce((a,n)=>a+M.rx[n.ai],0)/ns.length,cyg=ns.reduce((a,n)=>a+M.ry[n.ai],0)/ns.length;
+        ns.forEach(n=>n.ai=null);ns.forEach((n,i)=>{const ang=i/ns.length*Math.PI*2,r=ns.length>1?95:0;n.ai=nearestFree(cxg+Math.cos(ang)*r*1.3,cyg+Math.sin(ang)*r,n);rememberLayout(n,false);setTimeout(()=>ripple(nx(n.ai),ny(n.ai),1),i*80)});saveMeta()}
+      else if(k==='drop'){const saved={g:{...groups[g]},m:mem};mem.forEach(m=>delete members[m]);delete groups[g];saveMeta();wake();
+        toast('Grup dağıtıldı',()=>{groups[g]=saved.g;saved.m.forEach(m=>members[m]=g);saveMeta();wake()})}});
+}
+
+/* ════════════════════════════════════════════════════════════
+   PEEK — üzerine gelince canlı önizleme
+   ════════════════════════════════════════════════════════════ */
+const PK={el:$('#peek'),f:$('#pkf'),n:null,key:null,t:0,x:0,y:0,shown:false,unload:0,side:1};
+PK.f.addEventListener('load',()=>{if(PK.f.src!=='about:blank'||PK.f.srcdoc)$('#pkL').classList.add('done')});
+function schedulePeek(n){if(!FINE||n.drag||linkDrag||W.app)return;clearTimeout(PK.t);PK.t=setTimeout(()=>showPeek(n),420)}
+function showPeek(n){
+  if(!n.hov||n.drag||linkDrag||W.app)return;const a=n.a;clearTimeout(PK.unload);
+  $('#pkN').textContent=a.name;$('#pkD').textContent=a.desc||(a.kind==='draft'?'Bu tarayıcıdan eklenmiş taslak':'');$('#pkD').hidden=!$('#pkD').textContent;
+  const g=groupOf(a.key),dg=degree(a.key);
+  $('#pkM').innerHTML=`<i>${a.kind==='draft'?'taslak':'yayında'}</i>${dg?`<i>${dg} bağlantı</i>`:''}${g?`<i><em style="background:${GCOL[groups[g].color]||GCOL.gray}"></em>${esc(groups[g].name)}</i>`:''}`;
+  if(PK.key!==a.key){PK.key=a.key;$('#pkL').classList.remove('done');
+    if(a.kind==='draft'){PK.f.setAttribute('sandbox','allow-scripts');PK.f.removeAttribute('src');PK.f.srcdoc=a.html}
+    else{PK.f.removeAttribute('srcdoc');PK.f.removeAttribute('sandbox');PK.f.src=a.url}}
+  PK.n=n;PK.el.hidden=false;
+  const r=n.el.getBoundingClientRect();PK.side=r.right+330<innerWidth?1:-1;
+  PK.x=PK.side>0?n.x+52:n.x-352;PK.y=clamp(n.y-90,70,innerHeight-310);
+  PK.el.style.transform=`translate3d(${PK.x}px,${PK.y}px,0)`;
+  anim(PK.el,[{opacity:0,transform:`translate3d(${PK.x-12*PK.side}px,${PK.y+6}px,0) scale(.94)`},{opacity:1,transform:`translate3d(${PK.x}px,${PK.y}px,0)`}],{duration:420,easing:OUT,fill:'forwards'});
+  PK.shown=true;
+}
+function followPeek(k){if(!PK.shown||!PK.n)return;const n=PK.n,tx=PK.side>0?n.x+52:n.x-352,ty=clamp(n.y-90,70,innerHeight-310);
+  PK.x+=(tx-PK.x)*(1-Math.pow(.75,k));PK.y+=(ty-PK.y)*(1-Math.pow(.75,k));
+  if(!PK.el.getAnimations().length)PK.el.style.transform=`translate3d(${PK.x.toFixed(1)}px,${PK.y.toFixed(1)}px,0)`}
+function hidePeek(now){clearTimeout(PK.t);if(!PK.shown)return;PK.shown=false;PK.n=null;
+  PK.el.getAnimations().forEach(a=>a.cancel());
+  if(now){PK.el.hidden=true}else anim(PK.el,[{opacity:1,transform:`translate3d(${PK.x}px,${PK.y}px,0)`},{opacity:0,transform:`translate3d(${PK.x}px,${PK.y+4}px,0) scale(.97)`}],{duration:160,easing:EASE,fill:'forwards'}).finished.then(()=>{if(!PK.shown)PK.el.hidden=true},()=>{});
+  clearTimeout(PK.unload);PK.unload=setTimeout(()=>{if(!PK.shown){PK.f.removeAttribute('srcdoc');PK.f.src='about:blank';PK.key=null}},20000)} // free memory
 
 /* ════════════════════════════════════════════════════════════
    LOOP — tek rAF; ağ uyur, boştayken 30fps'e iner
@@ -711,6 +844,9 @@ function frame(t){
     if(ptr.amp>.01&&!n.hov){const ddx=ptr.sx-n.x,ddy=ptr.sy-n.y;if(ddx<200&&ddx>-200&&ddy<200&&ddy>-200){const d=Math.hypot(ddx,ddy);if(d<200){const f=(1-d/200);tx+=ddx*.16*f*f*ptr.amp;ty+=ddy*.16*f*f*ptr.amp}}}
     n.tx=tx;n.ty=ty;
   }
+  // group cohesion: members drift gently toward their group's centre
+  const gc={};for(const n of list){const g=groupOf(n.a.key);if(!g)continue;(gc[g]||=[0,0,0]);gc[g][0]+=n.tx;gc[g][1]+=n.ty;gc[g][2]++}
+  for(const n of list){const g=groupOf(n.a.key);if(!g||n.drag||gc[g][2]<2)continue;const cxg=gc[g][0]/gc[g][2],cyg=gc[g][1]/gc[g][2],ddx=cxg-n.tx,ddy=cyg-n.ty,d=Math.hypot(ddx,ddy)||1,p=Math.min(18,Math.max(0,d-110)*.05);n.tx+=ddx/d*p;n.ty+=ddy/d*p}
   for(const[ka,kb]of links){const a=nodes.get(ka),b=nodes.get(kb);if(!a||!b)continue;
     const ddx=b.tx-a.tx,ddy=b.ty-a.ty,d=Math.hypot(ddx,ddy)||1,ux=ddx/d,uy=ddy/d;
     const pa=b.drag?Math.min(90,Math.max(0,d-150)*.22):Math.min(26,Math.max(0,d-130)*.06);
@@ -728,7 +864,7 @@ function frame(t){
   ptr.sx+=(ptr.x-ptr.sx)*(1-Math.pow(1-.22,k));ptr.sy+=(ptr.y-ptr.sy)*(1-Math.pow(1-.22,k));ptr.amp+=(ptr.tAmp-ptr.amp)*(1-Math.pow(1-.07,k));
   if(meshAwake||introT<1){const settled=stepMesh(k,t);drawMesh(t);if(settled&&introT>=1)meshAwake=false}
   else if(meshDirty)drawMesh(t);
-  fx.clearRect(0,0,M.W,M.H);drawLinks(time);drawTethers(time);drawRubber(time);
+  fx.clearRect(0,0,M.W,M.H);drawGroups(time);drawLinks(time);drawTethers(time);drawRubber(time);followPeek(k);
   raf=requestAnimationFrame(frame);
 }
 const wake=()=>{if(!raf&&!paused)raf=requestAnimationFrame(frame)};
@@ -742,10 +878,11 @@ addEventListener('pointermove',e=>{if(e.pointerType==='mouse'||ptr.down){ptr.x=e
   if(linkDrag&&linkDrag.mode==='click')updateLink(e.clientX,e.clientY)},{passive:true});
 document.documentElement.addEventListener('pointerleave',()=>{ptr.tAmp=0;wakeMesh()});
 addEventListener('blur',()=>{ptr.tAmp=0;wakeMesh()});
-$('#stage').addEventListener('pointermove',e=>{if(e.pointerType!=='mouse'||linkDrag)return;const h=linkHit(e.clientX,e.clientY);
+$('#stage').addEventListener('pointermove',e=>{if(e.pointerType!=='mouse'||linkDrag)return;$('#stage').classList.toggle('ongroup',!!groupAt(e.clientX,e.clientY));const h=linkHit(e.clientX,e.clientY);
   if(h!==hoverLink){hoverLink=h;$('#stage').classList.toggle('onlink',h>=0);wake()}});
 $('#stage').addEventListener('pointerdown',e=>{
   if(linkDrag){if(linkDrag.mode==='click')cancelLink();return}
+  const gl=groupAt(e.clientX,e.clientY);if(gl){groupLabelMenu(e.clientX,e.clientY+14,gl);return}
   const h=e.pointerType==='mouse'?hoverLink:linkHit(e.clientX,e.clientY);
   if(h>=0){const[ka,kb]=links[h],A=find(ka),Bn=find(kb);
     popMenu(e.clientX,e.clientY,`<div class="who"><b>${esc(A?.name||'')} ↔ ${esc(Bn?.name||'')}</b>bağlantı</div><div class="msep"></div><button class="mi danger" data-m="unl">${si(UI.del)}Bağlantıyı kaldır</button>`,
@@ -783,7 +920,7 @@ $('#pill').addEventListener('pointerleave',()=>{clearTimeout(pillT);pillT=setTim
 $('#grab').addEventListener('click',()=>showPill(3500));
 function chrome(on){for(const id of['#hot','#pill','#grab'])$(id).hidden=!on}
 function openApp(a,el){
-  if(!a||justDragged||linkDrag)return;
+  if(!a||justDragged||linkDrag)return;hidePeek(true);
   if(W.app&&W.app.key===a.key&&W.min){restore();return}
   if(W.app)hideWin(true);
   W.app=a;W.min=false;$('#dock').hidden=true;
@@ -853,7 +990,7 @@ function popMenu(x,y,html,onClick){
   const lx=clamp(x,8,innerWidth-r.width-8),ly=clamp(y,8,innerHeight-r.height-8);m.style.left=lx+'px';m.style.top=ly+'px';m.style.setProperty('--ox',(x-lx)+'px');m.style.setProperty('--oy',(y-ly)+'px');
   anim(m,[{opacity:0,transform:'scale(.94)'},{opacity:1,transform:'none'}],{duration:260,easing:OUT});m.addEventListener('click',onClick);menuEl=m;return m}
 function showMenu(x,y,a){
-  const dg=degree(a.key),lk=[['connect','Başka uygulamaya bağla','⇧'],...(dg?[['unlinkall',`Bağlantıları kaldır (${dg})`]]:[])];
+  const dg=degree(a.key),gg=groupOf(a.key),lk=[['connect','Başka uygulamaya bağla','⇧'],...(dg?[['unlinkall',`Bağlantıları kaldır (${dg})`]]:[]),['group',gg?`Grup: ${groups[gg].name}`:'Gruba ekle…']];
   const items=a.kind==='pub'?[['open','Aç','↵'],['tab','Yeni sekmede aç'],['link','Adresi kopyala'],'-',...lk,['home','Merkeze getir']]
     :[['open','Aç','↵'],['edit','Düzenle'],['ship','Yayına hazırla'],['dl','HTML indir'],'-',...lk,['home','Merkeze getir'],'-',['del','Sil']];
   popMenu(x,y,items.map(i=>i==='-'?'<div class="msep"></div>':`<button class="mi${i[0]==='del'?' danger':''}" data-m="${i[0]}" role="menuitem">${si(UI[i[0]])}${i[1]}${i[2]?`<span class="k">${i[2]}</span>`:''}</button>`).join(''),
@@ -865,6 +1002,7 @@ function showMenu(x,y,a){
       else if(k==='edit')openSheet(a);else if(k==='ship')shipSheet(a);else if(k==='dl')download(a.html,slugify(a.name)+'.html');
       else if(k==='home'&&n){n.ai=nearestFree(M.W/2,M.H/2+50,n);rememberLayout(n);ripple(nx(n.ai),ny(n.ai),1.6)}
       else if(k==='connect'&&n)startLink(n,{clientX:n.x+60,clientY:n.y},'click');
+      else if(k==='group')groupMenu(x,y,a);
       else if(k==='unlinkall'){const removed=links.filter(l=>l[0]===a.key||l[1]===a.key);links=links.filter(l=>l[0]!==a.key&&l[1]!==a.key);saveMeta();statusText();if(n)ripple(n.x,n.y+TAIL,1.3);
         toast('Bağlantılar kaldırıldı',()=>{removed.forEach(l=>{if(!hasLink(l[0],l[1]))links.push(l)});saveMeta();statusText();wake()});wake()}
       else if(k==='del')removeDraft(a)});
@@ -895,7 +1033,7 @@ function palette(){
   const draw=()=>{
     query=inp.value;applyFilter();const q=inp.value.trim().toLocaleLowerCase('tr');
     const apps=[...pub,...drafts].filter(a=>!q||a.name.toLocaleLowerCase('tr').includes(q)||(a.desc||'').toLocaleLowerCase('tr').includes(q))
-      .map(a=>({app:a,l:a.name,sub:a.kind==='draft'?'taslak':a.desc,run:()=>openApp(a,nodes.get(a.key)?.el)}));
+      .map(a=>({app:a,l:a.name,sub:[groupOf(a.key)&&groups[groupOf(a.key)].name,a.kind==='draft'?'taslak':a.desc].filter(Boolean).join(' · '),run:()=>openApp(a,nodes.get(a.key)?.el)}));
     const cm=cmds().filter(c=>!q||c.l.toLocaleLowerCase('tr').includes(q));
     items=[...apps,...cm];sel=Math.min(sel,Math.max(0,items.length-1));
     let html='',i=0;const sec=(h,arr)=>{if(!arr.length)return;html+=`<div class="pal-h">${h}</div>`;arr.forEach(it=>{const m=it.app?miniIcon(it.app):null;

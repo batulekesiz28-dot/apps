@@ -257,5 +257,45 @@
     "fix": "İstenirse SAT Bank reposuna da aynı denetim eklenebilir."
    }
   ]
+ },
+ {
+  "at": "2026-11-13T22:00:00+03:00",
+  "change": "6 yeni widget: Çalışma serisi (alev), Yer imleri (favoriler), Geri sayım, Alışkanlıklar, Günün kelimesi, Odak sesi",
+  "scores": {
+   "Widget'lar telefon": {
+    "before": 87,
+    "after": 100
+   },
+   "Widget'lar bilgisayar": {
+    "before": 94,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Hub",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Yer imlerindeki sarı favori yıldızı beyaz zeminde okunmuyordu; koyu altın rengine çevrildi."
+   },
+   {
+    "app": "Hub",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Telefonda widget kapatma (×), kelime oklar ve ses düzeyi çok küçüktü; 40px yapıldı."
+   },
+   {
+    "app": "Hub",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Telefonda alışkanlık kutuları, yıldız/sil düğmeleri ve site adları küçüktü; büyütüldü."
+   },
+   {
+    "app": "Hub",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Site ikonu yüklenemezse sitenin baş harfi gösteriliyor."
+   }
+  ]
  }
 ]

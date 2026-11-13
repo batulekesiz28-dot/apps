@@ -144,7 +144,7 @@ body.far .port{display:none}
 body.locked #widgets,body.locked .zbar{visibility:hidden}
 
 /* ── Zoom bar ─────────────────────────────────── */
-.zbar{position:fixed;right:22px;bottom:calc(40px + env(safe-area-inset-bottom));z-index:20;display:flex;align-items:center;gap:1px;height:32px;padding:0 3px;border-radius:11px;background:var(--glass);box-shadow:0 0 0 .5px var(--line2),0 6px 20px -12px rgba(0,0,0,.14);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);user-select:none}
+.zbar{position:fixed;right:22px;bottom:calc(40px + env(safe-area-inset-bottom));z-index:20;display:flex;align-items:center;gap:1px;height:32px;padding:0 3px;border-radius:11px;background:var(--menu);box-shadow:0 0 0 .5px var(--line2),0 6px 20px -12px rgba(0,0,0,.14);user-select:none}
 .zbar button{height:26px;min-width:26px;border-radius:8px;display:grid;place-items:center;color:var(--ink2);transition:background .15s,color .15s}
 .zbar button:hover{background:var(--hover);color:var(--ink)}
 .zbar svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
@@ -161,12 +161,12 @@ body.locked #widgets,body.locked .zbar{visibility:hidden}
 .mark-glyph i:nth-child(2),.mark-glyph i:nth-child(3){opacity:.45}
 .mark-glyph i:nth-child(4){opacity:.18}
 .mark-name{font-weight:600;letter-spacing:-.02em;font-size:13.5px}
-.search{display:flex;align-items:center;gap:8px;height:34px;padding:0 8px 0 12px;width:230px;border-radius:11px;color:var(--ink3);font-size:13px;background:var(--glass);box-shadow:0 0 0 .5px var(--line2),0 6px 20px -12px rgba(0,0,0,.14);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);transition:box-shadow .3s,transform .45s var(--spring)}
+.search{display:flex;align-items:center;gap:8px;height:34px;padding:0 8px 0 12px;width:230px;border-radius:11px;color:var(--ink3);font-size:13px;background:var(--menu);box-shadow:0 0 0 .5px var(--line2),0 6px 20px -12px rgba(0,0,0,.14);transition:box-shadow .3s,transform .45s var(--spring)}
 .search:hover{box-shadow:0 0 0 .5px var(--line3),0 8px 24px -12px rgba(0,0,0,.18);color:var(--ink2)}
 .search:active{transform:scale(.98)}
 .search span:first-of-type{flex:1;text-align:left}
 .kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radius:4px;box-shadow:inset 0 0 0 .5px var(--line3)}
-.ib{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;color:var(--ink2);background:var(--glass);box-shadow:0 0 0 .5px var(--line2),0 6px 20px -12px rgba(0,0,0,.14);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);transition:transform .45s var(--spring),box-shadow .2s,color .2s}
+.ib{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;color:var(--ink2);background:var(--menu);box-shadow:0 0 0 .5px var(--line2),0 6px 20px -12px rgba(0,0,0,.14);transition:transform .45s var(--spring),box-shadow .2s,color .2s}
 .ib:hover{color:var(--ink);box-shadow:0 0 0 .5px var(--line3),0 8px 24px -12px rgba(0,0,0,.2)}
 .ib:active{transform:scale(.9);transition-duration:.08s}
 .ib svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}
@@ -631,7 +631,7 @@ function camMoved(){
     for(const n of nodes.values()){n.x=tx(n.x);n.y=ty(n.y);n.vx*=r;n.vy*=r;if(n.drag){n.gx=tx(n.gx);n.gy=ty(n.gy)}}
     for(const q of ripples){q.x=tx(q.x);q.y=ty(q.y)}
     if(PK.shown){PK.x=tx(PK.x);PK.y=ty(PK.y)}}
-  layoutMesh();placeWidgets();zoomLabel();camLayers();document.body.classList.toggle('far',cam.z<.5);saveCam();hidePeekIfMoving();
+  lastCamMove=performance.now();layoutMesh();placeWidgets();zoomLabel();camLayers();document.body.classList.toggle('far',cam.z<.5);saveCam();hidePeekIfMoving();
 }
 let clT=0,clOn=false;function camLayers(){if(!clOn){clOn=true;$('#widgets').classList.add('moving')}clearTimeout(clT);clT=setTimeout(()=>{clOn=false;$('#widgets').classList.remove('moving')},220)}
 let zlT='';function zoomLabel(){const t=Math.round(cam.z*100)+'%';if(t!==zlT){zlT=t;$('#zPct').textContent=t}}
@@ -707,26 +707,44 @@ function drawFlat(){
     ptx.fillStyle=`rgb(${TH.dot})`;ptx.beginPath();ptx.arc(c,c,(dpr>1?1:1.05)*dpr,0,6.2832);ptx.fill();pat=cx.createPattern(ptc,'repeat');patKey=key}
   const sc=M.gap*dpr/T;pat.setTransform(new DOMMatrix([sc,0,0,sc,M.ox*dpr-T*sc/2,M.oy*dpr-T*sc/2]));
   cx.save();cx.setTransform(1,0,0,1,0,0);cx.fillStyle=pat;cx.fillRect(0,0,cv.width,cv.height);cx.restore();meshDirty=false}
-function drawMesh(now){
-  const{W,H,cols,rows,n,en,wk}=M;cx.clearRect(0,0,W,H);
-  if(M.flat&&!M.warp&&introT>=1&&typeof DOMMatrix!=='undefined')return drawFlat();
-  let reveal=1;if(introT<1){introT=clamp((now-introStart)/1500,0,1);reveal=1-Math.pow(1-introT,3)}
-  const cxm=W/2,cym=H/2,maxR=Math.hypot(W,H)*.6*reveal,full=reveal>=1;
-  const vis=i=>full?1:clamp((maxR-Math.hypot(M.rx[i]-cxm,M.ry[i]-cym))/140,0,1);
-  // fade lines a little when zoomed far out so the field stays airy
-  const la=cam.z<.6?.75:1;
+// Draw lines + dots of the mesh into ctx. rest=true ignores displacement (for the cache);
+// R=[x0,y0,x1,y1] limits work to one screen rectangle.
+function paintMesh(ctx,rest,R,vis){
+  const{cols,rows,n,en,wk,rx,ry,dx,dy}=M,full=!vis,la=cam.z<.6?.75:1;
+  const X=rest?i=>rx[i]:i=>rx[i]+dx[i],Y=rest?i=>ry[i]:i=>ry[i]+dy[i],E=rest?i=>wk[i]:i=>en[i]>wk[i]?en[i]:wk[i];
+  const inR=R?(x,y)=>x>=R[0]&&x<=R[2]&&y>=R[1]&&y<=R[3]:null;
   const L=[new Path2D(),new Path2D(),new Path2D()];
-  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){const i=r*cols+c;if(!full&&vis(i)<.5)continue;const x=nx(i),y=ny(i);
-    if(c<cols-1){const j=i+1,e=Math.max(en[i],en[j],wk[i],wk[j]),b=e>.45?2:e>.08?1:0;L[b].moveTo(x,y);L[b].lineTo(nx(j),ny(j))}
-    if(r<rows-1){const j=i+cols,e=Math.max(en[i],en[j],wk[i],wk[j]),b=e>.45?2:e>.08?1:0;L[b].moveTo(x,y);L[b].lineTo(nx(j),ny(j))}}
-  cx.lineWidth=.5;for(let b=0;b<3;b++){cx.strokeStyle=`rgba(${TH.l},${TH.la[b]*(b?1:la)})`;cx.stroke(L[b])}
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){const i=r*cols+c;if(!full&&vis(i)<.5)continue;const x=X(i),y=Y(i),ii=!inR||inR(x,y);
+    if(c<cols-1){const j=i+1,xj=X(j),yj=Y(j);if(ii||inR(xj,yj)){const e=Math.max(E(i),E(j)),b=e>.45?2:e>.08?1:0;L[b].moveTo(x,y);L[b].lineTo(xj,yj)}}
+    if(r<rows-1){const j=i+cols,xj=X(j),yj=Y(j);if(ii||inR(xj,yj)){const e=Math.max(E(i),E(j)),b=e>.45?2:e>.08?1:0;L[b].moveTo(x,y);L[b].lineTo(xj,yj)}}}
+  ctx.lineWidth=.5;for(let b=0;b<3;b++){ctx.strokeStyle=`rgba(${TH.l},${TH.la[b]*(b?1:la)})`;ctx.stroke(L[b])}
   const base=new Path2D(),r0=M.dpr>1?1:1.05,D=TH.dot,Hh=TH.hot,NB=6,bk=[];
-  for(let i=0;i<n;i++){const v=vis(i);if(v<=0)continue;const e=en[i],x=nx(i),y=ny(i);
+  for(let i=0;i<n;i++){const v=full?1:vis(i);if(v<=0)continue;const e=rest?0:en[i],x=X(i),y=Y(i);if(inR&&!inR(x,y))continue;
     if(e<.06&&v>=1){base.moveTo(x+r0,y);base.arc(x,y,r0,0,6.2832);continue}
-    if(v<1){cx.fillStyle=`rgba(${D},${v})`;cx.beginPath();cx.arc(x,y,r0,0,6.2832);cx.fill();continue} // intro edge only
-    const q=Math.min(NB-1,(e*NB)|0),P=bk[q]||(bk[q]=new Path2D()),r=r0+(q+.5)/NB*.9;P.moveTo(x+r,y);P.arc(x,y,r,0,6.2832)}
-  cx.fillStyle=`rgb(${D})`;cx.fill(base);
-  for(let q=0;q<NB;q++){if(!bk[q])continue;const e=(q+.5)/NB;cx.fillStyle=`rgb(${Math.round(D[0]+(Hh[0]-D[0])*e)},${Math.round(D[1]+(Hh[1]-D[1])*e)},${Math.round(D[2]+(Hh[2]-D[2])*e)})`;cx.fill(bk[q])}
+    if(v<1){ctx.fillStyle=`rgba(${D},${v})`;ctx.beginPath();ctx.arc(x,y,r0,0,6.2832);ctx.fill();continue} // intro edge only
+    const q=Math.min(NB-1,(e*NB)|0),P=bk[q]||(bk[q]=new Path2D()),rr=r0+(q+.5)/NB*.9;P.moveTo(x+rr,y);P.arc(x,y,rr,0,6.2832)}
+  ctx.fillStyle=`rgb(${D})`;ctx.fill(base);
+  for(let q=0;q<NB;q++){if(!bk[q])continue;const e=(q+.5)/NB;ctx.fillStyle=`rgb(${Math.round(D[0]+(Hh[0]-D[0])*e)},${Math.round(D[1]+(Hh[1]-D[1])*e)},${Math.round(D[2]+(Hh[2]-D[2])*e)})`;ctx.fill(bk[q])}
+}
+// Rest-state mesh cached in an offscreen canvas while the camera is still; each frame only the
+// disturbed rectangle (around the pointer / ripples) is cleared and repainted on top of it.
+const mcv=document.createElement('canvas'),mcx=mcv.getContext('2d');let mKey='',lastCamMove=0;
+function drawMesh(now){
+  const{W,H,n,dx,dy,en,rx,ry}=M;
+  if(M.flat&&!M.warp&&introT>=1&&typeof DOMMatrix!=='undefined'){cx.clearRect(0,0,W,H);return drawFlat()}
+  if(introT<1){introT=clamp((now-introStart)/1500,0,1);const reveal=1-Math.pow(1-introT,3),cxm=W/2,cym=H/2,maxR=Math.hypot(W,H)*.6*reveal;
+    cx.clearRect(0,0,W,H);paintMesh(cx,false,null,reveal>=1?null:i=>clamp((maxR-Math.hypot(rx[i]-cxm,ry[i]-cym))/140,0,1));meshDirty=false;return}
+  // camera moving: a cache would be stale next frame, so paint directly
+  if(now-lastCamMove<160){cx.clearRect(0,0,W,H);paintMesh(cx,false,null,null);mKey='';meshDirty=false;return}
+  const key=cam.x+','+cam.y+','+cam.z+','+W+','+H+','+M.dpr+','+TH.l+TH.dot;
+  if(key!==mKey){mcv.width=cv.width;mcv.height=cv.height;mcx.setTransform(M.dpr,0,0,M.dpr,0,0);mcx.clearRect(0,0,W,H);paintMesh(mcx,true,null,null);mKey=key}
+  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+  for(let i=0;i<n;i++){if(en[i]===0&&dx[i]===0&&dy[i]===0)continue;if(Math.abs(dx[i])+Math.abs(dy[i])<.02&&en[i]<.01)continue;
+    const x=rx[i],y=ry[i];if(x<x0)x0=x;if(y<y0)y0=y;if(x>x1)x1=x;if(y>y1)y1=y}
+  cx.setTransform(1,0,0,1,0,0);cx.clearRect(0,0,cv.width,cv.height);cx.drawImage(mcv,0,0);cx.setTransform(M.dpr,0,0,M.dpr,0,0);
+  if(x1>=x0){const pad=M.gap*1.6+16,R=[x0-pad,y0-pad,x1+pad,y1+pad];
+    cx.save();cx.beginPath();cx.rect(R[0],R[1],R[2]-R[0],R[3]-R[1]);cx.clip();cx.clearRect(R[0],R[1],R[2]-R[0],R[3]-R[1]);
+    paintMesh(cx,false,[R[0]-M.gap,R[1]-M.gap,R[2]+M.gap,R[3]+M.gap],null);cx.restore()}
   meshDirty=false;
 }
 
@@ -1081,6 +1099,7 @@ function galaxyModel(){
   GX.RG=S?GX.RS+maxR+30:inner;
   relocateWidgets();
 }
+function galaxyOnScreen(){if(GX.ts<.02)return false;for(const n of nodes.values())if(!n.off&&n.a.key!==BH_KEY)return true;return false}
 function galaxyStep(dt){
   // the pointer near a planet holds the sky still so it's easy to click (planets would otherwise slide away)
   let near=false;if(FINE&&ptr.amp>.3)for(const n of nodes.values()){const dx=n.x-ptr.x,dy=n.y-ptr.y;if(dx*dx+dy*dy<90*90){near=true;break}}
@@ -1141,10 +1160,10 @@ function relocateWidgets(){if(!wReady||!booted)return;const RG=GX.RG+40;let move
 
 function frame(t){
   raf=0;if(paused)return;
-  const idle=t-lastInput>8000&&!linkDrag;
+  const idle=t-lastInput>8000&&!linkDrag&&!galaxyOnScreen();
   if(idle&&t-lastDraw<31){raf=requestAnimationFrame(frame);return}
   lastDraw=t;const dt=Math.min(40,t-(last||t));last=t;const k=dt/16.667,time=t/1000;
-  stepCam(k);if(cam.x!==cam.px||cam.y!==cam.py||cam.z!==cam.pz){camMoved();meshDirty=true}
+  stepCam(k);if(cam.x!==cam.px||cam.y!==cam.py||cam.z!==cam.pz){camMoved();meshDirty=true}else if(!mKey&&t-lastCamMove>=160)meshDirty=true;
   stepWidgets(k);
   const list=[...nodes.values()],anyDrag=list.some(n=>n.drag),Z=cam.z,LZ=LIFT*Z;
   galaxyModel();galaxyStep(dt);
@@ -1155,8 +1174,8 @@ function frame(t){
     n.tx=sx;n.ty=sy-n.hover*4*Z;
   }
   for(const n of list){
-    const st=n.drag?.32:.09,dp=Math.pow(n.drag?.7:.8,k);
-    n.vx=(n.vx+(n.tx-n.x)*st*k)*dp;n.vy=(n.vy+(n.ty-n.y)*st*k)*dp;n.x+=n.vx*k;n.y+=n.vy*k;
+    if(n.drag){const dp=Math.pow(.7,k);n.vx=(n.vx+(n.tx-n.x)*.32*k)*dp;n.vy=(n.vy+(n.ty-n.y)*.32*k)*dp;n.x+=n.vx*k;n.y+=n.vy*k}
+    else{const f=1-Math.pow(1-.14,k),ox=n.x,oy=n.y;n.x+=(n.tx-n.x)*f;n.y+=(n.ty-n.y)*f;n.vx=(n.x-ox)/k;n.vy=(n.y-oy)/k}
     n.rot+=(clamp(n.drag?n.vx*1.4:0,-16,16)-n.rot)*(1-Math.pow(.8,k));place(n);
   }
   highlight();

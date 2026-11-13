@@ -134,5 +134,52 @@
     "fix": "İstenirse uzak görünümde sadece güneş adları yerine kısa uygulama adları da gösterilebilir."
    }
   ]
+ },
+ {
+  "at": "2026-11-13T20:20:00+03:00",
+  "change": "Akıcılık: gezegenler tam 60/120 fps, ağ çizimi önbellekli, cam efektleri kaldırıldı",
+  "scores": {
+   "Hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Hub bilgisayar": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Hub",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "8 saniye dokunulmayınca ekran 30 fps'e düşüyordu; galaksi döndüğü sürece artık tam hızda."
+   },
+   {
+    "app": "Hub",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Gezegenler yörüngeyi yaylı bir gecikmeyle takip ediyordu; artık yörünge çizgisinin tam üstünde akıyorlar."
+   },
+   {
+    "app": "Hub",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Fare hareket ederken tüm ağ her karede baştan çiziliyordu (≈2,3 ms); artık sadece imlecin etrafı çiziliyor (≈0,8 ms)."
+   },
+   {
+    "app": "Hub",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Üst çubuk ve yakınlaştırma çubuğundaki bulanık cam efekti, hareketli arka planda her karede yeniden hesaplanıyordu; düz yarı saydam zemine çevrildi."
+   },
+   {
+    "app": "Hub",
+    "sev": "info",
+    "status": "open",
+    "text": "Kaydırırken kara deliğin çevresindeki bükülmüş ağ her karede yeniden çiziliyor.",
+    "fix": "Gerekirse kaydırma sırasında ağ daha seyrek çizilebilir."
+   }
+  ]
  }
 ]

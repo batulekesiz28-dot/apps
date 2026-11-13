@@ -331,5 +331,50 @@
     "text": "Güneşler: nefes alan parıltı, titreyen taç ve önden-arkadan dönen iki halka; 60 fps korunuyor."
    }
   ]
+ },
+ {
+  "at": "2026-11-13T22:30:00+03:00",
+  "change": "Oto senkron (akıllı kümeleme), sürüklenebilir yıldızlar, sadece AI uygulamaları kara deliğin yörüngesinde, yeni Öneriler uygulaması",
+  "scores": {
+   "Hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Öneriler telefon": {
+    "before": 96,
+    "after": 100
+   },
+   "Öneriler bilgisayar": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Öneriler",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Telefonda kaynak linkleri ve küçük etiketler dar/küçüktü; 40px ve 12px yapıldı."
+   },
+   {
+    "app": "Hub",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Yıldıza tıklamak menüyü açıyor, sürüklemek taşıyor; ikisi karışmasın diye 5px eşiği var. Taşıma geri alınabiliyor."
+   },
+   {
+    "app": "Hub",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Kümesi olmayan, yapay zekâ dışı uygulamalar artık gri “Diğer” yıldızında; kara deliğin yörüngesi sadece AI uygulamaları için."
+   },
+   {
+    "app": "Notlar",
+    "sev": "warn",
+    "status": "open",
+    "text": "Telefonda hâlâ birkaç küçük yazı ve 4 küçük düğme var (önceden de açıktı).",
+    "fix": "Telefon için 12px alt sınır ve 40px düğme."
+   }
+  ]
  }
 ]

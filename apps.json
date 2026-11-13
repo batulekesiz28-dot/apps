@@ -28,7 +28,8 @@
    "name": "Denetçi",
    "icon": "spark",
    "color": "violet",
-   "desc": "Her değişikliği senin gözünden denetler: erişim, kullanım, estetik, hız"
+   "desc": "Her değişikliği senin gözünden denetler: erişim, kullanım, estetik, hız",
+   "ai": true
   },
   {
    "slug": "sat-bank",
@@ -49,6 +50,14 @@
    "url": "../sat-bank/math.html",
    "group": "SAT",
    "groupColor": "violet"
+  },
+  {
+   "slug": "oneriler",
+   "name": "Öneriler",
+   "icon": "spark",
+   "color": "amber",
+   "desc": "Ünlü uygulamalar ve Reddit/forumlar araştırılarak hub için öneriler",
+   "ai": true
   }
  ]
 }

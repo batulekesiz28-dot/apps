@@ -1,0 +1,294 @@
+{
+ "updated": "2026-11-13",
+ "method": "Ünlü uygulamaların (Duolingo, Momentum, Arc, Obsidian, Anki, Pomofocus, Toggl) yaklaşımları ve Reddit / forum tartışmaları tarandı; her öneri kaynağıyla birlikte, hub'a uyarlanmış haliyle yazıldı.",
+ "ideas": [
+  {
+   "id": "freeze",
+   "app": "Study Log",
+   "area": "Seri",
+   "title": "Seri dondurma hakkı",
+   "why": "Duolingo kaçırılan günleri anlayışla karşılayan “esnek seri” yaklaşımını benimsiyor. Oyunlaştırma uzmanları da dondurma ve onarım hakkını kullanıcıyı kaybetmemek için “merhamet altyapısı” olarak görüyor. Kanıtlar da tek bir kaçırılan günü affeden serinin sıfırlanan seriden daha iyi tuttuğunu söylüyor.",
+   "what": "Ayda 2 dondurma hakkı. Bir gün çalışılmazsa otomatik kullanılır, alev buz mavisine döner ve seri kopmaz. Kalan hak widget'ta görünür.",
+   "effort": "S",
+   "impact": 3,
+   "sources": [
+    {
+     "t": "Duolingo — streak nasıl alışkanlık kurar",
+     "u": "https://blog.duolingo.com/how-duolingo-streak-builds-habit"
+    },
+    {
+     "t": "Yu-kai Chou — Streak tasarımı",
+     "u": "https://yukaichou.com/gamification-study/master-the-art-of-streak-design-for-short-term/"
+    },
+    {
+     "t": "Newly — kaçırılan günü affeden alışkanlık takibi",
+     "u": "https://newly.app/build/habit-tracker-app"
+    },
+    {
+     "t": "Speak — Streak freeze otomatik uygulanır",
+     "u": "https://help.speak.com/en/articles/11645358-streak-101-how-streaks-work-how-to-keep-them"
+    }
+   ]
+  },
+  {
+   "id": "milestone",
+   "app": "Study Log",
+   "area": "Seri",
+   "title": "Kilometre taşı kutlamaları",
+   "why": "Duolingo 7, 30, 100 ve 365. günlerde akışı durdurup kutlama yapıyor; bu anlar seriyi korumayı anlamlı kılıyor.",
+   "what": "7/30/100. günde tam ekran kısa bir alev animasyonu ve rozet; rozetler Takip sekmesinde birikir.",
+   "effort": "S",
+   "impact": 2,
+   "sources": [
+    {
+     "t": "Duolingo streak kilometre taşları (7/30/100/365)",
+     "u": "https://duolingo.deconstructoroffun.com/mechanics/streaks"
+    }
+   ]
+  },
+  {
+   "id": "activetask",
+   "app": "Study Log",
+   "area": "Sayaç",
+   "title": "Sayaçta aktif görev",
+   "why": "Pomofocus ve Tomatillo gibi sevilen sayaçlar görev listesini sayaca bağlıyor ve tek bir aktif görevi ana ekranda gösteriyor; böylece bütün liste insanı bunaltmıyor.",
+   "what": "Konu alanının altında küçük bir görev listesi; bir görev seçilince sayaçta görünür, oturum bitince “bitti mi?” diye sorar.",
+   "effort": "M",
+   "impact": 3,
+   "sources": [
+    {
+     "t": "En iyi Pomodoro / çalışma sayacı uygulamaları 2026",
+     "u": "https://www.alphonsolabs.com/best-pomodoro-timer-apps-study-2026/amp/"
+    },
+    {
+     "t": "Tomatillo Timer — aktif görevi ana ekranda gösterme",
+     "u": "https://itnext.io/i-built-a-study-timer-to-improve-my-focus-2aeda64606bf"
+    }
+   ]
+  },
+  {
+   "id": "insights",
+   "app": "Study Log",
+   "area": "Takip",
+   "title": "Çalışma örüntüsü içgörüleri",
+   "why": "Kullanıcılar çalışma sayaçlarında daha fazla içgörü ve görselleştirme istiyor. Toggl gibi araçların en güçlü yanı “nereye zaman gitti” sorusuna dürüst cevap vermesi.",
+   "what": "Takip sekmesine: günün saatine göre ısı haritası (en verimli saatlerin), ders başına haftalık eğilim ve “bu hafta en çok ihmal edilen ders” kartı.",
+   "effort": "M",
+   "impact": 2,
+   "sources": [
+    {
+     "t": "Product Hunt yorumu — çalışma örüntüsü görselleri istendi",
+     "u": "https://www.producthunt.com/@northatlas/reviews"
+    },
+    {
+     "t": "En iyi Pomodoro / çalışma sayacı uygulamaları 2026",
+     "u": "https://www.alphonsolabs.com/best-pomodoro-timer-apps-study-2026/amp/"
+    }
+   ]
+  },
+  {
+   "id": "breakmusic",
+   "app": "Widget'lar",
+   "area": "Odak",
+   "title": "Odak sesi + sayaç birlikte çalışsın",
+   "why": "Toplulukta istenen bir özellik: 25 dk çalışma, 5 dk mola ve molada müziğin otomatik durması.",
+   "what": "Odak sayacı başlayınca Odak sesi kendiliğinden açılır, mola başlayınca kısılır, bitince alarm çalar.",
+   "effort": "S",
+   "impact": 2,
+   "sources": [
+    {
+     "t": "Elfsight topluluğu — molada müziği durduran Pomodoro isteği",
+     "u": "https://community.elfsight.com/t/study-timer-widget/55162"
+    }
+   ]
+  },
+  {
+   "id": "negative",
+   "app": "Widget'lar",
+   "area": "Alışkanlıklar",
+   "title": "Bırakılacak alışkanlıklar ve esnek sıklık",
+   "why": "Kullanıcılar kötü alışkanlıktan uzak durmayı da iyi alışkanlık kadar takip etmek istiyor. İyi takipçiler “haftada 3 kez” gibi esnek sıklıklar da sunuyor.",
+   "what": "Alışkanlığa “bırak” türü (örn. gece telefona bakma) ve “haftada N kez” hedefi; seri buna göre sayılır.",
+   "effort": "M",
+   "impact": 2,
+   "sources": [
+    {
+     "t": "Hacker News — alışkanlık takipçisinde ne eksik?",
+     "u": "https://ask.live.com.de/33842599"
+    },
+    {
+     "t": "Newly — kaçırılan günü affeden alışkanlık takibi",
+     "u": "https://newly.app/build/habit-tracker-app"
+    }
+   ]
+  },
+  {
+   "id": "paletteSearch",
+   "app": "Hub",
+   "area": "Komut paleti",
+   "title": "⌘K içeriği de arasın",
+   "why": "İyi bir komut paletinin özelliklerinden biri sadece komutları değil içeriği (belgeler, dosyalar) de araması. Bir de kullanıcıların paletin varlığından haberdar olması gerekiyor.",
+   "what": "⌘K'ye Notlar sayfaları, yer imleri ve Study Log konuları eklenir; boş arama kutusunda “Şunu deneyin” ipuçları görünür.",
+   "effort": "M",
+   "impact": 3,
+   "sources": [
+    {
+     "t": "Command palette: geçmiş, bugün, gelecek",
+     "u": "https://command.ai/blog/command-palette-past-present-and-future"
+    }
+   ]
+  },
+  {
+   "id": "spaces",
+   "app": "Hub",
+   "area": "Düzen",
+   "title": "Alanlar (Spaces): İş / Kişisel / Ders",
+   "why": "Arc sekmeleri ayrı temalı “alanlar” içinde topluyor; tasarımcılar 2-3 alanla başlamayı öneriyor.",
+   "what": "Kamera konumu + tema + görünen yıldızlardan oluşan kayıtlı alanlar; ⌥1/⌥2/⌥3 ile anında geçiş.",
+   "effort": "M",
+   "impact": 2,
+   "sources": [
+    {
+     "t": "Arc Browser — Spaces ve Command Bar",
+     "u": "https://en.wikipedia.org/wiki/Arc_(web_browser)"
+    },
+    {
+     "t": "Hack Design — Arc: 2-3 alanla başla",
+     "u": "https://www.hackdesign.org/toolkit/arc-browser/"
+    }
+   ]
+  },
+  {
+   "id": "activeglow",
+   "app": "Hub",
+   "area": "Galaksi",
+   "title": "Açık uygulama galakside parlasın",
+   "why": "Obsidian kullanıcıları yıllardır grafik görünümünün o an açık olan dosyayı vurgulamasını istiyor.",
+   "what": "Tam ekran açtığın uygulama küçültüldüğünde galakside nabız gibi atan bir halka ile işaretlenir; son açılanlar hafif iz bırakır.",
+   "effort": "S",
+   "impact": 2,
+   "sources": [
+    {
+     "t": "Obsidian forum — grafik açık dosyayı vurgulasın",
+     "u": "https://forum.obsidian.md/t/make-graph-view-react-to-obsidian-activity-open-files-are-highlighted/3424/23"
+    }
+   ]
+  },
+  {
+   "id": "areas",
+   "app": "Hub",
+   "area": "Galaksi",
+   "title": "Kümeleri yumuşak alanlar olarak göster",
+   "why": "Obsidian forumunda klasörlerin grafikte su birikintisi gibi alanlar olarak gösterilmesi isteniyor; ilişkileri bir bakışta okumayı kolaylaştırıyor.",
+   "what": "Her yıldız sisteminin arkasına renginde çok soluk bir bulutsu; uzaklaşınca yıldız adları büyür, uygulamalar noktaya döner.",
+   "effort": "S",
+   "impact": 1,
+   "sources": [
+    {
+     "t": "Obsidian forum — klasörler grafikte alan olarak",
+     "u": "https://forum.obsidian.md/t/graph-view-show-folders-like-puddles-of-water/72463/2"
+    }
+   ]
+  },
+  {
+   "id": "export",
+   "app": "Notlar",
+   "area": "Veri",
+   "title": "Tüm notları Markdown olarak yedekle",
+   "why": "Notion'dan kaçanlar notlarını yıllar sonra da açabilecekleri düz metin/Markdown olarak saklamak istiyor; Reddit analizlerinde güvenilmez çevrimdışı mod ve şişkinlik en çok şikâyet edilen konular.",
+   "what": "Notlar'a “Hepsini indir (.zip)” — her sayfa ayrı .md dosyası; ayrıca haftalık otomatik yedek hatırlatması.",
+   "effort": "S",
+   "impact": 2,
+   "sources": [
+    {
+     "t": "Latenode topluluğu — Notion çok şişti, düz metin isteyenler",
+     "u": "https://community.latenode.com/t/looking-for-simple-note-taking-alternatives-fed-up-with-notions-complexity-and-want-better-privacy/21422"
+    },
+    {
+     "t": "Reddit analizi — not uygulamaları",
+     "u": "https://discury.io/reddit-research/note-taking-apps"
+    }
+   ]
+  },
+  {
+   "id": "tags",
+   "app": "Notlar",
+   "area": "Düzen",
+   "title": "Etiketler, ama sade",
+   "why": "r/Notion'da birçok kişi AI özelliklerini hiç kullanmadığını, sadece not alıp etiketle düzenlediğini söylüyor; istenen şey sakin, dağınık olmayan bir uygulama.",
+   "what": "Başlığın altına #etiket; kenar çubuğunda etiket filtresi. Başka ek kalabalık yok.",
+   "effort": "M",
+   "impact": 2,
+   "sources": [
+    {
+     "t": "r/Notion — Apple Notes ile Notion arası",
+     "u": "https://reddit.birdcat.cafe/r/Notion/comments/1k1jujl/somewhere_between_apple_notes_and_notion_what"
+    }
+   ]
+  },
+  {
+   "id": "srs",
+   "app": "Yeni uygulama",
+   "area": "SAT",
+   "title": "Kelime kartları (FSRS ile)",
+   "why": "Anki'nin FSRS algoritması aynı hatırlama oranına daha az tekrarla ulaşıyor ve hedef hatırlama oranını kullanıcının seçmesine izin veriyor.",
+   "what": "SAT Bank kelimelerinden kartlar; “Tekrar / Zor / İyi / Kolay”; hedef hatırlama %90; günün kartları sayısı Bugün widget'ında.",
+   "effort": "L",
+   "impact": 3,
+   "sources": [
+    {
+     "t": "Anki — FSRS algoritması",
+     "u": "https://docs.ankiweb.net/faqs/what-spaced-repetition-algorithm"
+    }
+   ]
+  },
+  {
+   "id": "focusline",
+   "app": "Widget'lar",
+   "area": "Odak",
+   "title": "“Günün odağı” widget'ı",
+   "why": "2 milyon kullanıcılı Momentum'un çekirdeği: her yeni sekmede günün tek odağını, bir yapılacaklar listesini ve odak modunu göstermek.",
+   "what": "Sabah tek cümlelik hedef yaz; gün boyu hub'ın en üstünde durur, akşam “oldu mu?” diye sorar.",
+   "effort": "S",
+   "impact": 2,
+   "sources": [
+    {
+     "t": "Web Highlights — En iyi yeni sekme eklentileri",
+     "u": "https://web-highlights.com/blog/the-best-new-tab-chrome-extensions-for-2024/"
+    }
+   ]
+  },
+  {
+   "id": "integr",
+   "app": "Widget'lar",
+   "area": "Entegrasyon",
+   "title": "Takvim ve RSS widget'ları",
+   "why": "PresentBoard gibi panolar Google Takvim etkinlikleri, e-postalar, borsa ve RSS akışlarını aynı ekranda toplayarak öne çıkıyor.",
+   "what": "Önce RSS/haber widget'ı (anahtar gerektirmez); sonra Google Takvim (giriş izni gerekir).",
+   "effort": "L",
+   "impact": 2,
+   "sources": [
+    {
+     "t": "Fast Company — Chrome panosu eklentileri",
+     "u": "https://www.fastcompany.com/91467399/chrome-dashboard-extensions-new-tab-start-page"
+    }
+   ]
+  },
+  {
+   "id": "tour",
+   "app": "Hub",
+   "area": "Keşif",
+   "title": "30 saniyelik ilk tur",
+   "why": "Çok widget'lı panolar ilk açılışta bunaltıcı olabiliyor; karşılaştırmalarda öğretici olmadan her ayarın anlaşılmadığı not ediliyor.",
+   "what": "İlk açılışta 4 adımlık kısa tur: galaksi, yıldız sürükleme, ⌘K ve widget ekleme.",
+   "effort": "S",
+   "impact": 1,
+   "sources": [
+    {
+     "t": "Tooltivity — PresentBoard/Momentum karşılaştırması",
+     "u": "https://www.tooltivity.com/extensions/compare/new-tab-calendar-with-chatgpt-vs-presentboard-vs-momentum"
+    }
+   ]
+  }
+ ]
+}

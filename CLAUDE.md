@@ -14,3 +14,12 @@ Kullanıcı, yaptığım her işin kendi gözünden denetlenmesini istiyor. Her 
 
 Denetim motoru: `audit/engine.js` (hub'daki Denetçi uygulaması da aynısını kullanır).
 Yazı/renk ölçüleri: metin için en az 12px (telefon), dokunma alanı ≥ 24px (telefonda ≥ 40px), kontrast ≥ 4.5:1.
+
+## Galaksi düzeni
+- Kara delik = Denetçi (`p:denetci`). Yörüngesinde **sadece** `apps.json`'da `"ai": true` olan uygulamalar döner.
+- Kümesiz, AI olmayan uygulamalar gri “Diğer” yıldızına düşer. `"group"` alanı yeni uygulamayı bir kez o yıldıza önerir.
+- Oto senkron (akıllı kümeleme) anahtar kelimelere bakar: yeni uygulamaya iyi bir `desc` yaz.
+
+## Öneriler uygulaması
+- Veri: `audit/ideas.json` (`{updated, method, ideas:[{id,app,area,title,why,what,effort,impact,sources:[{t,u}]}]}`).
+- Kullanıcı yeni araştırma isterse ya da büyük bir özellik eklendiğinde: ünlü uygulamaları ve Reddit/forum tartışmalarını web'de araştır, kaynaklı ve kendi cümlelerinle (alıntı yapmadan) yeni öneriler ekle; yapılanları `"status":"done"` olarak işaretle.

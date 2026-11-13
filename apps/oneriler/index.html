@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Öneriler</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>try{const t=JSON.parse(localStorage.getItem('notlar:theme'));document.documentElement.dataset.theme=t||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch{document.documentElement.dataset.theme='light'}</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#FFFFFF;--bg2:#FAFAF9;--card:#FFFFFF;--ink:#18181B;--ink2:#52525B;--ink3:#6E6E77;--ink4:#E4E4E7;--line:rgba(0,0,0,.06);--line2:rgba(0,0,0,.1);--hover:rgba(0,0,0,.04);
+  --font:'Geist',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;--mono:'Geist Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --out:cubic-bezier(.16,1,.3,1);--spring:cubic-bezier(.3,1.4,.5,1);--acc:#B45309;--ok:#15803D;--no:#71717A;color-scheme:light}
+[data-theme=dark]{--bg:#0E0E10;--bg2:#141416;--card:#18181B;--ink:#EDEDEF;--ink2:#A1A1AA;--ink3:#8B8B94;--ink4:#2A2A2F;--line:rgba(255,255,255,.06);--line2:rgba(255,255,255,.1);--hover:rgba(255,255,255,.05);--acc:#FBBF24;--ok:#4ADE80;--no:#8B8B94;color-scheme:dark}
+html,body{background:var(--bg)}
+body{font-family:var(--font);color:var(--ink);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+main{max-width:980px;margin:0 auto;padding:calc(26px + env(safe-area-inset-top)) 22px 80px}
+header{display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap;margin-bottom:22px}
+.ttl{flex:1;min-width:240px}
+.ttl h1{font-size:28px;font-weight:500;letter-spacing:-.03em;display:flex;align-items:center;gap:10px}
+.ttl h1 i{width:28px;height:28px;border-radius:9px;background:var(--ink);display:grid;place-items:center}
+.ttl h1 i svg{width:15px;height:15px;stroke:var(--bg);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.ttl p{color:var(--ink2);font-size:13.5px;margin-top:6px;max-width:600px}
+.meta{font:500 11.5px/1.5 var(--mono);color:var(--ink3);margin-top:8px}
+.btn{height:42px;padding:0 18px;border-radius:13px;font-weight:500;display:inline-flex;align-items:center;gap:8px;transition:transform .4s var(--spring),background .2s}
+.btn:active{transform:scale(.96)}
+.btn.pri{background:var(--ink);color:var(--bg)}
+.btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.chip{height:36px;padding:0 14px;border-radius:11px;font-size:13px;box-shadow:inset 0 0 0 .5px var(--line2);background:var(--card);transition:background .2s,color .2s}
+.chip:hover{background:var(--hover)}.chip.on{background:var(--ink);color:var(--bg);box-shadow:none}
+.chip .n{font:500 11.5px var(--mono);opacity:.75;margin-left:4px}
+.sp{flex:1}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr));gap:14px}
+.card{background:var(--card);border-radius:20px;box-shadow:0 0 0 .5px var(--line2),0 10px 30px -22px rgba(0,0,0,.25);padding:18px 18px 16px;display:grid;gap:10px;align-content:start;animation:in .5s var(--out) both;transition:opacity .3s}
+.card.no{opacity:.55}
+@keyframes in{from{opacity:0;transform:translateY(8px)}}
+.tags{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.tag{font:500 11.5px/1 var(--mono);padding:5px 8px;border-radius:7px;background:var(--bg2);box-shadow:inset 0 0 0 .5px var(--line2);color:var(--ink2)}
+.tag.imp{color:var(--acc)}
+.st{margin-left:auto;font:600 11.5px/1 var(--mono);padding:5px 8px;border-radius:7px}
+.st.want{color:var(--ok);background:color-mix(in srgb,var(--ok) 12%,transparent)}
+.st.later{color:var(--acc);background:color-mix(in srgb,var(--acc) 12%,transparent)}
+.st.no{color:var(--no);background:var(--bg2)}
+.st.done{color:#fff;background:var(--ok)}
+.card h2{font-size:16.5px;font-weight:500;letter-spacing:-.015em}
+.why{color:var(--ink2);font-size:13.5px}
+.what{font-size:13.5px;padding:10px 12px;border-radius:12px;background:var(--bg2);box-shadow:inset 0 0 0 .5px var(--line)}
+.what b{font:600 11px var(--mono);letter-spacing:.06em;color:var(--ok);display:block;margin-bottom:3px}
+.src{display:grid;gap:3px}
+.src a{font-size:12.5px;color:var(--ink3);text-decoration:none;display:flex;gap:6px;align-items:baseline;min-height:24px;padding:2px 0}
+.src a:hover{color:var(--ink);text-decoration:underline}
+.src a::before{content:'↗';font-size:11px}
+.acts{display:flex;gap:6px;margin-top:2px}
+.acts button{flex:1;height:40px;border-radius:11px;font-size:13px;box-shadow:inset 0 0 0 .5px var(--line2);transition:background .2s,transform .4s var(--spring)}
+.acts button:hover{background:var(--hover)}.acts button:active{transform:scale(.95)}
+.acts button.on{background:var(--ink);color:var(--bg);box-shadow:none}
+.empty{color:var(--ink3);padding:30px 0;text-align:center}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:11px 16px;border-radius:13px;font-size:13px;z-index:50;box-shadow:0 14px 34px -12px rgba(0,0,0,.4)}
+@media (max-width:600px){main{padding:calc(18px + env(safe-area-inset-top)) 14px 60px}.chip{height:40px}.src a{min-height:40px;align-items:center;font-size:13px}.what b,.tag,.st,.meta{font-size:12px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="ttl"><h1><i><svg viewBox="0 0 16 16"><path d="M8 1.8l1.6 3.9 4.1.3-3.1 2.7 1 4L8 10.5 4.4 12.7l1-4L2.3 6l4.1-.3z"/></svg></i>Öneriler</h1>
+      <p>Hub'ı nasıl daha iyi yapabiliriz? Dünyaca bilinen uygulamaların çözümleri ve Reddit, forum, kullanıcı yorumlarında insanların gerçekten istedikleri araştırıldı; her öneri kaynağıyla birlikte burada. Beğendiklerine “İstiyorum” de, Claude'a gönder.</p>
+      <div class="meta" id="meta"></div></div>
+    <button class="btn pri" id="send"><svg viewBox="0 0 16 16"><path d="M2.5 8h11M9 3.5L13.5 8 9 12.5"/></svg>İstediklerimi Claude'a gönder</button>
+  </header>
+  <div class="bar" id="filters"></div>
+  <div class="grid" id="list"><div class="empty">Yükleniyor…</div></div>
+</main>
+<script>
+'use strict';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ls={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+const EFF={S:'küçük iş',M:'orta iş',L:'büyük iş'},ST={want:'istiyorum',later:'sonra',no:'hayır',done:'yapıldı'};
+let DATA=null,state=ls.get('oneriler:state',{}),filter='all',doc=null;
+const FB={apiKey:'AIzaSyDpJc9g4XDBq32T9Pf1UKbuhzRmnx__mak',authDomain:'apps-f1cfd.firebaseapp.com',projectId:'apps-f1cfd'};
+
+/* Sync choices with the hub account when it's already signed in (same site → shared login). No sign-in UI here. */
+const loadScript=src=>new Promise((ok,no)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=no;document.head.appendChild(s)});
+async function cloud(){if(new URLSearchParams(location.search).has('local')||!/^https?:$/.test(location.protocol))return;
+  try{const b='https://www.gstatic.com/firebasejs/10.12.2/';await loadScript(b+'firebase-app-compat.js');await Promise.all([loadScript(b+'firebase-auth-compat.js'),loadScript(b+'firebase-firestore-compat.js')]);
+    if(!firebase.apps.length)firebase.initializeApp(FB);
+    firebase.auth().onAuthStateChanged(u=>{if(!u)return;doc=firebase.firestore().collection('hub').doc('ideas');
+      doc.onSnapshot(s=>{const d=s.data();if(d&&d.state&&!s.metadata.hasPendingWrites){state={...d.state};ls.set('oneriler:state',state);paint()}},()=>{})})}catch{}}
+function save(){ls.set('oneriler:state',state);if(doc)doc.set({state},{merge:true}).catch(()=>{})}
+
+async function load(){try{DATA=await(await fetch('../../audit/ideas.json',{cache:'no-cache'})).json()}catch{DATA={ideas:[]}}
+  $('#meta').textContent=`${DATA.ideas.length} öneri · araştırma ${DATA.updated?new Date(DATA.updated).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'}):''}`;paint()}
+function paint(){if(!DATA)return;const I=DATA.ideas,apps=[...new Set(I.map(i=>i.app))];
+  const cnt=k=>k==='all'?I.length:k==='want'?I.filter(i=>state[i.id]==='want').length:I.filter(i=>i.app===k).length;
+  $('#filters').innerHTML=[['all','Tümü'],['want','İstediklerim'],...apps.map(a=>[a,a])].map(([k,l])=>`<button class="chip${filter===k?' on':''}" data-f="${esc(k)}">${esc(l)}<span class="n">${cnt(k)}</span></button>`).join('');
+  const list=I.filter(i=>filter==='all'||(filter==='want'?state[i.id]==='want':i.app===filter))
+    .sort((a,b)=>((state[a.id]==='no')-(state[b.id]==='no'))||(b.impact-a.impact));
+  $('#list').innerHTML=list.length?list.map((i,n)=>{const s=state[i.id];return`<article class="card${s==='no'?' no':''}" style="animation-delay:${Math.min(n,8)*40}ms">
+    <div class="tags"><span class="tag">${esc(i.app)} · ${esc(i.area)}</span><span class="tag">${EFF[i.effort]||''}</span><span class="tag imp">${'●'.repeat(i.impact)}${'○'.repeat(3-i.impact)} etki</span>${s?`<span class="st ${s}">${ST[s]}</span>`:''}</div>
+    <h2>${esc(i.title)}</h2><div class="why">${esc(i.why)}</div><div class="what"><b>BİZDE NASIL OLUR</b>${esc(i.what)}</div>
+    <div class="src">${i.sources.map(x=>`<a href="${esc(x.u)}" target="_blank" rel="noopener">${esc(x.t)}</a>`).join('')}</div>
+    <div class="acts">${['want','later','no'].map(k=>`<button data-id="${esc(i.id)}" data-s="${k}" class="${s===k?'on':''}">${k==='want'?'İstiyorum':k==='later'?'Sonra':'Hayır'}</button>`).join('')}</div></article>`}).join('')
+    :'<div class="empty">Bu filtrede öneri yok.</div>'}
+document.addEventListener('click',e=>{const f=e.target.closest('[data-f]'),b=e.target.closest('[data-s]');
+  if(f){filter=f.dataset.f;paint()}
+  else if(b){const id=b.dataset.id,s=b.dataset.s;state[id]=state[id]===s?undefined:s;if(!state[id])delete state[id];save();paint()}});
+$('#send').onclick=async()=>{const w=(DATA?.ideas||[]).filter(i=>state[i.id]==='want');if(!w.length)return toast('Önce birkaç öneriye “İstiyorum” de');
+  const txt='Öneriler uygulamasından şunları istiyorum, yap ve Denetçi\'den geçir:\n'+w.map(i=>`- ${i.app}: ${i.title} — ${i.what}`).join('\n');
+  try{await navigator.clipboard.writeText(txt)}catch{const t=document.createElement('textarea');t.value=txt;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove()}
+  toast('Kopyalandı — sohbete yapıştır')};
+function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2400)}
+addEventListener('storage',e=>{if(e.key==='notlar:theme')document.documentElement.dataset.theme=JSON.parse(e.newValue)||'light'});
+load();cloud();
+</script>
+</body>
+</html>

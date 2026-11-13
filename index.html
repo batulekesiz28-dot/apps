@@ -170,6 +170,8 @@ body.far .port{display:none}
 .wg-sk{height:10px;border-radius:5px;background:var(--line2);margin:8px 0;animation:sk 1.2s ease-in-out infinite alternate}
 @keyframes sk{to{opacity:.4}}
 .thsw{width:16px;height:16px;border-radius:5px;flex:none;box-shadow:inset 0 0 0 .5px rgba(127,127,127,.4)}
+.scl{display:grid;gap:4px;max-height:46vh;overflow:auto}
+.sc-r{display:flex;gap:10px;align-items:center;padding:9px 10px;border-radius:10px;font-size:13.5px;cursor:pointer;box-shadow:inset 0 0 0 .5px var(--line2)}.sc-r:hover{background:var(--hover)}.sc-r input{width:18px;height:18px;accent-color:var(--ink);flex:none}
 .gpre{display:flex;flex-wrap:wrap;gap:6px}
 .gpre button{display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 12px 0 10px;border-radius:9px;font-size:12.5px;box-shadow:inset 0 0 0 .5px var(--line3);transition:background .15s,transform .4s var(--spring)}
 .gpre button:hover{background:var(--hover)}.gpre button:active{transform:scale(.95)}.gpre button.on{box-shadow:inset 0 0 0 1.2px var(--ink)}
@@ -643,7 +645,7 @@ async function loadFirebase(){if(window.firebase?.auth&&window.firebase?.firesto
 const sig=list=>list.map(d=>[d.id,d.name,d.icon,d.color,d.html?.length]).join('|');
 const Local={kind:'local',
   async load(){try{await DB.open();return(await DB.all()).map(toDraft)}catch{return[]}},
-  put:d=>DB.put(d),del:id=>DB.del(id),saveMeta:()=>{store.set('appshell:pos',pos);store.set('appshell:links',links);store.set('appshell:groups',groups);store.set('appshell:members',members);store.set('appshell:widgets',widgets)}};
+  put:d=>DB.put(d),del:id=>DB.del(id),saveMeta:()=>{store.set('appshell:orbits',orbits);store.set('appshell:wstar',wstar);store.set('appshell:autocl',autoCl);store.set('appshell:pos',pos);store.set('appshell:links',links);store.set('appshell:groups',groups);store.set('appshell:members',members);store.set('appshell:widgets',widgets)}};
 const Cloud={kind:'cloud',meta:null,col:null,unsubs:[],
   start(fs){this.meta=fs.collection('hub').doc('meta');this.col=this.meta.collection('drafts');
     return new Promise(done=>{let first=true,need=2;const res=()=>{if(--need===0)done()};let mFirst=true;const mRes=()=>{if(mFirst){mFirst=false;res()}};
@@ -652,17 +654,20 @@ const Cloud={kind:'cloud',meta:null,col:null,unsubs:[],
         if(sig(list)!==sig(drafts)){drafts=list;if(!first&&booted)syncNodes()}
         if(first){first=false;res()}
       },err=>{setSync('error');toast('Senkron hatası: '+(err.code||err.message));if(first){first=false;res()}}));
-      this.unsubs.push(this.meta.onSnapshot({includeMetadataChanges:true},s=>{if(!s.metadata.fromCache)metaFresh=true;const d=s.data()||{};if(d.layout)legacy=d.layout;if(d.pos)applyRemotePos(d.pos);applyRemoteWidgets(d.widgets);if(Array.isArray(d.links))applyRemoteLinks(d.links);if(d.groups||d.members)applyRemoteGroups(d.groups||{},d.members||{});mRes();if(booted){seedWidgets();seedMore()}},()=>mRes()));
+      this.unsubs.push(this.meta.onSnapshot({includeMetadataChanges:true},s=>{if(!s.metadata.fromCache)metaFresh=true;const d=s.data()||{};if(d.layout)legacy=d.layout;if(d.pos)applyRemotePos(d.pos);if(d.orbits&&!starDrag){orbits=d.orbits;GX.key=''}if('wstar' in d&&!starDrag)wstar=d.wstar;if(typeof d.autoCl==='boolean')autoCl=d.autoCl;applyRemoteWidgets(d.widgets);if(Array.isArray(d.links))applyRemoteLinks(d.links);if(d.groups||d.members)applyRemoteGroups(d.groups||{},d.members||{});mRes();if(booted){seedWidgets();seedMore()}},()=>mRes()));
     })},
   stop(){this.unsubs.forEach(u=>{try{u()}catch{}});this.unsubs=[]},
   put(d){return this.col.doc(d.id).set(d)},del(id){return this.col.doc(id).delete()},
-  saveMeta(){Local.saveMeta();const m={pos,links:links.map(([a,b])=>a+'|'+b),groups,members};if(widgets)m.widgets=widgets.map(cleanW);return this.meta.update(m).catch(()=>this.meta.set(m,{merge:true}))}};
+  saveMeta(){Local.saveMeta();const m={pos,links:links.map(([a,b])=>a+'|'+b),groups,members,orbits,autoCl,wstar:wstar||null};if(widgets)m.widgets=widgets.map(cleanW);return this.meta.update(m).catch(()=>this.meta.set(m,{merge:true}))}};
 let S=Local;
 let metaT=0;const saveMeta=()=>{clearTimeout(metaT);metaT=setTimeout(()=>Promise.resolve(S.saveMeta()).catch(()=>{}),250)};
 function setSync(s){sync=s;const d=$('#sDot');d.classList.toggle('warn',s==='pending');d.classList.toggle('err',s==='error');statusText()}
 
 /* ── App state ────────────────────────────────────────────── */
 let pub=[],drafts=[],query='',manifest={ok:false,why:''},booted=false,justDragged=false;
+let orbits=store.get('appshell:orbits',{});     // star id → {r,a} pinned orbit (dragged stars)
+let wstar=store.get('appshell:wstar',null);     // widget star pinned world position
+let autoCl=store.get('appshell:autocl',true);    // place new apps on the right star automatically
 let legacy=store.get('appshell:layout',{});         // old screen-fraction layout (read-only, for migration)
 let pos=store.get('appshell:pos',{});               // appKey → [wx,wy] world coords
 let widgets=store.get('appshell:widgets',null);     // [{id,type,w:[x,y],…}] · null = never set
@@ -674,7 +679,7 @@ function applyRemoteGroups(g,m){if(JSON.stringify(g)===JSON.stringify(groups)&&J
   groups=g;members=m;store.set('appshell:groups',groups);store.set('appshell:members',members);wake()}
 const groupOf=k=>{const g=members[k];return g&&groups[g]?g:null};
 let linkDrag=null,hoverLink=-1,hoverNode=null;
-const toPub=a=>({key:'p:'+a.slug,kind:'pub',slug:a.slug,name:a.name||a.slug,icon:a.icon||'',color:a.color||'gray',desc:a.desc||'',group:a.group||'',groupColor:a.groupColor||'',url:a.url||a.file||`apps/${a.slug}/`});
+const toPub=a=>({key:'p:'+a.slug,kind:'pub',slug:a.slug,name:a.name||a.slug,icon:a.icon||'',color:a.color||'gray',desc:a.desc||'',group:a.group||'',groupColor:a.groupColor||'',ai:!!a.ai,url:a.url||a.file||`apps/${a.slug}/`});
 const toDraft=d=>({key:'d:'+d.id,kind:'draft',id:d.id,name:d.name,icon:d.icon||'',color:d.color||colorKeys[hash(d.id)%colorKeys.length],html:d.html,order:d.order??0});
 const rawDraft=d=>({id:d.id,name:d.name,icon:d.icon||'',color:d.color,html:d.html,order:d.order??0,ts:Date.now()});
 const find=k=>pub.find(a=>a.key===k)||drafts.find(a=>a.key===k);
@@ -904,13 +909,14 @@ function syncNodes(){
   const list=[...pub,...drafts],keys=new Set(list.map(a=>a.key));
   for(const k of[...nodes.keys()])if(!keys.has(k))removeNode(k);
   const hadAny=Object.keys(pos).length>0||Object.keys(legacy).length>0,fresh=[];
-  let d=0;list.forEach(a=>{const n=nodes.get(a.key);if(n)updateNode(n,a);else{const nn=createNode(a,booted?0:260+d*90);d++;if(nn.fresh&&a.kind==='pub')fresh.push(nn)}});
+  const created=[];let d=0;list.forEach(a=>{const n=nodes.get(a.key);if(n)updateNode(n,a);else{const nn=createNode(a,booted?0:260+d*90);d++;created.push(a);if(nn.fresh&&a.kind==='pub')fresh.push(nn)}});
   // apps.json may suggest a küme ("group"): applied once per app, then it's the user's choice
   const hinted=store.get('appshell:hinted',[]);let hc=false;
   for(const a of pub){if(!a.group||hinted.includes(a.key))continue;hinted.push(a.key);hc=true;if(groupOf(a.key))continue;
     let g=Object.keys(groups).find(k=>(groups[k].name||'').toLocaleLowerCase('tr')===a.group.toLocaleLowerCase('tr'));
     if(!g){g='g'+uid();groups[g]={name:a.group,color:a.groupColor||'violet'}}members[a.key]=g}
   if(hc){store.set('appshell:hinted',hinted);if(booted)saveMeta();GX.key=''}
+  autoPlace(created);
   // a newly published app: say so and glide the camera to it if it landed off-screen
   if(hadAny&&fresh.length)setTimeout(()=>{const f=fresh[0],sx=w2sx(f.aw[0]),sy=w2sy(f.aw[1]-LIFT);
     toast(fresh.length>1?`${fresh.length} yeni uygulama eklendi`:`Yeni uygulama: ${f.a.name}`);
@@ -1138,6 +1144,55 @@ function autoClusters(){if(store.get('appshell:clustered',false)||!links.length)
     if(gs.length===1)comp.forEach(k=>{if(!groupOf(k))members[k]=gs[0]});
     else if(!gs.length){const id='g'+uid();groups[id]={name:'Küme '+(Object.keys(groups).length+1),color:Object.keys(GCOL)[Object.keys(groups).length%6]};comp.forEach(k=>members[k]=id);made++}}
   store.set('appshell:clustered',true);saveMeta();wake();if(made)toast(`Bağlı uygulamalar ${made} kümeye alındı — etiketine tıklayıp ad ver`)}
+/* ── Smart clustering ("oto senkron"): related apps land on the same star ── */
+const CATS=[
+ {n:'SAT',c:'violet',k:['sat','study','çalış','ders','sınav','exam','kelime','vocab','math','matematik','okul','ielts','quiz','soru','reading','writing']},
+ {n:'Verimlilik',c:'blue',k:['not','note','takvim','calendar','plan','görev','task','todo','yapılacak','ajanda','proje']},
+ {n:'Eğlence',c:'rose',k:['oyun','game','müzik','music','film','movie','video','eğlence','fun','dizi','şarkı']},
+ {n:'Araçlar',c:'teal',k:['saat','clock','hesap','calc','araç','tool','dönüştür','convert','hava','dünya']},
+ {n:'Finans',c:'green',k:['para','bütçe','harcama','finans','kur','döviz','borsa','hisse','money']}];
+const textOf=a=>((a.name||'')+' '+(a.desc||'')+' '+(a.slug||'')).toLocaleLowerCase('tr');
+function catOf(a){const t=textOf(a);let best=null,bs=0;for(const c of CATS){let sc=0;for(const k of c.k)if(t.includes(k))sc+=k.length>3?2:1;if(sc>bs){bs=sc;best=c}}return bs>=2?best:null}
+function suggestFor(a){const t=textOf(a),cat=catOf(a);let best=null,bs=0;
+  for(const g of Object.keys(groups)){const ms=Object.keys(members).filter(k=>members[k]===g&&k!==a.key).map(find).filter(Boolean);if(!ms.length)continue;
+    const gname=(groups[g].name||'').toLocaleLowerCase('tr');let sc=0;
+    if(cat&&(gname.includes(cat.n.toLocaleLowerCase('tr'))||ms.filter(m=>catOf(m)===cat).length*2>=ms.length))sc+=3;
+    for(const m of ms)sc+=new Set(textOf(m).split(/[^a-zçğıöşü0-9]+/).filter(w=>w.length>3&&t.includes(w))).size;
+    if(gname.length>2&&t.includes(gname))sc+=3;
+    if(sc>bs){bs=sc;best=g}}
+  if(best&&bs>=3)return{g:best,name:groups[best].name,score:bs};
+  if(cat)return{newName:cat.n,color:cat.c,score:2};return null}
+function smartPlan(){const plan=[];for(const a of[...pub,...drafts]){if(a.key===BH_KEY||a.ai||groupOf(a.key))continue;const s=suggestFor(a);if(s)plan.push({a,...s})}
+  const cnt={};plan.forEach(p=>{if(p.newName)cnt[p.newName]=(cnt[p.newName]||0)+1});
+  return plan.filter(p=>!p.newName||cnt[p.newName]>=2||Object.values(groups).some(g=>g.name===p.newName))}
+function applyPlan(plan){const prevG=JSON.parse(JSON.stringify(groups)),prevM={...members};
+  for(const p of plan){let g=p.g;if(!g){g=Object.keys(groups).find(k=>groups[k].name===p.newName);if(!g){g='g'+uid();groups[g]={name:p.newName,color:p.color}}}members[p.a.key]=g}
+  GX.key='';saveMeta();wake();return()=>{groups=prevG;members=prevM;GX.key='';saveMeta();wake()}}
+function smartSheet(){const plan=smartPlan();
+  sheet('Akıllı kümeleme',`${plan.length?`<div class="note" style="margin-bottom:12px">Uygulamaların adına ve açıklamasına bakıp ilgili yıldızları öneriyorum. İstemediklerinin işaretini kaldır.</div>
+    <div class="scl">${plan.map((p,i)=>`<label class="sc-r"><input type="checkbox" checked data-i="${i}"><span><b>${esc(p.a.name)}</b> → ${p.g?esc(p.name):`yeni yıldız <b>${esc(p.newName)}</b>`}</span></label>`).join('')}</div>`
+    :'<div class="note">Şu an önerilecek bir şey yok: kümesiz uygulamalar ya yapay zekâ uygulaması ya da hiçbir yıldıza açıkça uymuyor.</div>'}
+    <label class="sc-r" style="margin-top:14px"><input type="checkbox" id="acl" ${autoCl?'checked':''}><span><b>Oto senkron</b> · yeni gelen uygulamaları kendiliğinden doğru yıldıza yerleştir</span></label>`,
+   `<button class="btn ghost" data-x2>Kapat</button>${plan.length?'<button class="btn solid" id="scOk">Uygula</button>':''}`,
+   s=>{s.querySelector('[data-x2]').onclick=()=>closeSheet();s.querySelector('#acl').onchange=e=>{autoCl=e.target.checked;saveMeta();toast(autoCl?'Oto senkron açık':'Oto senkron kapalı')};
+     const ok=s.querySelector('#scOk');if(ok)ok.onclick=()=>{const pick=[...s.querySelectorAll('[data-i]')].filter(c=>c.checked).map(c=>plan[+c.dataset.i]);closeSheet();if(!pick.length)return;
+       const undo=applyPlan(pick);toast(`${pick.length} uygulama yıldızına yerleşti`,undo);setTimeout(fitAll,300)}})}
+function autoPlace(created){if(!autoCl||!booted)return;const plan=[];
+  for(const a of created){if(a.key===BH_KEY||a.ai||groupOf(a.key)||a.group)continue;const s=suggestFor(a);if(s&&(s.g||Object.values(groups).some(g=>g.name===s.newName)))plan.push({a,...s})}
+  if(!plan.length)return;const undo=applyPlan(plan);toast(plan.length>1?`${plan.length} yeni uygulama yıldızına yerleşti`:`${plan[0].a.name} → ${plan[0].name||plan[0].newName} (oto)`,undo)}
+/* ── Stars can be dragged anywhere; a click (no drag) still opens the küme menu ── */
+let starDrag=null;
+function startStarDrag(e,id){const sx=e.clientX,sy=e.clientY;let moved=false;hideMenu();hidePeek(true);
+  const s=id==='_w'?{x:WS.x,y:WS.y}:GX.sys.find(q=>q.g===id)||{x:0,y:0},ox=s2wx(sx)-s.x,oy=s2wy(sy)-s.y;
+  const mv=ev=>{if(!moved&&Math.hypot(ev.clientX-sx,ev.clientY-sy)<5)return;if(!moved){moved=true;starDrag={id,x:s.x,y:s.y};document.body.classList.add('panning')}
+    starDrag.x=s2wx(ev.clientX)-ox;starDrag.y=s2wy(ev.clientY)-oy;ptr.tAmp=0;wakeMesh()};
+  const up=ev=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up);removeEventListener('pointercancel',up);document.body.classList.remove('panning');
+    if(!moved){if(id==='_w')toast("Widget yıldızını sürükleyerek taşıyabilirsin");else if(id==='_other')toast('“Diğer” kümesiz uygulamaların yıldızı · sürükleyerek taşıyabilirsin');else groupLabelMenu(ev.clientX,ev.clientY+14,id);return}
+    const d=starDrag;starDrag=null;
+    if(id==='_w'){wstar=[Math.round(d.x),Math.round(d.y)]}
+    else{const r=Math.max(GX.loose.length?GX.loose[GX.loose.length-1].r+220:300,Math.hypot(d.x,d.y/.9)),a=((Math.atan2(d.y/.9,d.x)-GX.T*6.2832/480)%6.2832+6.2832)%6.2832;orbits[id]={r:Math.round(r),a:+a.toFixed(4)};GX.key=''}
+    saveMeta();ripple(ev.clientX,ev.clientY,1.6);toast('Yıldız yeni yerinde',()=>{if(id==='_w')wstar=null;else delete orbits[id];GX.key='';saveMeta()})};
+  addEventListener('pointermove',mv,{passive:true});addEventListener('pointerup',up);addEventListener('pointercancel',up)}
 function groupLabelMenu(x,y,g){
   const mem=Object.keys(members).filter(k=>members[k]===g&&nodes.has(k));
   popMenu(x,y,`<div class="who"><b>${esc(groups[g].name)}</b>${mem.length} uygulama</div><div class="msep"></div>
@@ -1193,14 +1248,16 @@ let sunHover=null;
 const hashU=s=>(hash(s)%10007)/10007;
 const hexA=(h,a)=>{const n=parseInt(h.slice(1),16);return`rgba(${n>>16&255},${n>>8&255},${n&255},${a})`};
 function galaxyModel(){
-  const key=[...nodes.keys()].join()+'|'+JSON.stringify(members)+'|'+JSON.stringify(groups);if(key===GX.key)return;GX.key=key;
+  const key=[...nodes.keys()].join()+'|'+JSON.stringify(members)+'|'+JSON.stringify(groups)+'|'+JSON.stringify(orbits);if(key===GX.key)return;GX.key=key;
   const by={},loose=[],nm=(a,b)=>a.a.name.localeCompare(b.a.name,'tr');
-  for(const n of nodes.values()){if(n.a.key===BH_KEY)continue;const g=groupOf(n.a.key);if(g)(by[g]||=[]).push(n);else loose.push(n)}
+  const other=[];
+  for(const n of nodes.values()){if(n.a.key===BH_KEY)continue;const g=groupOf(n.a.key);if(g)(by[g]||=[]).push(n);else if(n.a.ai)loose.push(n);else other.push(n)}
   GX.sys=Object.keys(by).sort((a,b)=>(groups[a].name||'').localeCompare(groups[b].name||'','tr')).map(g=>{const ms=by[g].sort(nm),orbits=ms.map((n,j)=>96+j*66);return{g,ms,orbits,R:orbits[orbits.length-1]+48,ph:hashU(g)*6.283,x:0,y:0}});
+  if(other.length){const ms=other.sort(nm),ob=ms.map((n,j)=>96+j*66);GX.sys.push({g:'_other',virt:1,ms,orbits:ob,R:ob[ob.length-1]+48,ph:2.2,x:0,y:0})}
   loose.sort(nm);const rings=[];let r=230,i=0;while(i<loose.length){const cap=Math.max(3,Math.floor(2*Math.PI*r/150));rings.push({r,ms:loose.slice(i,i+cap)});i+=cap;r+=100}GX.loose=rings;
   const inner=rings.length?rings[rings.length-1].r+70:170,S=GX.sys.length,maxR=S?Math.max(...GX.sys.map(s=>s.R)):0;
   GX.RS=S?Math.max(inner+maxR+80,S>1?(2*maxR+100)/(2*Math.sin(Math.PI/S)):0,520):0;
-  GX.RG=S?GX.RS+maxR+30:inner;
+  const far=Math.max(0,...Object.values(orbits).map(o=>o.r||0));GX.RG=S?Math.max(GX.RS,far)+maxR+30:inner;
   relocateWidgets();
 }
 function galaxyOnScreen(){for(const r of WEL.values())if(r.vis&&WS.ts>.02)return true;if(GX.ts<.02)return false;for(const n of nodes.values())if(!n.off&&n.a.key!==BH_KEY)return true;return false}
@@ -1210,7 +1267,7 @@ function galaxyStep(dt){
   const hold=!!(near||hoverNode||sunHover||menuEl||sheetEl||linkDrag||[...nodes.values()].some(n=>n.drag));
   GX.ts+=((hold?0:1)-GX.ts)*(1-Math.pow(.86,dt/16.667));if(!REDUCED)GX.T+=dt/1000*GX.ts;
   const T=GX.T,S=GX.sys.length;
-  GX.sys.forEach((s,k)=>{const a=k/S*6.2832+T*6.2832/480-1.2;s.x=Math.cos(a)*GX.RS;s.y=Math.sin(a)*GX.RS*.9;
+  GX.sys.forEach((s,k)=>{if(starDrag?.id===s.g){s.x=starDrag.x;s.y=starDrag.y}else{const o=orbits[s.g],a=(o?o.a:k/S*6.2832-1.2)+T*6.2832/480,rr=o?o.r:GX.RS;s.x=Math.cos(a)*rr;s.y=Math.sin(a)*rr*.9}
     s.ms.forEach((n,j)=>{const r=s.orbits[j],per=34*Math.pow(r/96,1.5),ang=hashU(n.a.key)*6.283+T*6.2832/per;n.aw=[s.x+Math.cos(ang)*r,s.y+Math.sin(ang)*r]})});
   for(const ring of GX.loose){const per=90*Math.pow(ring.r/230,1.5),m=ring.ms.length;ring.ms.forEach((n,i)=>{const ang=i/m*6.2832+T*6.2832/per+ring.r*.013;n.aw=[Math.cos(ang)*ring.r,Math.sin(ang)*ring.r]})}
   const bh=nodes.get(BH_KEY);if(bh)bh.aw=[0,0];
@@ -1232,7 +1289,7 @@ function drawGalaxy(time){
   if(GX.RS){fx.setLineDash([2,7]);fx.strokeStyle=`rgba(${L},.12)`;fx.beginPath();fx.ellipse(cx0,cy0,GX.RS*Z,GX.RS*.9*Z,0,0,6.2832);fx.stroke();fx.setLineDash([])}
   for(const r of GX.loose){fx.strokeStyle=`rgba(${L},.09)`;fx.beginPath();fx.arc(cx0,cy0,r.r*Z,0,6.2832);fx.stroke()}
   drawBH(cx0,cy0,Z,time,dark);
-  for(const s of GX.sys){const x=w2sx(s.x),y=w2sy(s.y),grp=groups[s.g];if(!grp)continue;const col=GCOL[grp.color]||GCOL.gray;
+  for(const s of GX.sys){const x=w2sx(s.x),y=w2sy(s.y),grp=s.virt?{name:'Diğer',color:'gray'}:groups[s.g];if(!grp)continue;const col=GCOL[grp.color]||GCOL.gray;
     if(x+(s.R+60)*Z<0||x-(s.R+60)*Z>M.W||y+(s.R+60)*Z<0||y-(s.R+60)*Z>M.H)continue;
     const hot=sunHover===s.g;
     for(const r of s.orbits){fx.strokeStyle=hot?hexA(col,.35):`rgba(${L},.1)`;fx.beginPath();fx.arc(x,y,r*Z,0,6.2832);fx.stroke()}
@@ -1265,7 +1322,8 @@ function drawSun(x,y,R,col,time,ph,dark,Z){
 const WS={T:0,ts:1,x:0,y:0,rings:[],hov:0};
 function widgetRings(){const list=(widgets||[]).filter(w=>WEL.has(w.id));const rings=[];let r=330,i=0;
   while(i<list.length){const cap=Math.max(3,Math.floor(2*Math.PI*r/350));rings.push({r,ws:list.slice(i,i+cap)});i+=cap;r+=330}
-  WS.rings=rings;const outer=rings.length?rings[rings.length-1].r+190:200;WS.x=GX.RG+outer+160;WS.y=0;WS.R=outer}
+  WS.rings=rings;const outer=rings.length?rings[rings.length-1].r+190:200;WS.R=outer;
+  if(starDrag?.id==='_w'){WS.x=starDrag.x;WS.y=starDrag.y}else if(wstar){WS.x=wstar[0];WS.y=wstar[1]}else{WS.x=GX.RG+outer+160;WS.y=0}}
 function widgetOrbit(dt){
   const hold=!!(WS.hov||wDrag||menuEl||sheetEl||document.activeElement?.closest?.('#widgets'));
   WS.ts+=((hold?0:1)-WS.ts)*(1-Math.pow(.86,dt/16.667));if(!REDUCED)WS.T+=dt/1000*WS.ts;widgetRings();
@@ -1291,7 +1349,8 @@ let dropHint=false;
 function dropToGalaxy(n){const key=n.a.key;if(key===BH_KEY)return;const wx=s2wx(n.x),wy=s2wy(n.y),cur=groupOf(key);
   let best=null,bd=1e18;for(const s of GX.sys){const d=Math.hypot(s.x-wx,s.y-wy);if(d<s.R+30&&d<bd){bd=d;best=s}}
   const innerR=GX.loose.length?GX.loose[GX.loose.length-1].r+90:320;
-  if(best&&best.g!==cur){const prev=assignGroup(key,best.g),pobj=prev&&{...groups[prev]};toast(`${n.a.name} → ${groups[best.g].name}`,()=>{if(prev&&!groups[prev])groups[prev]=pobj;assignGroup(key,prev)})}
+  if(best&&best.virt){if(cur){const gobj={...groups[cur]},prev=assignGroup(key,null);toast(`${n.a.name} → Diğer`,()=>{if(!groups[prev])groups[prev]=gobj;assignGroup(key,prev)})}}
+  else if(best&&best.g!==cur){const prev=assignGroup(key,best.g),pobj=prev&&{...groups[prev]};toast(`${n.a.name} → ${groups[best.g].name}`,()=>{if(prev&&!groups[prev])groups[prev]=pobj;assignGroup(key,prev)})}
   else if(!best&&cur&&Math.hypot(wx,wy)<innerR){const gobj={...groups[cur]},prev=assignGroup(key,null);toast(`${n.a.name} kara deliğin yörüngesine geçti`,()=>{if(!groups[prev])groups[prev]=gobj;assignGroup(key,prev)})}
   else if(!best&&!dropHint){dropHint=true;toast('Bir güneşin üstüne bırakırsan o kümeye girer')}
   ripple(n.x,n.y,1.4)}
@@ -1346,7 +1405,8 @@ $('#stage').addEventListener('pointermove',e=>{if(e.pointerType!=='mouse'||linkD
   if(h!==hoverLink){hoverLink=h;$('#stage').classList.toggle('onlink',h>=0);wake()}});
 $('#stage').addEventListener('pointerdown',e=>{
   if(linkDrag){if(linkDrag.mode==='click')cancelLink();return}
-  const gl=groupAt(e.clientX,e.clientY);if(gl){groupLabelMenu(e.clientX,e.clientY+14,gl);return}
+  const gl=groupAt(e.clientX,e.clientY);if(gl){startStarDrag(e,gl);return}
+  if(WEL.size&&Math.hypot(e.clientX-w2sx(WS.x),e.clientY-w2sy(WS.y))<Math.max(22,40*cam.z)){startStarDrag(e,'_w');return}
   const h=e.pointerType==='mouse'?hoverLink:linkHit(e.clientX,e.clientY);
   if(h>=0){const[ka,kb]=links[h],A=find(ka),Bn=find(kb);
     popMenu(e.clientX,e.clientY,`<div class="who"><b>${esc(A?.name||'')} ↔ ${esc(Bn?.name||'')}</b>bağlantı</div><div class="msep"></div><button class="mi danger" data-m="unl">${si(UI.del)}Bağlantıyı kaldır</button>`,
@@ -1901,6 +1961,7 @@ function palette(){
     {ic:UI.fit,l:'Hepsini göster',k:'1',run:fitAll},
     {ic:UI.zoom,l:'Yakınlaştırmayı sıfırla (%100)',k:'0',run:()=>zoomTo(1)},
     {ic:UI.graph,l:'Galaksiyi göster',k:'G',run:fitAll},
+    {ic:UI.group,l:'Akıllı kümeleme · oto senkron',k:'K',run:smartSheet},
     ...THEME_KEYS.map(k=>({ic:UI.moon,l:'Tema: '+THEMES[k].n,k:k===document.documentElement.dataset.theme?'✓':'',run:()=>setTheme(k)})),
     {ic:UI.fs,l:document.fullscreenElement?'Tam ekrandan çık':'Tarayıcı tam ekranı',k:'F',run:toggleFS},
     {ic:UI.key,l:'Klavye kısayolları',k:'?',run:shortcuts},
@@ -2056,6 +2117,7 @@ addEventListener('keydown',e=>{
   if(e.key==='?'){e.preventDefault();shortcuts()}
   else if(k==='/'){e.preventDefault();palette()}
   else if(k==='g'&&!W.app){fitAll()}
+  else if(k==='k'&&!W.app){smartSheet()}
   else if(k==='f'){toggleFS()}
   else if(W.app&&!W.min){}
   else if(e.key==='+'||e.key==='='){zoomTo(cam.tz*1.25)}

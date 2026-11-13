@@ -297,5 +297,39 @@
     "text": "Site ikonu yüklenemezse sitenin baş harfi gösteriliyor."
    }
   ]
+ },
+ {
+  "at": "2026-11-13T22:10:00+03:00",
+  "change": "Widget'lar kendi yıldızlarının etrafında dönüyor; güneşler kara delik kalitesinde canlandırıldı",
+  "scores": {
+   "Hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Hub bilgisayar": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Hub",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Dönen kartlara yazı yazmak/tıklamak zor olurdu: imleç bir kartın üstündeyken ya da kartta yazarken halka duruyor."
+   },
+   {
+    "app": "Hub",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Kartlar birbirinin üstüne binmiyor (halka kapasitesi kart boyuna göre); sürükleyip bırakınca bıraktığın boşluğa yerleşiyor."
+   },
+   {
+    "app": "Hub",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Güneşler: nefes alan parıltı, titreyen taç ve önden-arkadan dönen iki halka; 60 fps korunuyor."
+   }
+  ]
  }
 ]

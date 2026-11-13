@@ -1203,7 +1203,7 @@ function galaxyModel(){
   GX.RG=S?GX.RS+maxR+30:inner;
   relocateWidgets();
 }
-function galaxyOnScreen(){if(GX.ts<.02)return false;for(const n of nodes.values())if(!n.off&&n.a.key!==BH_KEY)return true;return false}
+function galaxyOnScreen(){for(const r of WEL.values())if(r.vis&&WS.ts>.02)return true;if(GX.ts<.02)return false;for(const n of nodes.values())if(!n.off&&n.a.key!==BH_KEY)return true;return false}
 function galaxyStep(dt){
   // the pointer near a planet holds the sky still so it's easy to click (planets would otherwise slide away)
   let near=false;if(FINE&&ptr.amp>.3)for(const n of nodes.values()){const dx=n.x-ptr.x,dy=n.y-ptr.y;if(dx*dx+dy*dy<90*90){near=true;break}}
@@ -1236,17 +1236,56 @@ function drawGalaxy(time){
     if(x+(s.R+60)*Z<0||x-(s.R+60)*Z>M.W||y+(s.R+60)*Z<0||y-(s.R+60)*Z>M.H)continue;
     const hot=sunHover===s.g;
     for(const r of s.orbits){fx.strokeStyle=hot?hexA(col,.35):`rgba(${L},.1)`;fx.beginPath();fx.arc(x,y,r*Z,0,6.2832);fx.stroke()}
-    const R=Math.max(7,18*Z)*(1+Math.sin(time*1.4+s.ph)*.035)*(hot?1.12:1);
-    const g=fx.createRadialGradient(x,y,R*.4,x,y,R*4.6);g.addColorStop(0,hexA(col,dark?.5:.34));g.addColorStop(.35,hexA(col,dark?.16:.1));g.addColorStop(1,hexA(col,0));
-    fx.fillStyle=g;fx.beginPath();fx.arc(x,y,R*4.6,0,6.2832);fx.fill();
-    fx.fillStyle=col;fx.beginPath();fx.arc(x,y,R,0,6.2832);fx.fill();
-    fx.fillStyle='rgba(255,255,255,.32)';fx.beginPath();fx.arc(x-R*.32,y-R*.32,R*.42,0,6.2832);fx.fill();
+    const R=Math.max(7,18*Z)*(hot?1.12:1);drawSun(x,y,R,col,time,s.ph,dark,Z);
     const name=(grp.name||'').toLocaleUpperCase('tr'),fs=Math.round(Math.max(10.5,12*Math.min(1.15,Z)));
     fx.font=`600 ${fs}px "Geist Mono",ui-monospace,Menlo,monospace`;if('letterSpacing' in fx)fx.letterSpacing='1.5px';fx.textAlign='center';fx.textBaseline='top';
     const ly=y+R+8,w=fx.measureText(name).width;fx.fillStyle=dark?'rgba(13,13,15,.7)':'rgba(255,255,255,.82)';fx.beginPath();fx.roundRect?.(x-w/2-7,ly-3,w+14,fs+7,6);fx.fill();
     fx.fillStyle=dark?'rgba(255,255,255,.9)':col;fx.fillText(name,x,ly);
     groupHits.push({g:s.g,x:Math.min(x-R,x-w/2-7),y:y-R,w:Math.max(R*2,w+14),h:R*2+fs+18})}
   fx.restore()}
+// A living star: breathing glow, flickering corona, two tilted rings that sweep in front of and behind the core.
+function drawSun(x,y,R,col,time,ph,dark,Z){
+  const br=1+Math.sin(time*1.3+ph)*.05,G=R*5.2*br;
+  const g=fx.createRadialGradient(x,y,R*.5,x,y,G);g.addColorStop(0,hexA(col,dark?.55:.36));g.addColorStop(.3,hexA(col,dark?.2:.12));g.addColorStop(1,hexA(col,0));
+  fx.fillStyle=g;fx.beginPath();fx.arc(x,y,G,0,6.2832);fx.fill();
+  // corona: soft rays that wobble
+  const N=14,cr=fx.createRadialGradient(x,y,R*.9,x,y,R*2.3);cr.addColorStop(0,hexA(col,dark?.5:.38));cr.addColorStop(1,hexA(col,0));fx.fillStyle=cr;fx.beginPath();
+  for(let i=0;i<=N*2;i++){const a=i/(N*2)*6.2832+time*.18+ph,rr=i%2?R*1.15:R*(1.55+.45*Math.sin(time*2.1+i*1.7+ph));const px=x+Math.cos(a)*rr,py=y+Math.sin(a)*rr;i?fx.lineTo(px,py):fx.moveTo(px,py)}fx.fill();
+  const ring=(a0,a1)=>{fx.save();fx.translate(x,y);fx.rotate(-.35+Math.sin(ph)*.3);fx.scale(1,.32);
+    for(let i=0;i<2;i++){const rr=R*(1.75+i*.45);fx.lineWidth=Math.max(.8,(1.8-i*.6)*Math.min(1.3,Z))/.32*.45;fx.strokeStyle=hexA(col,(dark?.75:.6)-i*.25);
+      fx.setLineDash([rr*.7,rr*.45]);fx.lineDashOffset=-time*(30+i*12)*Math.max(.5,Z)*(i?-1:1);fx.beginPath();fx.arc(0,0,rr,a0,a1);fx.stroke()}
+    fx.setLineDash([]);fx.restore()};
+  ring(Math.PI,Math.PI*2);
+  // core: hot white centre fading into the star's colour
+  const c=fx.createRadialGradient(x-R*.3,y-R*.3,R*.1,x,y,R);c.addColorStop(0,'#fff');c.addColorStop(.35,hexA(col,1));c.addColorStop(1,hexA(col,.85));
+  fx.fillStyle=c;fx.beginPath();fx.arc(x,y,R*br,0,6.2832);fx.fill();
+  fx.lineWidth=1;fx.strokeStyle='rgba(255,255,255,.55)';fx.beginPath();fx.arc(x,y,R*br*1.02,-2.4,-.6);fx.stroke();
+  ring(0,Math.PI)}
+/* ── Widget star: cards ride slow rings around their own star, to the right of the galaxy ── */
+const WS={T:0,ts:1,x:0,y:0,rings:[],hov:0};
+function widgetRings(){const list=(widgets||[]).filter(w=>WEL.has(w.id));const rings=[];let r=330,i=0;
+  while(i<list.length){const cap=Math.max(3,Math.floor(2*Math.PI*r/350));rings.push({r,ws:list.slice(i,i+cap)});i+=cap;r+=330}
+  WS.rings=rings;const outer=rings.length?rings[rings.length-1].r+190:200;WS.x=GX.RG+outer+160;WS.y=0;WS.R=outer}
+function widgetOrbit(dt){
+  const hold=!!(WS.hov||wDrag||menuEl||sheetEl||document.activeElement?.closest?.('#widgets'));
+  WS.ts+=((hold?0:1)-WS.ts)*(1-Math.pow(.86,dt/16.667));if(!REDUCED)WS.T+=dt/1000*WS.ts;widgetRings();
+  WS.rings.forEach((ring,ri)=>{const m=ring.ws.length,per=260*Math.pow(ring.r/330,1.5);ring.ws.forEach((w,i)=>{const r=WEL.get(w.id);if(!r||wDrag?.r===r)return;
+    const a=i/m*6.2832+WS.T*6.2832/per*(ri%2?-1:1)-1.5708;w.w=[WS.x+Math.cos(a)*ring.r-r.ww/2,WS.y+Math.sin(a)*ring.r*.86-(r.wh||160)/2];w.a=a})})}
+function drawWidgetStar(time){if(!WEL.size)return;const Z=cam.z,x=w2sx(WS.x),y=w2sy(WS.y),L=TH.l,dark=!!TH.dark,R0=(WS.R+60)*Z;
+  if(x+R0<0||x-R0>M.W||y+R0<0||y-R0>M.H)return;
+  fx.save();fx.lineWidth=1;for(const r of WS.rings){fx.setLineDash([3,8]);fx.strokeStyle=`rgba(${L},.12)`;fx.beginPath();fx.ellipse(x,y,r.r*Z,r.r*.86*Z,0,0,6.2832);fx.stroke()}fx.setLineDash([]);
+  drawSun(x,y,Math.max(9,26*Z),TH.dark?'#FBBF24':'#F59E0B',time,1.3,dark,Z);
+  const fs=Math.round(Math.max(10.5,12*Math.min(1.15,Z)));fx.font=`600 ${fs}px "Geist Mono",ui-monospace,Menlo,monospace`;if('letterSpacing' in fx)fx.letterSpacing='1.5px';fx.textAlign='center';fx.textBaseline='top';
+  const t="WIDGET'LAR",w=fx.measureText(t).width,ly=y+Math.max(9,26*Z)+12;fx.fillStyle=dark?'rgba(13,13,15,.7)':'rgba(255,255,255,.82)';fx.beginPath();fx.roundRect?.(x-w/2-7,ly-3,w+14,fs+7,6);fx.fill();
+  fx.fillStyle=dark?'rgba(255,255,255,.9)':'#B45309';fx.fillText(t,x,ly);fx.restore()}
+// drop a card: it takes the slot nearest to where it was let go
+function dropWidget(r){const cx=r.dx+r.ww/2,cy=r.dy+(r.wh||160)/2,ad=Math.atan2((cy-WS.y)/.86,cx-WS.x),dist=Math.hypot(cx-WS.x,(cy-WS.y)/.86);
+  const rings=WS.rings.map(g=>g.ws.filter(w=>w!==r.w));if(!rings.length)return;
+  let ti=0;WS.rings.forEach((g,i)=>{if(Math.abs(g.r-dist)<Math.abs(WS.rings[ti].r-dist))ti=i});
+  const list=rings[ti],norm=a=>((a-ad)%6.2832+6.2832)%6.2832;
+  // insert before the first card (going round from the drop point) — i.e. into the gap it was dropped in
+  let at=list.length;if(list.length){let best=0,bv=1e9;list.forEach((w,i)=>{const v=norm(w.a??0);if(v<bv){bv=v;best=i}});at=best}
+  list.splice(at,0,r.w);const rest=widgets.filter(w=>!WEL.has(w.id));widgets=[...rings.flat(),...rest];saveMeta()}
 // drop a dragged app: on a sun → joins that küme; near the black hole → leaves its küme
 let dropHint=false;
 function dropToGalaxy(n){const key=n.a.key;if(key===BH_KEY)return;const wx=s2wx(n.x),wy=s2wy(n.y),cur=groupOf(key);
@@ -1257,7 +1296,7 @@ function dropToGalaxy(n){const key=n.a.key;if(key===BH_KEY)return;const wx=s2wx(
   else if(!best&&!dropHint){dropHint=true;toast('Bir güneşin üstüne bırakırsan o kümeye girer')}
   ripple(n.x,n.y,1.4)}
 // keep widget cards out of the galaxy disc
-function relocateWidgets(){if(!wReady||!booted)return;const RG=GX.RG+40;let moved=false;
+function relocateWidgets(){return;if(!wReady||!booted)return;const RG=GX.RG+40;let moved=false;
   for(const r of WEL.values()){if(wDrag?.r===r)continue;const[x,y]=r.w.w,w=r.ww,h=r.wh||160,cx=clamp(0,x,x+w),cy=clamp(0,y,y+h);
     if(Math.hypot(cx,cy)<RG){r.w.w=wSpot(w,h,[RG+60,-RG*.55],r.w.id);moved=true}}
   if(moved)saveMeta()}
@@ -1270,7 +1309,7 @@ function frame(t){
   stepCam(k);if(cam.x!==cam.px||cam.y!==cam.py||cam.z!==cam.pz){camMoved();meshDirty=true}else if(!mKey&&t-lastCamMove>=160)meshDirty=true;
   stepWidgets(k);
   const list=[...nodes.values()],anyDrag=list.some(n=>n.drag),Z=cam.z,LZ=LIFT*Z;
-  galaxyModel();galaxyStep(dt);
+  galaxyModel();galaxyStep(dt);widgetOrbit(dt);
   for(const n of list){
     n.hover+=((n.hov||n.drag?1:0)-n.hover)*(1-Math.pow(.85,k));
     const sx=w2sx(n.aw[0]),sy=w2sy(n.aw[1]);n.ax=sx;n.ay=sy;
@@ -1289,7 +1328,7 @@ function frame(t){
   if(meshAwake||introT<1){const settled=stepMesh(k,t);drawMesh(t);if(settled&&introT>=1)meshAwake=false}
   else if(meshDirty)drawMesh(t);
   fx.clearRect(0,0,M.W,M.H);
-  drawGalaxy(time);drawRubber(time);followPeek(k);
+  drawGalaxy(time);drawWidgetStar(time);drawRubber(time);followPeek(k);
   raf=requestAnimationFrame(frame);
 }
 const wake=()=>{if(!raf&&!paused)raf=requestAnimationFrame(frame)};
@@ -1639,18 +1678,18 @@ function placeW(r){const z=cam.z,sx=w2sx(r.dx),sy=w2sy(r.dy),vis=!(sx>M.W+40||sy
   if(!vis)return;const s=`translate3d(${sx.toFixed(1)}px,${sy.toFixed(1)}px,0) scale(${z.toFixed(4)}) rotate(${r.rot.toFixed(2)}deg)`;if(s!==r.ps){r.el.style.transform=s;r.ps=s}}
 function placeWidgets(){for(const r of WEL.values())placeW(r)}
 function stepWidgets(k){for(const r of WEL.values()){if(wDrag?.r===r)continue;const tx=r.w.w[0],ty=r.w.w[1];
-  if(Math.abs(tx-r.dx)+Math.abs(ty-r.dy)+Math.abs(r.vx)+Math.abs(r.vy)+Math.abs(r.rot)<.02){if(r.dx!==tx||r.dy!==ty){r.dx=tx;r.dy=ty;r.rot=0;placeW(r)}continue}
-  const dp=Math.pow(.74,k);r.vx=(r.vx+(tx-r.dx)*.16*k)*dp;r.vy=(r.vy+(ty-r.dy)*.16*k)*dp;r.dx+=r.vx*k;r.dy+=r.vy*k;r.rot+=(clamp(r.vx*.25,-3,3)-r.rot)*(1-Math.pow(.8,k));placeW(r)}}
+  if(Math.abs(tx-r.dx)+Math.abs(ty-r.dy)+Math.abs(r.rot)<.01){if(r.dx!==tx||r.dy!==ty){r.dx=tx;r.dy=ty;r.rot=0;placeW(r)}continue}
+  const f=1-Math.pow(1-.12,k),ox=r.dx;r.dx+=(tx-r.dx)*f;r.dy+=(ty-r.dy)*f;r.rot+=(clamp((r.dx-ox)*.4,-3,3)-r.rot)*(1-Math.pow(.8,k));placeW(r)}}
 function mountWidget(w,fresh){if(WEL.has(w.id)||!WT[w.type])return WEL.get(w.id);const T=WT[w.type];
   const el=document.createElement('div');el.className='wg';el.dataset.id=w.id;el.style.width=T.w+'px';el.setAttribute('role','group');el.setAttribute('aria-label',T.n);
   el.innerHTML=`<button class="wg-x" data-wx aria-label="Widget'ı kaldır" title="Kaldır">${XI}</button><div class="wg-in"></div>`;$('#widgets').appendChild(el);
   const r={w,el,dx:w.w[0],dy:w.w[1],vx:0,vy:0,rot:0,ww:T.w,wh:0,ps:'',vis:null};WEL.set(w.id,r);renderW(r);placeW(r);wireW(r);
   if(fresh){r.dy-=36/cam.z;anim(el,[{opacity:0,filter:'blur(8px)'},{opacity:1,filter:'blur(0)'}],{duration:520,easing:OUT})}
   return r}
-function unmountWidget(r,quiet){WEL.delete(r.w.id);if(wDrag?.r===r)wDrag=null;
+function unmountWidget(r,quiet){WEL.delete(r.w.id);if(r.el.matches(':hover'))WS.hov=Math.max(0,WS.hov-1);if(wDrag?.r===r)wDrag=null;
   if(quiet)return r.el.remove();anim(r.el,[{opacity:1,filter:'blur(0)'},{opacity:0,filter:'blur(8px)'}],{duration:320,easing:EASE,fill:'forwards'}).finished.then(()=>r.el.remove(),()=>r.el.remove())}
 function wireW(r){const el=r.el;
-  el.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse'){ptr.tAmp=0;wakeMesh()}});
+  el.addEventListener('pointerenter',e=>{WS.hov++;if(e.pointerType==='mouse'){ptr.tAmp=0;wakeMesh()}});el.addEventListener('pointerleave',()=>{WS.hov=Math.max(0,WS.hov-1)});
   el.addEventListener('click',e=>{const x=e.target.closest('[data-wx]');if(x){removeWidget(r.w.id);return}
     const b=e.target.closest('[data-act]');if(b&&!r.moved)WT[r.w.type].act?.(r,b.dataset.act,b)});
   el.addEventListener('pointerdown',e=>{
@@ -1667,8 +1706,7 @@ function wireW(r){const el=r.el;
       wDrag.cx=ev.clientX;wDrag.cy=ev.clientY;placeW(r);wakeMesh()};
     const off=()=>{clearTimeout(timer);removeEventListener('pointermove',mv);removeEventListener('pointerup',up);removeEventListener('pointercancel',up)};
     const up=()=>{off();if(!started)return;el.classList.remove('drag');wDrag=null;r.vx=r.vy=0;
-      const p=wSpot(r.ww,r.wh,[r.dx,r.dy],r.w.id);r.w.w=p;shoveNodes(r);saveMeta();
-      ripple(w2sx(p[0]+r.ww/2),w2sy(p[1]+r.wh),1.3);setTimeout(()=>r.moved=false,0);wakeMesh()};
+      dropWidget(r);ripple(w2sx(r.dx+r.ww/2),w2sy(r.dy+r.wh/2),1.3);setTimeout(()=>r.moved=false,0);wakeMesh()};
     addEventListener('pointermove',mv,{passive:true});addEventListener('pointerup',up);addEventListener('pointercancel',up)});
 }
 // Free spot for a w×h card, nearest to a top-left hint (snapped to the world grid).
@@ -1687,10 +1725,10 @@ function shoveNodes(r){const[x,y]=r.w.w;for(const n of nodes.values()){const ax=
   if(x<ax+64&&x+r.ww>ax-64&&y<ay+16&&y+r.wh>ay-LIFT-48){n.aw=[1e9,1e9];n.aw=nearestFree(ax,ay,n);rememberLayout(n,false)}}}
 function addWidget(type,hint){if(!WT[type])return;if(widgets===null)widgets=[];
   const w={id:'w'+uid(),type,w:[0,0],...(WT[type].def?.()||{})};
-  const r=mountWidget(w,false);const[cxw,cyw]=hint||viewCentre();const p=wSpot(r.ww,r.wh,[cxw-r.ww/2,cyw-r.wh/2-40],w.id);
-  w.w=p;r.dx=p[0];r.dy=p[1]-40/cam.z;r.vis=null;placeW(r);anim(r.el,[{opacity:0,filter:'blur(8px)'},{opacity:1,filter:'blur(0)'}],{duration:520,easing:OUT});
-  widgets.push(w);shoveNodes(r);saveMeta();setTimeout(()=>ripple(w2sx(p[0]+r.ww/2),w2sy(p[1]+r.wh/2),1.5),160);
-  const sx=w2sx(p[0]),sy=w2sy(p[1]);if(sx<0||sy<60||sx+r.ww*cam.z>M.W||sy+r.wh*cam.z>M.H-40)flyTo(p[0]+r.ww/2,p[1]+r.wh/2,cam.z);
+  widgets.push(w);const r=mountWidget(w,false);widgetRings();widgetOrbit(0);r.dx=WS.x-r.ww/2;r.dy=WS.y-(r.wh||160)/2;r.vis=null;placeW(r);
+  anim(r.el,[{opacity:0,filter:'blur(8px)'},{opacity:1,filter:'blur(0)'}],{duration:620,easing:OUT});saveMeta();
+  setTimeout(()=>ripple(w2sx(WS.x),w2sy(WS.y),1.6),200);
+  const sx=w2sx(WS.x),sy=w2sy(WS.y);if(sx<0||sy<60||sx>M.W||sy>M.H-40)flyTo(WS.x,WS.y,Math.min(cam.z,.6));
   wake();return r}
 function removeWidget(id){const r=WEL.get(id);if(!r)return;const w=r.w,i=widgets.indexOf(w);
   unmountWidget(r);widgets=widgets.filter(x=>x!==w);saveMeta();const c=r.el.getBoundingClientRect();ripple(c.left+c.width/2,c.top+c.height/2,1.2);

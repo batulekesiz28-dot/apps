@@ -39,7 +39,7 @@ input,select,textarea{font:inherit;color:inherit}
 .brand i::after{content:'';width:8px;height:8px;border-radius:50%;border:1.5px solid var(--bg)}
 body.running .brand i::after{background:var(--bg);animation:pulse 1.6s ease-in-out infinite}
 @keyframes pulse{50%{transform:scale(.6)}}
-.tabs{display:flex;gap:2px;padding:3px;border-radius:12px;background:var(--bg2);box-shadow:inset 0 0 0 .5px var(--line2);position:relative}
+.tabs{position:absolute;left:50%;transform:translateX(-50%);display:flex;gap:2px;padding:3px;border-radius:12px;background:var(--bg2);box-shadow:inset 0 0 0 .5px var(--line2)}
 .tabs button{position:relative;z-index:1;height:30px;padding:0 14px;border-radius:9px;font-size:13px;color:var(--ink2);transition:color .2s}
 .tabs button.on{color:var(--ink)}
 .tabs .ind{position:absolute;top:3px;bottom:3px;left:0;border-radius:9px;background:var(--card);box-shadow:0 0 0 .5px var(--line2),0 2px 6px -2px rgba(0,0,0,.12);transition:transform .45s var(--spring),width .45s var(--spring)}
@@ -51,7 +51,7 @@ body.running .brand i::after{background:var(--bg);animation:pulse 1.6s ease-in-o
   .top{padding:calc(12px + env(safe-area-inset-top)) 16px 10px;backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--bg)}
   main{padding:6px 14px 60px}
   .tcard{padding:18px 16px 22px}
-  .tabs{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:30;background:color-mix(in srgb,var(--card) 88%,transparent);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:var(--shadow);border-radius:16px;padding:4px}
+  .tabs{position:fixed;top:auto;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:30;background:color-mix(in srgb,var(--card) 88%,transparent);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:var(--shadow);border-radius:16px;padding:4px}
   .tabs button{height:38px;padding:0 15px;border-radius:12px}.tabs .ind{top:4px;bottom:4px;border-radius:12px}
   main{padding-bottom:110px!important}
 }
@@ -85,12 +85,11 @@ main{max-width:980px;margin:0 auto;padding:10px 22px 60px}
 .tgrid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:22px;align-items:start}
 @media (max-width:860px){.tgrid{grid-template-columns:minmax(0,1fr)}}
 .tcard{padding:22px 22px 26px;display:grid;gap:18px}
-.today{display:grid;gap:8px;text-align:center;justify-items:center}
-.today .t{display:flex;align-items:baseline;gap:8px;justify-content:center;flex-wrap:wrap}
-.today .bar{justify-self:stretch}.today .h{justify-content:center}
+.today{display:grid;gap:8px}
+.today .t{display:flex;align-items:baseline;gap:8px}
 .today b{font-size:22px;font-weight:500;letter-spacing:-.03em}
 .today span{color:var(--ink3);font-size:13px}
-.today .streak{margin-left:4px;align-self:center;font:500 11px/1 var(--mono);color:var(--ink2);padding:6px 9px;border-radius:8px;background:var(--bg2);box-shadow:inset 0 0 0 .5px var(--line2)}
+.today .streak{margin-left:auto;font:500 11px/1 var(--mono);color:var(--ink2);padding:6px 9px;border-radius:8px;background:var(--bg2);box-shadow:inset 0 0 0 .5px var(--line2)}
 .bar{height:6px;border-radius:6px;background:var(--ink4);overflow:hidden;display:flex}
 .bar i{display:block;height:100%;transition:width .8s var(--out)}
 .topic{border:0;outline:0;background:none;font-size:15px;padding:10px 2px;border-bottom:.5px solid var(--line2);width:100%;transition:border-color .2s}
@@ -154,7 +153,6 @@ main{max-width:980px;margin:0 auto;padding:10px 22px 60px}
 .legend{display:flex;align-items:center;gap:4px;margin-top:12px;font-size:11px;color:var(--ink3);justify-content:flex-end}
 .legend i{width:12px;height:12px;border-radius:4px;background:var(--heat)}
 .dayp{padding:20px;display:grid;gap:12px}
-.dayp>.h:first-child,.dayp .big,.dayp .dg{text-align:center;justify-content:center}
 .dayp .big{font-size:34px;font-weight:300;letter-spacing:-.04em;line-height:1}
 .mt{display:grid;gap:12px;padding:14px;border-radius:16px;background:var(--bg2);box-shadow:inset 0 0 0 .5px var(--line2)}
 .mt:not(.idle){box-shadow:inset 0 0 0 1px var(--c);background:color-mix(in srgb,var(--c) 6%,var(--bg2))}
@@ -164,6 +162,7 @@ main{max-width:980px;margin:0 auto;padding:10px 22px 60px}
 .mt-b{display:flex;gap:8px;align-items:center}.mt-b .btn{height:40px}.mt-b .btn.pri{flex:1}
 .mt-hint{font-size:12px;color:var(--ink3);margin-right:auto}
 .mt.idle .mt-b .btn.pri{flex:none}
+.qrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}.qrow .btn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}.qrow>:only-child{justify-self:start}
 .spark7{display:grid;grid-template-columns:repeat(14,1fr);gap:4px;align-items:end;height:70px;margin-top:4px}
 .spark7 i{display:block;border-radius:3px;background:var(--ink4);min-height:3px;transition:height .6s var(--out)}
 .spark7 i.on{background:var(--ink)}
@@ -172,14 +171,12 @@ main{max-width:980px;margin:0 auto;padding:10px 22px 60px}
 .ggrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;align-items:start}
 @media (max-width:760px){.ggrid{grid-template-columns:minmax(0,1fr)}}
 .gc{padding:22px;display:grid;gap:14px}
-.gc>.h:first-child{justify-content:center}
-.gv{display:flex;align-items:center;gap:14px;justify-content:center}
-.gv b{font-size:40px;font-weight:300;letter-spacing:-.04em;line-height:1}
+.gv{display:flex;align-items:center;gap:14px}
+.gv b{font-size:40px;font-weight:300;letter-spacing:-.04em;line-height:1;flex:1}
 .step{display:flex;gap:6px}
 .step button{width:38px;height:38px;border-radius:12px;box-shadow:inset 0 0 0 .5px var(--line2);font-size:18px;color:var(--ink2);transition:background .2s,transform .4s var(--spring)}
 .step button:hover{background:var(--hover)}.step button:active{transform:scale(.9)}
-.ring{display:flex;align-items:center;gap:14px;justify-content:center}
-.gc>.row{justify-content:center}
+.ring{display:flex;align-items:center;gap:14px}
 .ring svg{width:56px;height:56px;transform:rotate(-90deg);flex:none}
 .ring circle{fill:none;stroke-width:5}
 .ring .a{stroke:var(--ink4)}.ring .b{stroke:var(--ink);stroke-linecap:round;transition:stroke-dashoffset .8s var(--out)}
@@ -375,7 +372,8 @@ setInterval(tick,1000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)tick()});
 
 /* ── Router ── */
-function go(v){if(!['timer','days','goals','stats'].includes(v))v='timer';if(location.hash!=='#'+v)history.replaceState(null,'','#'+v);view=v;render();moveInd()}
+function go(v){if(v==='start'){v='timer';if(!set.run&&set.subjects.length)setTimeout(()=>startRun({mode:'up',topic:lastTopic(set.sel)}),0)}
+  if(!['timer','days','goals','stats'].includes(v))v='timer';if(location.hash!=='#'+v)history.replaceState(null,'','#'+v);view=v;render();moveInd()}
 addEventListener('hashchange',()=>go(location.hash.slice(1)));
 $('#tabs').addEventListener('click',e=>{const b=e.target.closest('[data-v]');if(b)go(b.dataset.v)});
 function moveInd(){const b=$(`#tabs [data-v="${view}"]`),ind=$('#ind');$$('#tabs button').forEach(x=>x.classList.toggle('on',x===b));if(!b)return;
@@ -507,13 +505,14 @@ function vDays(){
    <section class="card dayp"><div class="h">${esc(longDay(selDay))}</div>
      <div class="big num">${fm(dm)}</div><div class="bar">${set.goalDay?`<i style="width:${Math.min(100,dm/set.goalDay*100)}%;background:var(--ink)"></i>`:''}</div>
      <div class="dg" style="font-size:12.5px;color:var(--ink3)">${set.goalDay?(dm>=set.goalDay?'Günlük hedef tamamlandı ✓':`Hedefin %${Math.round(dm/set.goalDay*100)}’i · ${fm(set.goalDay)}`):''}</div>
-     ${selDay===today()?miniTimer():''}
+     ${set.run?miniTimer():''}
      <div class="sl">${day.length?day.map(sessRow).join(''):'<div class="empty" style="padding-left:10px">Bu gün kayıt yok.</div>'}</div>
-     <button class="btn sec add" data-act="addday"><svg viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></svg>Bu güne ekle</button>
+     <div class="qrow">${set.run?'':`<button class="btn pri" data-act="quick" title="${esc(subjOf(set.sel).name)} için kronometreyi hemen başlat"><svg viewBox="0 0 16 16"><path d="M5 3.5l8 4.5-8 4.5z"/></svg>Kronometre · ${esc(subjOf(set.sel).name)}</button>`}<button class="btn sec" data-act="addday"><svg viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></svg>Bu güne ekle</button></div>
      <div class="h" style="margin-top:8px">Son 14 gün</div>
      <div class="spark7">${strip.map(([k,m])=>`<i class="${k===selDay?'on':''}" title="${esc(longDay(k))} · ${fm(m)}" style="height:${Math.max(4,m/mx*100)}%"></i>`).join('')}</div></section>
   </div>`}
-document.addEventListener('click',e=>{if(view!=='days'||e.target.closest('.scrim'))return;const ta=e.target.closest('.mt [data-act]'),ts=e.target.closest('.mt [data-sub]');
+document.addEventListener('click',e=>{if(view!=='days'||e.target.closest('.scrim'))return;const ta=e.target.closest('.mt [data-act]'),ts=e.target.closest('.mt [data-sub]'),qk=e.target.closest('[data-act=quick]');
+  if(qk){selDay=today();startRun({mode:'up',topic:lastTopic(set.sel)});toast(`${subjOf(set.sel).name} · kronometre başladı`);return}
   if(ts){set.sel=ts.dataset.sub;saveSet();render();return}
   if(ta){const a=ta.dataset.act;if(a==='start')startRun({topic:''});else if(a==='pause')pauseRun();else if(a==='finish')finishRun(false);else if(a==='discard')discardRun();return}
   const c=e.target.closest('[data-cal]'),d=e.target.closest('[data-day]'),si=e.target.closest('[data-sid]'),a=e.target.closest('[data-act=addday]');

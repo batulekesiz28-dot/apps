@@ -961,7 +961,7 @@ const Cloud={kind:'cloud',meta:null,col:null,unsubs:[],
   put(d){return this.col.doc(d.id).set(d)},del(id){return this.col.doc(id).delete()},
   saveMeta(){Local.saveMeta();const m={pos,links:links.map(([a,b])=>a+'|'+b),groups,members,orbits,autoCl,wstar:wstar||null};if(widgets)m.widgets=widgets.map(cleanW);return this.meta.update(m).catch(()=>this.meta.set(m,{merge:true}))}};
 let S=Local;
-let metaT=0;const saveMeta=()=>{GX.poke=true;clearTimeout(metaT);metaT=setTimeout(()=>Promise.resolve(S.saveMeta()).catch(()=>{}),250)};
+let metaT=0;const saveMeta=()=>{GX.poke=true;setTimeout(()=>window.Worlds?.regroup?.(),0);clearTimeout(metaT);metaT=setTimeout(()=>Promise.resolve(S.saveMeta()).catch(()=>{}),250)};
 function setSync(s){sync=s;const d=$('#sDot');d.classList.toggle('warn',s==='pending');d.classList.toggle('err',s==='error');statusText()}
 
 /* ── App state ────────────────────────────────────────────── */
@@ -977,7 +977,7 @@ let groups=store.get('appshell:groups',{});       // gid → {name,color}
 let members=store.get('appshell:members',{});     // appKey → gid
 const GCOL={blue:'#2F6FEB',green:'#1F9D55',amber:'#D97706',rose:'#E11D48',violet:'#7C3AED',teal:'#0D9488',gray:'#71717A'};
 function applyRemoteGroups(g,m){if(JSON.stringify(g)===JSON.stringify(groups)&&JSON.stringify(m)===JSON.stringify(members))return;
-  groups=g;members=m;store.set('appshell:groups',groups);store.set('appshell:members',members);wake()}
+  groups=g;members=m;store.set('appshell:groups',groups);store.set('appshell:members',members);wake();GX.poke=true;window.Worlds?.regroup?.()}
 const groupOf=k=>{const g=members[k];return g&&groups[g]?g:null};
 let linkDrag=null,hoverLink=-1,hoverNode=null;
 const toPub=a=>({key:'p:'+a.slug,kind:'pub',slug:a.slug,name:a.name||a.slug,icon:a.icon||'',color:a.color||'gray',desc:a.desc||'',group:a.group||'',groupColor:a.groupColor||'',ai:!!a.ai,url:a.url||a.file||`apps/${a.slug}/`});
@@ -2771,7 +2771,14 @@ window.HUB={apps:()=>pub,open:k=>{const a=find(k);if(a)openApp(a,nodes.get(k)?.e
   groups:()=>{try{GX.poke=true;galaxyModel()}catch{}const col=c=>GCOL[c]||c||GCOL.violet;
     const out=(GX.sys||[]).map(s=>s.g==='_other'?{id:'_other',name:'Diğer',color:GCOL.gray,keys:s.ms.map(n=>n.a.key)}:{id:s.g,name:groups[s.g]?.name||'Küme',color:col(groups[s.g]?.color),keys:s.ms.map(n=>n.a.key)});
     const ai=[BH_KEY,...(GX.loose||[]).flatMap(r=>r.ms.map(n=>n.a.key))].filter(k=>nodes.has(k));if(ai.length)out.unshift({id:'_ai',name:'Yapay zekâ',color:'#8B7BFF',keys:ai});
-    const o=out.findIndex(g=>g.id==='_other');if(o>=0)out.push(out.splice(o,1)[0]);return out}};
+    const o=out.findIndex(g=>g.id==='_other');if(o>=0)out.push(out.splice(o,1)[0]);return out},
+  /* Mekânsal'dan grup değiştirme — galaksiyle aynı veri (members/groups), buluta da yazılır */
+  setGroup:(k,target,name)=>{if(!nodes.has(k))return null;let id=target;
+    if(target==='_new'){id='g'+uid();groups[id]={name:name||'Yeni grup',color:Object.keys(GCOL)[Object.keys(groups).length%6]}}
+    if(!target||target==='_ai'||target==='_other')delete members[k];else members[k]=id;
+    GX.key='';saveMeta();wake();return id},
+  renameGroup:(g,name)=>{if(!groups[g]||!name)return;groups[g].name=name.slice(0,40);GX.key='';saveMeta();wake()},
+  toast:(t,undo)=>toast(t,undo),bh:BH_KEY};
 addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.shiftKey&&(e.key==='u'||e.key==='U')){e.preventDefault();window.Worlds?.picker()}});
 </script>
 <link rel="stylesheet" href="ui/worlds.css">

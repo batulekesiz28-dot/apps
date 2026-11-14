@@ -215,7 +215,8 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
   order(d){const by=new Map(d.apps.map(a=>[a.key,a])),gs=d.groups.map(g=>({id:g.id,name:g.name,color:g.color,apps:g.keys.map(k=>by.get(k)).filter(Boolean)})).filter(g=>g.apps.length),
       seen=new Set(gs.flatMap(g=>g.apps.map(a=>a.key))),rest=d.apps.filter(a=>!seen.has(a.key));
     if(rest.length){const o=gs.find(g=>g.id==='_other');o?o.apps.push(...rest):gs.push({id:'_other',name:gs.length?'Diğer':'Uygulamalar',color:'#8E8E99',apps:rest})}
-    let i=0;gs.forEach((g,gi)=>g.apps.forEach(a=>{a.gi=gi;a.si=i++}));SP.G=gs;SP.list=gs.flatMap(g=>g.apps);return gs},
+    const ord=SP.cfg.order||[],ix=k=>{const j=ord.indexOf(k);return j<0?1e4:j};gs.forEach(g=>{const base=g.apps.map(a=>a.key);g.apps.sort((a,b)=>ix(a.key)-ix(b.key)||base.indexOf(a.key)-base.indexOf(b.key))});
+    let i=0;gs.forEach((g,gi)=>g.apps.forEach(a=>{a.gi=gi;a.si=i++}));SP.G=gs;SP.list=gs.flatMap(g=>g.apps);SP.sig=JSON.stringify(d.groups);return gs},
   cfg:(()=>{try{return Object.assign({},SPD,JSON.parse(localStorage.getItem(SPK))||{})}catch{return{...SPD}}})(),
   save(){clearTimeout(SP.st);SP.st=setTimeout(()=>{try{localStorage.setItem(SPK,JSON.stringify(SP.cfg))}catch{}},250)},
   ENVS:[['studyo','Stüdyo'],['gece','Gece'],['gol','Gün batımı'],['jupiter','Jüpiter']],
@@ -230,9 +231,11 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
       <aside class="sp-side sp-left" data-side="left"><div data-live="today"></div><button class="sp-grab" aria-label="Bugün penceresini taşı (çift tık: yerine koy)"></button></aside>
       <div class="sp-ringw"><div class="sp-shadow" aria-hidden="true"></div><div class="sp-ring" role="listbox" aria-label="Gruplara göre uygulamalar halkası">${SP.list.map((a,i)=>{const g=SP.G[a.gi];return`<button class="sp-win" role="option" data-i="${i}" data-key="${esc(a.key)}" style="--gc:${esc(g.color)}" aria-label="${esc(a.name)} — ${esc(g.name)}"><em class="sp-tag"><i></i>${esc(g.name)}</em><span class="sp-ic">${appIcon(a)}</span><b>${esc(a.name)}</b><small>${esc(a.desc.slice(0,80))}</small></button>`}).join('')}
         ${SP.G.length>1?SP.G.map((g,gi)=>`<button class="sp-gt" data-g="${gi}" style="--gc:${esc(g.color)}" tabindex="-1"><i></i>${esc(g.name)}<small>${g.apps.length}</small></button>`).join(''):''}</div></div>
-      <div class="sp-home" role="list" aria-label="Ana görünüm, gruplara göre">${SP.G.length>1?SP.G.map((g,gi)=>`<p class="sp-gh" data-g="${gi}" style="--gc:${esc(g.color)}"><i></i>${esc(g.name)}</p>`).join(''):''}${SP.list.map((a,i)=>`<button class="sp-hi" role="listitem" data-i="${i}" data-key="${esc(a.key)}" title="${esc(a.desc)}" style="--gc:${esc(SP.G[a.gi].color)}"><span class="sp-hb">${appIcon(a)}</span><b>${esc(a.name)}</b></button>`).join('')}</div>
+      <div class="sp-home" role="list" aria-label="Ana görünüm, gruplara göre">${SP.G.length>1?SP.G.map((g,gi)=>`<p class="sp-gh" data-g="${gi}" style="--gc:${esc(g.color)}" title="${g.id[0]==='_'?'Otomatik grup':'Çift tık: yeniden adlandır'}"><i></i><span>${esc(g.name)}</span></p>`).join(''):''}${SP.list.map((a,i)=>`<button class="sp-hi" role="listitem" data-i="${i}" data-key="${esc(a.key)}" title="${esc(a.desc)}" style="--gc:${esc(SP.G[a.gi].color)}"><span class="sp-hb">${appIcon(a)}</span><b>${esc(a.name)}</b></button>`).join('')}</div>
       <aside class="sp-side sp-right" data-side="right"><div data-live="notes"></div><button class="sp-grab" aria-label="Son sayfalar penceresini taşı (çift tık: yerine koy)"></button></aside></div></div>
     <div class="sp-find" aria-live="polite"></div>
+    <div class="sp-hint">${mobile()?'Uzun bas ve sürükle: gruba taşı':'Uzun bas ya da sürükle: gruba taşı, sırala · Sağ tık: menü · Grup adına çift tık: yeniden adlandır'}</div>
+    <div class="sp-drop" aria-hidden="true">${SP.G.map(g=>`<span data-drop="${esc(g.id)}" style="--gc:${esc(g.color)}"><i></i>${esc(g.name)}</span>`).join('')}<span data-drop="_new">＋ Yeni grup</span></div>
     <div class="sp-cap" aria-live="polite"></div>
     <div class="sp-crown" role="slider" tabindex="0" aria-label="Dalma düzeyi (tıkla: odaya dön / ortama dal)" aria-valuemin="0" aria-valuemax="100" title="Dalma — kaydır, sürükle ya da [ ] tuşları"><i class="cr-fill"></i><i class="cr-rid"></i><span></span></div>
     <div class="sp-envp" role="dialog" aria-label="Ortamlar" hidden><p class="sp-k">Ortam</p>
@@ -276,7 +279,7 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
     const rh=rows.map(r=>Math.max(...r.map(b=>b.h))),H=rh.reduce((a,b)=>a+b,0)+gy*(rows.length-1);
     const it=[...root.querySelectorAll('.sp-hi')],gh=[...root.querySelectorAll('.sp-gh')],curve=(x,y,z)=>{const u=x/(maxW/2);return[(-u*u*(m?30:110)+(z||0)).toFixed(0),(-u*(m?8:16)).toFixed(1)]};
     let y=-H/2;SP.pos=[];rows.forEach((row,ri)=>{let x=-(row.reduce((a,b)=>a+b.w,0)+gx*(row.length-1))/2;
-      row.forEach(b=>{const cx=x+b.w/2,[z,ry]=curve(cx);const L=gh[SP.G.indexOf(b.g)];if(L)L.style.transform=`translate3d(calc(${cx.toFixed(0)}px - 50%),${(y).toFixed(0)}px,${z}px) rotateY(${ry}deg)`;
+      row.forEach(b=>{const cx=x+b.w/2,[z,ry]=curve(cx);b.g.box={x0:x-gx/2,x1:x+b.w+gx/2,y0:y-gy/2,y1:y+b.h+gy/2};const L=gh[SP.G.indexOf(b.g)];if(L)L.style.transform=`translate3d(calc(${cx.toFixed(0)}px - 50%),${(y).toFixed(0)}px,${z}px) rotateY(${ry}deg)`;
         b.g.apps.forEach((a,j)=>{const c=j%b.c,r=Math.floor(j/b.c),inRow=Math.min(b.c,b.g.apps.length-r*b.c),ix=x+(b.w-inRow*sx)/2+c*sx+sx/2,iy=y+(multi?lh:0)+r*sy+sy/2,[zz,rr]=curve(ix);
           SP.pos[a.si]={x:ix,y:iy};const el=it[a.si];if(el){el.style.transform=`translate3d(${ix.toFixed(0)}px,${iy.toFixed(0)}px,${zz}px) rotateY(${rr}deg)`;el.style.setProperty('--d',(a.si*45)+'ms')}});
         x+=b.w+gx});y+=rh[ri]+gy});
@@ -297,7 +300,7 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
   find(root,ch){clearTimeout(SP.bt);SP.buf+=ch;SP.bt=setTimeout(()=>{SP.buf='';root.querySelector('.sp-find').classList.remove('on')},900);
     const q=SP.buf.toLocaleLowerCase('tr-TR'),apps=SP.list,i=apps.findIndex(a=>a.name.toLocaleLowerCase('tr-TR').startsWith(q)),j=i<0?apps.findIndex(a=>a.name.toLocaleLowerCase('tr-TR').includes(q)):i;
     const f=root.querySelector('.sp-find');f.innerHTML=`<kbd>${esc(SP.buf)}</kbd> ${j<0?'<span>bulunamadı</span>':esc(apps[j].name)}`;f.classList.add('on');if(j>=0)SP.goTo(root,j)},
-  mount(root){SP.deg=0;SP.layout(root);SP.env(root,SP.cfg.env);SP.imm(root,SP.cfg.imm,1);SP.mode(root,SP.cfg.mode);
+  mount(root){SP.deg=0;SP.layout(root);if(SP.renameKey){const k=SP.renameKey;SP.renameKey=null;setTimeout(()=>{const gi=SP.G.findIndex(g=>g.apps.some(x=>x.key===k)),l=root.querySelector(`.sp-gh[data-g="${gi}"]`)||root.querySelector(`.sp-gt[data-g="${gi}"]`);if(l&&root.isConnected)SP.rename(root,gi,l)},60)}if(SP.keep){const i=SP.list.findIndex(a=>a.key===SP.keep);if(i>=0){SP.deg=SP.ang[i];SP.sel=i;SP.apply(root)}SP.keep=null}SP.env(root,SP.cfg.env);SP.imm(root,SP.cfg.imm,1);SP.mode(root,SP.cfg.mode);
     root.querySelectorAll('.sp-side').forEach(s=>{const o=SP.cfg.off[s.dataset.side];if(o){s.style.setProperty('--ox',o[0]+'px');s.style.setProperty('--oy',o[1]+'px')}});
     const ring=root.querySelector('.sp-ring'),scene=root.querySelector('.sp-scene'),stage=root.querySelector('.sp-stage'),crown=root.querySelector('.sp-crown');
     root.addEventListener('click',e=>{const r=e.target.closest('[data-rot]');if(r)return SP.cfg.mode==='izgara'?SP.goTo(root,(SP.sel+(+r.dataset.rot)+SP.n)%SP.n):SP.turn(root,+r.dataset.rot);
@@ -320,7 +323,7 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
     addEventListener('pointermove',SP.pm=e=>{
       if(gr&&gr.id===e.pointerId){const x=Math.round(e.clientX-gr.x),y=Math.round(e.clientY-gr.y);gr.s.style.setProperty('--ox',x+'px');gr.s.style.setProperty('--oy',y+'px');SP.cfg.off[gr.s.dataset.side]=[x,y];return}
       if(cr&&cr.id===e.pointerId){const dy=cr.y-e.clientY;if(Math.abs(dy)>3)cr.moved=true;if(cr.moved)SP.imm(root,cr.v+dy/220);return}
-      if(st&&st.id===e.pointerId&&SP.cfg.mode==='halka'){const dx=e.clientX-st.x;if(Math.abs(dx)>6){SP.dragged=true;ring.style.transition='none';SP.deg=st.d-dx/(mobile()?160:260)*SP.step;SP.apply(root)}}
+      if(st&&st.id===e.pointerId&&SP.cfg.mode==='halka'&&!SP.lift){const dx=e.clientX-st.x;if(Math.abs(dx)>6){SP.dragged=true;ring.style.transition='none';SP.deg=st.d-dx/(mobile()?160:260)*SP.step;SP.apply(root)}}
       if(e.pointerType!=='mouse'||calmMotion()||SP.raf)return;
       SP.raf=requestAnimationFrame(()=>{SP.raf=0;scene.style.setProperty('--ry',((e.clientX/innerWidth-.5)*7).toFixed(2)+'deg');scene.style.setProperty('--rx',((.5-e.clientY/innerHeight)*5).toFixed(2)+'deg');
         const fw=root.querySelector('.sp-win.front');if(!fw||st)return;const b=fw.getBoundingClientRect(),u=(e.clientX-b.left)/b.width,v=(e.clientY-b.top)/b.height,inside=u>=0&&u<=1&&v>=0&&v<=1;
@@ -330,10 +333,66 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
       if(gr&&gr.id===e.pointerId){gr.s.classList.remove('moving');gr=null;SP.save();return}
       if(cr&&cr.id===e.pointerId){if(!cr.moved)SP.imm(root,SP.cfg.imm>.05?0:(SP.cfg.last||.8),SP.cfg.imm>.05);cr=null;return}
       if(!st||st.id!==e.pointerId)return;st=null;ring.style.transition='';if(SP.dragged){SP.rotTo(root,SP.f);setTimeout(()=>SP.dragged=false,0)}});
+    SP.dnd(root);
+    root.addEventListener('contextmenu',e=>{const t=e.target.closest('.sp-hi,.sp-win');if(!t)return;e.preventDefault();e.stopPropagation();if(SP.lift||e.pointerType==='touch'||(e.button===-1))return;SP.menu(root,+t.dataset.i,e.clientX,e.clientY)});
+    root.addEventListener('dblclick',e=>{const l=e.target.closest('.sp-gh,.sp-gt');if(l)SP.rename(root,+l.dataset.g,l)});
     root.querySelectorAll('.sp-hi').forEach(h=>{h.addEventListener('pointerenter',()=>{SP.sel=+h.dataset.i;SP.cap(root)});h.addEventListener('focus',()=>{SP.sel=+h.dataset.i;SP.cap(root)})});
     stage.addEventListener('wheel',e=>{if(SP.cfg.mode!=='halka'||e.target.closest('.sp-side')||Math.abs(e.deltaX)+Math.abs(e.deltaY)<8||SP.wl)return;SP.wl=1;setTimeout(()=>SP.wl=0,260);SP.turn(root,(e.deltaY||e.deltaX)>0?1:-1)},{passive:true})},
+  /* taşıma: grup değiştir / sırala */
+  move(root,i,target,before){const a=SP.list[i];if(!a)return;if(a.key===H().bh&&target!==SP.G[a.gi].id){H().toast('Denetçi galaksinin merkezi; gruba girmez');SP.rebuild();return}const ord=SP.list.map(x=>x.key).filter(k=>k!==a.key);
+    const tg=target==='_new'?null:SP.G.find(g=>g.id===target),src=SP.G[a.gi];
+    if(tg&&tg.id[0]==='_'&&tg!==src&&((tg.id==='_ai')!==!!a.ai)){H().toast(tg.id==='_ai'?'Yapay zekâ grubuna sadece AI uygulamaları girer':'“Diğer” otomatik grup; AI uygulamaları orada durmaz');SP.rebuild();return}
+    let at=before!=null?ord.indexOf(before):-1;if(at<0){const last=(tg||src).apps.filter(x=>x.key!==a.key).pop();at=last?ord.indexOf(last.key)+1:ord.length}
+    ord.splice(at,0,a.key);SP.cfg.order=ord;SP.keep=a.key;try{localStorage.setItem(SPK,JSON.stringify(SP.cfg))}catch{}
+    if(target==='_new'){H().setGroup(a.key,'_new','Yeni grup');SP.hinted();SP.renameKey=a.key;SP.rebuild();return}
+    if(tg&&tg!==src){const gname=tg.name,prev=src.id;H().setGroup(a.key,tg.id);H().toast(`${a.name} → ${gname}`,()=>{H().setGroup(a.key,prev[0]==='_'?null:prev)});SP.hinted();return}
+    SP.hinted();SP.rebuild()},
+  hinted(){if(!SP.cfg.hinted){SP.cfg.hinted=1;SP.save()}document.querySelector('.world .sp')?.classList.add('hinted')},
+  menu(root,i,x,y){SP.closeMenu();const a=SP.list[i];if(!a)return;const cur=SP.G[a.gi];
+    const bh=a.key===H().bh,opts=bh?[]:SP.G.filter(g=>g!==cur&&!(g.id==='_ai'&&!a.ai)&&!(g.id==='_other'&&a.ai));
+    const m=document.createElement('div');m.className='sp-menu';m.setAttribute('role','menu');
+    m.innerHTML=`<p>${esc(a.name)}</p><button role="menuitem" data-m="open">Aç</button>${opts.length?'<p>Taşı</p>':''}${opts.map(g=>`<button role="menuitem" data-m="${esc(g.id)}" style="--gc:${esc(g.color)}"><i></i>${esc(g.name)}</button>`).join('')}${bh?'<p>Galaksinin merkezi, taşınmaz</p>':'<button role="menuitem" data-m="_new">＋ Yeni grup</button>'}${cur.id[0]!=='_'&&!bh?'<button role="menuitem" data-m="_out">Gruptan çıkar</button>':''}`;
+    root.querySelector('.sp').appendChild(m);const W=m.offsetWidth,Hh=m.offsetHeight;m.style.left=Math.min(x,innerWidth-W-12)+'px';m.style.top=Math.min(y,innerHeight-Hh-12)+'px';
+    m.addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(!b)return;const k=b.dataset.m;SP.closeMenu();if(k==='open')H().open(a.key);else if(k==='_out'){SP.keep=a.key;H().setGroup(a.key,null);H().toast(`${a.name} gruptan çıktı`)}else SP.move(root,i,k)});
+    m.querySelector('button').focus();setTimeout(()=>addEventListener('pointerdown',SP.mOut=e=>{if(!e.target.closest('.sp-menu'))SP.closeMenu()},true),0)},
+  closeMenu(){document.querySelector('.world .sp-menu')?.remove();if(SP.mOut){removeEventListener('pointerdown',SP.mOut,true);SP.mOut=null}},
+  rename(root,gi,el){const g=SP.G[gi];if(!g)return;if(g.id[0]==='_'){H().toast('Bu grup otomatik; adı değişmez');return}
+    const sp=el.querySelector('span')||el,old=g.name,inp=document.createElement('input');inp.className='sp-ren';inp.value=old;inp.maxLength=40;inp.setAttribute('aria-label','Grup adı');
+    sp.replaceWith(inp);el.style.pointerEvents='auto';inp.focus();inp.select();let done=false;
+    const fin=ok=>{if(done)return;done=true;const v=inp.value.trim(),sp2=document.createElement('span');sp2.textContent=ok&&v?v:old;inp.replaceWith(sp2);el.style.pointerEvents='';if(ok&&v&&v!==old)H().renameGroup(g.id,v)};
+    inp.addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter')fin(true);if(e.key==='Escape')fin(false)});inp.addEventListener('blur',()=>fin(true))},
+  dnd(root){const home=root.querySelector('.sp-home'),drop=root.querySelector('.sp-drop'),sp=root.querySelector('.sp');let d=null;
+    const local=e=>{const c=home.getBoundingClientRect(),k=parseFloat(getComputedStyle(home).getPropertyValue('--hs'))||1;return{x:(e.clientX-c.left)/k,y:(e.clientY-c.top)/k}};
+    const start=()=>{if(SP.list[d.i]?.key===H().bh){H().toast('Denetçi galaksinin merkezi; taşınmaz');d=null;return}d.on=true;d.el.classList.add('drag');sp.classList.add('dragging');SP.closeMenu();navigator.vibrate?.(8)};
+    const target=e=>{const z=document.elementsFromPoint(e.clientX,e.clientY).find(n=>n.dataset?.drop);if(z)return{g:z.dataset.drop,z};const p=local(e),g=SP.G.find(g=>g.box&&p.x>=g.box.x0&&p.x<=g.box.x1&&p.y>=g.box.y0&&p.y<=g.box.y1);
+      if(!g)return null;let before=null,best=1e9;g.apps.forEach(a=>{if(a.si===d.i)return;const q=SP.pos[a.si];if(!q)return;const dist=Math.hypot(q.x-p.x,q.y-p.y);if(dist<best&&dist<120){best=dist;before=p.x<q.x?a.key:(g.apps[g.apps.indexOf(a)+1]?.key??'__end')}});return{g:g.id,before:before==='__end'?null:before}};
+    home.addEventListener('pointerdown',e=>{const el=e.target.closest('.sp-hi');if(!el||e.button)return;d={el,i:+el.dataset.i,x:e.clientX,y:e.clientY,id:e.pointerId,on:false,touch:e.pointerType!=='mouse'};
+      d.t=setTimeout(()=>{if(d&&!d.on){start();if(!d)return;try{el.setPointerCapture(d.id)}catch{}const p=local({clientX:d.x,clientY:d.y});el.style.transform=`translate3d(${p.x.toFixed(0)}px,${(p.y+20).toFixed(0)}px,140px) scale(1.12)`}},380)});
+    addEventListener('pointermove',SP.dm=e=>{if(!d||d.id!==e.pointerId)return;const mv=Math.hypot(e.clientX-d.x,e.clientY-d.y);
+      if(!d.on){if(d.touch){if(mv>10){clearTimeout(d.t);d=null}return}if(mv<6)return;clearTimeout(d.t);start();if(!d)return;try{d.el.setPointerCapture(d.id)}catch{}}
+      e.preventDefault();const p=local(e);d.el.style.transform=`translate3d(${p.x.toFixed(0)}px,${(p.y+20).toFixed(0)}px,140px) scale(1.12)`;
+      const t=target(e);d.t2=t;root.querySelectorAll('.sp-gh').forEach(l=>l.classList.toggle('drop',!!t&&SP.G[+l.dataset.g]?.id===t.g));drop.querySelectorAll('span').forEach(c=>c.classList.toggle('on',!!t?.z&&c===t.z));
+      const tg=t&&SP.G.find(g=>g.id===t.g);root.querySelector('.sp-cap').innerHTML=`<b>${esc(SP.list[d.i].name)}</b><span>${t?.g==='_new'?'Bırak: yeni grup kur':tg?(tg===SP.G[SP.list[d.i].gi]?'Bırak: sırayı değiştir':'Bırak: '+esc(tg.name)+' grubuna taşı'):'Gruba bırak ya da vazgeçmek için boşluğa bırak'}</span>`},{passive:false});
+    addEventListener('pointerup',SP.du=e=>{if(!d||d.id!==e.pointerId)return;clearTimeout(d.t);const was=d;d=null;if(!was.on)return;
+      sp.classList.remove('dragging');was.el.classList.remove('drag');root.querySelectorAll('.sp-gh.drop').forEach(l=>l.classList.remove('drop'));SP.dragged=true;setTimeout(()=>SP.dragged=false,0);
+      const t=was.t2;if(!t){SP.home(root);SP.cap(root);return}SP.move(root,was.i,t.g,t.before)});
+    home.addEventListener('click',e=>{if(SP.dragged){e.stopPropagation();e.preventDefault()}},true);
+    /* halka: uzun bas → cam kalkar, grup çiplerine sürükle */
+    let L=null;const ring=root.querySelector('.sp-ring');
+    ring.addEventListener('pointerdown',e=>{const w=e.target.closest('.sp-win');if(!w||e.button)return;L={w,i:+w.dataset.i,x:e.clientX,y:e.clientY,id:e.pointerId,on:false};
+      L.t=setTimeout(()=>{if(!L||L.on)return;if(SP.list[L.i]?.key===H().bh){H().toast('Denetçi galaksinin merkezi; taşınmaz');L=null;return}L.on=true;SP.lift=true;w.classList.add('lifted');sp.classList.add('dragging','lifting');SP.closeMenu();navigator.vibrate?.(10);
+        const a=SP.list[L.i];L.g=document.createElement('div');L.g.className='sp-ghost';L.g.innerHTML=`${appIcon(a)}<b>${esc(a.name)}</b>`;sp.appendChild(L.g);L.g.style.transform=`translate(${L.x}px,${L.y}px)`;
+        root.querySelector('.sp-cap').innerHTML=`<b>${esc(a.name)}</b><span>Bir gruba sürükle ya da bırakıp vazgeç</span>`;try{w.setPointerCapture(L.id)}catch{}},400)});
+    addEventListener('pointermove',SP.lm=e=>{if(!L||L.id!==e.pointerId)return;if(!L.on){if(Math.hypot(e.clientX-L.x,e.clientY-L.y)>8){clearTimeout(L.t);L=null}return}
+      e.preventDefault();L.g.style.transform=`translate(${e.clientX}px,${e.clientY}px)`;const z=document.elementsFromPoint(e.clientX,e.clientY).find(n=>n.dataset?.drop);L.z=z;
+      drop.querySelectorAll('span').forEach(c=>c.classList.toggle('on',c===z))},{passive:false});
+    addEventListener('pointerup',SP.lu=e=>{if(!L||L.id!==e.pointerId)return;clearTimeout(L.t);const was=L;L=null;if(!was.on)return;
+      SP.lift=false;SP.dragged=true;setTimeout(()=>SP.dragged=false,0);was.w.classList.remove('lifted');sp.classList.remove('dragging','lifting');was.g.remove();drop.querySelectorAll('.on').forEach(c=>c.classList.remove('on'));
+      if(was.z){const g=was.z.dataset.drop,src=SP.G[SP.list[was.i].gi];if(g===src.id){SP.cap(root);H().toast('Zaten bu grupta');return}SP.move(root,was.i,g)}else SP.cap(root)});
+    addEventListener('pointercancel',SP.lc=e=>{if(L&&L.id===e.pointerId){clearTimeout(L.t);if(L.on){L.w.classList.remove('lifted');sp.classList.remove('dragging','lifting');L.g.remove();SP.lift=false}L=null}})},
   launch(el,key){if(!calmMotion()){const t=el.style.transform||'';el.animate([{transform:t},{transform:t+' translateZ(140px) scale(1.06)',opacity:0}],{duration:280,easing:'cubic-bezier(.4,0,.2,1)'})}setTimeout(()=>H().open(key),calmMotion()?0:220)},
   key(root,e){const k=e.key,crownF=document.activeElement?.classList?.contains('sp-crown');
+    if(k==='Escape'&&root.querySelector('.sp-menu')){e.preventDefault();e.stopPropagation();SP.closeMenu();return}
     if(k==='Escape'&&!root.querySelector('.sp-envp').hidden){e.preventDefault();e.stopPropagation();SP.envp(root,false);root.querySelector('[data-sp=envp]').focus();return}
     if(k==='['||k===']'||(crownF&&(k==='ArrowUp'||k==='ArrowDown'))){e.preventDefault();SP.imm(root,SP.cfg.imm+((k===']'||k==='ArrowUp')?.1:-.1));return}
     if(crownF&&(k==='Enter'||k===' ')){e.preventDefault();SP.imm(root,SP.cfg.imm>.05?0:(SP.cfg.last||.8),SP.cfg.imm>.05);return}
@@ -345,7 +404,7 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
     else if(k==='Enter'&&!e.target.closest?.('button')){e.preventDefault();const a=SP.list[SP.sel];a&&H().open(a.key)}
     else if(k.length===1&&/\p{L}/u.test(k)){e.preventDefault();SP.find(root,k)}},
   resize(root){SP.layout(root)},
-  unmount(){removeEventListener('pointermove',SP.pm);removeEventListener('pointerup',SP.pu)}};
+  unmount(){removeEventListener('pointermove',SP.pm);removeEventListener('pointerup',SP.pu);removeEventListener('pointermove',SP.dm);removeEventListener('pointerup',SP.du);removeEventListener('pointermove',SP.lm);removeEventListener('pointerup',SP.lu);removeEventListener('pointercancel',SP.lc);SP.lift=false;SP.closeMenu()}};
 
 const R={defter:NB,terminal:TM,organik:OG,isvicre:SW,mekansal:SP};
 
@@ -368,6 +427,10 @@ function set(w,instant){try{localStorage.setItem(KEY,JSON.stringify(w))}catch{}
 function refresh(){if(!root||rq)return;rq=requestAnimationFrame(()=>{rq=0;if(!root)return;R[cur].refresh?R[cur].refresh(root):fillLive()})}
 addEventListener('keydown',e=>{if(!root||!R[cur].key||e.metaKey||e.ctrlKey||e.altKey)return;if(e.target.closest?.('input,textarea,[contenteditable]'))return;
   if(document.querySelector('.wp-bg,.pal-bg,.menu,.radial')||[...document.querySelectorAll('.win')].some(w=>!w.hidden))return;R[cur].key(root,e);if(e.defaultPrevented)e.stopPropagation()},true);
+function rebuild(){if(!root||cur==='galaksi')return;const sc=root.scrollTop;apply(cur);if(root)root.scrollTop=sc}
+SP.rebuild=rebuild;
+function regroup(){if(cur!=='mekansal'||!root||!H()?.groups)return;let g;try{g=JSON.stringify(H().groups())}catch{return}if(g===SP.sig)return;
+  if(document.querySelector('.world .sp-ren')||document.querySelector('.world .sp-hi.drag'))return;SP.keep=SP.keep||SP.list[SP.sel]?.key;rebuild()}
 let rt=0;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(root)R[cur].resize?.(root)},150)});
 addEventListener('storage',e=>{if(e.key===KEY&&started){const w=read();if(w!==cur)apply(w)}});
 setInterval(()=>{if(root&&!document.hidden)refresh()},60000);
@@ -397,5 +460,5 @@ function topBtn(){const t=document.getElementById('themeBtn');if(!t||document.ge
   b.innerHTML='<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/><path d="M2.5 8h11M8 2.5c2 2 2 9 0 11M8 2.5c-2 2-2 9 0 11"/></svg>';b.onclick=e=>{e.stopPropagation();picker()};t.before(b)}
 function boot(){topBtn();if(started)return refresh();started=true;const w=read();if(w!=='galaksi'&&R[w])apply(w)}
 topBtn();
-window.Worlds={boot,refresh,picker,set,get:()=>cur,list:WORLDS.map(w=>w[0])};
+window.Worlds={boot,refresh,regroup,picker,set,get:()=>cur,list:WORLDS.map(w=>w[0])};
 })();

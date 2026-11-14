@@ -884,5 +884,41 @@
     "fix": "Geniş ekranda sadece öndeki ve komşuları görünüyor"
    }
   ]
+ },
+ {
+  "at": "2026-11-14T11:02:16",
+  "change": "Mekânsal: gruplar buluttan geç gelince de görünüyor; uzun basıp uygulamayı gruba taşıma, yeni grup kurma, sıralama, sağ tık menüsü, grup adını değiştirme",
+  "scores": {
+   "Mekânsal telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Mekânsal masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Mekânsal",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Galaksi grupları buluttan sonradan gelince Mekânsal eski (grupsuz) hâliyle kalıyordu",
+    "fix": "Gruplar değişince Mekânsal kendini yeniden diziyor"
+   },
+   {
+    "app": "Mekânsal",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Yeni grubun ad kutusu açılır açılmaz odağını kaybediyordu",
+    "fix": "Önce yeniden çiziliyor, sonra ad kutusu açılıyor"
+   },
+   {
+    "app": "Mekânsal",
+    "sev": "bilgi",
+    "status": "open",
+    "text": "Denetçi galaksinin merkezi olduğu için gruba taşınamıyor (bilerek)"
+   }
+  ]
  }
 ]

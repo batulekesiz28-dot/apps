@@ -1666,5 +1666,28 @@
     "fix": "Her gün/hafta içi tekrarlar Yaklaşan'da gösterilmiyor (Tekrarlanan sekmesinde)"
    }
   ]
+ },
+ {
+  "at": "2026-11-14T19:54:41",
+  "change": "Görevler: belirgin işaret kutusu, bitenler 'Tamamlandı' başlığıyla altta açık görünür; Notlar'da Ctrl+Enter satırı işaretlenebilir yapar (wip-gorev-isaret dalı test edilip alındı)",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Biten görevin yeşil dairesinde gri halka kalıyordu",
+    "fix": "Bitmiş görevde kenar halkası kaldırıldı"
+   }
+  ]
  }
 ]

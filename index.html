@@ -1580,31 +1580,64 @@ function galaxyStep(dt){
   GX.ts+=((hold?0:1)-GX.ts)*(1-Math.pow(.86,dt/16.667));if(!REDUCED)GX.T+=dt/1000*GX.ts;
   const T=GX.T,S=GX.sys.length;
   GX.sys.forEach((s,k)=>{if(starDrag?.id===s.g){s.x=starDrag.x;s.y=starDrag.y}else{const o=orbits[s.g],a=(o?o.a:k/S*6.2832-1.2)+T*6.2832/480,rr=o?o.r:GX.RS;s.x=Math.cos(a)*rr;s.y=Math.sin(a)*rr*.9}
-    s.ms.forEach((n,j)=>{const r=s.orbits[j],per=34*Math.pow(r/96,1.5),ang=hashU(n.a.key)*6.283+T*6.2832/per;n.aw=[s.x+Math.cos(ang)*r,s.y+Math.sin(ang)*r]})});
-  for(const ring of GX.loose){const per=90*Math.pow(ring.r/230,1.5),m=ring.ms.length;ring.ms.forEach((n,i)=>{const ang=i/m*6.2832+T*6.2832/per+ring.r*.013;n.aw=[Math.cos(ang)*ring.r,Math.sin(ang)*ring.r]})}
+    s.ms.forEach((n,j)=>{const r=s.orbits[j],per=34*Math.pow(r/96,1.5),ang=hashU(n.a.key)*6.283+T*6.2832/per;n.aw=[s.x+Math.cos(ang)*r,s.y+Math.sin(ang)*r];n.orb={cx:s.x,cy:s.y,r,ang}})});
+  for(const ring of GX.loose){const per=90*Math.pow(ring.r/230,1.5),m=ring.ms.length;ring.ms.forEach((n,i)=>{const ang=i/m*6.2832+T*6.2832/per+ring.r*.013;n.aw=[Math.cos(ang)*ring.r,Math.sin(ang)*ring.r];n.orb={cx:0,cy:0,r:ring.r,ang}})}
   const bh=nodes.get(BH_KEY);if(bh)bh.aw=[0,0];
 }
-function drawBH(x,y,Z,time,dark){const R=Math.max(12,40*Z);if(x<-R*6||x>M.W+R*6||y<-R*6||y>M.H+R*6)return;
-  const g=fx.createRadialGradient(x,y,R*.8,x,y,R*3.4);const bc=TH.bh||[255,160,90];g.addColorStop(0,dark?`rgba(${bc},.22)`:'rgba(24,24,27,.13)');g.addColorStop(1,'rgba(0,0,0,0)');fx.fillStyle=g;fx.beginPath();fx.arc(x,y,R*3.4,0,6.2832);fx.fill();
-  const disk=(a0,a1)=>{fx.save();fx.translate(x,y);fx.rotate(-.18);fx.scale(1,.36);
-    for(let i=0;i<4;i++){const rr=R*(1.4+i*.34);fx.lineWidth=Math.max(1,(2.6-i*.5)*Math.min(1.4,Z))/.36*.5;fx.strokeStyle=TH.bh?`rgba(${TH.bh.map((v,j)=>Math.max(0,v-i*(j?24:10)))},${.65-i*.13})`:dark?`rgba(255,${200-i*28},${130-i*22},${.6-i*.12})`:`rgba(24,24,27,${.5-i*.09})`;
-      fx.setLineDash([rr*.8,rr*.3]);fx.lineDashOffset=-time*(46-i*7)*Math.max(.5,Z);fx.beginPath();fx.arc(0,0,rr,a0,a1);fx.stroke()}
-    fx.setLineDash([]);fx.restore()};
-  disk(Math.PI,Math.PI*2); // back half
-  fx.fillStyle='#050506';fx.beginPath();fx.arc(x,y,R,0,6.2832);fx.fill();
-  fx.lineWidth=1.3;fx.strokeStyle=dark?'rgba(255,205,150,.75)':'rgba(255,255,255,.7)';fx.beginPath();fx.arc(x,y,R*1.03,0,6.2832);fx.stroke();
-  disk(0,Math.PI); // front half passes in front of the hole
-}
+/* Kara delik (Denetçi): NASA/Interstellar görselleştirmelerinden — Doppler'le bir yanı parlak ışık diski,
+   bükülmüş ışığın oluşturduğu üst hale, ince foton halkası, gölge. Açık temada mürekkep tonları. */
+function drawBH(x,y,Z,time,dark){const R=Math.max(12,40*Z);if(x<-R*7||x>M.W+R*7||y<-R*7||y>M.H+R*7)return;
+  const bc=dark?(TH.bh||[255,170,90]):[63,63,70],hot=dark?[255,238,214]:[24,24,27],dim=dark?bc.map(v=>Math.round(v*.55)):[113,113,122],A=(c,a)=>`rgba(${c},${a})`,mv=MOTION==='off'?0:time;
+  const g=fx.createRadialGradient(x,y,R*.8,x,y,R*4);g.addColorStop(0,dark?A(bc,.26):'rgba(24,24,27,.12)');g.addColorStop(.45,dark?A(bc,.08):'rgba(24,24,27,.04)');g.addColorStop(1,'rgba(0,0,0,0)');fx.fillStyle=g;fx.beginPath();fx.arc(x,y,R*4,0,6.2832);fx.fill();
+  const r0=R*1.22,r1=R*2.75,sq=.27;
+  const disk=front=>{fx.save();fx.translate(x,y);fx.rotate(-.16);fx.scale(1,sq);
+    const lg=fx.createLinearGradient(-r1,0,r1,0);lg.addColorStop(0,A(hot,dark?.95:.55));lg.addColorStop(.32,A(bc,dark?.8:.35));lg.addColorStop(.68,A(bc,dark?.45:.22));lg.addColorStop(1,A(dim,dark?.22:.12));
+    const rg=fx.createRadialGradient(0,0,r0,0,0,r1);rg.addColorStop(0,'rgba(0,0,0,0)');rg.addColorStop(1,'rgba(0,0,0,1)');
+    fx.beginPath();if(front){fx.arc(0,0,r1,0,Math.PI);fx.arc(0,0,r0,Math.PI,0,true)}else{fx.arc(0,0,r1,Math.PI,6.2832);fx.arc(0,0,r0,6.2832,Math.PI,true)}fx.closePath();fx.fillStyle=lg;fx.fill();
+    fx.globalCompositeOperation='destination-out';fx.globalAlpha=.4;fx.fillStyle=rg;fx.fill();fx.globalAlpha=1;fx.globalCompositeOperation='source-over';
+    // akış çizgileri: iç kısım daha hızlı döner
+    for(let i=0;i<4;i++){const rr=r0+(r1-r0)*(.12+i*.22);fx.lineWidth=Math.max(.8,(1.7-i*.3)*Math.min(1.4,Z))/sq*.4;fx.strokeStyle=A(i<2?hot:bc,(dark?.5:.3)-i*.09);
+      fx.setLineDash([rr*.55,rr*.4]);fx.lineDashOffset=-mv*(52-i*9)*Math.max(.5,Z);fx.beginPath();front?fx.arc(0,0,rr,0,Math.PI):fx.arc(0,0,rr,Math.PI,6.2832);fx.stroke()}
+    fx.setLineDash([]);fx.lineWidth=Math.max(1,1.6*Math.min(1.3,Z))/sq*.45;fx.strokeStyle=A(hot,dark?.85:.5);fx.beginPath();front?fx.arc(0,0,r0,0,Math.PI):fx.arc(0,0,r0,Math.PI,6.2832);fx.stroke();fx.restore()};
+  disk(false);
+  // bükülmüş ışık: diskin arka yüzü deliğin üstünde (ve sönükçe altında) bir hale olarak görünür
+  const hg=fx.createLinearGradient(0,y-R*1.75,0,y+R*1.75);hg.addColorStop(0,A(hot,dark?.9:.5));hg.addColorStop(.28,A(bc,dark?.45:.22));hg.addColorStop(.5,A(bc,0));hg.addColorStop(.85,A(bc,dark?.12:.06));hg.addColorStop(1,A(bc,dark?.28:.12));
+  fx.lineWidth=R*.2;fx.strokeStyle=hg;fx.beginPath();fx.ellipse(x,y,R*1.34,R*1.3,0,0,6.2832);fx.stroke();
+  fx.fillStyle=dark?'#020203':'#09090B';fx.beginPath();fx.arc(x,y,R,0,6.2832);fx.fill();
+  // foton halkası
+  const pulse=1+.06*Math.sin(mv*1.7);fx.lineWidth=Math.max(3,R*.16);fx.strokeStyle=A(hot,(dark?.22:.12)*pulse);fx.beginPath();fx.arc(x,y,R*1.05,0,6.2832);fx.stroke();
+  fx.lineWidth=Math.max(1,R*.045);fx.strokeStyle=A(hot,dark?.95:.6);fx.beginPath();fx.arc(x,y,R*1.04,0,6.2832);fx.stroke();
+  disk(true)}
+/* Yörünge izleri: gezegenin arkasında, kendi yörüngesi üstünde sönerek uzayan iz + altında hafif ışıma */
+function drawTrail(n,col,dark){const o=n.orb;if(!o||n.off||n.drag)return;const Z=cam.z,cx=w2sx(o.cx),cy=w2sy(o.cy),R=o.r*Z;if(R<8)return;
+  const span=Math.min(1.25,Math.max(.3,200/R)),seg=TIER>=2?6:12,w=Math.max(1.2,3.2*Math.min(1.3,Z));fx.lineCap='round';
+  for(let i=0;i<seg;i++){const a0=o.ang-span*(1-i/seg),a1=o.ang-span*(1-(i+1)/seg)-(i===seg-1?.06:0),t=(i+1)/seg;
+    fx.lineWidth=w*(.35+.65*t);fx.strokeStyle=hexA(col,(dark?.7:.45)*t*t);fx.beginPath();fx.arc(cx,cy,R,a0,a1);fx.stroke()}
+  fx.lineCap='butt';const gr=46*Z*(n.sc||1),g=fx.createRadialGradient(n.x,n.y,gr*.3,n.x,n.y,gr*1.5);g.addColorStop(0,hexA(col,dark?.32:.16));g.addColorStop(1,hexA(col,0));fx.fillStyle=g;fx.beginPath();fx.arc(n.x,n.y,gr*1.5,0,6.2832);fx.fill()}
+/* Derin uzay: kamerayla farklı hızda kayan üç kat yıldız, göz kırpma, ara sıra kayan yıldız (koyu temalar; 'evren'in kendi gökyüzü var) */
+const STARS=(()=>{const a=[];let sd=7;const rnd=()=>(sd=(sd*16807)%2147483647)/2147483647;for(let i=0;i<260;i++){const k=i%3;a.push({x:rnd(),y:rnd(),k:[.04,.1,.2][k],s:[.8,1.1,1.6][k]*(rnd()*.5+.75),b:.25+rnd()*.55,tw:.6+rnd()*2.2,ph:rnd()*6.28})}return a})();
+let SHOOT=null,shootNext=0;
+function starsOn(){return!!TH.dark&&document.documentElement.dataset.theme!=='evren'}
+function drawStars(time){const W=M.W,H=M.H,mv=MOTION==='full',tt=mv?time:0;
+  const lim=TIER>=2?60:TIER===1?140:STARS.length;for(let si=0;si<lim;si++){const st=STARS[si];let x=(st.x*W-cam.x*cam.z*st.k)%W,y=(st.y*H-cam.y*cam.z*st.k)%H;if(x<0)x+=W;if(y<0)y+=H;
+    const a=st.b*(mv?.65+.35*Math.sin(tt*st.tw+st.ph):1);fx.fillStyle=`rgba(225,232,255,${a.toFixed(3)})`;fx.fillRect(x,y,st.s,st.s)}
+  if(!mv)return;const now=performance.now();
+  if(!SHOOT&&now>shootNext){if(shootNext){const a=.35+Math.random()*.5;SHOOT={x:Math.random()*W*.8+W*.1,y:Math.random()*H*.4,dx:Math.cos(a),dy:Math.sin(a),t0:now,len:120+Math.random()*120}}shootNext=now+9000+Math.random()*9000}
+  if(SHOOT){const p=(now-SHOOT.t0)/900;if(p>=1){SHOOT=null;return}const d=p*W*.35,hx=SHOOT.x+SHOOT.dx*d,hy=SHOOT.y+SHOOT.dy*d,al=Math.sin(p*Math.PI);
+    const g=fx.createLinearGradient(hx,hy,hx-SHOOT.dx*SHOOT.len,hy-SHOOT.dy*SHOOT.len);g.addColorStop(0,`rgba(255,255,255,${(.85*al).toFixed(3)})`);g.addColorStop(1,'rgba(255,255,255,0)');
+    fx.strokeStyle=g;fx.lineWidth=1.4;fx.beginPath();fx.moveTo(hx,hy);fx.lineTo(hx-SHOOT.dx*SHOOT.len,hy-SHOOT.dy*SHOOT.len);fx.stroke()}}
 function drawGalaxy(time){
   groupHits=[];const Z=cam.z,L=TH.l,dark=!!TH.dark,cx0=w2sx(0),cy0=w2sy(0);
   fx.save();fx.lineWidth=1;
   if(GX.RS){fx.setLineDash([2,7]);fx.strokeStyle=`rgba(${L},.12)`;fx.beginPath();fx.ellipse(cx0,cy0,GX.RS*Z,GX.RS*.9*Z,0,0,6.2832);fx.stroke();fx.setLineDash([])}
   for(const r of GX.loose){fx.strokeStyle=`rgba(${L},.09)`;fx.beginPath();fx.arc(cx0,cy0,r.r*Z,0,6.2832);fx.stroke()}
+  const bhc=TH.bh?`#${TH.bh.map(v=>v.toString(16).padStart(2,'0')).join('')}`:(dark?'#FFAA5A':'#52525B');for(const r of GX.loose)for(const n of r.ms)drawTrail(n,bhc,dark);
   drawBH(cx0,cy0,Z,time,dark);
   for(const s of GX.sys){const x=w2sx(s.x),y=w2sy(s.y),grp=s.virt?{name:'Diğer',color:'gray'}:groups[s.g];if(!grp)continue;const col=GCOL[grp.color]||GCOL.gray;
     if(x+(s.R+60)*Z<0||x-(s.R+60)*Z>M.W||y+(s.R+60)*Z<0||y-(s.R+60)*Z>M.H)continue;
     const hot=sunHover===s.g;nebula(x,y,(s.R+30)*Z,col,s.ph,dark,time);
-    for(const r of s.orbits){fx.strokeStyle=hot?hexA(col,.35):`rgba(${L},.1)`;fx.beginPath();fx.arc(x,y,r*Z,0,6.2832);fx.stroke()}
+    for(const r of s.orbits){fx.lineWidth=1;fx.strokeStyle=hot?hexA(col,.35):`rgba(${L},.1)`;fx.beginPath();fx.arc(x,y,r*Z,0,6.2832);fx.stroke()}
+    for(const n of s.ms)drawTrail(n,col,dark);fx.lineWidth=1;
     const R=Math.max(7,18*Z)*(hot?1.12:1);drawSun(x,y,R,col,time,s.ph,dark,Z);
     // zoomed out: the system's name grows so clusters read like regions on a map
     const name=(grp.name||'').toLocaleUpperCase('tr'),fs=Math.round(Z<.6?Math.min(24,12+(.6-Z)*34):Math.max(10.5,12*Math.min(1.15,Z)));
@@ -1711,8 +1744,8 @@ function frame(t){
   else if(meshDirty)drawMesh(t);
   // glow layer: skip entirely when neither the galaxy nor the widget star is on screen
   const gOn=onScr(0,0,(GX.RG||400)+260)||GX.sys.some(s=>onScr(s.x,s.y,s.R+80)),wOn=WEL.size&&onScr(WS.x,WS.y,(WS.R||300)+120);
-  if(gOn||wOn||linkDrag||PERF.fx){fx.clearRect(0,0,M.W,M.H);PERF.fx=!!(gOn||wOn||linkDrag)}
-  if(gOn)drawGalaxy(time);else groupHits=[];if(wOn)drawWidgetStar(time);drawRubber(time);followPeek(k);
+  const sOn=starsOn();if(gOn||wOn||linkDrag||sOn||PERF.fx){fx.clearRect(0,0,M.W,M.H);PERF.fx=!!(gOn||wOn||linkDrag||sOn)}
+  if(sOn)drawStars(time);if(gOn)drawGalaxy(time);else groupHits=[];if(wOn)drawWidgetStar(time);drawRubber(time);followPeek(k);
   raf=requestAnimationFrame(frame);
 }
 const wake=()=>{if(!raf&&!paused)raf=requestAnimationFrame(frame)};

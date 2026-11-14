@@ -987,5 +987,27 @@
     "fix": "Izgara genişliği yan pencerelere göre sınırlı"
    }
   ]
+ },
+ {
+  "at": "2026-11-14T11:37:17",
+  "change": "Galaksi görselleri: Interstellar tarzı kara delik (ışık diski, hale, foton halkası), gezegenlerin arkasında yörünge izleri ve renk ışıması, koyu temalarda derinlikli yıldızlar ve kayan yıldız",
+  "scores": {
+   "Hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Hub masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Hub",
+    "sev": "bilgi",
+    "status": "fixed",
+    "text": "Yeni efektler 60 FPS'te çalışıyor; hafif modda yıldız sayısı ve iz ayrıntısı azalıyor, animasyon kapalıyken yıldızlar duruyor"
+   }
+  ]
  }
 ]

@@ -1507,8 +1507,12 @@ function groupLabelMenu(x,y,g){
   const mem=Object.keys(members).filter(k=>members[k]===g&&nodes.has(k));
   popMenu(x,y,`<div class="who"><b>${esc(groups[g].name)}</b>${mem.length} uygulama</div><div class="msep"></div>
     <button class="mi" data-gm="edit">${si(UI.edit)}Adı ve rengi düzenle</button>
+    <div class="msep"></div><div class="who" style="padding-bottom:2px">Dünya görünümü</div>
+    ${WORLD_KINDS.map(([k,n])=>`<button class="mi" data-gw="${k}">${worldOf(g)===k?'● ':'○ '}${n}</button>`).join('')}
+    <div class="msep"></div>
     <button class="mi danger" data-gm="drop">${si(UI.del)}Kümeyi dağıt</button>`,
-    e=>{const b=e.target.closest('[data-gm]');if(!b)return;hideMenu();const k=b.dataset.gm;
+    e=>{const w=e.target.closest('[data-gw]');if(w){hideMenu();groups[g].world=w.dataset.gw;saveMeta();wake();toast(`${groups[g].name}: ${WORLD_KINDS.find(x=>x[0]===w.dataset.gw)[1]}`);return}
+      const b=e.target.closest('[data-gm]');if(!b)return;hideMenu();const k=b.dataset.gm;
       if(k==='edit')groupSheet(g);
       else if(k==='gather'){const ns=mem.map(m=>nodes.get(m));const cxg=ns.reduce((a,n)=>a+n.aw[0],0)/ns.length,cyg=ns.reduce((a,n)=>a+n.aw[1],0)/ns.length;
         ns.forEach(n=>n.aw=[1e9,1e9]);ns.forEach((n,i)=>{const ang=i/ns.length*Math.PI*2,r=ns.length>1?95:0;n.aw=nearestFree(cxg+Math.cos(ang)*r*1.3,cyg+Math.sin(ang)*r,n);rememberLayout(n,false);setTimeout(()=>{anc(n);ripple(n.ax,n.ay,1)},i*80)});saveMeta()}
@@ -1638,7 +1642,7 @@ function drawGalaxy(time){
     const hot=sunHover===s.g;nebula(x,y,(s.R+30)*Z,col,s.ph,dark,time);
     for(const r of s.orbits){fx.lineWidth=1;fx.strokeStyle=hot?hexA(col,.35):`rgba(${L},.1)`;fx.beginPath();fx.arc(x,y,r*Z,0,6.2832);fx.stroke()}
     for(const n of s.ms)drawTrail(n,col,dark);fx.lineWidth=1;
-    const R=Math.max(7,18*Z)*(hot?1.12:1);drawSun(x,y,R,col,time,s.ph,dark,Z);
+    const R0=Math.max(7,18*Z)*(hot?1.12:1),wk=worldOf(s.g);drawWorld(wk,x,y,R0,col,time,s.ph,dark,Z);const R=R0*WORLD_EXT[wk];
     // zoomed out: the system's name grows so clusters read like regions on a map
     const name=(grp.name||'').toLocaleUpperCase('tr'),fs=Math.round(Z<.6?Math.min(24,12+(.6-Z)*34):Math.max(10.5,12*Math.min(1.15,Z)));
     fx.font=`600 ${fs}px "Geist Mono",ui-monospace,Menlo,monospace`;if('letterSpacing' in fx)fx.letterSpacing='1.5px';fx.textAlign='center';fx.textBaseline='top';
@@ -1669,6 +1673,50 @@ function drawSun(x,y,R,col,time,ph,dark,Z){
   fx.fillStyle=c;fx.beginPath();fx.arc(x,y,R*br,0,6.2832);fx.fill();
   fx.lineWidth=1;fx.strokeStyle='rgba(255,255,255,.55)';fx.beginPath();fx.arc(x,y,R*br*1.02,-2.4,-.6);fx.stroke();
   ring(0,Math.PI)}
+/* ── Küme dünyaları: her kümenin merkezi kendi karakteriyle (kara delik gibi) — renk kümenin rengi ── */
+const WORLD_KINDS=[['gaz','Halkalı gaz devi'],['okyanus','Okyanus dünyası'],['pulsar','Pulsar'],['ikili','İkili yıldız'],['sarmal','Sarmal galaksi'],['yildiz','Yıldız'],['ay','Kraterli ay']];
+const WORLD_EXT={gaz:1.3,okyanus:1.35,pulsar:1.25,ikili:1.7,sarmal:2,yildiz:1,ay:1.1};
+function worldOf(g){if(g==='_other')return groups._other?.world||'ay';const w=groups[g]?.world;if(w&&WORLD_EXT[w])return w;const ids=Object.keys(groups).filter(k=>k!=='_other').sort();return WORLD_KINDS[Math.max(0,ids.indexOf(g))%6][0]}
+const hexRGB=h=>{h=String(h).replace('#','');if(h.length===3)h=h.split('').map(c=>c+c).join('');const n=parseInt(h,16);return[(n>>16)&255,(n>>8)&255,n&255]};
+const blend=(c1,c2,t)=>{const a=hexRGB(c1),b=hexRGB(c2);return'#'+a.map((v,i)=>Math.round(v+(b[i]-v)*t).toString(16).padStart(2,'0')).join('')};
+const mixc=(col,t,a=1)=>{const c=hexRGB(col),m=t>=0?255:0,k=Math.abs(t);return`rgba(${c.map(v=>Math.round(v+(m-v)*k)).join(',')},${a})`};
+function wglow(x,y,r0,r1,col,a){const g=fx.createRadialGradient(x,y,r0,x,y,r1);g.addColorStop(0,hexA(col,a));g.addColorStop(1,hexA(col,0));fx.fillStyle=g;fx.beginPath();fx.arc(x,y,r1,0,6.2832);fx.fill()}
+function shade(x,y,R,dark){const g=fx.createRadialGradient(x-R*.45,y-R*.45,R*.1,x,y,R*1.05);g.addColorStop(0,'rgba(255,255,255,.18)');g.addColorStop(.55,'rgba(0,0,0,0)');g.addColorStop(1,`rgba(0,0,0,${dark?.62:.4})`);fx.fillStyle=g;fx.beginPath();fx.arc(x,y,R,0,6.2832);fx.fill()}
+function drawWorld(kind,x,y,R,col,time,ph,dark,Z){const t=MOTION==='off'?0:time,lw=v=>Math.max(.8,v*Math.min(1.3,Z));
+  if(kind==='yildiz')return drawSun(x,y,R,col,time,ph,dark,Z);
+  if(kind==='gaz'){const S=R*1.18;wglow(x,y,S*.8,S*3.6,col,dark?.32:.18);
+    const ring=front=>{fx.save();fx.translate(x,y);fx.rotate(-.32+Math.sin(ph)*.15);fx.scale(1,.3);
+      for(const [r0,r1,a] of [[1.45,1.95,.75],[2.02,2.35,.45],[2.4,2.55,.3]]){fx.beginPath();front?(fx.arc(0,0,S*r1,0,Math.PI),fx.arc(0,0,S*r0,Math.PI,0,true)):(fx.arc(0,0,S*r1,Math.PI,6.2832),fx.arc(0,0,S*r0,6.2832,Math.PI,true));fx.closePath();fx.fillStyle=mixc(col,.35,(dark?a:a*.8));fx.fill()}fx.restore()};
+    ring(false);fx.save();fx.beginPath();fx.arc(x,y,S,0,6.2832);fx.clip();fx.fillStyle=mixc(col,-.15);fx.fillRect(x-S,y-S,S*2,S*2);
+    for(let i=-5;i<=5;i++){const by=y+i*S*.2+Math.sin(i*1.7+ph)*S*.04,h=S*(.08+.06*((i+7)%3)/2),dx=Math.sin(t*.25+i)*S*.06;fx.fillStyle=mixc(col,i%2?.32:-.35,.8);fx.beginPath();fx.ellipse(x+dx,by,S*1.3,h,0,0,6.2832);fx.fill()}
+    fx.fillStyle=mixc(col,-.45,.85);fx.beginPath();fx.ellipse(x+S*.35+Math.sin(t*.3)*S*.05,y+S*.28,S*.2,S*.11,0,0,6.2832);fx.fill();shade(x,y,S,dark);fx.restore();
+    fx.lineWidth=lw(1.2);fx.strokeStyle=mixc(col,.5,.6);fx.beginPath();fx.arc(x,y,S*1.01,-2.6,-.4);fx.stroke();ring(true);return}
+  if(kind==='okyanus'){const S=R*1.2,ma=t*.5+ph,mx=x+Math.cos(ma)*S*2.1,my=y+Math.sin(ma)*S*.55,mr=S*.26,moon=()=>{const g=fx.createRadialGradient(mx-mr*.4,my-mr*.4,mr*.1,mx,my,mr);g.addColorStop(0,'#E9E9EE');g.addColorStop(1,'#7A7A86');fx.fillStyle=g;fx.beginPath();fx.arc(mx,my,mr,0,6.2832);fx.fill()};
+    wglow(x,y,S*.9,S*2.8,col,dark?.3:.16);if(Math.sin(ma)<0)moon();
+    fx.save();fx.beginPath();fx.arc(x,y,S,0,6.2832);fx.clip();const sea=blend(col,'#1E5FD8',.62),og=fx.createLinearGradient(x,y-S,x,y+S);og.addColorStop(0,mixc(sea,-.05));og.addColorStop(1,mixc(sea,-.5));fx.fillStyle=og;fx.fillRect(x-S,y-S,S*2,S*2);
+    const span=S*4;for(let i=0;i<5;i++){const bx=x-S*2+((i*S*.9+t*S*.12+ph*20)%span),by=y+Math.sin(i*2.3+ph)*S*.55;fx.fillStyle=mixc(blend('#5FA86A',col,.25),.05,.95);fx.beginPath();fx.ellipse(bx,by,S*(.35+.15*(i%2)),S*(.22+.08*(i%3)),i*.7,0,6.2832);fx.fill()}
+    for(let i=0;i<4;i++){const bx=x-S*2+((i*S*1.1+t*S*.22)%span),by=y+Math.cos(i*1.9+ph)*S*.6;fx.fillStyle='rgba(255,255,255,.5)';fx.beginPath();fx.ellipse(bx,by,S*.42,S*.07,-.2,0,6.2832);fx.fill()}
+    shade(x,y,S,dark);fx.restore();fx.lineWidth=lw(2.2);fx.strokeStyle=mixc(col,.55,dark?.55:.4);fx.beginPath();fx.arc(x,y,S*1.04,0,6.2832);fx.stroke();if(Math.sin(ma)>=0)moon();return}
+  if(kind==='pulsar'){const p=.75+.25*Math.sin(t*9+ph),a=t*1.6+ph,L=R*7;wglow(x,y,R*.3,R*3*p,col,dark?.5:.28);
+    fx.save();if(dark)fx.globalCompositeOperation='lighter';
+    for(const d of [0,Math.PI]){const g=fx.createLinearGradient(x,y,x+Math.cos(a+d)*L,y+Math.sin(a+d)*L*.6);g.addColorStop(0,mixc(col,.6,dark?.7:.45));g.addColorStop(1,mixc(col,.3,0));fx.fillStyle=g;fx.beginPath();fx.moveTo(x,y);
+      fx.lineTo(x+Math.cos(a+d-.13)*L,y+Math.sin(a+d-.13)*L*.6);fx.lineTo(x+Math.cos(a+d+.13)*L,y+Math.sin(a+d+.13)*L*.6);fx.closePath();fx.fill()}fx.restore();
+    fx.lineWidth=lw(1);for(let i=1;i<=2;i++){fx.strokeStyle=hexA(col,(dark?.35:.25)/i);fx.beginPath();fx.ellipse(x,y,R*1.1*i,R*.45*i,a+Math.PI/2,0,6.2832);fx.stroke()}
+    const c=fx.createRadialGradient(x,y,0,x,y,R*.6);c.addColorStop(0,'#fff');c.addColorStop(.5,mixc(col,.6));c.addColorStop(1,hexA(col,.0));fx.fillStyle=c;fx.beginPath();fx.arc(x,y,R*.6*(.9+.1*p),0,6.2832);fx.fill();return}
+  if(kind==='ikili'){const a=t*.9+ph,d=R*.95,ax=x+Math.cos(a)*d*.55,ay=y+Math.sin(a)*d*.35,bx=x-Math.cos(a)*d,by=y-Math.sin(a)*d*.6,c2=mixc(col,.65);
+    fx.lineWidth=lw(1);fx.strokeStyle=hexA(col,.2);fx.beginPath();fx.ellipse(x,y,d,d*.6,0,0,6.2832);fx.stroke();
+    fx.lineWidth=lw(2.4);const sg=fx.createLinearGradient(bx,by,ax,ay);sg.addColorStop(0,'rgba(255,255,255,.75)');sg.addColorStop(1,hexA(col,.15));fx.strokeStyle=sg;fx.beginPath();fx.moveTo(bx,by);fx.quadraticCurveTo(x+Math.sin(a)*R*.7,y-Math.cos(a)*R*.7,ax,ay);fx.stroke();
+    const star=(sx,sy,rr,cc,glowA)=>{wglow(sx,sy,rr*.4,rr*3,col,glowA);const g=fx.createRadialGradient(sx-rr*.3,sy-rr*.3,rr*.1,sx,sy,rr);g.addColorStop(0,'#fff');g.addColorStop(.45,cc);g.addColorStop(1,hexA(col,.8));fx.fillStyle=g;fx.beginPath();fx.arc(sx,sy,rr,0,6.2832);fx.fill()};
+    const big=()=>star(ax,ay,R*.72,mixc(col,.2),dark?.4:.22),small=()=>star(bx,by,R*.42,c2,dark?.3:.16);Math.sin(a)>0?(small(),big()):(big(),small());return}
+  if(kind==='sarmal'){fx.save();fx.translate(x,y);fx.rotate(ph);fx.scale(1,.55);wglow(0,0,R*.2,R*3.6,col,dark?.42:.24);
+    const n=TIER>=2?26:56;for(let k=0;k<2;k++)for(let i=0;i<n;i++){const u=i/n,an=u*4.2+k*Math.PI+t*.12,rr=R*(.4+u*3.1),sz=Math.max(.8,(3.2-u*2.2)*Math.min(1.3,Z));
+      fx.fillStyle=i%5===0?`rgba(255,255,255,${(.95-u*.5).toFixed(2)})`:mixc(col,dark?.4:-.1,Math.min(1,(1.15-u)*(dark?.95:.8)));fx.beginPath();fx.arc(Math.cos(an)*rr+Math.sin(i*7.1)*R*.12,Math.sin(an)*rr+Math.cos(i*5.3)*R*.12,sz,0,6.2832);fx.fill()}
+    const c=fx.createRadialGradient(0,0,0,0,0,R*1.05);c.addColorStop(0,'#fff');c.addColorStop(.3,mixc(col,.55));c.addColorStop(1,hexA(col,0));fx.fillStyle=c;fx.beginPath();fx.arc(0,0,R*1.05,0,6.2832);fx.fill();fx.restore();return}
+  // ay: kraterli gri uydu (Diğer)
+  const S=R*1.05;wglow(x,y,S*.8,S*2.2,dark?'#C8C8D0':'#71717A',dark?.18:.1);fx.save();fx.beginPath();fx.arc(x,y,S,0,6.2832);fx.clip();
+  const g=fx.createLinearGradient(x-S,y-S,x+S,y+S);g.addColorStop(0,dark?'#D4D4DA':'#C4C4CC');g.addColorStop(1,dark?'#8A8A94':'#9A9AA4');fx.fillStyle=g;fx.fillRect(x-S,y-S,S*2,S*2);
+  for(const [u,v,q] of [[-.35,-.25,.28],[.3,.1,.2],[-.05,.45,.16],[.45,-.4,.13],[-.55,.3,.1]]){const cx=x+u*S,cy=y+v*S,cr=q*S;fx.fillStyle='rgba(60,60,70,.28)';fx.beginPath();fx.arc(cx,cy,cr,0,6.2832);fx.fill();fx.lineWidth=lw(.9);fx.strokeStyle='rgba(255,255,255,.35)';fx.beginPath();fx.arc(cx,cy,cr,2.2,5.2);fx.stroke()}
+  shade(x,y,S,dark);fx.restore()}
 /* ── Widget star: cards ride slow rings around their own star, to the right of the galaxy ── */
 const WS={T:0,ts:1,x:0,y:0,rings:[],hov:0};
 let wrKey='';function widgetRings(){let k=WEL.size+':'+(widgets||[]).length;for(const w of widgets||[])k+=w.id[0]+w.id.slice(-3);

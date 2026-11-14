@@ -1032,5 +1032,27 @@
     "fix": "Açı pencerenin ekrandaki yerine göre hesaplanıyor"
    }
   ]
+ },
+ {
+  "at": "2026-11-14T16:24:42",
+  "change": "Galaksi: küme yıldızları artık birer dünya — halkalı gaz devi, okyanus dünyası (uydulu), pulsar, ikili yıldız, sarmal galaksi, yıldız; Diğer için kraterli ay. Küme menüsünden değiştirilebilir",
+  "scores": {
+   "Hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Hub masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Hub",
+    "sev": "bilgi",
+    "status": "fixed",
+    "text": "Yeni dünyalar üç temada 60 FPS; hafif modda sarmal galaksinin nokta sayısı azalıyor, animasyon kapalıyken dünyalar duruyor"
+   }
+  ]
  }
 ]

@@ -23,7 +23,7 @@ Her işte bu dosyadaki standarda uy. Özet:
 ## Projenin haritası (ne nerede)
 - `index.html` — **hub** (galaksi masaüstü). Tek dosya: CSS + JS. Önemli bölümler (`grep` ile bul):
   - Kamera/ızgara: `w2sx`, `cam`, `drawMesh`, `buildMesh` · akıcılık: `TIER`, `perfSample`, `frame()` içindeki kare hızı sınırı
-  - Galaksi: `galaxyModel`, `drawGalaxy`, `drawSun`, `nebula`, `BH_KEY='p:denetci'` · kara delik `drawBH` (Doppler disk, hale, foton halkası) · yörünge izi `drawTrail` (`n.orb`) · derin uzay `drawStars`/`STARS` (koyu temalar, 'evren' hariç; `TIER`'e göre azalır)
+  - Galaksi: `galaxyModel`, `drawGalaxy`, `drawSun`, `nebula`, `BH_KEY='p:denetci'` · kara delik `drawBH` (Doppler disk, hale, foton halkası) · yörünge izi `drawTrail` (`n.orb`) · küme dünyaları `drawWorld`/`worldOf`/`WORLD_KINDS` (gaz, okyanus, pulsar, ikili, sarmal, yildiz, ay; `groups[g].world`, küme menüsünden seçilir) · derin uzay `drawStars`/`STARS` (koyu temalar, 'evren' hariç; `TIER`'e göre azalır)
   - Widget'lar: `const WT={` (clock, weather, focus, rss, gcal, today, timer, cal, streak, links, countdown, habits, word, noise…), `cleanW` kaydedilen alanlar
   - Sekmeli uygulamalar (OS gibi): `TABS`, `openApp`, `switchTo`, `goHome`, `closeTab`, `switcher` (Alt+Q), `#dock`
   - Canlı ada `paintFocusBar`/`islandItems`, radyal menü `radial`, Sakin mod `calm`, komut paleti `palette`/`cmds`

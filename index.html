@@ -1576,7 +1576,7 @@ function showPeek(n){
   PK.el.querySelector('.pk-frame').style.display=TIER>=1?'none':''; // live preview loads a whole app: skip on lighter tiers
   if(PK.key!==a.key&&TIER<1){PK.key=a.key;$('#pkL').classList.remove('done');
     if(a.kind==='draft'){PK.f.setAttribute('sandbox','allow-scripts');PK.f.removeAttribute('src');PK.f.srcdoc=a.html}
-    else{PK.f.removeAttribute('srcdoc');PK.f.removeAttribute('sandbox');PK.f.src=a.url}}
+    else{PK.f.removeAttribute('srcdoc');PK.f.removeAttribute('sandbox');PK.f.src=bust(a.url)}}
   PK.n=n;PK.el.hidden=false;
   const r=n.el.getBoundingClientRect();PK.side=r.right+330<innerWidth?1:-1;
   PK.x=PK.side>0?n.x+52:n.x-352;PK.y=clamp(n.y-90,70,innerHeight-310);
@@ -2483,7 +2483,7 @@ function chrome(on){for(const id of['#hot','#pill','#grab'])$(id).hidden=!on}
 
 function mountFrame(t){const f=document.createElement('iframe'),a=t.app;f.className='frame';f.title=a.name;f.setAttribute('allow','fullscreen; clipboard-write');f.hidden=true;
   if(a.kind==='draft'){f.setAttribute('sandbox','allow-scripts allow-forms allow-modals allow-popups allow-downloads allow-pointer-lock');t.blob=URL.createObjectURL(new Blob([a.html],{type:'text/html'}));f.src=t.blob}
-  else f.src=a.url;
+  else f.src=bust(a.url);
   t.loading=true;f.addEventListener('load',()=>frameLoaded(t,f));W.el.appendChild(f);t.fr=f}
 function dropFrame(t){if(t.fr){t.fr.remove();t.fr=null}if(t.blob){URL.revokeObjectURL(t.blob);t.blob=null}t.loading=false}
 // keep memory in check: the least recently used background apps go to sleep (reloaded when you come back)
@@ -2498,11 +2498,13 @@ function frameLoaded(t,f){if(t.fr!==f)return;t.loading=false;if(curTab()===t&&!W
     w.addEventListener('pointermove',ev=>{if(ev.clientY<8)showPill(0);else if(!$('#pill').classList.contains('hide')&&ev.clientY>80){clearTimeout(pillT);pillT=setTimeout(hidePill,700)}},{passive:true});
     edgeSwipe(w)}catch{}}
 
+/* önbellek kırıcı: yayınlanan yeni sürüm, uygulama penceresinde de en geç 5 dk içinde görünsün */
+const bust=u=>{try{const x=new URL(u,location.href);if(x.origin!==location.origin)return u;x.searchParams.set('v',Math.floor(Date.now()/3e5).toString(36));return x.href}catch{return u}};
 function openApp(a,el){
   if(!a||justDragged||linkDrag)return;hidePeek(true);
   let t=tabOf(a.key);
   if(!t){t={key:a.key,app:a,fr:null,blob:null,t:0,loading:false};TABS.push(t)}
-  else if(a.url&&a.url!==t.app.url&&t.fr&&a.kind!=='draft'){t.app=a;try{t.fr.contentWindow.location.replace(new URL(a.url,location.href).href)}catch{t.fr.src=a.url}}
+  else if(a.url&&a.url!==t.app.url&&t.fr&&a.kind!=='draft'){t.app=a;try{t.fr.contentWindow.location.replace(bust(a.url))}catch{t.fr.src=bust(a.url)}}
   switchTo(a.key,el);
 }
 function switchTo(key,el){

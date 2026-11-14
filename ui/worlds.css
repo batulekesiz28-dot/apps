@@ -339,6 +339,9 @@ body.locked .world{display:none}
 .sp-ghost .w-ic{width:48px;height:48px;border-radius:14px}
 .sp-win{touch-action:pan-y;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 @media (max-width:759px){.sp-drop{bottom:250px}.sp-hint{top:auto;bottom:250px;font-size:12px}.sp-menu button{min-height:44px}}
+.sp-slot{position:absolute;left:-48px;top:-56px;width:96px;height:96px;border-radius:50%;border:2px dashed var(--gc,#fff);background:color-mix(in srgb,var(--gc,#9DB4FF) 18%,transparent);opacity:0;transition:transform .3s cubic-bezier(.16,1,.3,1),opacity .2s;pointer-events:none}
+.sp-slot.on{opacity:1}
+@media (max-width:759px){.sp-slot{left:-38px;top:-56px;width:76px;height:76px}}
 /* ana görünüm */
 .sp-home{left:50%;top:42%;right:auto;bottom:auto;width:0;height:0}
 .sp-hi{position:absolute;left:-60px;top:-62px;width:120px;display:flex;flex-direction:column;align-items:center;gap:10px;padding:6px 0!important;transform-style:preserve-3d}

@@ -232,17 +232,17 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
       <aside class="sp-side sp-left" data-side="left"><div data-live="today"></div><button class="sp-grab" aria-label="Bugün penceresini taşı (çift tık: yerine koy)"></button></aside>
       <div class="sp-ringw"><div class="sp-shadow" aria-hidden="true"></div><div class="sp-ring" role="listbox" aria-label="Gruplara göre uygulamalar halkası">${SP.list.map((a,i)=>{const g=SP.G[a.gi];return`<button class="sp-win" role="option" data-i="${i}" data-key="${esc(a.key)}" style="--gc:${esc(g.color)}" aria-label="${esc(a.name)} — ${esc(g.name)}"><em class="sp-tag"><i></i>${esc(g.name)}</em><span class="sp-ic">${appIcon(a)}</span><b>${esc(a.name)}</b><small>${esc(a.desc.slice(0,80))}</small></button>`}).join('')}
         ${SP.G.length>1?SP.G.map((g,gi)=>`<button class="sp-gt" data-g="${gi}" style="--gc:${esc(g.color)}" tabindex="-1"><i></i>${esc(g.name)}<small>${g.apps.length}</small></button>`).join(''):''}</div></div>
-      <div class="sp-home" role="list" aria-label="Ana görünüm, gruplara göre">${SP.G.length>1?SP.G.map((g,gi)=>`<p class="sp-gh" data-g="${gi}" style="--gc:${esc(g.color)}" title="${g.id[0]==='_'?'Otomatik grup':'Çift tık: yeniden adlandır'}"><i></i><span>${esc(g.name)}</span></p>`).join(''):''}${SP.list.map((a,i)=>`<button class="sp-hi" role="listitem" data-i="${i}" data-key="${esc(a.key)}" title="${esc(a.desc)}" style="--gc:${esc(SP.G[a.gi].color)}"><span class="sp-hb">${appIcon(a)}</span><b>${esc(a.name)}</b></button>`).join('')}</div>
+      <div class="sp-home" role="list" aria-label="Ana görünüm, gruplara göre"><i class="sp-slot" aria-hidden="true"></i>${SP.G.length>1?SP.G.map((g,gi)=>`<p class="sp-gh" data-g="${gi}" style="--gc:${esc(g.color)}" title="${g.id[0]==='_'?'Otomatik grup':'Çift tık: yeniden adlandır'}"><i></i><span>${esc(g.name)}</span></p>`).join(''):''}${SP.list.map((a,i)=>`<button class="sp-hi" role="listitem" data-i="${i}" data-key="${esc(a.key)}" title="${esc(a.desc)}" style="--gc:${esc(SP.G[a.gi].color)}"><span class="sp-hb">${appIcon(a)}</span><b>${esc(a.name)}</b></button>`).join('')}</div>
       <aside class="sp-side sp-right" data-side="right"><div data-live="notes"></div><button class="sp-grab" aria-label="Son sayfalar penceresini taşı (çift tık: yerine koy)"></button></aside></div></div>
     <div class="sp-find" aria-live="polite"></div>
-    <div class="sp-hint">${mobile()?'Uzun bas ve sürükle: gruba taşı':'Uzun bas ya da sürükle: gruba taşı, sırala · Sağ tık: menü · Grup adına çift tık: yeniden adlandır'}</div>
+    <div class="sp-hint">${mobile()?'Uzun bas, sürükle: yuvaya otomatik hizalanır':'Uzun bas ya da sürükle: bir yuvaya taşı, otomatik hizalanır · Sağ tık: menü · Grup adına çift tık: yeniden adlandır'}</div>
     <div class="sp-drop" aria-hidden="true">${SP.G.map(g=>`<span data-drop="${esc(g.id)}" style="--gc:${esc(g.color)}"><i></i>${esc(g.name)}</span>`).join('')}<span data-drop="_new">＋ Yeni grup</span></div>
     <div class="sp-cap" aria-live="polite"></div>
     <div class="sp-crown" role="slider" tabindex="0" aria-label="Dalma düzeyi (tıkla: odaya dön / ortama dal)" aria-valuemin="0" aria-valuemax="100" title="Dalma — kaydır, sürükle ya da [ ] tuşları"><i class="cr-fill"></i><i class="cr-rid"></i><span></span></div>
     <div class="sp-envp" role="dialog" aria-label="Ortamlar" hidden><p class="sp-k">Ortam</p>
       <div class="sp-envs">${SP.ENVS.map(([k,n])=>`<button data-env="${k}" aria-pressed="false"><i class="ept ept-${k}"></i><span>${n}</span></button>`).join('')}</div>
       <label class="sp-imm"><span>Dalma</span><input type="range" min="0" max="100" step="1" aria-label="Dalma düzeyi"><b></b></label>
-      <button class="sp-recenter" data-sp="center">Ortala <kbd>0</kbd></button><button class="sp-recenter" data-sp="relayout">Izgara düzenini sıfırla</button></div>
+      <button class="sp-recenter" data-sp="center">Ortala <kbd>0</kbd></button></div>
     <nav class="sp-orn" aria-label="Mekânsal gezinme"><button data-rot="-1" class="sp-arr" aria-label="Önceki uygulama">‹</button>
       <span class="sp-seg" role="group" aria-label="Görünüm"><button data-sp="halka" aria-pressed="false">Halka</button><button data-sp="izgara" aria-pressed="false">Izgara</button></span>
       <button data-act="ara">Ara</button><button data-act="today">Bugün</button><button data-sp="envp" aria-expanded="false">Ortam</button><button data-act="world">Arayüz</button><button data-rot="1" class="sp-arr" aria-label="Sonraki uygulama">›</button></nav></div>`},
@@ -280,21 +280,23 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
   turn(root,dx){SP.rotTo(root,(SP.f+dx+SP.n)%SP.n)},
   goTo(root,i){if(SP.cfg.mode==='izgara'){SP.sel=i;root.querySelectorAll('.sp-hi')[i]?.focus({preventScroll:true});SP.cap(root);return}SP.rotTo(root,i)},
   /* ana görünüm: hafif kavisli petek */
-  home(root){const m=mobile(),sx=m?100:140,sy=m?116:140,lh=m?32:42,gx=m?18:64,gy=m?14:30,maxW=m?330:Math.max(560,Math.min(1120,innerWidth*.6)),multi=SP.G.length>1;
-    const bl=SP.G.map(g=>{const c=Math.min(m?3:(multi?3:5),g.apps.length),rw=Math.ceil(g.apps.length/c);return{g,c,w:c*sx,h:(multi?lh:0)+rw*sy}});
-    const rows=[];let cur=[],cw=0;bl.forEach(b=>{if(cur.length&&cw+gx+b.w>maxW){rows.push(cur);cur=[];cw=0}cw+=(cur.length?gx:0)+b.w;cur.push(b)});if(cur.length)rows.push(cur);
-    const rh=rows.map(r=>Math.max(...r.map(b=>b.h)));let H=rh.reduce((a,b)=>a+b,0)+gy*(rows.length-1);
-    const it=[...root.querySelectorAll('.sp-hi')],gh=[...root.querySelectorAll('.sp-gh')],curve=(x,y,z)=>{const u=x/(maxW/2);return[(-u*u*(m?30:110)+(z||0)).toFixed(0),(-u*(m?8:16)).toFixed(1)]};
-    let y=-H/2;SP.pos=[];rows.forEach((row,ri)=>{let x=-(row.reduce((a,b)=>a+b.w,0)+gx*(row.length-1))/2;
-      row.forEach(b=>{const cx=x+b.w/2,[z,ry]=curve(cx);b.g.box={x0:x-gx/2,x1:x+b.w+gx/2,y0:y-gy/2,y1:y+b.h+gy/2};const L=gh[SP.G.indexOf(b.g)];if(L)L.style.transform=`translate3d(calc(${cx.toFixed(0)}px - 50%),${(y).toFixed(0)}px,${z}px) rotateY(${ry}deg)`;
-        b.g.apps.forEach((a,j)=>{const c=j%b.c,r=Math.floor(j/b.c),inRow=Math.min(b.c,b.g.apps.length-r*b.c),ix=x+(b.w-inRow*sx)/2+c*sx+sx/2,iy=y+(multi?lh:0)+r*sy+sy/2,[zz,rr]=curve(ix);
-          SP.pos[a.si]={x:ix,y:iy};const el=it[a.si];if(el){el.style.transform=`translate3d(${ix.toFixed(0)}px,${iy.toFixed(0)}px,${zz}px) rotateY(${rr}deg)`;el.style.setProperty('--d',(a.si*45)+'ms')}});
-        x+=b.w+gx});y+=rh[ri]+gy});
-    const fp=SP.cfg.pos||{};SP.list.forEach(a=>{const q=fp[a.key];if(!q)return;SP.pos[a.si]={x:q[0],y:q[1]};const el=it[a.si];if(el){const[zz,rr]=curve(q[0]);el.style.transform=`translate3d(${q[0]}px,${q[1]}px,${zz}px) rotateY(${rr}deg)`}});
-    if(multi&&Object.keys(fp).length)SP.G.forEach((g,gi)=>{const L=gh[gi];if(!L)return;const ps=g.apps.map(a=>SP.pos[a.si]).filter(Boolean),mx=ps.reduce((s,q)=>s+q.x,0)/ps.length,my=Math.min(...ps.map(q=>q.y))-sy/2-lh+4,[z,ry]=curve(mx);
-      L.style.transform=`translate3d(calc(${mx.toFixed(0)}px - 50%),${my.toFixed(0)}px,${z}px) rotateY(${ry}deg)`});
-    const ys=SP.pos.filter(Boolean).map(q=>q.y);if(ys.length)H=Math.max(H,2*Math.max(...ys.map(Math.abs))+sy);
-    const avail=Math.max(260,innerHeight-(m?300:330)),sc=Math.min(1,avail/H);root.querySelector('.sp-home').style.setProperty('--hs',sc.toFixed(3))},
+  /* ızgara yerleşimi: gruplar küme küme, her uygulama kendi yuvasında (serbest konum yok) */
+  calc(G,fix){const m=mobile(),sx=m?100:140,sy=m?116:140,lh=m?32:42,gx=m?18:64,gy=m?14:30,maxW=m?330:Math.max(520,Math.min(1120,innerWidth>=900?innerWidth-660:innerWidth*.9)),multi=G.length>1;
+    const bl=G.map((g,gi)=>{const n=Math.max(1,g.apps.length),c=Math.min(m?3:(multi?3:5),n),rw=Math.ceil(n/c);return{gi,g,c,w:c*sx,h:(multi?lh:0)+rw*sy}});
+    let rows=[];if(fix)rows=fix.map(r=>r.map(gi=>bl[gi]).filter(Boolean)).filter(r=>r.length);else{let cur=[],cw=0;bl.forEach(b=>{if(cur.length&&cw+gx+b.w>maxW){rows.push(cur);cur=[];cw=0}cw+=(cur.length?gx:0)+b.w;cur.push(b)});if(cur.length)rows.push(cur)}
+    const rh=rows.map(r=>Math.max(...r.map(b=>b.h))),H=rh.reduce((a,b)=>a+b,0)+gy*(rows.length-1),curve=x=>{const u=x/(maxW/2);return[(-u*u*(m?30:110)).toFixed(0),(-u*(m?8:16)).toFixed(1)]};
+    const pos={},lab=[],slots=[];let y=-H/2;
+    rows.forEach((row,ri)=>{let x=-(row.reduce((a,b)=>a+b.w,0)+gx*(row.length-1))/2;
+      row.forEach(b=>{lab[b.gi]={x:x+b.w/2,y};const n=b.g.apps.length,cell=j=>{const c=j%b.c,r=Math.floor(j/b.c),inRow=Math.min(b.c,Math.max(1,n-r*b.c));return{x:x+(b.w-inRow*sx)/2+c*sx+sx/2,y:y+(multi?lh:0)+r*sy+sy/2}};
+        b.g.apps.forEach((a,j)=>{pos[a.key]=cell(j);slots.push({gi:b.gi,before:a.key,...pos[a.key]})});
+        const e=n%b.c===0&&n?{x:x+b.w+sx*.15,y:y+(multi?lh:0)+(Math.ceil(n/b.c)-1)*sy+sy/2}:(()=>{const c=n%b.c,r=Math.floor(n/b.c),inRow=c+1;return{x:x+(b.w-Math.min(b.c,inRow)*sx)/2+c*sx+sx/2,y:y+(multi?lh:0)+r*sy+sy/2}})();
+        slots.push({gi:b.gi,before:null,end:1,...e});x+=b.w+gx});y+=rh[ri]+gy});
+    return{pos,lab,slots,H,curve,sy,multi,rows:rows.map(r=>r.map(b=>b.gi))}},
+  place(root,C,skip){const it=[...root.querySelectorAll('.sp-hi')],gh=[...root.querySelectorAll('.sp-gh')];
+    SP.list.forEach(a=>{const q=C.pos[a.key],el=it[a.si];if(!q||!el||a.si===skip)return;SP.pos[a.si]={x:q.x,y:q.y};const[z,r]=C.curve(q.x);el.style.transform=`translate3d(${q.x.toFixed(0)}px,${q.y.toFixed(0)}px,${z}px) rotateY(${r}deg)`;el.style.setProperty('--d',(a.si*45)+'ms')});
+    gh.forEach(L=>{const q=C.lab[+L.dataset.g];if(!q)return;const[z,r]=C.curve(q.x);L.style.transform=`translate3d(calc(${q.x.toFixed(0)}px - 50%),${q.y.toFixed(0)}px,${z}px) rotateY(${r}deg)`})},
+  home(root){if(SP.cfg.pos){delete SP.cfg.pos;SP.save()}const C=SP.calc(SP.G);SP.pos=[];SP.place(root,C);
+    const avail=Math.max(260,innerHeight-(mobile()?300:330)),sc=Math.min(1,avail/C.H);root.querySelector('.sp-home').style.setProperty('--hs',sc.toFixed(3))},
   mode(root,m){SP.cfg.mode=m;SP.save();const sp=root.querySelector('.sp');sp.dataset.mode=m;
     root.querySelectorAll('[data-sp=halka],[data-sp=izgara]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.sp===m));
     if(m==='izgara'){SP.sel=SP.front();SP.cap(root)}else SP.apply(root);setTimeout(()=>SP.fit(root),550)},
@@ -316,7 +318,7 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
     const ring=root.querySelector('.sp-ring'),scene=root.querySelector('.sp-scene'),stage=root.querySelector('.sp-stage'),crown=root.querySelector('.sp-crown');
     root.addEventListener('click',e=>{const r=e.target.closest('[data-rot]');if(r)return SP.cfg.mode==='izgara'?SP.goTo(root,(SP.sel+(+r.dataset.rot)+SP.n)%SP.n):SP.turn(root,+r.dataset.rot);
       const gt=e.target.closest('.sp-gt');if(gt){SP.rotTo(root,SP.G[+gt.dataset.g].apps[0].si);return}
-      const x=e.target.closest('[data-sp]');if(x){const k=x.dataset.sp;if(k==='halka'||k==='izgara')SP.mode(root,k);else if(k==='envp')SP.envp(root);else if(k==='center')SP.center(root);else if(k==='relayout'){const old=SP.cfg.pos;SP.cfg.pos={};SP.save();SP.home(root);H().toast('Izgara düzeni sıfırlandı',()=>{SP.cfg.pos=old;SP.save();SP.home(root)})}return}
+      const x=e.target.closest('[data-sp]');if(x){const k=x.dataset.sp;if(k==='halka'||k==='izgara')SP.mode(root,k);else if(k==='envp')SP.envp(root);else if(k==='center')SP.center(root);return}
       const ev=e.target.closest('.sp-envs [data-env]');if(ev){SP.env(root,ev.dataset.env);if(SP.cfg.imm<.3)SP.imm(root,.8);return}
       if(!e.target.closest('.sp-envp,[data-sp=envp]')&&!root.querySelector('.sp-envp').hidden)SP.envp(root,false);
       const h=e.target.closest('.sp-hi');if(h){SP.launch(h,h.dataset.key);return}
@@ -362,9 +364,9 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
   menu(root,i,x,y){SP.closeMenu();const a=SP.list[i];if(!a)return;const cur=SP.G[a.gi];
     const bh=a.key===H().bh,opts=bh?[]:SP.G.filter(g=>g!==cur&&!(g.id==='_ai'&&!a.ai)&&!(g.id==='_other'&&a.ai));
     const m=document.createElement('div');m.className='sp-menu';m.setAttribute('role','menu');
-    m.innerHTML=`<p>${esc(a.name)}</p><button role="menuitem" data-m="open">Aç</button>${opts.length?'<p>Taşı</p>':''}${opts.map(g=>`<button role="menuitem" data-m="${esc(g.id)}" style="--gc:${esc(g.color)}"><i></i>${esc(g.name)}</button>`).join('')}${bh?'<p>Galaksinin merkezi, taşınmaz</p>':'<button role="menuitem" data-m="_new">＋ Yeni grup</button>'}${cur.id[0]!=='_'&&!bh?'<button role="menuitem" data-m="_out">Gruptan çıkar</button>':''}${SP.cfg.pos?.[a.key]?'<button role="menuitem" data-m="_home">Kümesine geri koy</button>':''}`;
+    m.innerHTML=`<p>${esc(a.name)}</p><button role="menuitem" data-m="open">Aç</button>${opts.length?'<p>Taşı</p>':''}${opts.map(g=>`<button role="menuitem" data-m="${esc(g.id)}" style="--gc:${esc(g.color)}"><i></i>${esc(g.name)}</button>`).join('')}${bh?'<p>Galaksinin merkezi, taşınmaz</p>':'<button role="menuitem" data-m="_new">＋ Yeni grup</button>'}${cur.id[0]!=='_'&&!bh?'<button role="menuitem" data-m="_out">Gruptan çıkar</button>':''}`;
     root.querySelector('.sp').appendChild(m);const W=m.offsetWidth,Hh=m.offsetHeight;m.style.left=Math.min(x,innerWidth-W-12)+'px';m.style.top=Math.min(y,innerHeight-Hh-12)+'px';
-    m.addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(!b)return;const k=b.dataset.m;SP.closeMenu();if(k==='open')H().open(a.key);else if(k==='_home'){delete SP.cfg.pos[a.key];SP.save();SP.home(root)}else if(k==='_out'){SP.keep=a.key;H().setGroup(a.key,null);H().toast(`${a.name} gruptan çıktı`)}else SP.move(root,i,k)});
+    m.addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(!b)return;const k=b.dataset.m;SP.closeMenu();if(k==='open')H().open(a.key);else if(k==='_out'){SP.keep=a.key;H().setGroup(a.key,null);H().toast(`${a.name} gruptan çıktı`)}else SP.move(root,i,k)});
     m.querySelector('button').focus();setTimeout(()=>addEventListener('pointerdown',SP.mOut=e=>{if(!e.target.closest('.sp-menu'))SP.closeMenu()},true),0)},
   closeMenu(){document.querySelector('.world .sp-menu')?.remove();if(SP.mOut){removeEventListener('pointerdown',SP.mOut,true);SP.mOut=null}},
   rename(root,gi,el){const g=SP.G[gi];if(!g)return;if(g.id[0]==='_'){H().toast('Bu grup otomatik; adı değişmez');return}
@@ -374,24 +376,26 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
     inp.addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter')fin(true);if(e.key==='Escape')fin(false)});inp.addEventListener('blur',()=>fin(true))},
   dnd(root){const home=root.querySelector('.sp-home'),drop=root.querySelector('.sp-drop'),sp=root.querySelector('.sp');let d=null;
     const local=e=>{const c=home.getBoundingClientRect(),k=parseFloat(getComputedStyle(home).getPropertyValue('--hs'))||1;return{x:(e.clientX-c.left)/k,y:(e.clientY-c.top)/k}};
-    const start=()=>{if(SP.list[d.i]?.key===H().bh){H().toast('Denetçi galaksinin merkezi; taşınmaz');d=null;return}d.on=true;d.el.classList.add('drag');sp.classList.add('dragging');SP.closeMenu();navigator.vibrate?.(8)};
+    const start=()=>{if(SP.list[d.i]?.key===H().bh){H().toast('Denetçi galaksinin merkezi; taşınmaz');d=null;return}d.on=true;d.rows=SP.calc(SP.G).rows;d.el.classList.add('drag');sp.classList.add('dragging');SP.closeMenu();navigator.vibrate?.(8)};
+    /* sürüklerken: uygulamayı çıkarılmış hâlde yuvaları hesapla, en yakın yuvayı seç, diğerleri yer açsın */
+    const without=i=>SP.G.map(g=>({...g,apps:g.apps.filter(a=>a.si!==i)})),okG=(g,a)=>!(g.id==='_ai'&&!a.ai)&&!(g.id==='_other'&&a.ai);
     const target=e=>{const hits=document.elementsFromPoint(e.clientX,e.clientY),z=hits.find(n=>n.dataset?.drop);if(z)return{g:z.dataset.drop,z};
-      const lb=hits.find(n=>n.classList?.contains('sp-gh'));if(lb)return{g:SP.G[+lb.dataset.g].id,lb};
-      const p=local(e),py=p.y+20;let near=null,best=1e9;SP.list.forEach(a=>{if(a.si===d.i)return;const q=SP.pos[a.si];if(!q)return;const dist=Math.hypot(q.x-p.x,q.y-py);if(dist<best){best=dist;near=a}});
-      if(near&&best<78){const g=SP.G[near.gi],ix=g.apps.indexOf(near),before=p.x<SP.pos[near.si].x?near.key:(g.apps[ix+1]?.key&&g.apps[ix+1].si!==d.i?g.apps[ix+1].key:null);return{g:g.id,before,near:near.key}}
-      return{free:[Math.round(p.x),Math.round(py)]}};
+      const a=SP.list[d.i],p=local(e),py=p.y+20,C0=d.C0||(d.C0=SP.calc(without(d.i),d.rows));let best=null,bd=1e9;
+      C0.slots.forEach(sl=>{const g=SP.G[sl.gi];if(!okG(g,a))return;const dist=Math.hypot(sl.x-p.x,sl.y-py);if(dist<bd){bd=dist;best=sl}});
+      if(!best)return null;return{g:SP.G[best.gi].id,gi:best.gi,before:best.before}};
+    const preview=t=>{const slot=root.querySelector('.sp-slot'),a=SP.list[d.i];if(!t||t.z||t.gi==null){SP.place(root,SP.calc(SP.G,d.rows),d.i);slot.classList.remove('on');return}
+      const G=without(d.i),g=G[t.gi],ix=t.before?g.apps.findIndex(x=>x.key===t.before):g.apps.length;g.apps=[...g.apps];g.apps.splice(ix<0?g.apps.length:ix,0,a);
+      const C=SP.calc(G,d.rows);SP.place(root,C,d.i);const q=C.pos[a.key],[z,r]=C.curve(q.x);slot.style.transform=`translate3d(${q.x.toFixed(0)}px,${q.y.toFixed(0)}px,${z}px) rotateY(${r}deg)`;slot.style.setProperty('--gc',SP.G[t.gi].color);slot.classList.add('on')};
     home.addEventListener('pointerdown',e=>{const el=e.target.closest('.sp-hi');if(!el||e.button)return;d={el,i:+el.dataset.i,x:e.clientX,y:e.clientY,id:e.pointerId,on:false,touch:e.pointerType!=='mouse'};
       d.t=setTimeout(()=>{if(d&&!d.on){start();if(!d)return;try{el.setPointerCapture(d.id)}catch{}const p=local({clientX:d.x,clientY:d.y});el.style.transform=`translate3d(${p.x.toFixed(0)}px,${(p.y+20).toFixed(0)}px,140px) scale(1.12)`}},380)});
     addEventListener('pointermove',SP.dm=e=>{if(!d||d.id!==e.pointerId)return;const mv=Math.hypot(e.clientX-d.x,e.clientY-d.y);
       if(!d.on){if(d.touch){if(mv>10){clearTimeout(d.t);d=null}return}if(mv<6)return;clearTimeout(d.t);start();if(!d)return;try{d.el.setPointerCapture(d.id)}catch{}}
       e.preventDefault();const p=local(e);d.el.style.transform=`translate3d(${p.x.toFixed(0)}px,${(p.y+20).toFixed(0)}px,140px) scale(1.12)`;
-      const t=target(e);d.t2=t;root.querySelectorAll('.sp-gh').forEach(l=>l.classList.toggle('drop',!!t?.g&&SP.G[+l.dataset.g]?.id===t.g));drop.querySelectorAll('span').forEach(c=>c.classList.toggle('on',!!t?.z&&c===t.z));
-      const tg=t&&SP.G.find(g=>g.id===t.g);root.querySelector('.sp-cap').innerHTML=`<b>${esc(SP.list[d.i].name)}</b><span>${t?.g==='_new'?'Bırak: yeni grup kur':tg?(tg===SP.G[SP.list[d.i].gi]?'Bırak: sırayı değiştir':'Bırak: '+esc(tg.name)+' grubuna taşı'):'Bırak: tam buraya yerleştir'}</span>`},{passive:false});
+      const t=target(e),key=t?(t.z?'z'+t.g:t.gi+'|'+t.before):'';if(key!==d.k){d.k=key;preview(t)}d.t2=t;root.querySelectorAll('.sp-gh').forEach(l=>l.classList.toggle('drop',!!t?.g&&!t.z&&SP.G[+l.dataset.g]?.id===t.g&&SP.G[+l.dataset.g]!==SP.G[SP.list[d.i].gi]));drop.querySelectorAll('span').forEach(c=>c.classList.toggle('on',!!t?.z&&c===t.z));
+      const tg=t&&SP.G.find(g=>g.id===t.g);root.querySelector('.sp-cap').innerHTML=`<b>${esc(SP.list[d.i].name)}</b><span>${t?.g==='_new'?'Bırak: yeni grup kur':tg?(tg===SP.G[SP.list[d.i].gi]?'Bırak: sırayı değiştir':'Bırak: '+esc(tg.name)+' grubuna taşı'):'Bir yuvaya sürükle'}</span>`},{passive:false});
     addEventListener('pointerup',SP.du=e=>{if(!d||d.id!==e.pointerId)return;clearTimeout(d.t);const was=d;d=null;if(!was.on)return;
       sp.classList.remove('dragging');was.el.classList.remove('drag');root.querySelectorAll('.sp-gh.drop').forEach(l=>l.classList.remove('drop'));SP.dragged=true;setTimeout(()=>SP.dragged=false,0);
-      const t=was.t2;if(!t){SP.home(root);SP.cap(root);return}
-      if(t.free){const a=SP.list[was.i];(SP.cfg.pos||={})[a.key]=t.free;SP.save();SP.hinted();SP.home(root);SP.cap(root);return}
-      if(SP.cfg.pos)delete SP.cfg.pos[SP.list[was.i].key];SP.move(root,was.i,t.g,t.before)});
+      root.querySelector('.sp-slot').classList.remove('on');const t=was.t2;if(!t){SP.home(root);SP.cap(root);return}SP.move(root,was.i,t.g,t.before)});
     home.addEventListener('click',e=>{if(SP.dragged){e.stopPropagation();e.preventDefault()}},true);
     /* halka: uzun bas → cam kalkar, grup çiplerine sürükle */
     let L=null;const ring=root.querySelector('.sp-ring');
@@ -400,9 +404,9 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
         const a=SP.list[L.i];L.g=document.createElement('div');L.g.className='sp-ghost';L.g.innerHTML=`${appIcon(a)}<b>${esc(a.name)}</b>`;sp.appendChild(L.g);L.g.style.transform=`translate(${L.x}px,${L.y}px)`;
         root.querySelector('.sp-cap').innerHTML=`<b>${esc(a.name)}</b><span>Bir gruba sürükle ya da bırakıp vazgeç</span>`;try{w.setPointerCapture(L.id)}catch{}},400)});
     addEventListener('pointermove',SP.lm=e=>{if(!L||L.id!==e.pointerId)return;if(!L.on){if(Math.hypot(e.clientX-L.x,e.clientY-L.y)>8){clearTimeout(L.t);L=null}return}
-      e.preventDefault();L.g.style.transform=`translate(${e.clientX}px,${e.clientY}px)`;const hits=document.elementsFromPoint(e.clientX,e.clientY),z=hits.find(n=>n.dataset?.drop),pw=!z&&hits.find(n=>n.classList?.contains('sp-win')&&n!==L.w);L.z=z;L.pw=pw;
+      e.preventDefault();L.g.style.transform=`translate(${e.clientX}px,${e.clientY}px)`;const hits=document.elementsFromPoint(e.clientX,e.clientY),z=hits.find(n=>n.dataset?.drop),pw=!z&&(hits.find(n=>n.classList?.contains('sp-win')&&n!==L.w)||(()=>{let bw=null,bd=1e9;root.querySelectorAll('.sp-win').forEach(w=>{if(w===L.w||w.style.visibility==='hidden')return;const b=w.getBoundingClientRect(),dd=Math.hypot(b.left+b.width/2-e.clientX,b.top+b.height/2-e.clientY);if(dd<bd){bd=dd;bw=w}});return bw})());L.z=z;L.pw=pw;
       drop.querySelectorAll('span').forEach(c=>c.classList.toggle('on',c===z));root.querySelectorAll('.sp-win.target').forEach(w=>w!==pw&&w.classList.remove('target'));if(pw)pw.classList.add('target');
-      const a=SP.list[L.i],tw=pw&&SP.list[+pw.dataset.i];root.querySelector('.sp-cap').innerHTML=`<b>${esc(a.name)}</b><span>${tw?'Bırak: '+esc(tw.name)+' yanına'+(tw.gi!==a.gi?' ('+esc(SP.G[tw.gi].name)+')':''):z?'Bırak: '+esc(z.textContent):'Bir cama ya da gruba sürükle, boşlukta bırakırsan vazgeçersin'}</span>`},{passive:false});
+      const a=SP.list[L.i],tw=pw&&SP.list[+pw.dataset.i];root.querySelector('.sp-cap').innerHTML=`<b>${esc(a.name)}</b><span>${tw?'Bırak: '+esc(tw.name)+' yanına'+(tw.gi!==a.gi?' ('+esc(SP.G[tw.gi].name)+')':''):z?'Bırak: '+esc(z.textContent):'Bir cama ya da gruba sürükle'}</span>`},{passive:false});
     addEventListener('pointerup',SP.lu=e=>{if(!L||L.id!==e.pointerId)return;clearTimeout(L.t);const was=L;L=null;if(!was.on)return;
       SP.lift=false;SP.dragged=true;setTimeout(()=>SP.dragged=false,0);was.w.classList.remove('lifted');sp.classList.remove('dragging','lifting');was.g.remove();drop.querySelectorAll('.on').forEach(c=>c.classList.remove('on'));
       root.querySelectorAll('.sp-win.target').forEach(w=>w.classList.remove('target'));

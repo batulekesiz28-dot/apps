@@ -957,5 +957,35 @@
     "fix": "Beyaz ve daha az saydam"
    }
   ]
+ },
+ {
+  "at": "2026-11-14T11:23:10",
+  "change": "Mekânsal: serbest yerleşim kaldırıldı; uygulamalar sadece yuvalara taşınıyor ve otomatik hizalanıyor (sürüklerken yer açılıyor)",
+  "scores": {
+   "Mekânsal telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Mekânsal masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Mekânsal",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Sürükleme başlayınca ızgara yeniden dizilip hedef parmağın altından kaçıyordu",
+    "fix": "Sürükleme boyunca satır düzeni sabit, sadece hedef küme yer açıyor"
+   },
+   {
+    "app": "Mekânsal",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Kümeler yan pencerelerin altına giriyordu",
+    "fix": "Izgara genişliği yan pencerelere göre sınırlı"
+   }
+  ]
  }
 ]

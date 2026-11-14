@@ -1054,5 +1054,35 @@
     "text": "Yeni dünyalar üç temada 60 FPS; hafif modda sarmal galaksinin nokta sayısı azalıyor, animasyon kapalıyken dünyalar duruyor"
    }
   ]
+ },
+ {
+  "at": "2026-11-14T16:29:27",
+  "change": "Galaksi: uygulamalar yuvarlak mini gezegenler (küre gölgesi, parlama, atmosfer halkası); küme yörüngeleri arası açıldı, uygulamalar artık üst üste binmiyor",
+  "scores": {
+   "Hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Hub masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Hub",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Aynı kümedeki uygulamalar yan yörüngelerde hizalanınca üst üste biniyordu",
+    "fix": "Yörünge aralığı 66'dan 88'e, gezegenler 48 piksele; en yakın mesafe hep 88"
+   },
+   {
+    "app": "Hub",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Dış yörüngelerde iz çizgisi bazen tam daire çiziliyordu",
+    "fix": "İz yayı artık hiç sarmıyor"
+   }
+  ]
  }
 ]

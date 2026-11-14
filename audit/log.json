@@ -1732,5 +1732,47 @@
     "text": "Telefonda hafta görünümünde sütunlar dar; uzun başlıklar kısalıyor (gün görünümü tam gösteriyor)"
    }
   ]
+ },
+ {
+  "at": "2026-11-14T20:55:30",
+  "change": "Notlar: mat cam tasarım sistemi (glass.css) — derin koyu zemin, yarı opak füme kapsül menü ve kenar menü, beyaz sade yazı (tek sans aile), aktif öğe açık mat yüzey, takvimde nötr bloklar + küçük renk göstergesi, görevlerde tek renkli daireler ve sağda hizalı bilgi; bir kereliğine koyu temaya geçiş",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Başlıklarda serif, etiketlerde daktilo yazısı karışıktı",
+    "fix": "Tek sans yazı ailesi"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Görev ayrıntı panelinde başlık hâlâ serifti",
+    "fix": "Serif değişkeni sans'a bağlandı"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "open",
+    "text": "Library (medya/kütüphane) kendi sıcak renkli tasarımında kaldı; bu dile geçirilmedi"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "open",
+    "text": "Hub'da bir tema evreni (Evren, Neon…) seçiliyse renkleri o tema belirler; yüzey ve yazı kuralları yine uygulanır"
+   }
+  ]
  }
 ]

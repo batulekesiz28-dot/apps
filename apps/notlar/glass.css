@@ -1,0 +1,144 @@
+/* ══ Notlar · mat cam tasarım sistemi ═════════════════════════════════════
+   Referans: Apple TV üst kapsül menü + kenar menü, koyu operasyon panelleri.
+   Derin koyu zemin · arkası hissedilen yarı opak füme yüzeyler · beyaz sade yazı ·
+   aktif öğe = daha açık mat yüzey · çok az renk · kontrollü blur (yalnızca
+   gezinme ve yüzen paneller). Bu dosya EN SON yüklenir; mevcut stilleri ezer.
+   Renk paleti yalnızca hub teması seçili değilken; yüzey ve yazı kuralları her
+   koyu temada geçerli. */
+
+/* ── 1. Ölçüler (her tema) ── */
+:root{--r-s:8px;--r-m:12px;--r-l:18px;--h-ctl:32px;--serif:var(--font)}  /* tek yazı ailesi: serif başlıklar da sans */
+
+/* ── 2. Renk paleti (koyu, hub teması yok) ── */
+html[data-theme=dark]:not([data-skin]){
+  --bg:#0C0C0E;--panel:#141416;--card:#1C1C1F;--tint:#18181B;
+  --ink:#F5F5F7;--ink2:#AEAEB5;--ink3:#8E8E96;--ink4:#46464C;
+  --line:rgba(255,255,255,.07);--line2:rgba(255,255,255,.1);--hover:rgba(255,255,255,.05);--hover2:rgba(255,255,255,.08);
+  --sel:rgba(255,255,255,.12);--accent:#0A84FF;
+  --shadow:0 0 0 .5px rgba(255,255,255,.09),0 24px 60px -20px rgba(0,0,0,.75);
+}
+/* zemin: düz siyah değil — çok hafif ortam ışığı, cam yüzeyler bunun üstünde "hissedilir" */
+html[data-theme=dark]:not([data-skin]) body{
+  background:radial-gradient(70% 55% at 10% -10%,rgba(128,138,168,.14),transparent 70%),
+             radial-gradient(55% 45% at 100% 108%,rgba(150,132,120,.08),transparent 70%),var(--bg);
+  background-attachment:fixed}
+
+/* ── 3. Malzeme (her koyu tema) ── */
+html[data-theme=dark]{
+  --glass:rgba(34,34,38,.56);--glass-strong:rgba(26,26,30,.74);--glass-hi:rgba(255,255,255,.13);
+  --glass-line:rgba(255,255,255,.085);--glass-fx:saturate(1.6) blur(26px);
+  --field:rgba(255,255,255,.045);--field-hi:rgba(255,255,255,.075);
+}
+
+/* ── 4. Tipografi (her tema): tek sans aile, tutarlı ölçek, daktilo etiket yok ── */
+.cal-h h1,.tm-ph h1,.tk-head h1,.dp h2,.hello h1,.pg-title,.tk-pn,.tm-ed-t{font-family:var(--font)!important;font-weight:600;letter-spacing:-.022em}
+.cal-h h1,.cal .cal-h h1,.tm-ph h1,.tk-head h1{font-size:26px;line-height:1.2}
+.cal-h h1 em,.cal .cal-h h1 em{font-size:inherit;font-weight:400;margin-left:6px;color:var(--ink3)}
+.dp h2,.cal .dp h2{font-size:20px;line-height:1.25}
+.hello h1{font-size:30px;line-height:1.2}.hello h1 em{font-style:normal}
+.pg-title{font-size:32px;line-height:1.2}
+.tm-ed-t{font-size:20px}
+.sh,.hello p,.grp,.card small,.saved,.muted,.ni .cnt,.pop-h,.ag .d,.wd span,.tld small,.pgn,.tk-tabs em,.tm-cc,.tk-spark small,.tk-col header em,.tk-day header em,
+.cal .sh,.tm-page .sh,.dp .wd,.dp .row small{font-family:var(--font)!important;letter-spacing:0!important;text-transform:none!important}
+.sh{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:10px}.sh .rule{display:none}.sh a{font-size:12.5px;font-weight:400}
+.hello p{font-size:13px;font-weight:400;margin-top:6px}
+.grp{font-size:12px;font-weight:500}
+.card small,.saved,.muted,.ni .cnt,.dp .row small{font-size:12px;font-weight:400}
+.tk-tabs em{font-size:12px;font-weight:500}
+
+/* ── 5. Üst gezinme: yüzen kapsüller ── */
+html[data-theme=dark] .top{background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none}
+html[data-theme=dark] .top::after{opacity:0}
+html[data-theme=dark] .tnav,html[data-theme=dark] .top .modes{padding:4px;gap:2px;border-radius:999px;background:var(--glass);
+  backdrop-filter:var(--glass-fx);-webkit-backdrop-filter:var(--glass-fx);box-shadow:inset 0 0 0 .5px var(--glass-line)}
+html[data-theme=dark] .tnav a,html[data-theme=dark] .tnav button,html[data-theme=dark] .top .modes a{height:30px;padding:0 13px;border-radius:999px;color:var(--ink2)}
+html[data-theme=dark] .tnav a:hover,html[data-theme=dark] .top .modes a:hover{color:var(--ink)}
+html[data-theme=dark] .tnav .on,html[data-theme=dark] .top .modes a.on{color:var(--ink)}
+html[data-theme=dark] .tnav .tk,html[data-theme=dark] .top .modes .mk{top:4px;bottom:4px;border-radius:999px;background:var(--glass-hi);box-shadow:none}
+html[data-theme=dark] .tb.sbt,html[data-theme=dark] .tb.tai,html[data-theme=dark] .tb.tsrch{width:38px;height:38px;border-radius:50%;color:var(--ink2);background:var(--glass);
+  backdrop-filter:var(--glass-fx);-webkit-backdrop-filter:var(--glass-fx);box-shadow:inset 0 0 0 .5px var(--glass-line)}
+html[data-theme=dark] .tb.sbt:hover,html[data-theme=dark] .tb.tai:hover,html[data-theme=dark] .tb.tsrch:hover,
+html[data-theme=dark] .tb.sbt.on,html[data-theme=dark] .tb.tai.on{color:var(--ink);background:var(--glass-hi)}
+html[data-theme=dark] .tnav .li,html[data-theme=dark] .top .modes .li{width:15px;height:15px;stroke-width:1.6}
+
+/* ── 6. Kenar menü: dar, düzenli; profil → arama → öğeler, ince ayraçlar ── */
+html[data-theme=dark] .side{border-radius:var(--r-l);background:var(--glass-strong);backdrop-filter:var(--glass-fx);-webkit-backdrop-filter:var(--glass-fx);
+  box-shadow:inset 0 0 0 .5px var(--glass-line),0 30px 80px -30px rgba(0,0,0,.7);width:min(268px,calc(100vw - 20px))}
+html[data-theme=dark] .ws{padding:16px 14px 10px 16px}
+html[data-theme=dark] .srch{height:34px;margin:2px 10px 10px;padding:0 10px;border-radius:10px;background:var(--field);box-shadow:inset 0 0 0 .5px var(--glass-line)}
+html[data-theme=dark] .srch:hover{background:var(--field-hi)}
+html[data-theme=dark] .ni{height:34px;padding:0 10px;border-radius:10px;gap:11px;color:var(--ink2)}
+html[data-theme=dark] .ni:hover{background:var(--hover)}
+html[data-theme=dark] .ni.on{background:var(--glass-hi);color:var(--ink);font-weight:500}
+html[data-theme=dark] .ni .ic{color:var(--ink3)}html[data-theme=dark] .ni.on .ic{color:var(--ink)}
+html[data-theme=dark] .grp{margin:10px 2px 0;padding:14px 8px 6px;border-top:.5px solid var(--line);color:var(--ink3)}
+html[data-theme=dark] .side-f{border-top-color:var(--line)}
+
+/* ── 7. Kontroller: segment, alanlar, düğmeler ── */
+html[data-theme=dark] .tm-mseg,html[data-theme=dark] .tm-seg{padding:3px;gap:2px;border-radius:999px;background:var(--field);box-shadow:inset 0 0 0 .5px var(--glass-line)}
+html[data-theme=dark] .tm-mseg button,html[data-theme=dark] .tm-seg button{height:28px;padding:0 12px;border-radius:999px;color:var(--ink2)}
+html[data-theme=dark] .tm-mseg button.on,html[data-theme=dark] .tm-seg button.on{background:var(--glass-hi);color:var(--ink);box-shadow:none}
+html[data-theme=dark] .tk-tabs .on em{color:var(--ink)}
+html[data-theme=dark] .tm-qa,html[data-theme=dark] .tk-qa,html[data-theme=dark] .tm-sel,html[data-theme=dark] .tm-srch,
+html[data-theme=dark] .tm-row input,html[data-theme=dark] .tm-ed textarea{background:var(--field);box-shadow:inset 0 0 0 .5px var(--glass-line)}
+html[data-theme=dark] .tm-qa,html[data-theme=dark] .tk-qa{border-radius:var(--r-m)}
+html[data-theme=dark] .tm-qa:focus-within,html[data-theme=dark] .tk-qa:focus-within{background:var(--field-hi);box-shadow:inset 0 0 0 .5px rgba(255,255,255,.2)}
+html[data-theme=dark] .tm-qa:focus-within .tm-qa-b{background:var(--glass-hi);color:var(--ink)}
+html[data-theme=dark] .tk-go{background:var(--ink);color:var(--bg)}
+html[data-theme=dark] .tm-btn{border-radius:10px;background:var(--field);box-shadow:inset 0 0 0 .5px var(--glass-line)}
+html[data-theme=dark] .tm-btn:hover{background:var(--field-hi)}
+html[data-theme=dark] .tm-btn.pri{background:var(--glass-hi);color:var(--ink)}html[data-theme=dark] .tm-btn.pri:hover{background:rgba(255,255,255,.18);opacity:1}
+html[data-theme=dark] .pill,html[data-theme=dark] .chip{border-radius:var(--r-s);background:var(--field);box-shadow:inset 0 0 0 .5px var(--glass-line)}
+html[data-theme=dark] .pill:hover,html[data-theme=dark] .chip:hover{background:var(--field-hi)}
+html[data-theme=dark] .tm-qc,html[data-theme=dark] .tm-cat{box-shadow:inset 0 0 0 .5px var(--glass-line)}
+
+/* ── 8. Yüzen paneller: menü, komut paleti, ayrıntı, düzenleme ── */
+html[data-theme=dark] .pop,html[data-theme=dark] .pal,html[data-theme=dark] .tk-dp,html[data-theme=dark] .tm-ed{background:var(--glass-strong);
+  backdrop-filter:var(--glass-fx);-webkit-backdrop-filter:var(--glass-fx);box-shadow:inset 0 0 0 .5px var(--glass-line),0 30px 80px -24px rgba(0,0,0,.75)}
+html[data-theme=dark] .pop{border-radius:14px}html[data-theme=dark] .pal,html[data-theme=dark] .tk-dp,html[data-theme=dark] .tm-ed{border-radius:var(--r-l)}
+html[data-theme=dark] .pal-bg,html[data-theme=dark] .tm-ed-bg{background:rgba(0,0,0,.45)}
+html[data-theme=dark] .mi:hover,html[data-theme=dark] .mi.on{background:var(--hover2)}
+
+/* ── 9. Ana sayfa: kutu yığını yerine sakin yüzeyler ── */
+html[data-theme=dark] .card{background:rgba(255,255,255,.035);box-shadow:inset 0 0 0 .5px var(--glass-line);border-radius:14px}
+html[data-theme=dark] .card:hover{transform:none;background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 .5px rgba(255,255,255,.12)}
+.quick .card{min-height:0}
+
+/* ── 10. Görevler: satır tabanlı liste ── */
+html[data-theme=dark] .tk-row{border-radius:10px}
+html[data-theme=dark] .tk-row:hover{background:rgba(255,255,255,.035)}
+html[data-theme=dark] .tk-row.sel{background:rgba(255,255,255,.06)}
+html[data-theme=dark] .tk-row::after{background:var(--line)}
+html[data-theme=dark] .tk-row>.tk-chk,html[data-theme=dark] .tk-chk{--pc:rgba(255,255,255,.42)}
+html[data-theme=dark] .tk-row>.tk-chk{width:20px;height:20px;box-shadow:inset 0 0 0 1.5px var(--pc)}
+html[data-theme=dark] .tk-row:hover>.tk-chk:not(.on){--pc:rgba(255,255,255,.7)}
+html[data-theme=dark] .tk-chk.on,html[data-theme=dark] .tk-row.done>.tk-chk,html[data-theme=dark] .tk-pop>.tk-chk{background:rgba(255,255,255,.88)!important;box-shadow:none!important}
+html[data-theme=dark] .tk-chk.on::after,html[data-theme=dark] .tk-row.done>.tk-chk::after,html[data-theme=dark] .tk-pop>.tk-chk::after{border-color:#0C0C0E!important}
+html[data-theme=dark] .tk-t{color:var(--ink)}html[data-theme=dark] .tk-row.done .tk-t{color:var(--ink3)}
+html[data-theme=dark] .tk-d{color:var(--ink3)}html[data-theme=dark] .tk-d.late{color:#FF8A66}
+html[data-theme=dark] .tk-h{color:var(--ink2)}
+/* bilgisayarda ikincil bilgiler sağda, aynı sütunda hizalı */
+@media (min-width:761px){
+  .tk-list>.tk-row{align-items:center}
+  .tk-list>.tk-row .tk-main{flex-direction:row;align-items:center;gap:14px}
+  .tk-list>.tk-row .tk-t{flex:1;min-width:0}
+  .tk-list>.tk-row .tk-m{flex-shrink:0;justify-content:flex-end;min-width:72px;font-variant-numeric:tabular-nums}
+  .tk-list>.tk-row .tk-grip{top:50%;transform:translateY(-50%)}
+}
+
+/* ── 11. Takvim: mat bloklar, renk yalnızca küçük göstergede ── */
+html[data-theme=dark] .cal{--gl:rgba(255,255,255,.065)}
+html[data-theme=dark] .cal .tm-ev{background:rgba(255,255,255,.07);color:var(--ink)}
+html[data-theme=dark] .cal .tm-ev.st-plan{background:rgba(255,255,255,.045)}
+html[data-theme=dark] .cal .tm-ev.st-done{background:rgba(255,255,255,.1)}
+html[data-theme=dark] .cal .tm-ev small{color:var(--ink3)}
+html[data-theme=dark] .cal .tm-ev:hover{background:rgba(255,255,255,.1);box-shadow:none}
+html[data-theme=dark] .cal .cd.sel::after{background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 .5px rgba(255,255,255,.14)}
+html[data-theme=dark] .cal .cd::before{background:rgba(255,255,255,.03)}
+html[data-theme=dark] .cal .tm-chip{background:rgba(255,255,255,.06)}
+
+@media (max-width:760px){
+  html[data-theme=dark] .tb.sbt,html[data-theme=dark] .tb.tai,html[data-theme=dark] .tb.tsrch{width:40px;height:40px}
+  html[data-theme=dark] .tnav a,html[data-theme=dark] .tnav button,html[data-theme=dark] .top .modes a{height:36px;min-width:36px;padding:0 10px}
+  .cal-h h1,.cal .cal-h h1,.tm-ph h1,.tk-head h1{font-size:22px}.hello h1{font-size:26px}.pg-title{font-size:28px}
+}

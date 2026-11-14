@@ -1629,5 +1629,42 @@
     "text": "Notların içindeki eski yapılacak satırları ayrı bölümde kalıyor; görev kayıtlarına otomatik taşınmıyor"
    }
   ]
+ },
+ {
+  "at": "2026-11-14T22:44:56",
+  "change": "Görevler sadeleştirildi: 4 sekme (Bugün, Yaklaşan, Tekrarlanan, Tamamlananlar), tek satırlık hızlı ekleme (tarih/saat/tekrar/öncelik isteğe bağlı), küçük ayrıntı paneli",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Görevler ekranı çok kalabalıktı (7 kapsam + 5 görünüm, kanban, projeler)",
+    "fix": "4 sekmeye indirildi; kanban/takvim/proje görünümleri kaldırıldı, veri korunuyor"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Telefonda sekmeler taşıyordu, ayrıntı paneli satırları kırılıyordu",
+    "fix": "Sekmeler sığdırıldı, panel tek sütun"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Yaklaşan listesi her gün tekrarlanan görevlerle doluyordu",
+    "fix": "Her gün/hafta içi tekrarlar Yaklaşan'da gösterilmiyor (Tekrarlanan sekmesinde)"
+   }
+  ]
  }
 ]

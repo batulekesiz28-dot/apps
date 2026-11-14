@@ -299,3 +299,10 @@ Dünyanın en başarılı ürünlerini incele, onların neden başarılı olduğ
 Don't build something that merely works. Build something people genuinely enjoy using.
 
 **Minimal complexity. Maximum quality. Exceptional experience.**
+## Tasarım anlayışı — kesin kural (2026-11, kullanıcı belirledi; diğer her şeyin önünde)
+Referans Apple'ın sadeliği (kopya değil). Amaç daha çok özellik göstermek değil, var olanı en basit şekilde kullandırmak.
+- Son derece sade, premium; temiz tipografi, dengeli boşluk, az ama doğru yerde buton, hafif saydam/opak yüzeyler, zarif ve anlamlı geçişler.
+- İlk bakışta anlaşılmalı; bir işi yapmak için birkaç yere tıklatma.
+- YAPMA: gereksiz dashboard, her şeyi karta koymak, büyük renkli kutular, her özellik için ayrı panel, onlarca ayar, süs animasyonu, mevcut tasarımı baştan değiştirmek, çalışanı bozmak, istenmemiş özellik icat etmek.
+- Yeni özellik için yeni ana menü açma; üstteki küçük, yuvarlak, hafif opak şeridi koru, var olan bölümlerin içine yerleştir.
+- Her değişiklikten önce sor: “Bu gerçekten kullanımı kolaylaştırıyor mu?” Hayırsa ekleme.

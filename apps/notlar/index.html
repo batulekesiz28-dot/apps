@@ -438,6 +438,8 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
 @media (max-width:760px){.pgb{min-height:58px}.tw,.tw0{width:36px;height:40px}.ni.tr{padding-left:calc(2px + var(--dp,0)*14px)}.sub-add{height:44px}.crumb .cr{height:40px;max-width:120px}.pgn{display:none}.mv-q{height:40px}}
 </style>
 <script src="../../shared/skin.js"></script>
+<link rel="stylesheet" href="library.css">
+<link rel="stylesheet" href="brain.css">
 </head>
 <body>
 <div class="app" id="app">
@@ -455,6 +457,7 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
     <header class="top" id="top">
       <button class="tb burger" id="burger" title="Menü"><svg class="i" viewBox="0 0 16 16"><path d="M2.5 5h11M2.5 11h11"/></svg></button>
       <div class="crumb" id="crumb"></div>
+      <nav class="modes" id="modes" aria-label="Bölümler"><i class="mk"></i><a href="#home" data-mode="ws"><svg class="li" viewBox="0 0 16 16"><path d="M4 2h5.5L12 4.5V14H4z"/><path d="M9.5 2v2.5H12M6 8h4M6 10.5h4"/></svg><span>Workspace</span></a><a href="#lib" data-mode="lib"><svg class="li" viewBox="0 0 16 16"><path d="M2.5 13.5V3M5.5 13.5V3M8.5 13.5l-1-10 3-.4 1.3 10.2z"/><path d="M1.5 13.5h13"/></svg><span>Library</span></a><a href="#brain" data-mode="brain"><svg class="li" viewBox="0 0 16 16"><circle cx="4" cy="4" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="7" cy="12" r="2"/><path d="M5.8 4.4l4.3.4M5 5.7l1.4 4.4M10.8 6.6L8.3 10.4"/></svg><span>Second Brain</span></a></nav>
       <span class="saved" id="saved"><i></i>kaydedildi</span>
       <div id="topAct" style="display:flex;gap:2px"></div>
     </header>
@@ -473,6 +476,9 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
   </div>
 </div>
 <div class="toasts" id="toasts"></div>
+<script src="kb.js"></script>
+<script src="library.js"></script>
+<script src="brain.js"></script>
 
 <script>
 'use strict';
@@ -561,6 +567,7 @@ const TYPES=[
   {k:'divider',l:'Ayırıcı',d:'Yatay çizgi',kw:'ayirici divider cizgi ---',b:SV('<path d="M2 8h12"/>')},
 ];
 const ACTIONS=[
+  {k:'@lib',l:'Kaynak',d:'Library’den bir PDF, kitap, video ya da site göm',kw:'kaynak library kütüphane pdf kitap video makale link source',b:SV('<path d="M2.5 13.5V3M5.5 13.5V3M8.5 13.5l-1-10 3-.4 1.3 10.2z"/><path d="M1.5 13.5h13"/>')},
   {k:'@page',l:'Sayfa',d:'Bu sayfanın içinde yeni bir sayfa aç',kw:'sayfa page alt link subpage içinde',b:SV('<path d="M4 2h5.5L12 4.5V14H4z"/><path d="M9.5 2v2.5H12"/>')},
   {k:'@date',l:'Bugünün tarihi',d:'Metne bugünün tarihini yaz',kw:'tarih date bugun',b:SV('<rect x="2" y="3" width="12" height="11" rx="2"/><path d="M2 6.5h12"/>')},
   {k:'@due',l:'Tarih ver',d:'Satır o günde de görünsün (yarın, cuma…)',kw:'tarih ver zamanla planla due schedule son gün',b:SV('<rect x="2" y="3" width="12" height="11" rx="2"/><path d="M2 6.5h12M8 8.5v3l2 1"/>')},
@@ -664,9 +671,24 @@ function route(){
   else if(v==='timeline'){view='timeline';openId=null}
   else if(v==='cal'){view='cal';openId=null}
   else if(v==='tpl'){view='tpl';openId=null}
+  else if(v==='lib'||v==='brain'){const parts=h.split('/').slice(1);
+    if(view===v&&(v==='lib'?Library.soft(parts):Brain.soft(parts)))return;
+    const was=view;view=v;openId=null;secParts=parts;setMode(v,was);return}
   else{view='home';openId=null}
-  renderSide();renderView();closeDrawer();
+  if(view!=='lib'&&view!=='brain')lastWs=location.hash||'#home';
+  setMode('ws');renderSide();renderView();closeDrawer();
 }
+/* ── Bölümler: Workspace · Library · Second Brain ── */
+let secParts=[],lastWs='#home',curMode='ws';
+function setMode(m,was){const app=$('#app'),prev=curMode;curMode=m;app.dataset.mode=m;
+  $$('#modes a').forEach(a=>{const on=a.dataset.mode===m;a.classList.toggle('on',on);a.toggleAttribute('aria-current',on);if(a.dataset.mode==='ws')a.setAttribute('href',lastWs)});
+  modeMark();
+  if(m!=='lib')Library.closeAll();
+  if(m==='ws')return;
+  const paint=()=>{hideFloat(true);closeDrawer();m==='lib'?Library.render(secParts):Brain.render(secParts);$('#scroll').scrollTop=0;onScroll()};
+  if(prev!==m&&document.startViewTransition&&!REDUCED&&document.documentElement.dataset.motion!=='off')document.startViewTransition(paint);else{paint();if(prev===m||was===m)return;anim($('#view'),[{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'none'}],{duration:460,easing:OUT})}}
+function modeMark(){const on=$('#modes a.on'),mk=$('#modes .mk');if(!on||!mk)return;mk.style.width=on.offsetWidth+'px';mk.style.transform=`translateX(${on.offsetLeft}px)`}
+addEventListener('resize',modeMark);
 const go=h=>{if(location.hash===h)route();else location.hash=h};
 addEventListener('hashchange',()=>{if(started)route()});
 
@@ -716,6 +738,7 @@ function closeDrawer(){$('#app').classList.remove('drawer')}
 
 /* ── Views ────────────────────────────────────────────────── */
 function renderView(soft){
+  if(view==='lib'||view==='brain'){if(!soft)(view==='lib'?Library:Brain).render(secParts);return}
   hideFloat();
   const v=$('#view'),sc=$('#scroll'),keep=soft?sc.scrollTop:0;
   if(view==='page')renderPage();else if(view==='timeline')renderTimeline();else if(view==='cal')renderCal();else if(view==='tpl')renderTpl();else renderHome();
@@ -1023,6 +1046,7 @@ function blockHTML(b){
   const ph=esc(PH[b.t]??'');
   if(b.t==='divider')return`<div class="blk" data-id="${b.id}" data-t="divider">${hd}<hr class="div" tabindex="0"></div>`;
   if(b.t==='page')return`<div class="blk" data-id="${b.id}" data-t="page">${hd}${pageCard(b)}</div>`;
+  if(b.t==='lib')return`<div class="blk" data-id="${b.id}" data-t="lib">${hd}${Library.libCard(b)}</div>`;
   if(b.t==='kv')return`<div class="blk" data-id="${b.id}" data-t="kv">${hd}<div class="kv"><div class="txt k" contenteditable="true" data-f="h" data-ph="Alan adı">${clean(b.h)}</div><div class="txt v" contenteditable="true" data-f="v" data-ph="Boş">${clean(b.v)}</div></div></div>`;
   const txt=`<div class="txt" contenteditable="true" data-f="h" data-ph="${ph}" spellcheck="${b.t==='code'?'false':'true'}">${b.t==='code'?esc(plain(b.h)):clean(b.h)}</div>`;
   if(b.t==='callout')return`<div class="blk" data-id="${b.id}" data-t="callout">${hd}<div class="cw"><span class="co" data-act="co">${b.e||'💡'}</span>${txt}</div></div>`;
@@ -1044,7 +1068,8 @@ function renderPage(){
       <div class="pg-meta">${metaHTML()}</div>
     </div>
     <div class="blocks" id="blocks">${P.blocks.map(blockHTML).join('')}</div>
-    <div style="height:${dly?40:56}px;cursor:text" data-act="tail"></div><div id="kids">${kidsHTML()}</div>${dly?foundHTML(P.date):''}</div>`;
+    <div style="height:${dly?40:56}px;cursor:text" data-act="tail"></div><div id="kids">${kidsHTML()}</div>${dly?foundHTML(P.date):''}<div id="kbx"></div></div>`;
+  Library.pagePanel(P);
   renumber();
   if(pendingFocus){const b=P.blocks.find(x=>x.id===pendingFocus);pendingFocus=null;if(b)requestAnimationFrame(()=>{const n=nodeOf(b);n?.scrollIntoView({block:'center'});n&&anim(n,[{background:'var(--sel)'},{background:'transparent'}],{duration:1400,easing:EASE});focusBlock(b,null)})}
   if(!P.title&&Date.now()-P.created<3000)requestAnimationFrame(()=>focusEnd($('.pg-title')));
@@ -1074,7 +1099,7 @@ const collapsed=()=>{const s=getSelection();return s.rangeCount&&s.getRangeAt(0)
 function caretRect(){const s=getSelection();if(!s.rangeCount)return null;const r=s.getRangeAt(0).cloneRange();r.collapse(true);const rs=r.getClientRects();return rs[0]||null}
 function onFirstLine(el){const c=caretRect();if(!c)return true;const lh=parseFloat(getComputedStyle(el).lineHeight)||24;return c.top-el.getBoundingClientRect().top<lh*.85}
 function onLastLine(el){const c=caretRect();if(!c)return true;const lh=parseFloat(getComputedStyle(el).lineHeight)||24;return el.getBoundingClientRect().bottom-c.bottom<lh*.85}
-function focusBlock(b,off,f){if(!b)return;if(b.t==='divider'){nodeOf(b)?.querySelector('.div')?.focus();return}if(b.t==='page'){nodeOf(b)?.querySelector('.pgb')?.focus();return}setCaret(txtOf(b,f||(b.t==='kv'&&off==null?'v':'h')),off)}
+function focusBlock(b,off,f){if(!b)return;if(b.t==='divider'){nodeOf(b)?.querySelector('.div')?.focus();return}if(b.t==='page'||b.t==='lib'){nodeOf(b)?.querySelector('.pgb')?.focus();return}setCaret(txtOf(b,f||(b.t==='kv'&&off==null?'v':'h')),off)}
 
 /* Block ops */
 const idx=b=>P.blocks.indexOf(b);
@@ -1119,8 +1144,8 @@ $('#view').addEventListener('keydown',e=>{
   const tEl=e.target;
   if(tEl.classList.contains('pg-title')){if(e.key==='Enter'||(e.key==='ArrowDown'&&onLastLine(tEl))){e.preventDefault();const b=P.blocks[0];if(e.key==='Enter'&&(b.t!=='p'||plain(b.h)))insertBeforeFirst();else focusBlock(b,0)}return}
   if(tEl.classList.contains('pgb')){const b=blockOf(tEl.closest('.blk').dataset.id);if(!b)return;
-    if(e.key==='Enter'){e.preventDefault();if(b.pid&&pages.has(b.pid))go('#p/'+b.pid);return}
-    if(e.key==='Backspace'||e.key==='Delete'){e.preventDefault();const prev=P.blocks[idx(b)-1];removeBlock(b);edited();toast('Bağlantı kaldırıldı — sayfa “Alt sayfalar”da duruyor');prev?focusBlock(prev,null):focusBlock(P.blocks[0],0);renderKids();return}
+    if(e.key==='Enter'){e.preventDefault();if(b.t==='lib'){if(KB.items.has(b.lid))Library.open(b.lid);return}if(b.pid&&pages.has(b.pid))go('#p/'+b.pid);return}
+    if(e.key==='Backspace'||e.key==='Delete'){e.preventDefault();const prev=P.blocks[idx(b)-1];removeBlock(b);edited();toast(b.t==='lib'?'Kaynak bloğu kaldırıldı — içerik Library’de duruyor':'Bağlantı kaldırıldı — sayfa “Alt sayfalar”da duruyor');prev?focusBlock(prev,null):focusBlock(P.blocks[0],0);renderKids();return}
     if(e.key==='ArrowUp'){e.preventDefault();focusBlock(P.blocks[idx(b)-1],null);return}
     if(e.key==='ArrowDown'){e.preventDefault();const n=P.blocks[idx(b)+1];n?focusBlock(n,0):insertAfter(b,B('p'));return}
     return}
@@ -1185,6 +1210,7 @@ $('#view').addEventListener('click',e=>{
   const a=e.target.closest('.txt a[href]');if(a){const h=a.getAttribute('href');if(h.startsWith('#p/')){e.preventDefault();go(h)}else if(e.metaKey||e.ctrlKey){e.preventDefault();window.open(h,'_blank','noopener')}return}
   const act=e.target.closest('[data-act]')?.dataset.act;
   if(act==='chk'){toggleTodo(blockOf(e.target.closest('.blk').dataset.id));return}
+  if(act==='libopen'){e.preventDefault();const b=blockOf(e.target.closest('.blk')?.dataset.id);if(b?.lid&&KB.items.has(b.lid))Library.open(b.lid);else toast('Bu kaynak silinmiş — bloğu seçip Backspace ile kaldırabilirsin');return}
   if(act==='pgopen'){e.preventDefault();const b=blockOf(e.target.closest('.blk')?.dataset.id);const id=b?.pid||e.target.closest('[href]')?.getAttribute('href')?.slice(3);if(id&&pages.has(id))go('#p/'+id);return}
   if(act==='addsub'){const last=P.blocks.at(-1);addSubpage(last,{replaceEmpty:true});return}
   if(act==='hd'){blockMenu(blockOf(e.target.closest('.blk').dataset.id),e.target.closest('.hd'));return}
@@ -1260,6 +1286,9 @@ function applySlash(i){
   if(t.k==='@due'){datePop(nodeOf(b).querySelector('.txt'),b.d,d=>{setBlockDate(P,b,d);focusBlock(b,null)});return}
   if(t.k==='@today'){b.h=normHTML(el.innerHTML);moveToDay(P,b,today());return}
   if(t.k==='@move'){b.h=normHTML(el.innerHTML);datePop(nodeOf(b).querySelector('.txt'),null,d=>d&&moveToDay(P,b,d),{title:'Hangi günün notuna?',clear:false});return}
+  if(t.k==='@lib'){b.h=normHTML(el.innerHTML);const pg=P;Library.itemPicker(el,id=>{if(!id||P!==pg)return;const nb=B('lib','',{lid:id});
+      if(!plain(b.h).trim()&&b.t==='p'){const i=idx(b);P.blocks[i]=nb;nb.id=b.id;replaceNode(nb)}else insertAfter(b,nb);KB.link(P.id,id);edited();
+      const nx=P.blocks[idx(nb)+1];nx?focusBlock(nx,0):insertAfter(nb,B('p'))});return}
   if(t.k==='@page'){b.h=normHTML(el.innerHTML);addSubpage(b,{replaceEmpty:true});return}
   if(t.k==='divider'){if(!el.textContent){b.t='divider';b.h='';replaceNode(b);insertAfter(b,B('p'))}else insertAfter(b,B('divider')),insertAfter(P.blocks[idx(b)+1],B('p'));return}
   if(t.k==='kv'&&el.textContent){insertAfter(b,B('kv','',{v:''}));return}
@@ -1365,7 +1394,7 @@ function tplPicker(anchor,cb){
 function toMd(p){const out=[`# ${p.icon?p.icon+' ':''}${titleOf(p)}`,''];if(p.date)out.push(`_${fmtLong(p.date)}_`,'');let n=0;
   for(const b of p.blocks){const t=plain(b.h);if(b.t!=='num')n=0;
     out.push(b.t==='h1'?`## ${t}`:b.t==='h2'?`### ${t}`:b.t==='h3'?`#### ${t}`:b.t==='todo'?`- [${b.c?'x':' '}] ${t}`:b.t==='bullet'?`- ${t}`:b.t==='num'?`${++n}. ${t}`:
-      b.t==='quote'?`> ${t}`:b.t==='callout'?`> ${b.e||'💡'} ${t}`:b.t==='code'?'```\n'+t+'\n```':b.t==='divider'?'---':b.t==='page'?`- 📄 ${pages.get(b.pid)?titleOf(pages.get(b.pid)):'(silinmiş sayfa)'}`:b.t==='kv'?`**${t}:** ${plain(b.v)}`:t)}
+      b.t==='quote'?`> ${t}`:b.t==='callout'?`> ${b.e||'💡'} ${t}`:b.t==='code'?'```\n'+t+'\n```':b.t==='divider'?'---':b.t==='page'?`- 📄 ${pages.get(b.pid)?titleOf(pages.get(b.pid)):'(silinmiş sayfa)'}`:b.t==='lib'?(it=>it?`- 📚 [${it.title}](${it.url||'#lib/i/'+it.id})`:'- 📚 (silinmiş kaynak)')(KB.items.get(b.lid)):b.t==='kv'?`**${t}:** ${plain(b.v)}`:t)}
   return out.join('\n')}
 async function copyText(t){try{await navigator.clipboard.writeText(t)}catch{const x=document.createElement('textarea');x.value=t;document.body.appendChild(x);x.select();document.execCommand('copy');x.remove()}}
 
@@ -1387,6 +1416,9 @@ function palette(){
     {ic:'🧭',l:'Zaman çizelgesi',run:()=>go('#timeline')},
     {ic:'🧩',l:'Şablonlar',run:()=>go('#tpl')},
     {ic:'🏠',l:'Ana sayfa',run:()=>go('#home')},
+    {ic:'📚',l:'Library',run:()=>go('#lib')},
+    {ic:'➕',l:'Library’ye içerik ekle',run:()=>{go('#lib');setTimeout(()=>Library.addSheet(),60)}},
+    {ic:'🕸️',l:'Second Brain — bilgi grafiği',run:()=>go('#brain')},
     {ic:'◐',l:'Temayı değiştir',run:()=>toggleTheme()},
   ];
   const draw=()=>{
@@ -1467,16 +1499,16 @@ $('#me').onclick=e=>{const u=firebase.auth().currentUser;if(!u)return;const p=fl
 function start(){applyTheme();welcome();if(!started){started=true}route()}
 (async()=>{
   applyTheme();
-  if(!CLOUD){S=Local;Local.load().forEach(p=>{const n=norm(p);pages.set(n.id,n)});$('#saved').title='Bu tarayıcıda kayıtlı';start();return}
+  if(!CLOUD){S=Local;KB.startLocal();Local.load().forEach(p=>{const n=norm(p);pages.set(n.id,n)});$('#saved').title='Bu tarayıcıda kayıtlı';start();return}
   gate('loading');
   try{await loadFirebase()}catch{return gate('error','Firebase yüklenemedi. İnternet bağlantını kontrol et.')}
   if(!firebase.apps.length)firebase.initializeApp(FB);
   const fs=firebase.firestore();try{await fs.enablePersistence({synchronizeTabs:true})}catch{}
   firebase.auth().getRedirectResult().catch(e=>gate('error',authMsg(e)));
   firebase.auth().onAuthStateChanged(async u=>{
-    if(!u){Cloud.stop();pages.clear();P=null;$('#view').innerHTML='';$('#nav').innerHTML='';$('#me').hidden=true;closePal();hideFloat(true);return gate('signin')}
+    if(!u){Cloud.stop();KB.stop();pages.clear();P=null;$('#view').innerHTML='';$('#nav').innerHTML='';$('#me').hidden=true;closePal();hideFloat(true);return gate('signin')}
     if((u.email||'').toLowerCase()!==OWNER){Cloud.stop();return gate('denied',`<b>${esc(u.email)}</b> bu deftere erişemez.`)}
-    gate('loading','Notlar yükleniyor…');S=Cloud;pages.clear();await Cloud.start(fs);
+    gate('loading','Notlar yükleniyor…');S=Cloud;pages.clear();await Cloud.start(fs);await KB.startCloud(fs);
     const me=$('#me');me.hidden=false;me.innerHTML=u.photoURL?`<img src="${esc(u.photoURL)}" alt="" referrerpolicy="no-referrer">`:esc((u.displayName||u.email)[0].toUpperCase());
     start();await ungate();
   });

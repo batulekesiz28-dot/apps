@@ -1136,5 +1136,85 @@
     "fix": "Shift+Tab her zaman yakalanıyor; uygulama yoksa uyarı çıkıyor, odak sayfada kalıyor"
    }
   ]
+ },
+ {
+  "at": "2026-11-14T17:15:04",
+  "change": "Notlar → kişisel bilgi sistemi: Workspace · Library · Second Brain (ortak veri, bağlantılar, bilgi grafiği)",
+  "scores": {
+   "Notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   },
+   "Library telefon": {
+    "before": 0,
+    "after": 100
+   },
+   "Library masaüstü": {
+    "before": 0,
+    "after": 100
+   },
+   "Second Brain telefon": {
+    "before": 0,
+    "after": 100
+   },
+   "Second Brain masaüstü": {
+    "before": 0,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Notlar",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Kütüphane sayfası açılınca içerik dar sol sütuna sıkışıyordu",
+    "fix": "Library ve Second Brain'de kenar çubuğu sütunu kaldırılıyor"
+   },
+   {
+    "app": "Notlar",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "PDF okuyucudan çıkıp nota geçince kütüphane notun üstüne yeniden çiziliyordu",
+    "fix": "Gecikmeli yenileme artık hangi bölümde olduğunu kontrol ediyor; bölüm değişince açık pencereler kapanıyor"
+   },
+   {
+    "app": "Notlar",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Üretilen kapaklardaki beyaz yazı denetçide okunaksız görünüyordu",
+    "fix": "Kapaklara koyu düz renk zemini eklendi; denetçi artık modern renk biçimlerini (color(srgb…)) de okuyor"
+   },
+   {
+    "app": "Notlar",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Telefonda renk seçicileri, arama kutuları ve etiketler 40px'ten küçüktü",
+    "fix": "Telefonda tüm dokunma alanları en az 40px"
+   },
+   {
+    "app": "Notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Notlar alanı sadece placeholder ile etiketlenmişti",
+    "fix": "aria-label eklendi"
+   },
+   {
+    "app": "Notlar",
+    "sev": "uyarı",
+    "status": "open",
+    "text": "Dosyalar (PDF, görsel) sadece bu cihazda (IndexedDB) duruyor; başlık/kapak/notlar buluta gidiyor ama dosyanın kendisi diğer cihazda açılmaz",
+    "fix": "İleride Firebase Storage ile eşitlenebilir"
+   },
+   {
+    "app": "Notlar",
+    "sev": "uyarı",
+    "status": "open",
+    "text": "Kapak/başlık otomatik bulma dış servislere bağlı (YouTube, Open Library, microlink); erişilemezse tasarlanmış kapak kullanılıyor"
+   }
+  ]
  }
 ]

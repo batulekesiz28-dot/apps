@@ -227,6 +227,7 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
         <div class="env env-gol"><i class="sun"></i><i class="mtn"></i><i class="water"></i></div>
         <div class="env env-jupiter"><i class="stars"></i><i class="planet"></i></div>
         <div class="sp-floor"></div></div></div>
+    <div class="sp-light" aria-hidden="true"></div>
     <div class="sp-stage"><div class="sp-scene">
       <aside class="sp-side sp-left" data-side="left"><div data-live="today"></div><button class="sp-grab" aria-label="Bugün penceresini taşı (çift tık: yerine koy)"></button></aside>
       <div class="sp-ringw"><div class="sp-shadow" aria-hidden="true"></div><div class="sp-ring" role="listbox" aria-label="Gruplara göre uygulamalar halkası">${SP.list.map((a,i)=>{const g=SP.G[a.gi];return`<button class="sp-win" role="option" data-i="${i}" data-key="${esc(a.key)}" style="--gc:${esc(g.color)}" aria-label="${esc(a.name)} — ${esc(g.name)}"><em class="sp-tag"><i></i>${esc(g.name)}</em><span class="sp-ic">${appIcon(a)}</span><b>${esc(a.name)}</b><small>${esc(a.desc.slice(0,80))}</small></button>`}).join('')}
@@ -241,7 +242,7 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
     <div class="sp-envp" role="dialog" aria-label="Ortamlar" hidden><p class="sp-k">Ortam</p>
       <div class="sp-envs">${SP.ENVS.map(([k,n])=>`<button data-env="${k}" aria-pressed="false"><i class="ept ept-${k}"></i><span>${n}</span></button>`).join('')}</div>
       <label class="sp-imm"><span>Dalma</span><input type="range" min="0" max="100" step="1" aria-label="Dalma düzeyi"><b></b></label>
-      <button class="sp-recenter" data-sp="center">Ortala <kbd>0</kbd></button></div>
+      <button class="sp-recenter" data-sp="center">Ortala <kbd>0</kbd></button><button class="sp-recenter" data-sp="relayout">Izgara düzenini sıfırla</button></div>
     <nav class="sp-orn" aria-label="Mekânsal gezinme"><button data-rot="-1" class="sp-arr" aria-label="Önceki uygulama">‹</button>
       <span class="sp-seg" role="group" aria-label="Görünüm"><button data-sp="halka" aria-pressed="false">Halka</button><button data-sp="izgara" aria-pressed="false">Izgara</button></span>
       <button data-act="ara">Ara</button><button data-act="today">Bugün</button><button data-sp="envp" aria-expanded="false">Ortam</button><button data-act="world">Arayüz</button><button data-rot="1" class="sp-arr" aria-label="Sonraki uygulama">›</button></nav></div>`},
@@ -258,15 +259,21 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
     let p=0;SP.ang=[];SP.G.forEach(g=>{const a0=p*step;g.apps.forEach(()=>{SP.ang.push(p*step);p++});g.mid=(a0+(p-1)*step)/2;p+=gap});
     ws.forEach((el,i)=>{el.style.transform=`rotateY(${SP.ang[i]}deg) translateZ(${R}px) rotateX(var(--tx,0deg)) rotateY(var(--ty,0deg))`});
     root.querySelectorAll('.sp-gt').forEach(el=>{el.style.transform=`rotateY(${SP.G[+el.dataset.g].mid}deg) translateZ(${R+30}px) translate(-50%,${m?-168:-200}px)`});
-    SP.home(root);SP.apply(root)},
+    SP.home(root);SP.apply(root);SP.R=R;requestAnimationFrame(()=>SP.fit(root))},
+  /* halkayı yan pencerelerin arasına sığdır: gerekirse geriye it */
+  fit(root){if(!root.isConnected)return;const sides=[...root.querySelectorAll('.sp-side')].filter(s=>s.offsetParent),cx=innerWidth/2;
+    let W=cx-16;if(sides.length&&SP.cfg.mode==='halka'){const l=root.querySelector('.sp-left').getBoundingClientRect(),rr=root.querySelector('.sp-right').getBoundingClientRect(),w=Math.min(cx-l.right,rr.left-cx)-8;if(w>260)W=w}
+    if(mobile()){root.style.setProperty('--fz','0px');return}
+    const P=1500,R=SP.R,hw=(parseFloat(getComputedStyle(root).getPropertyValue('--pw'))||250)/2,ext=Z=>{let m=0;for(let a=0;a<=92;a+=4){const t=a*Math.PI/180,s=P/(P+Z+R-R*Math.cos(t)),x=(R*Math.sin(t)+hw*Math.cos(t))*s;if(x>m)m=x}return m};
+    let Z=0;while(Z<900&&ext(Z)>W)Z+=30;root.style.setProperty('--fz',Z+'px')},
   dist:a=>Math.abs(((a-SP.deg)%360+540)%360-180),
   front:()=>SP.f,
   apply(root){const ring=root.querySelector('.sp-ring');ring.style.transform=`translateZ(calc(var(--R) * -1)) rotateY(${-SP.deg}deg)`;
     let f=0,best=1e9;SP.ang.forEach((a,i)=>{const d=SP.dist(a);if(d<best){best=d;f=i}});SP.f=f;
     root.querySelectorAll('.sp-win').forEach((el,i)=>{const a=SP.dist(SP.ang[i]),k=Math.min(1,a/180);
-      const far=a>(innerWidth>=900?Math.max(50,SP.step*1.6):92),side=i!==f&&mobile();el.style.opacity=(1-k*.3).toFixed(2);el.style.visibility=far?'hidden':'';el.style.pointerEvents=side?'none':'';el.classList.toggle('front',i===f);
+      const far=a>92,side=i!==f&&mobile();el.style.opacity=(1-k*.3).toFixed(2);el.style.visibility=far?'hidden':'';el.style.pointerEvents=side?'none':'';el.classList.toggle('front',i===f);
       if(i!==f){el.setAttribute('aria-hidden','true');el.style.removeProperty('--tx');el.style.removeProperty('--ty')}else el.removeAttribute('aria-hidden');el.setAttribute('aria-selected',i===f);el.tabIndex=i===f?0:-1});
-    root.querySelectorAll('.sp-gt').forEach(el=>{const gi=+el.dataset.g,a=SP.dist(SP.G[gi].mid);el.style.visibility=a>(innerWidth>=900?45:70)?'hidden':'';el.style.opacity=(1-Math.min(1,a/60)*.5).toFixed(2);el.classList.toggle('on',SP.list[f]?.gi===gi)});
+    root.querySelectorAll('.sp-gt').forEach(el=>{const gi=+el.dataset.g,a=SP.dist(SP.G[gi].mid);const lim=mobile()?40:80;el.style.visibility=a>lim?'hidden':'';el.style.opacity=(1-Math.min(1,a/lim)*.25).toFixed(2);el.classList.toggle('on',SP.list[f]?.gi===gi)});
     if(SP.cfg.mode==='halka'){SP.sel=f;SP.cap(root)}},
   cap(root){const a=SP.list[SP.sel],g=a&&SP.G[a.gi];root.querySelector('.sp-cap').innerHTML=a?`<b>${esc(a.name)}</b><span>${SP.G.length>1?`<em style="--gc:${esc(g.color)}"><i></i>${esc(g.name)}</em> `:''}${esc(a.desc)}</span><button data-app="${esc(a.key)}" class="sp-open">Aç ↵</button>`:''},
   rotTo(root,i){SP.deg+=((SP.ang[i]-SP.deg)%360+540)%360-180;SP.apply(root)},
@@ -276,17 +283,21 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
   home(root){const m=mobile(),sx=m?100:140,sy=m?116:140,lh=m?32:42,gx=m?18:64,gy=m?14:30,maxW=m?330:Math.max(560,Math.min(1120,innerWidth*.6)),multi=SP.G.length>1;
     const bl=SP.G.map(g=>{const c=Math.min(m?3:(multi?3:5),g.apps.length),rw=Math.ceil(g.apps.length/c);return{g,c,w:c*sx,h:(multi?lh:0)+rw*sy}});
     const rows=[];let cur=[],cw=0;bl.forEach(b=>{if(cur.length&&cw+gx+b.w>maxW){rows.push(cur);cur=[];cw=0}cw+=(cur.length?gx:0)+b.w;cur.push(b)});if(cur.length)rows.push(cur);
-    const rh=rows.map(r=>Math.max(...r.map(b=>b.h))),H=rh.reduce((a,b)=>a+b,0)+gy*(rows.length-1);
+    const rh=rows.map(r=>Math.max(...r.map(b=>b.h)));let H=rh.reduce((a,b)=>a+b,0)+gy*(rows.length-1);
     const it=[...root.querySelectorAll('.sp-hi')],gh=[...root.querySelectorAll('.sp-gh')],curve=(x,y,z)=>{const u=x/(maxW/2);return[(-u*u*(m?30:110)+(z||0)).toFixed(0),(-u*(m?8:16)).toFixed(1)]};
     let y=-H/2;SP.pos=[];rows.forEach((row,ri)=>{let x=-(row.reduce((a,b)=>a+b.w,0)+gx*(row.length-1))/2;
       row.forEach(b=>{const cx=x+b.w/2,[z,ry]=curve(cx);b.g.box={x0:x-gx/2,x1:x+b.w+gx/2,y0:y-gy/2,y1:y+b.h+gy/2};const L=gh[SP.G.indexOf(b.g)];if(L)L.style.transform=`translate3d(calc(${cx.toFixed(0)}px - 50%),${(y).toFixed(0)}px,${z}px) rotateY(${ry}deg)`;
         b.g.apps.forEach((a,j)=>{const c=j%b.c,r=Math.floor(j/b.c),inRow=Math.min(b.c,b.g.apps.length-r*b.c),ix=x+(b.w-inRow*sx)/2+c*sx+sx/2,iy=y+(multi?lh:0)+r*sy+sy/2,[zz,rr]=curve(ix);
           SP.pos[a.si]={x:ix,y:iy};const el=it[a.si];if(el){el.style.transform=`translate3d(${ix.toFixed(0)}px,${iy.toFixed(0)}px,${zz}px) rotateY(${rr}deg)`;el.style.setProperty('--d',(a.si*45)+'ms')}});
         x+=b.w+gx});y+=rh[ri]+gy});
+    const fp=SP.cfg.pos||{};SP.list.forEach(a=>{const q=fp[a.key];if(!q)return;SP.pos[a.si]={x:q[0],y:q[1]};const el=it[a.si];if(el){const[zz,rr]=curve(q[0]);el.style.transform=`translate3d(${q[0]}px,${q[1]}px,${zz}px) rotateY(${rr}deg)`}});
+    if(multi&&Object.keys(fp).length)SP.G.forEach((g,gi)=>{const L=gh[gi];if(!L)return;const ps=g.apps.map(a=>SP.pos[a.si]).filter(Boolean),mx=ps.reduce((s,q)=>s+q.x,0)/ps.length,my=Math.min(...ps.map(q=>q.y))-sy/2-lh+4,[z,ry]=curve(mx);
+      L.style.transform=`translate3d(calc(${mx.toFixed(0)}px - 50%),${my.toFixed(0)}px,${z}px) rotateY(${ry}deg)`});
+    const ys=SP.pos.filter(Boolean).map(q=>q.y);if(ys.length)H=Math.max(H,2*Math.max(...ys.map(Math.abs))+sy);
     const avail=Math.max(260,innerHeight-(m?300:330)),sc=Math.min(1,avail/H);root.querySelector('.sp-home').style.setProperty('--hs',sc.toFixed(3))},
   mode(root,m){SP.cfg.mode=m;SP.save();const sp=root.querySelector('.sp');sp.dataset.mode=m;
     root.querySelectorAll('[data-sp=halka],[data-sp=izgara]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.sp===m));
-    if(m==='izgara'){SP.sel=SP.front();SP.cap(root)}else SP.apply(root)},
+    if(m==='izgara'){SP.sel=SP.front();SP.cap(root)}else SP.apply(root);setTimeout(()=>SP.fit(root),550)},
   /* ortam + dalma */
   env(root,k){SP.cfg.env=k;SP.save();root.querySelector('.sp').dataset.env=k;root.querySelectorAll('.sp-envs [data-env]').forEach(b=>{const on=b.dataset.env===k;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)})},
   imm(root,v,keep){v=Math.max(0,Math.min(1,Math.round(v*100)/100));SP.cfg.imm=v;if(v>.05&&!keep)SP.cfg.last=v;SP.save();const sp=root.querySelector('.sp');
@@ -294,18 +305,18 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
     const c=root.querySelector('.sp-crown'),pc=Math.round(v*100);c.setAttribute('aria-valuenow',pc);c.setAttribute('aria-valuetext','%'+pc);c.querySelector('span').textContent=pc;
     const r=root.querySelector('.sp-imm input');r.value=pc;root.querySelector('.sp-imm b').textContent='%'+pc},
   envp(root,open){const p=root.querySelector('.sp-envp'),b=root.querySelector('[data-sp=envp]');open=open??p.hidden;p.hidden=!open;b.setAttribute('aria-expanded',open);b.classList.toggle('on',open);if(open)p.querySelector('.on,[data-env]')?.focus({preventScroll:true})},
-  center(root){SP.cfg.off={};SP.save();root.querySelectorAll('.sp-side').forEach(s=>{s.style.removeProperty('--ox');s.style.removeProperty('--oy')});
+  center(root){SP.cfg.off={};setTimeout(()=>SP.fit(root),550);SP.save();root.querySelectorAll('.sp-side').forEach(s=>{s.style.removeProperty('--ox');s.style.removeProperty('--oy')});
     const sc=root.querySelector('.sp-scene');sc.style.setProperty('--rx','0deg');sc.style.setProperty('--ry','0deg');SP.rotTo(root,0);if(SP.cfg.mode==='izgara')SP.goTo(root,0);
     if(!calmMotion())root.querySelector('.sp-scene').animate([{transform:'scale(.94)',opacity:.6},{transform:'none',opacity:1}],{duration:500,easing:'cubic-bezier(.16,1,.3,1)'})},
   find(root,ch){clearTimeout(SP.bt);SP.buf+=ch;SP.bt=setTimeout(()=>{SP.buf='';root.querySelector('.sp-find').classList.remove('on')},900);
     const q=SP.buf.toLocaleLowerCase('tr-TR'),apps=SP.list,i=apps.findIndex(a=>a.name.toLocaleLowerCase('tr-TR').startsWith(q)),j=i<0?apps.findIndex(a=>a.name.toLocaleLowerCase('tr-TR').includes(q)):i;
     const f=root.querySelector('.sp-find');f.innerHTML=`<kbd>${esc(SP.buf)}</kbd> ${j<0?'<span>bulunamadı</span>':esc(apps[j].name)}`;f.classList.add('on');if(j>=0)SP.goTo(root,j)},
-  mount(root){SP.deg=0;SP.layout(root);if(SP.renameKey){const k=SP.renameKey;SP.renameKey=null;setTimeout(()=>{const gi=SP.G.findIndex(g=>g.apps.some(x=>x.key===k)),l=root.querySelector(`.sp-gh[data-g="${gi}"]`)||root.querySelector(`.sp-gt[data-g="${gi}"]`);if(l&&root.isConnected)SP.rename(root,gi,l)},60)}if(SP.keep){const i=SP.list.findIndex(a=>a.key===SP.keep);if(i>=0){SP.deg=SP.ang[i];SP.sel=i;SP.apply(root)}SP.keep=null}SP.env(root,SP.cfg.env);SP.imm(root,SP.cfg.imm,1);SP.mode(root,SP.cfg.mode);
+  mount(root){SP.deg=0;SP.layout(root);SP.light(root);if(SP.renameKey){const k=SP.renameKey;SP.renameKey=null;setTimeout(()=>{const gi=SP.G.findIndex(g=>g.apps.some(x=>x.key===k)),l=root.querySelector(`.sp-gh[data-g="${gi}"]`)||root.querySelector(`.sp-gt[data-g="${gi}"]`);if(l&&root.isConnected)SP.rename(root,gi,l)},60)}if(SP.keep){const i=SP.list.findIndex(a=>a.key===SP.keep);if(i>=0){SP.deg=SP.ang[i];SP.sel=i;SP.apply(root)}SP.keep=null}SP.env(root,SP.cfg.env);SP.imm(root,SP.cfg.imm,1);SP.mode(root,SP.cfg.mode);
     root.querySelectorAll('.sp-side').forEach(s=>{const o=SP.cfg.off[s.dataset.side];if(o){s.style.setProperty('--ox',o[0]+'px');s.style.setProperty('--oy',o[1]+'px')}});
     const ring=root.querySelector('.sp-ring'),scene=root.querySelector('.sp-scene'),stage=root.querySelector('.sp-stage'),crown=root.querySelector('.sp-crown');
     root.addEventListener('click',e=>{const r=e.target.closest('[data-rot]');if(r)return SP.cfg.mode==='izgara'?SP.goTo(root,(SP.sel+(+r.dataset.rot)+SP.n)%SP.n):SP.turn(root,+r.dataset.rot);
       const gt=e.target.closest('.sp-gt');if(gt){SP.rotTo(root,SP.G[+gt.dataset.g].apps[0].si);return}
-      const x=e.target.closest('[data-sp]');if(x){const k=x.dataset.sp;if(k==='halka'||k==='izgara')SP.mode(root,k);else if(k==='envp')SP.envp(root);else if(k==='center')SP.center(root);return}
+      const x=e.target.closest('[data-sp]');if(x){const k=x.dataset.sp;if(k==='halka'||k==='izgara')SP.mode(root,k);else if(k==='envp')SP.envp(root);else if(k==='center')SP.center(root);else if(k==='relayout'){const old=SP.cfg.pos;SP.cfg.pos={};SP.save();SP.home(root);H().toast('Izgara düzeni sıfırlandı',()=>{SP.cfg.pos=old;SP.save();SP.home(root)})}return}
       const ev=e.target.closest('.sp-envs [data-env]');if(ev){SP.env(root,ev.dataset.env);if(SP.cfg.imm<.3)SP.imm(root,.8);return}
       if(!e.target.closest('.sp-envp,[data-sp=envp]')&&!root.querySelector('.sp-envp').hidden)SP.envp(root,false);
       const h=e.target.closest('.sp-hi');if(h){SP.launch(h,h.dataset.key);return}
@@ -327,10 +338,10 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
       if(e.pointerType!=='mouse'||calmMotion()||SP.raf)return;
       SP.raf=requestAnimationFrame(()=>{SP.raf=0;scene.style.setProperty('--ry',((e.clientX/innerWidth-.5)*7).toFixed(2)+'deg');scene.style.setProperty('--rx',((.5-e.clientY/innerHeight)*5).toFixed(2)+'deg');
         const fw=root.querySelector('.sp-win.front');if(!fw||st)return;const b=fw.getBoundingClientRect(),u=(e.clientX-b.left)/b.width,v=(e.clientY-b.top)/b.height,inside=u>=0&&u<=1&&v>=0&&v<=1;
-        if(inside){fw.style.setProperty('--mx',(u*100).toFixed(0)+'%');fw.style.setProperty('--my',(v*100).toFixed(0)+'%');fw.style.setProperty('--ty',((u-.5)*10).toFixed(1)+'deg');fw.style.setProperty('--tx',((.5-v)*8).toFixed(1)+'deg');fw.classList.add('lit')}
+        if(inside){fw.style.setProperty('--ty',((u-.5)*10).toFixed(1)+'deg');fw.style.setProperty('--tx',((.5-v)*8).toFixed(1)+'deg');fw.classList.add('lit')}
         else if(fw.classList.contains('lit')){fw.classList.remove('lit');fw.style.removeProperty('--tx');fw.style.removeProperty('--ty')}})},{passive:true});
     addEventListener('pointerup',SP.pu=e=>{
-      if(gr&&gr.id===e.pointerId){gr.s.classList.remove('moving');gr=null;SP.save();return}
+      if(gr&&gr.id===e.pointerId){gr.s.classList.remove('moving');gr=null;SP.save();setTimeout(()=>SP.fit(root),520);return}
       if(cr&&cr.id===e.pointerId){if(!cr.moved)SP.imm(root,SP.cfg.imm>.05?0:(SP.cfg.last||.8),SP.cfg.imm>.05);cr=null;return}
       if(!st||st.id!==e.pointerId)return;st=null;ring.style.transition='';if(SP.dragged){SP.rotTo(root,SP.f);setTimeout(()=>SP.dragged=false,0)}});
     SP.dnd(root);
@@ -351,9 +362,9 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
   menu(root,i,x,y){SP.closeMenu();const a=SP.list[i];if(!a)return;const cur=SP.G[a.gi];
     const bh=a.key===H().bh,opts=bh?[]:SP.G.filter(g=>g!==cur&&!(g.id==='_ai'&&!a.ai)&&!(g.id==='_other'&&a.ai));
     const m=document.createElement('div');m.className='sp-menu';m.setAttribute('role','menu');
-    m.innerHTML=`<p>${esc(a.name)}</p><button role="menuitem" data-m="open">Aç</button>${opts.length?'<p>Taşı</p>':''}${opts.map(g=>`<button role="menuitem" data-m="${esc(g.id)}" style="--gc:${esc(g.color)}"><i></i>${esc(g.name)}</button>`).join('')}${bh?'<p>Galaksinin merkezi, taşınmaz</p>':'<button role="menuitem" data-m="_new">＋ Yeni grup</button>'}${cur.id[0]!=='_'&&!bh?'<button role="menuitem" data-m="_out">Gruptan çıkar</button>':''}`;
+    m.innerHTML=`<p>${esc(a.name)}</p><button role="menuitem" data-m="open">Aç</button>${opts.length?'<p>Taşı</p>':''}${opts.map(g=>`<button role="menuitem" data-m="${esc(g.id)}" style="--gc:${esc(g.color)}"><i></i>${esc(g.name)}</button>`).join('')}${bh?'<p>Galaksinin merkezi, taşınmaz</p>':'<button role="menuitem" data-m="_new">＋ Yeni grup</button>'}${cur.id[0]!=='_'&&!bh?'<button role="menuitem" data-m="_out">Gruptan çıkar</button>':''}${SP.cfg.pos?.[a.key]?'<button role="menuitem" data-m="_home">Kümesine geri koy</button>':''}`;
     root.querySelector('.sp').appendChild(m);const W=m.offsetWidth,Hh=m.offsetHeight;m.style.left=Math.min(x,innerWidth-W-12)+'px';m.style.top=Math.min(y,innerHeight-Hh-12)+'px';
-    m.addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(!b)return;const k=b.dataset.m;SP.closeMenu();if(k==='open')H().open(a.key);else if(k==='_out'){SP.keep=a.key;H().setGroup(a.key,null);H().toast(`${a.name} gruptan çıktı`)}else SP.move(root,i,k)});
+    m.addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(!b)return;const k=b.dataset.m;SP.closeMenu();if(k==='open')H().open(a.key);else if(k==='_home'){delete SP.cfg.pos[a.key];SP.save();SP.home(root)}else if(k==='_out'){SP.keep=a.key;H().setGroup(a.key,null);H().toast(`${a.name} gruptan çıktı`)}else SP.move(root,i,k)});
     m.querySelector('button').focus();setTimeout(()=>addEventListener('pointerdown',SP.mOut=e=>{if(!e.target.closest('.sp-menu'))SP.closeMenu()},true),0)},
   closeMenu(){document.querySelector('.world .sp-menu')?.remove();if(SP.mOut){removeEventListener('pointerdown',SP.mOut,true);SP.mOut=null}},
   rename(root,gi,el){const g=SP.G[gi];if(!g)return;if(g.id[0]==='_'){H().toast('Bu grup otomatik; adı değişmez');return}
@@ -364,18 +375,23 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
   dnd(root){const home=root.querySelector('.sp-home'),drop=root.querySelector('.sp-drop'),sp=root.querySelector('.sp');let d=null;
     const local=e=>{const c=home.getBoundingClientRect(),k=parseFloat(getComputedStyle(home).getPropertyValue('--hs'))||1;return{x:(e.clientX-c.left)/k,y:(e.clientY-c.top)/k}};
     const start=()=>{if(SP.list[d.i]?.key===H().bh){H().toast('Denetçi galaksinin merkezi; taşınmaz');d=null;return}d.on=true;d.el.classList.add('drag');sp.classList.add('dragging');SP.closeMenu();navigator.vibrate?.(8)};
-    const target=e=>{const z=document.elementsFromPoint(e.clientX,e.clientY).find(n=>n.dataset?.drop);if(z)return{g:z.dataset.drop,z};const p=local(e),g=SP.G.find(g=>g.box&&p.x>=g.box.x0&&p.x<=g.box.x1&&p.y>=g.box.y0&&p.y<=g.box.y1);
-      if(!g)return null;let before=null,best=1e9;g.apps.forEach(a=>{if(a.si===d.i)return;const q=SP.pos[a.si];if(!q)return;const dist=Math.hypot(q.x-p.x,q.y-p.y);if(dist<best&&dist<120){best=dist;before=p.x<q.x?a.key:(g.apps[g.apps.indexOf(a)+1]?.key??'__end')}});return{g:g.id,before:before==='__end'?null:before}};
+    const target=e=>{const hits=document.elementsFromPoint(e.clientX,e.clientY),z=hits.find(n=>n.dataset?.drop);if(z)return{g:z.dataset.drop,z};
+      const lb=hits.find(n=>n.classList?.contains('sp-gh'));if(lb)return{g:SP.G[+lb.dataset.g].id,lb};
+      const p=local(e),py=p.y+20;let near=null,best=1e9;SP.list.forEach(a=>{if(a.si===d.i)return;const q=SP.pos[a.si];if(!q)return;const dist=Math.hypot(q.x-p.x,q.y-py);if(dist<best){best=dist;near=a}});
+      if(near&&best<78){const g=SP.G[near.gi],ix=g.apps.indexOf(near),before=p.x<SP.pos[near.si].x?near.key:(g.apps[ix+1]?.key&&g.apps[ix+1].si!==d.i?g.apps[ix+1].key:null);return{g:g.id,before,near:near.key}}
+      return{free:[Math.round(p.x),Math.round(py)]}};
     home.addEventListener('pointerdown',e=>{const el=e.target.closest('.sp-hi');if(!el||e.button)return;d={el,i:+el.dataset.i,x:e.clientX,y:e.clientY,id:e.pointerId,on:false,touch:e.pointerType!=='mouse'};
       d.t=setTimeout(()=>{if(d&&!d.on){start();if(!d)return;try{el.setPointerCapture(d.id)}catch{}const p=local({clientX:d.x,clientY:d.y});el.style.transform=`translate3d(${p.x.toFixed(0)}px,${(p.y+20).toFixed(0)}px,140px) scale(1.12)`}},380)});
     addEventListener('pointermove',SP.dm=e=>{if(!d||d.id!==e.pointerId)return;const mv=Math.hypot(e.clientX-d.x,e.clientY-d.y);
       if(!d.on){if(d.touch){if(mv>10){clearTimeout(d.t);d=null}return}if(mv<6)return;clearTimeout(d.t);start();if(!d)return;try{d.el.setPointerCapture(d.id)}catch{}}
       e.preventDefault();const p=local(e);d.el.style.transform=`translate3d(${p.x.toFixed(0)}px,${(p.y+20).toFixed(0)}px,140px) scale(1.12)`;
-      const t=target(e);d.t2=t;root.querySelectorAll('.sp-gh').forEach(l=>l.classList.toggle('drop',!!t&&SP.G[+l.dataset.g]?.id===t.g));drop.querySelectorAll('span').forEach(c=>c.classList.toggle('on',!!t?.z&&c===t.z));
-      const tg=t&&SP.G.find(g=>g.id===t.g);root.querySelector('.sp-cap').innerHTML=`<b>${esc(SP.list[d.i].name)}</b><span>${t?.g==='_new'?'Bırak: yeni grup kur':tg?(tg===SP.G[SP.list[d.i].gi]?'Bırak: sırayı değiştir':'Bırak: '+esc(tg.name)+' grubuna taşı'):'Gruba bırak ya da vazgeçmek için boşluğa bırak'}</span>`},{passive:false});
+      const t=target(e);d.t2=t;root.querySelectorAll('.sp-gh').forEach(l=>l.classList.toggle('drop',!!t?.g&&SP.G[+l.dataset.g]?.id===t.g));drop.querySelectorAll('span').forEach(c=>c.classList.toggle('on',!!t?.z&&c===t.z));
+      const tg=t&&SP.G.find(g=>g.id===t.g);root.querySelector('.sp-cap').innerHTML=`<b>${esc(SP.list[d.i].name)}</b><span>${t?.g==='_new'?'Bırak: yeni grup kur':tg?(tg===SP.G[SP.list[d.i].gi]?'Bırak: sırayı değiştir':'Bırak: '+esc(tg.name)+' grubuna taşı'):'Bırak: tam buraya yerleştir'}</span>`},{passive:false});
     addEventListener('pointerup',SP.du=e=>{if(!d||d.id!==e.pointerId)return;clearTimeout(d.t);const was=d;d=null;if(!was.on)return;
       sp.classList.remove('dragging');was.el.classList.remove('drag');root.querySelectorAll('.sp-gh.drop').forEach(l=>l.classList.remove('drop'));SP.dragged=true;setTimeout(()=>SP.dragged=false,0);
-      const t=was.t2;if(!t){SP.home(root);SP.cap(root);return}SP.move(root,was.i,t.g,t.before)});
+      const t=was.t2;if(!t){SP.home(root);SP.cap(root);return}
+      if(t.free){const a=SP.list[was.i];(SP.cfg.pos||={})[a.key]=t.free;SP.save();SP.hinted();SP.home(root);SP.cap(root);return}
+      if(SP.cfg.pos)delete SP.cfg.pos[SP.list[was.i].key];SP.move(root,was.i,t.g,t.before)});
     home.addEventListener('click',e=>{if(SP.dragged){e.stopPropagation();e.preventDefault()}},true);
     /* halka: uzun bas → cam kalkar, grup çiplerine sürükle */
     let L=null;const ring=root.querySelector('.sp-ring');
@@ -384,10 +400,13 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
         const a=SP.list[L.i];L.g=document.createElement('div');L.g.className='sp-ghost';L.g.innerHTML=`${appIcon(a)}<b>${esc(a.name)}</b>`;sp.appendChild(L.g);L.g.style.transform=`translate(${L.x}px,${L.y}px)`;
         root.querySelector('.sp-cap').innerHTML=`<b>${esc(a.name)}</b><span>Bir gruba sürükle ya da bırakıp vazgeç</span>`;try{w.setPointerCapture(L.id)}catch{}},400)});
     addEventListener('pointermove',SP.lm=e=>{if(!L||L.id!==e.pointerId)return;if(!L.on){if(Math.hypot(e.clientX-L.x,e.clientY-L.y)>8){clearTimeout(L.t);L=null}return}
-      e.preventDefault();L.g.style.transform=`translate(${e.clientX}px,${e.clientY}px)`;const z=document.elementsFromPoint(e.clientX,e.clientY).find(n=>n.dataset?.drop);L.z=z;
-      drop.querySelectorAll('span').forEach(c=>c.classList.toggle('on',c===z))},{passive:false});
+      e.preventDefault();L.g.style.transform=`translate(${e.clientX}px,${e.clientY}px)`;const hits=document.elementsFromPoint(e.clientX,e.clientY),z=hits.find(n=>n.dataset?.drop),pw=!z&&hits.find(n=>n.classList?.contains('sp-win')&&n!==L.w);L.z=z;L.pw=pw;
+      drop.querySelectorAll('span').forEach(c=>c.classList.toggle('on',c===z));root.querySelectorAll('.sp-win.target').forEach(w=>w!==pw&&w.classList.remove('target'));if(pw)pw.classList.add('target');
+      const a=SP.list[L.i],tw=pw&&SP.list[+pw.dataset.i];root.querySelector('.sp-cap').innerHTML=`<b>${esc(a.name)}</b><span>${tw?'Bırak: '+esc(tw.name)+' yanına'+(tw.gi!==a.gi?' ('+esc(SP.G[tw.gi].name)+')':''):z?'Bırak: '+esc(z.textContent):'Bir cama ya da gruba sürükle, boşlukta bırakırsan vazgeçersin'}</span>`},{passive:false});
     addEventListener('pointerup',SP.lu=e=>{if(!L||L.id!==e.pointerId)return;clearTimeout(L.t);const was=L;L=null;if(!was.on)return;
       SP.lift=false;SP.dragged=true;setTimeout(()=>SP.dragged=false,0);was.w.classList.remove('lifted');sp.classList.remove('dragging','lifting');was.g.remove();drop.querySelectorAll('.on').forEach(c=>c.classList.remove('on'));
+      root.querySelectorAll('.sp-win.target').forEach(w=>w.classList.remove('target'));
+      if(was.pw){const tw=SP.list[+was.pw.dataset.i],a=SP.list[was.i],ix=SP.G[tw.gi].apps.indexOf(tw),dir=SP.dist(SP.ang[tw.si])>0&&(((SP.ang[tw.si]-SP.deg)%360+540)%360-180)>0;SP.move(root,was.i,SP.G[tw.gi].id,dir?(SP.G[tw.gi].apps[ix+1]?.key&&SP.G[tw.gi].apps[ix+1].key!==a.key?SP.G[tw.gi].apps[ix+1].key:null):tw.key);return}
       if(was.z){const g=was.z.dataset.drop,src=SP.G[SP.list[was.i].gi];if(g===src.id){SP.cap(root);H().toast('Zaten bu grupta');return}SP.move(root,was.i,g)}else SP.cap(root)});
     addEventListener('pointercancel',SP.lc=e=>{if(L&&L.id===e.pointerId){clearTimeout(L.t);if(L.on){L.w.classList.remove('lifted');sp.classList.remove('dragging','lifting');L.g.remove();SP.lift=false}L=null}})},
   launch(el,key){if(!calmMotion()){const t=el.style.transform||'';el.animate([{transform:t},{transform:t+' translateZ(140px) scale(1.06)',opacity:0}],{duration:280,easing:'cubic-bezier(.4,0,.2,1)'})}setTimeout(()=>H().open(key),calmMotion()?0:220)},
@@ -404,7 +423,20 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
     else if(k==='Enter'&&!e.target.closest?.('button')){e.preventDefault();const a=SP.list[SP.sel];a&&H().open(a.key)}
     else if(k.length===1&&/\p{L}/u.test(k)){e.preventDefault();SP.find(root,k)}},
   resize(root){SP.layout(root)},
-  unmount(){removeEventListener('pointermove',SP.pm);removeEventListener('pointerup',SP.pu);removeEventListener('pointermove',SP.dm);removeEventListener('pointerup',SP.du);removeEventListener('pointermove',SP.lm);removeEventListener('pointerup',SP.lu);removeEventListener('pointercancel',SP.lc);SP.lift=false;SP.closeMenu()}};
+  /* imleç ışığı: galaksideki çekim gibi yumuşak takip, ama sadece ışık */
+  light(root){const Ls=root.querySelector('.sp-light'),L=SP.L={x:innerWidth/2,y:innerHeight/2,tx:innerWidth/2,ty:innerHeight/2,a:0,ta:0,raf:0};
+    const els=()=>[...root.querySelectorAll('.sp-win,.sp-glass,.sp-hb,.sp-gt,.sp-orn,.sp-crown,.sp-cap')].filter(e=>e.offsetParent&&getComputedStyle(e).visibility!=='hidden');
+    const step=()=>{const k=calmMotion()?1:.2;L.x+=(L.tx-L.x)*k;L.y+=(L.ty-L.y)*k;L.a+=(L.ta-L.a)*(calmMotion()?1:.08);
+      Ls.style.transform=`translate(${L.x.toFixed(1)}px,${L.y.toFixed(1)}px)`;Ls.style.opacity=L.a.toFixed(3);
+      for(const el of els()){const b=el.getBoundingClientRect();if(!b.width)continue;const nx=Math.max(b.left,Math.min(L.x,b.right)),ny=Math.max(b.top,Math.min(L.y,b.bottom)),dd=Math.hypot(L.x-nx,L.y-ny),li=L.a*Math.max(0,1-dd/260);
+        el.style.setProperty('--lx',((L.x-b.left)/b.width*100).toFixed(1)+'%');el.style.setProperty('--ly',((L.y-b.top)/b.height*100).toFixed(1)+'%');el.style.setProperty('--li',li.toFixed(3))}
+      if(Math.abs(L.tx-L.x)+Math.abs(L.ty-L.y)>.3||Math.abs(L.ta-L.a)>.004)L.raf=requestAnimationFrame(step);else L.raf=0};
+    const go=()=>{if(!L.raf)L.raf=requestAnimationFrame(step)};
+    addEventListener('pointermove',SP.lpm=e=>{L.tx=e.clientX;L.ty=e.clientY;if(e.pointerType==='mouse'||e.buttons)L.ta=1;go()},{passive:true});
+    addEventListener('pointerdown',SP.lpd=e=>{L.tx=e.clientX;L.ty=e.clientY;if(e.pointerType!=='mouse'){L.x=L.tx;L.y=L.ty}L.ta=1;go()},{passive:true});
+    addEventListener('pointerup',SP.lpu=e=>{if(e.pointerType!=='mouse'){L.ta=0;go()}},{passive:true});
+    document.addEventListener('mouseleave',SP.lml=()=>{L.ta=0;go()});SP.lightGo=go},
+  unmount(){removeEventListener('pointermove',SP.pm);removeEventListener('pointerup',SP.pu);removeEventListener('pointermove',SP.dm);removeEventListener('pointerup',SP.du);removeEventListener('pointermove',SP.lm);removeEventListener('pointerup',SP.lu);removeEventListener('pointercancel',SP.lc);removeEventListener('pointermove',SP.lpm);removeEventListener('pointerdown',SP.lpd);removeEventListener('pointerup',SP.lpu);document.removeEventListener('mouseleave',SP.lml);if(SP.L?.raf)cancelAnimationFrame(SP.L.raf);SP.lift=false;SP.closeMenu()}};
 
 const R={defter:NB,terminal:TM,organik:OG,isvicre:SW,mekansal:SP};
 

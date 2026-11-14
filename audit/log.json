@@ -920,5 +920,42 @@
     "text": "Denetçi galaksinin merkezi olduğu için gruba taşınamıyor (bilerek)"
    }
   ]
+ },
+ {
+  "at": "2026-11-14T11:11:06",
+  "change": "Mekânsal: imleç ışığı (galaksideki çekim gibi, sadece ışık), halka yan pencerelere göre sığıyor ve kenarlar görünüyor, uygulamaları serbestçe yerleştirme",
+  "scores": {
+   "Mekânsal telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Mekânsal masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Mekânsal",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Halkanın sağ ve sol camları gizleniyordu",
+    "fix": "Halka yan pencerelerin arasına sığacak kadar otomatik geri itiliyor"
+   },
+   {
+    "app": "Mekânsal",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Telefonda yandan görünen grup etiketi çok küçük dokunma alanı oluyordu",
+    "fix": "Telefonda yana dönen etiketler gizleniyor"
+   },
+   {
+    "app": "Mekânsal",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Grup etiketindeki sayı soluktu",
+    "fix": "Beyaz ve daha az saydam"
+   }
+  ]
  }
 ]

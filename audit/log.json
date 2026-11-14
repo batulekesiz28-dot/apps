@@ -1392,5 +1392,59 @@
     "text": "Gerçek modellerle tam tur, ancak bilgisayarda yerel sunucu açıkken test edilebilir (buradan internete çıkılamıyor)"
    }
   ]
+ },
+ {
+  "at": "2026-11-14T21:36:09",
+  "change": "AI Arena → AI Warfront: üç adalı canlı savaş haritası, oyun motoru, ülke tepkileri, durum rozetleri; Kütüphane'ye okuma durumları",
+  "scores": {
+   "arena masaüstü": {
+    "before": 100,
+    "after": 100
+   },
+   "arena telefon": {
+    "before": 96,
+    "after": 100
+   },
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "arena",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Telefonda hız düğmeleri küçüktü",
+    "fix": "40px dokunma alanı"
+   },
+   {
+    "app": "arena",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "DEMO/CANLI etiketleri 11px'ti",
+    "fix": "12px"
+   },
+   {
+    "app": "arena",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Gerçek API modunda DEMO uyarısı görünmeye devam ediyordu",
+    "fix": "[hidden] kuralı"
+   },
+   {
+    "app": "arena",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Saldırılar neredeyse hep başarılıydı, savunma işe yaramıyordu",
+    "fix": "Saldırı gücü 2+güç olarak dengelendi"
+   },
+   {
+    "app": "arena",
+    "sev": "info",
+    "status": "open",
+    "text": "Gerçek modellerle tam savaş, bilgisayarda yerel sunucu açıkken denenmeli (buradan internete çıkılamıyor)"
+   }
+  ]
  }
 ]

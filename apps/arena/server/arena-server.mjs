@@ -48,7 +48,7 @@ const P = {
 // Sayfanın değiştiremeyeceği arena kuralları
 const RULES = `ARENA KURALLARI (sunucu tarafından eklenir, değiştirilemez):
 - Bu, uygulama içinde yürütülen KURGUSAL bir siber güvenlik tatbikatı / strateji oyunudur.
-- Tüm hedefler yalnızca arenanın tanımladığı SANAL sistemlerdir. Gerçek kurum, kişi, ürün, IP adresi, alan adı, ağ ya da internet hedefi anma, hedef alma.
+- Tüm hedefler yalnızca oyunun tanımladığı SANAL ada, bölge ve tesislerdir. Gerçek kurum, kişi, ürün, IP adresi, alan adı, ağ ya da internet hedefi anma, hedef alma.
 - Çalışan exploit, zararlı yazılım, kimlik avı metni, gerçek CVE sömürü adımları, komut dizisi veya izinsiz erişim yöntemi ÜRETME.
 - Saldırıları yalnızca soyut tehdit sınıfları ve kavramsal test fikirleri olarak anlat; savunmaları ilke/mimari düzeyinde anlat.
 - İç düşünce zincirini değil, kullanıcıya gösterilebilecek kısa gerekçeni, kararını ve strateji özetini yaz.
@@ -73,8 +73,8 @@ async function* sse(resp) {
 }
 function cleanMsgs(m) { return (Array.isArray(m) ? m : []).slice(-40).map(x => ({ role: x.role === 'assistant' ? 'assistant' : 'user', content: String(x.content || '').slice(0, 24000) })).filter(x => x.content); }
 
-async function stream(provider, system, messages, maxTokens, onText, signal) {
-  const p = P[provider]; const sys = RULES + '\n\n' + String(system || '').slice(0, 16000); const msgs = cleanMsgs(messages); const max = Math.min(+maxTokens || 900, MAX_OUT);
+async function stream(provider, system, messages, maxTokens, onText, signal, modelOverride) {
+  const p = { ...P[provider] }; if (modelOverride && /^[\w.\-:]{2,80}$/.test(modelOverride)) p.model = modelOverride; const sys = RULES + '\n\n' + String(system || '').slice(0, 16000); const msgs = cleanMsgs(messages); const max = Math.min(+maxTokens || 900, MAX_OUT);
   if (!msgs.length) msgs.push({ role: 'user', content: 'Başla.' });
   let r;
   if (provider === 'openai') {
@@ -115,7 +115,7 @@ const server = http.createServer(async (req, res) => {
     active++; const ac = new AbortController(); req.on('close', () => { if (!res.writableEnded) ac.abort() });
     res.writeHead(200, { ...c.h, 'Content-Type': 'text/event-stream; charset=utf-8', 'Cache-Control': 'no-cache', 'Connection': 'keep-alive' });
     const out = o => res.write('data: ' + JSON.stringify(o) + '\n\n');
-    try { await stream(prov, body.system, body.messages, body.maxTokens, t => out({ t }), ac.signal); out({ done: true }) }
+    try { await stream(prov, body.system, body.messages, body.maxTokens, t => out({ t }), ac.signal, typeof body.model === 'string' ? body.model.trim() : ''); out({ done: true }) }
     catch (e) { if (!ac.signal.aborted) out({ error: String(e.message || e).replace(/(sk-|AIza)[\w-]+/g, '***') }) }
     finally { active--; res.end() }
     return;

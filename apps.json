@@ -69,10 +69,10 @@
   },
   {
    "slug": "arena",
-   "name": "AI Arena",
+   "name": "AI Warfront",
    "icon": "spark",
    "color": "violet",
-   "desc": "ChatGPT, Gemini ve Claude yapay zekâ modelleri tartışır, savunma kurar ve sanal hedefte kontrollü saldırı simülasyonu yapar; şeffaf puanlama",
+   "desc": "ChatGPT, Gemini ve Claude yapay zekâlarının yönettiği üç ada ülkesi: sanal siber güvenlik strateji simülasyonu, canlı savaş haritası, oyun motoru ve puanlama",
    "ai": true
   }
  ]

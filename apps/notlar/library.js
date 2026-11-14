@@ -26,7 +26,14 @@ const Library=(()=>{
   const host=u=>{try{return new URL(u).hostname.replace(/^www\./,'')}catch{return''}};
   const ytId=u=>{const m=String(u).match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/|live\/)|youtu\.be\/)([\w-]{11})/);return m?m[1]:''};
   const MEDIA=['movie','series','game','anime'],SUF={movie:'film',series:'TV series',game:'video game',anime:'anime'};
-  const stLabel=it=>{const g=it.type==='game';return it.status==='done'?(g?'Oynandı':'İzlendi'):it.status==='todo'?(g?'Oynanacak':'İzlenecek'):it.status==='doing'?'Devam ediyor':''};
+  const READ=['book','pdf','article','research','doc'],WATCH=['youtube','course'],HASST=t=>MEDIA.includes(t)||READ.includes(t)||WATCH.includes(t);
+  /* okuma durumu: elle seçilen durum öncelikli; yoksa okuma ilerlemesinden çıkarılır */
+  const est=it=>it.status||(HASST(it.type)&&!MEDIA.includes(it.type)?(it.progress>=.99?'done':it.progress>.01?'doing':''):'');
+  const stLabel=it=>{const g=it.type==='game',r=READ.includes(it.type),w=WATCH.includes(it.type),s=it.status;
+    if(r)return s==='done'?'Okundu':s==='todo'?'Okunacak':s==='doing'?'Okunuyor':'';
+    if(w)return s==='done'?'İzlendi':s==='todo'?'İzlenecek':s==='doing'?(it.type==='course'?'Devam ediyor':'İzleniyor'):'';
+    return s==='done'?(g?'Oynandı':'İzlendi'):s==='todo'?(g?'Oynanacak':'İzlenecek'):s==='doing'?'Devam ediyor':''};
+  const ST_N={todo:'Okunacaklar',doing:'Okunuyor',done:'Okunanlar'},ST_D={todo:'Okumak / izlemek istediklerin',doing:'Şu an okuduğun ve izlediklerin',done:'Bitirdiklerin'};
   const shape=t=>['book','pdf','doc','course','research','movie','series','game','anime'].includes(t)?'p':t==='image'?'s':'l';
   const fmtD=ts=>new Date(ts).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'});
   const size=b=>b>1e6?(b/1e6).toFixed(1)+' MB':Math.max(1,Math.round(b/1e3))+' KB';
@@ -39,7 +46,7 @@ const Library=(()=>{
   function genCover(it){const t=T[it.type]||T.file,h=hash(it.id)%360;
     return`<div class="gc gc-${shape(it.type)}" style="--c:${t.c};--h:${h}deg"><span class="gc-k">${tIc(it.type)}${esc(t.n)}</span><b class="gc-t">${esc(it.title)}</b><span class="gc-a">${esc(it.author||it.site||host(it.url)||'')}</span></div>`}
   function cover(it,cls=''){const s=coverSrc(it);return`<div class="cv cv-${shape(it.type)} ${cls}">${genCover(it)}${s?`<img src="${esc(s)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()">`:''}${it.score?`<span class="cv-sc">${esc(it.score.replace('IMDb ','★ '))}</span>`:''}${it.type==='youtube'?'<span class="cv-play"><svg viewBox="0 0 16 16"><path d="M5.5 3.5v9l7-4.5z" fill="currentColor"/></svg></span>':''}${it.progress>.01&&it.progress<.99?`<span class="cv-pr"><i style="width:${Math.round(it.progress*100)}%"></i></span>`:''}</div>`}
-  const metaLine=it=>{const t=T[it.type]||T.file;return`<span class="lm">${tIc(it.type)}<span>${esc(MEDIA.includes(it.type)?(it.author||t.n):(it.author||it.site||host(it.url)||t.n))}</span>${it.pages?`<span>· ${it.pages} sf</span>`:''}${it.dur?`<span>· ${esc(it.dur)}</span>`:''}${it.status&&MEDIA.includes(it.type)?`<span class="lm-st st-${it.status}">· ${stLabel(it)}</span>`:''}</span>`};
+  const metaLine=it=>{const t=T[it.type]||T.file;return`<span class="lm">${tIc(it.type)}<span>${esc(MEDIA.includes(it.type)?(it.author||t.n):(it.author||it.site||host(it.url)||t.n))}</span>${it.pages?`<span>· ${it.pages} sf</span>`:''}${it.dur?`<span>· ${esc(it.dur)}</span>`:''}${est(it)&&HASST(it.type)?`<span class="lm-st st-${est(it)}">· ${stLabel({...it,status:est(it)})}</span>`:''}</span>`};
   function card(it,o={}){return`<article class="lc lc-${shape(it.type)}${o.big?' big':''}" data-open="${it.id}" tabindex="0" draggable="false" aria-label="${esc(it.title)}">
       ${cover(it)}<button class="lc-fav${it.fav?' on':''}" data-fav="${it.id}" aria-label="${it.fav?'Favorilerden çıkar':'Favorilere ekle'}" title="Favori">${sv('star')}</button>
       <div class="lc-b"><b class="lc-t">${esc(it.title)}</b>${metaLine(it)}</div></article>`}
@@ -51,6 +58,7 @@ const Library=(()=>{
     return`<aside class="lrail"><div class="lr-brand"><span class="lr-mark">${sv('read')}</span><span><b>Kütüphane</b><small>${items.length} içerik</small></span></div>
       <button class="lr-add" data-act="add">${sv('plus')}İçerik ekle<kbd>A</kbd></button>
       <nav><a class="lr-i lr-back" href="#lib">${sv('back')}<span>Medya merkezi</span></a>${ni('/docs',sv('home'),'Keşfet',S==='home')}${ni('/all',sv('all'),'Tümü',S==='all',items.length)}${ni('/reading',sv('read'),'Devam edilenler',S==='reading',items.filter(i=>i.progress>.01&&i.progress<.99).length||'')}${ni('/fav',sv('star'),'Favoriler',S==='fav',items.filter(i=>i.fav).length||'')}${ni('/recent',sv('clock'),'Son görüntülenen',S==='recent')}</nav>
+      <div class="lr-g">Okuma durumu</div><nav>${['todo','doing','done'].map(k=>ni('/st/'+k,`<i class="lr-dot st-${k}"></i>`,ST_N[k],S==='st'&&A===k,items.filter(i=>HASST(i.type)&&est(i)===k).length||'')).join('')}</nav>
       <div class="lr-g">Türler</div><nav>${Object.keys(T).filter(t=>cnt(t)).map(t=>ni('/type/'+t,`<i class="lr-dot" style="--c:${T[t].c}"></i>`,T[t].n,S==='type'&&A===t,cnt(t))).join('')||'<p class="lr-e">İçerik ekleyince türler burada görünür</p>'}</nav>
       <div class="lr-g">Koleksiyonlar<button data-act="newcol" title="Yeni koleksiyon" aria-label="Yeni koleksiyon">${sv('plus')}</button></div>
       <nav>${c.map(x=>ni('/col/'+x.id,`<i class="lr-dot sq" style="--c:${esc(x.color)}">${esc(x.emoji)}</i>`,x.name,S==='col'&&A===x.id,items.filter(i=>i.cols.includes(x.id)).length)).join('')||'<p class="lr-e">Henüz koleksiyon yok</p>'}</nav>
@@ -78,11 +86,12 @@ const Library=(()=>{
     const favs=items.filter(i=>i.fav).sort((a,b)=>b.updated-a.updated),seen=items.filter(i=>i.opened).sort((a,b)=>b.opened-a.opened).slice(0,10);
     const cs=[...KB.cols.values()].sort((a,b)=>a.order-b.order),day=new Date().toDateString(),old=items.filter(i=>Date.now()-(i.opened||i.added)>12*864e5);
     const pick=old.length?old[hash(day)%old.length]:null,tags=KB.allTags().slice(0,24),types=Object.keys(T).map(t=>[t,items.filter(i=>i.type===t).length]).filter(x=>x[1]);
-    const queue=items.filter(i=>i.status==='todo'&&MEDIA.includes(i.type)).sort((a,b)=>b.added-a.added);
+    const queue=items.filter(i=>est(i)==='todo'&&HASST(i.type)).sort((a,b)=>b.added-a.added),doneR=items.filter(i=>est(i)==='done'&&HASST(i.type)).sort((a,b)=>b.updated-a.updated);
     return impBanner()+hero()+(items.length?`
       ${shelf('Son eklenenler',byAdd.slice(0,14),'/all')}
-      ${queue.length?shelf('Sırada',queue.slice(0,16),'',{sub:'İzlenecek ve oynanacaklar'}):''}
+      ${queue.length?shelf('Okuma listen',queue.slice(0,16),'/st/todo',{sub:'Okunacak ve izlenecekler'}):''}
       ${prog.length>1?shelf('Devam edilenler',prog.slice(1,14),'/reading',{sub:'Yarım bıraktıkların'}):''}
+      ${doneR.length?shelf('Okunanlar',doneR.slice(0,14),'/st/done',{sub:'Bitirdiklerin'}):''}
       <section class="shelf"><header><h2>Koleksiyonlar</h2><button class="lnk" data-act="newcol">${sv('plus')}Yeni koleksiyon</button></header>
         <div class="cols">${cs.map(colCard).join('')}<button class="col add" data-act="newcol"><span>${sv('plus')}</span><b>Koleksiyon oluştur</b><small>Örn. Computer Science, SAT Preparation, Books to Read</small></button></div></section>
       ${shelf('Favoriler',favs.slice(0,14),'/fav')}
@@ -100,6 +109,7 @@ const Library=(()=>{
     if(S==='all')return{t:'Tümü',d:'Kütüphanendeki her şey',l:items};
     if(S==='fav')return{t:'Favoriler',d:'Yıldızladıkların',l:items.filter(i=>i.fav)};
     if(S==='reading')return{t:'Devam edilenler',d:'Yarım bıraktığın okumalar ve videolar',l:items.filter(i=>i.progress>.01&&i.progress<.99)};
+    if(S==='st')return{t:ST_N[A]||'Durum',d:ST_D[A]||'',l:items.filter(i=>HASST(i.type)&&est(i)===A)};
     if(S==='recent')return{t:'Son görüntülenenler',d:'En son açtıkların',l:items.filter(i=>i.opened).sort((a,b)=>b.opened-a.opened)};
     if(S==='type')return{t:(T[A]||T.file).n,d:'Tür',l:items.filter(i=>i.type===A),c:(T[A]||T.file).c};
     if(S==='tag')return{t:'#'+A,d:KB.topics[A]?.desc||'Konu',l:items.filter(i=>i.tags.includes(A)),tag:A};
@@ -132,7 +142,7 @@ const Library=(()=>{
     inner.innerHTML=rail()+`<div class="lmain">${st.sub==='home'?homeHTML():listHTML()}</div>`;setTimeout(autoCovers,1200);
     setCrumb(sv('read'),st.sub==='home'?'Kütüphane':listCtx().t.replace(/^#/,'#'),`<button class="tb" data-act="add" title="İçerik ekle (A)" aria-label="İçerik ekle">${sv('plus')}</button>`);
     return scY}
-  function parse(parts){const[a='',b='']=parts;if(!a)return{sub:'home',arg:''};if(['all','fav','reading','recent'].includes(a))return{sub:a,arg:''};if(['type','tag','col'].includes(a))return{sub:a,arg:decodeURIComponent(b)};return{sub:'home',arg:''}}
+  function parse(parts){const[a='',b='']=parts;if(!a)return{sub:'home',arg:''};if(['all','fav','reading','recent'].includes(a))return{sub:a,arg:''};if(['type','tag','col','st'].includes(a))return{sub:a,arg:decodeURIComponent(b)};return{sub:'home',arg:''}}
   const isMediaRoute=p=>!p.length||p[0]==='m';
   const bgView=()=>q('#view>.lib')?'lib':q('#view>.mc')?'mc':'';
   function render(parts){parts=parts||[];const ov=parts[0]==='i'||parts[0]==='read';const base=ov?st.base||'':parts.join('/');
@@ -206,7 +216,7 @@ const Library=(()=>{
           <button class="ib${it.fav?' on':''}" data-dfav title="Favori" aria-label="Favori">${sv('star')}</button><button class="ib" data-dgraph title="Second Brain'de gör" aria-label="Grafikte gör">${sv('graph')}</button><button class="ib" data-ddel title="Sil" aria-label="Sil">${sv('trash')}</button><button class="ib" data-dx title="Kapat (Esc)" aria-label="Kapat">${sv('x')}</button></div>
         <h1 class="ld-title" contenteditable="true" data-f="title" spellcheck="false">${esc(it.title)}</h1>
         <p class="ld-by"><span contenteditable="true" data-f="author" data-ph="${MEDIA.includes(it.type)?(it.type==='game'?'Stüdyo':'Yönetmen / yapımcı'):'Yazar / kaynak'}">${esc(it.author)}</span>${it.year?` · ${esc(it.year)}`:''}${it.url?` · <a href="${esc(it.url)}" target="_blank" rel="noopener">${favIco(it)?`<img src="${esc(favIco(it))}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">`:''}${esc(host(it.url))}${sv('ext')}</a>`:''}</p>
-        ${MEDIA.includes(it.type)?`<div class="ld-st" role="radiogroup" aria-label="Durum">${['todo','doing','done'].map(k=>`<button class="${it.status===k?'on':''}" data-sst="${k}" role="radio" aria-checked="${it.status===k}">${stLabel({...it,status:k})}</button>`).join('')}${it.score?`<span class="ld-sc">${esc(it.score)}</span>`:''}</div>`:''}
+        ${HASST(it.type)?`<div class="ld-st" role="radiogroup" aria-label="Durum">${['todo','doing','done'].map(k=>`<button class="${est(it)===k?'on':''}" data-sst="${k}" role="radio" aria-checked="${it.status===k}">${stLabel({...it,status:k})}</button>`).join('')}${it.score?`<span class="ld-sc">${esc(it.score)}</span>`:''}</div>`:''}
         <div class="ld-cta"><button class="btn pri" data-go="${it.id}">${it.type==='pdf'?sv('read')+'Oku':it.type==='youtube'?'İzle':it.file?'Dosyayı aç':it.url?sv('ext')+'Kaynağa git':'Aç'}</button>${it.type==='pdf'&&it.url&&!it.file?`<a class="btn" href="${esc(it.url)}" target="_blank" rel="noopener">${sv('ext')}Yeni sekmede</a>`:''}<button class="btn" data-dnote>${sv('note')}Bu kaynak için not</button>${MEDIA.includes(it.type)||!coverSrc(it)?`<button class="btn" data-dcover>${sv('search')}${coverSrc(it)?'Kapağı yenile':'Kapak bul'}</button>`:''}</div>
         <p class="ld-desc" contenteditable="true" data-f="desc" data-ph="Kısa bir açıklama ekle…">${esc(it.desc)}</p>
         <section class="ld-s"><h3>${sv('tag')}Etiketler</h3><div class="ld-tags">${it.tags.map(x=>`<span class="tg"><a href="#brain/t:${encodeURIComponent(x)}">#${esc(x)}</a><button data-untag="${esc(x)}" aria-label="Etiketi kaldır">${sv('x')}</button></span>`).join('')}<input data-tagin placeholder="+ etiket" aria-label="Etiket ekle"></div></section>

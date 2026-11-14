@@ -271,3 +271,7 @@
 .mc-imp .btn{height:40px}.mc-imp b{color:var(--mink)}.mc-imp .imp-ic{color:var(--acc)}
 .fp-k{font-size:12px;letter-spacing:.1em}
 @media (max-width:760px){.mc-brand,.mc-brand span{min-width:44px;min-height:44px}.mh-dots button{width:40px;height:40px}.mx-k{min-height:40px}}
+/* içe aktarma şeridindeki düğmeler medya merkezinde de tam stil alsın */
+.mc-imp .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 16px;border-radius:12px;font-size:14px;font-weight:500;color:var(--mink);background:rgba(255,255,255,.1);box-shadow:none;white-space:nowrap;transition:background .2s,transform .2s}
+.mc-imp .btn:hover{background:rgba(255,255,255,.16)}.mc-imp .btn.pri{background:var(--mink);color:#0A0A0C}.mc-imp .btn.pri:hover{background:#fff}
+.mc-imp b{font-family:var(--font,inherit)}

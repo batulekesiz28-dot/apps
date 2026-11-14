@@ -1499,5 +1499,35 @@
     "text": "Köşe yuvarlaklığı, yazı boyutu, yoğunluk ayarları eklenmedi: hub'da bu değerler sabit; güvenli şekilde değiştirmek ayrı bir iş"
    }
   ]
+ },
+ {
+  "at": "2026-11-14T21:56:40",
+  "change": "Notlar: sol menü kaldırıldı → üstte yatay cam gezinme (Ana Sayfa, Yapılacaklar, Notlar, İstatistikler, AI Center) + sağ üstte Workspace/Library; sayfa ağacı 'Notlar' ile açılan cam panelde",
+  "scores": {
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Panel açıkken üst menüye tıklanamıyordu",
+    "fix": "Üst şerit perdenin üstünde"
+   },
+   {
+    "app": "notlar",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Medya merkezindeki 'Notion listen hazır' şeridinin düğmeleri biçimsizdi (önceden vardı)",
+    "fix": "Düğme stili eklendi"
+   }
+  ]
  }
 ]

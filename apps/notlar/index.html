@@ -441,6 +441,7 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
 <link rel="stylesheet" href="library.css">
 <link rel="stylesheet" href="brain.css">
 <link rel="stylesheet" href="media.css">
+<link rel="stylesheet" href="time.css">
 <style id="tnavCss">
 /* ── Üst gezinme (sol menü yerine) — ince cam şerit, kayan seçili vurgu ── */
 .app,.app[data-mode=lib],.app[data-mode=brain]{grid-template-columns:1fr}
@@ -455,6 +456,7 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
 .top .modes a{height:30px;padding:0 11px}
 .tb.tsrch{margin-left:auto}
 #saved{order:0}
+.tb.tai{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:10px;color:var(--ink2);margin-left:auto}.tb.tai:hover,.tb.tai.on{color:var(--ink);background:color-mix(in srgb,var(--ink) 7%,transparent)}.tb.tai+.tb.tsrch{margin-left:0}
 .tb.sbt{width:34px;height:34px;border-radius:10px;color:var(--ink2);flex-shrink:0}.tb.sbt:hover,.tb.sbt.on{color:var(--ink);background:color-mix(in srgb,var(--ink) 7%,transparent)}
 .crumbbar{max-width:752px;margin:0 auto;padding:10px 0 0;min-height:12px}.crumbbar .crumb{margin-left:-6px}
 .crumbbar .crumb{flex:none;min-height:28px}
@@ -468,7 +470,7 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
 .tb.burger{display:none!important}
 @media (max-width:1100px){.tnav a span,.tnav button span{display:none}.tnav .on span{display:inline}}
 @media (max-width:760px){.top{height:54px;gap:4px;padding:0 6px}.tnav a,.tnav button,.top .modes a{height:40px;min-width:40px;padding:0 10px;justify-content:center}.tnav .on span,.top .modes a span{display:none}.tnav .li,.top .modes .li{width:17px;height:17px}
-  .tb.tsrch,.tb.sbt{width:40px;height:40px}.side{top:62px;left:6px;bottom:6px}#saved{display:none}.app.drawer .scrim{background:rgba(0,0,0,.18)}.crumbbar{padding:8px 20px 0}}
+  .tb.tsrch,.tb.sbt,.tb.tai{width:40px;height:40px}.side{top:62px;left:6px;bottom:6px}#saved{display:none}.app.drawer .scrim{background:rgba(0,0,0,.18)}.crumbbar{padding:8px 20px 0}}
 @media (max-width:420px){.tnav a,.tnav button,.top .modes a{padding:0 8px;min-width:38px}.tb.tsrch{margin-left:0}}
 @media (prefers-reduced-motion:reduce){.tnav .tk,.side{transition:none}}
 </style>
@@ -490,13 +492,15 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
       <button class="tb burger" id="burger" title="Menü" hidden><svg class="i" viewBox="0 0 16 16"><path d="M2.5 5h11M2.5 11h11"/></svg></button>
       <button class="tb sbt" id="sbt" title="Sayfalar paneli" aria-label="Sayfalar paneli" aria-expanded="false" aria-controls="side"><svg class="i" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" rx="2.5"/><path d="M6 3v10"/></svg></button>
       <nav class="tnav" id="tnav" aria-label="Ana gezinme"><i class="tk"></i>
-        <a href="#todo" data-tn="todo" title="Yapılacaklar"><svg class="li" viewBox="0 0 16 16"><rect x="2.5" y="2.5" width="11" height="11" rx="3"/><path d="M5.5 8.2l1.8 1.8 3.4-3.6"/></svg><span>Yapılacaklar</span></a>
-        <a href="#home" data-tn="notes" title="Notlar — ana sayfa"><svg class="li" viewBox="0 0 16 16"><path d="M4 2h5.5L12 4.5V14H4z"/><path d="M9.5 2v2.5H12M6 8h4M6 10.5h4"/></svg><span>Notlar</span></a>
-        <a href="../istatistik/" data-tn="stats" title="İstatistikler"><svg class="li" viewBox="0 0 16 16"><path d="M3 13.5V8.5M6.5 13.5V4.5M10 13.5V7M13.5 13.5V2.5"/></svg><span>İstatistikler</span></a>
-        <a href="#brain" data-tn="ai" title="AI Center — Second Brain ve yapay zekâ önerileri"><svg class="li" viewBox="0 0 16 16"><path d="M8 1.8l1.5 3.7 3.7 1.5-3.7 1.5L8 12.2 6.5 8.5 2.8 7l3.7-1.5z"/><path d="M12.8 11.3l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z"/></svg><span>AI Center</span></a>
+        <a href="#cal" data-tn="cal" title="Takvim — gün, hafta, ay"><svg class="li" viewBox="0 0 16 16"><rect x="2.5" y="3" width="11" height="10.5" rx="2.2"/><path d="M2.5 6.5h11M5.5 1.8v2.4M10.5 1.8v2.4"/></svg><span>Takvim</span></a>
+        <a href="#acts" data-tn="acts" title="Aktiviteler"><svg class="li" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.6"/><path d="M8 4.8V8l2.2 1.5"/></svg><span>Aktiviteler</span></a>
+        <a href="#tasks" data-tn="tasks" title="Görevler"><svg class="li" viewBox="0 0 16 16"><rect x="2.5" y="2.5" width="11" height="11" rx="3"/><path d="M5.5 8.2l1.8 1.8 3.4-3.6"/></svg><span>Görevler</span></a>
+        <a href="#home" data-tn="notes" title="Notlar"><svg class="li" viewBox="0 0 16 16"><path d="M4 2h5.5L12 4.5V14H4z"/><path d="M9.5 2v2.5H12M6 8h4M6 10.5h4"/></svg><span>Notlar</span></a>
+        <a href="#stats" data-tn="stats" title="İstatistikler"><svg class="li" viewBox="0 0 16 16"><path d="M3 13.5V8.5M6.5 13.5V4.5M10 13.5V7M13.5 13.5V2.5"/></svg><span>İstatistikler</span></a>
       </nav>
       <span class="saved" id="saved"><i></i>kaydedildi</span>
       <div id="topAct" style="display:flex;gap:2px"></div>
+      <a class="tb tai" id="topAi" href="#brain" title="AI Center — Second Brain" aria-label="AI Center"><svg class="i" viewBox="0 0 16 16"><path d="M8 1.8l1.5 3.7 3.7 1.5-3.7 1.5L8 12.2 6.5 8.5 2.8 7l3.7-1.5z"/><path d="M12.8 11.3l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z"/></svg></a>
       <button class="tb tsrch" id="topSrch" title="Ara (⌘K)" aria-label="Ara"><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg></button>
       <nav class="modes" id="modes" aria-label="Bölümler"><i class="mk"></i><a href="#home" data-mode="ws"><svg class="li" viewBox="0 0 16 16"><path d="M4 2h5.5L12 4.5V14H4z"/><path d="M9.5 2v2.5H12M6 8h4M6 10.5h4"/></svg><span>Workspace</span></a><a href="#lib" data-mode="lib"><svg class="li" viewBox="0 0 16 16"><path d="M2.5 13.5V3M5.5 13.5V3M8.5 13.5l-1-10 3-.4 1.3 10.2z"/><path d="M1.5 13.5h13"/></svg><span>Library</span></a></nav>
     </header>
@@ -519,6 +523,7 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
 <script src="library.js"></script>
 <script src="media.js"></script>
 <script src="brain.js"></script>
+<script src="time.js"></script>
 
 <script>
 'use strict';
@@ -712,6 +717,7 @@ function route(){
   if(v==='p'&&pages.has(id)){view='page';openId=id}
   else if(v==='timeline'){view='timeline';openId=null}
   else if(v==='cal'){view='cal';openId=null}
+  else if(v==='acts'||v==='tasks'||v==='stats'){view=v;openId=null}
   else if(v==='tpl'){view='tpl';openId=null}
   else if(v==='lib'||v==='brain'){const parts=h.split('/').slice(1);
     if(view===v&&(v==='lib'?Library.soft(parts):Brain.soft(parts)))return;
@@ -778,11 +784,11 @@ $('#burger').onclick=()=>$('#app').classList.add('drawer');
 /* üst gezinme: Ana Sayfa · Yapılacaklar · Notlar (sayfa paneli) · İstatistikler · AI Center */
 function openPages(){const app=$('#app');if(curMode!=='ws'){go(lastWs);setTimeout(()=>app.classList.add('drawer'),60)}else app.classList.toggle('drawer');tnavPaint()}
 $('#tnav').addEventListener('click',e=>{const t=e.target.closest('[data-tn]');if(!t)return;
-  if(t.dataset.tn==='stats'){e.preventDefault();try{if(window.parent!==window&&parent.HUB?.open){parent.HUB.open('p:istatistik');return}}catch{}location.href='../istatistik/'+(CLOUD?'':'?local')}});
+});
 $('#topSrch').onclick=()=>palette();
 $('#sbt').onclick=openPages;
 function tnavPaint(){const p=openId&&pages.get(openId),dr=$('#app').classList.contains('drawer');
-  const cur=curMode==='brain'?'ai':curMode==='lib'?'':p&&(p.tpl==='todo'||(p.tpl==='daily'&&p.date===today()))?'todo':'notes';
+  const cur=curMode!=='ws'?'':view==='cal'||view==='timeline'?'cal':view==='acts'?'acts':view==='tasks'?'tasks':view==='stats'?'stats':'notes';$('#topAi')?.classList.toggle('on',curMode==='brain');
   $$('#tnav [data-tn]').forEach(a=>{const on=a.dataset.tn===cur;a.classList.toggle('on',on);on?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current')});$('#sbt').setAttribute('aria-expanded',dr);$('#sbt').classList.toggle('on',dr);
   const on=$('#tnav .on'),k=$('#tnav .tk');if(k){k.style.opacity=on?1:0;if(on){k.style.width=on.offsetWidth+'px';k.style.transform=`translateX(${on.offsetLeft}px)`}}}
 addEventListener('resize',tnavPaint);
@@ -794,7 +800,7 @@ function renderView(soft){
   if(view==='lib'||view==='brain'){if(!soft)(view==='lib'?Library:Brain).render(secParts);return}
   hideFloat();
   const v=$('#view'),sc=$('#scroll'),keep=soft?sc.scrollTop:0;
-  if(view==='page')renderPage();else if(view==='timeline')renderTimeline();else if(view==='cal')renderCal();else if(view==='tpl')renderTpl();else renderHome();
+  if(view==='page')renderPage();else if(view==='timeline')renderTimeline();else if(view==='cal')renderCal();else if(view==='acts')Time.renderActs();else if(view==='tasks')Time.renderTasks();else if(view==='stats')Time.renderStats();else if(view==='tpl')renderTpl();else renderHome();
   sc.scrollTop=keep;onScroll();
   if(!soft)anim(v,[{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'none'}],{duration:460,easing:OUT});
 }
@@ -849,18 +855,18 @@ function stagger(sel){$$(sel,$('#view')).forEach((el,i)=>anim(el,[{opacity:0,tra
 /* Calendar */
 let calM=(()=>{const d=new Date();return new Date(d.getFullYear(),d.getMonth(),1)})(),selDay=today();
 function renderCal(dir,quiet){
-  setCrumb(IC.cal,'Takvim');
+  setCrumb(IC.cal,'Takvim');if(Time.calMode!=='month'){Time.renderGrid();return}
   const y=calM.getFullYear(),m=calM.getMonth(),first=new Date(y,m,1),off=(first.getDay()+6)%7,dim=new Date(y,m+1,0).getDate(),weeks=Math.ceil((off+dim)/7);
   const start=new Date(y,m,1-off),t=today(),by=new Map(),fix=dateIndex();
   for(const p of pages.values())if(p.date){if(!by.has(p.date))by.set(p.date,[]);by.get(p.date).push(p)}
   let cells='';
   for(let i=0;i<weeks*7;i++){const dd=new Date(start);dd.setDate(start.getDate()+i);const s=ymd(dd),its=(by.get(s)||[]).sort((a,b)=>a.created-b.created);
     const fdn=fix.get(s)?.blocks.length||0;
-    cells+=`<div class="cd${dd.getMonth()!==m?' out':''}${s===t?' today':''}${s===selDay?' sel':''}${i%7>4?' wk':''}" data-day="${s}"><span class="dn">${dd.getDate()}</span><div class="chips">${its.slice(0,3).map(p=>`<div class="c2" draggable="true" data-pid="${p.id}" title="${esc(titleOf(p))}">${iconOf(p)}<span>${esc(titleOf(p))}</span></div>`).join('')}${its.length>3?`<div class="more">+${its.length-3}</div>`:''}${fdn?`<div class="more fdn">📌 ${fdn} tarihli satır</div>`:''}</div></div>`}
+    cells+=`<div class="cd${dd.getMonth()!==m?' out':''}${s===t?' today':''}${s===selDay?' sel':''}${i%7>4?' wk':''}" data-day="${s}"><span class="dn">${dd.getDate()}</span><div class="chips">${Time.monthChips(s)}${its.slice(0,3).map(p=>`<div class="c2" draggable="true" data-pid="${p.id}" title="${esc(titleOf(p))}">${iconOf(p)}<span>${esc(titleOf(p))}</span></div>`).join('')}${its.length>3?`<div class="more">+${its.length-3}</div>`:''}${fdn?`<div class="more fdn">📌 ${fdn} tarihli satır</div>`:''}</div></div>`}
   const isCur=y===new Date().getFullYear()&&m===new Date().getMonth();
   $('#view').innerHTML=`<div class="wide cal"><div>
     <div class="cal-h"><h1>${MONTHS[m]} <em>${y}</em></h1>
-      <button class="tb" data-cal="-1" title="Önceki ay">${IC.chevL}</button>
+      ${Time.modeSeg()}<button class="tb" data-cal="-1" title="Önceki ay">${IC.chevL}</button>
       <button class="tb" data-cal="0"${isCur?' style="opacity:.45"':''}>Bugün</button>
       <button class="tb" data-cal="1" title="Sonraki ay">${IC.chevR}</button></div>
     <div class="dow">${DOW.map(d=>`<span>${d}</span>`).join('')}</div>
@@ -874,7 +880,7 @@ function renderDay(animate){
   const its=[...pages.values()].filter(p=>p.date===selDay).sort((a,b)=>a.created-b.created);
   const quick=['daily','meet','todo','client','class','week'];
   $('#dp').innerHTML=`<h2>${esc(fmtShort(selDay))}</h2><div class="wd">${esc(fmtWd(selDay))}${selDay===today()?' · bugün':''}</div>
-    <div class="lst">${its.length?its.map(p=>`<button class="row" data-pid="${p.id}"><span class="e">${iconOf(p)}</span><b>${esc(titleOf(p))}</b><small>${rel(p.updated)}</small></button>`).join(''):'<div class="none">Bu gün için plan yok.</div>'}</div>
+    ${Time.dayPanelExtra(selDay)}<div class="sh"><span>Notlar</span><span class="rule"></span></div><div class="lst">${its.length?its.map(p=>`<button class="row" data-pid="${p.id}"><span class="e">${iconOf(p)}</span><b>${esc(titleOf(p))}</b><small>${rel(p.updated)}</small></button>`).join(''):'<div class="none">Bu güne bağlı not yok.</div>'}</div>
     ${(()=>{const e=dateIndex().get(selDay);return e&&e.blocks.length?`<div class="sh"><span>Bu güne tarihli satırlar</span><span class="rule"></span></div><div class="lst">${e.blocks.slice(0,8).map(o=>`<button class="row" data-pid="${o.p.id}"><span class="e">${o.b.t==='todo'?(o.b.c?'☑️':'⬜'):'📌'}</span><b>${esc(plain(o.b.h).slice(0,60))}</b><small>${esc(titleOf(o.p))}</small></button>`).join('')}</div>`:''})()}
     <button class="pill" data-day-open="${selDay}" style="margin:6px 0 14px">📓 Bu günün notunu aç</button>
     <div class="sh"><span>Bu güne ekle</span><span class="rule"></span></div>
@@ -1549,19 +1555,19 @@ $('#gBtn').onclick=async()=>{const p=new firebase.auth.GoogleAuthProvider();p.se
 $('#gOut').onclick=()=>firebase.auth().signOut();
 $('#me').onclick=e=>{const u=firebase.auth().currentUser;if(!u)return;const p=float($('#me'),`<div class="pop-h" style="text-transform:none;letter-spacing:0;font-family:var(--font);font-size:12px;line-height:1.4"><b style="display:block;color:var(--ink);font-weight:500">${esc(u.displayName||'Hesap')}</b>${esc(u.email)}</div><div class="sep"></div><button class="mi" data-out><span class="bi">${IC.out}</span><span class="tx">Çıkış yap</span></button>`,{w:240});
   p.addEventListener('click',ev=>{if(ev.target.closest('[data-out]')){hideFloat();flushAll();firebase.auth().signOut()}})};
-function start(){applyTheme();welcome();if(!started){started=true}route()}
+function start(){applyTheme();welcome();if(!started){started=true;Time.bind()}route()}
 (async()=>{
   applyTheme();
-  if(!CLOUD){S=Local;KB.startLocal();Local.load().forEach(p=>{const n=norm(p);pages.set(n.id,n)});$('#saved').title='Bu tarayıcıda kayıtlı';start();return}
+  if(!CLOUD){S=Local;KB.startLocal();TM.startLocal();Local.load().forEach(p=>{const n=norm(p);pages.set(n.id,n)});$('#saved').title='Bu tarayıcıda kayıtlı';start();return}
   gate('loading');
   try{await loadFirebase()}catch{return gate('error','Firebase yüklenemedi. İnternet bağlantını kontrol et.')}
   if(!firebase.apps.length)firebase.initializeApp(FB);
   const fs=firebase.firestore();try{await fs.enablePersistence({synchronizeTabs:true})}catch{}
   firebase.auth().getRedirectResult().catch(e=>gate('error',authMsg(e)));
   firebase.auth().onAuthStateChanged(async u=>{
-    if(!u){Cloud.stop();KB.stop();pages.clear();P=null;$('#view').innerHTML='';$('#nav').innerHTML='';$('#me').hidden=true;closePal();hideFloat(true);return gate('signin')}
+    if(!u){Cloud.stop();KB.stop();TM.stop();pages.clear();P=null;$('#view').innerHTML='';$('#nav').innerHTML='';$('#me').hidden=true;closePal();hideFloat(true);return gate('signin')}
     if((u.email||'').toLowerCase()!==OWNER){Cloud.stop();return gate('denied',`<b>${esc(u.email)}</b> bu deftere erişemez.`)}
-    gate('loading','Notlar yükleniyor…');S=Cloud;pages.clear();await Cloud.start(fs);await KB.startCloud(fs);
+    gate('loading','Notlar yükleniyor…');S=Cloud;pages.clear();await Cloud.start(fs);await KB.startCloud(fs);await TM.startCloud(fs);
     const me=$('#me');me.hidden=false;me.innerHTML=u.photoURL?`<img src="${esc(u.photoURL)}" alt="" referrerpolicy="no-referrer">`:esc((u.displayName||u.email)[0].toUpperCase());
     start();await ungate();
   });

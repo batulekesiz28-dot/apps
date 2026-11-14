@@ -1559,5 +1559,39 @@
    }
   },
   "items": []
+ },
+ {
+  "at": "2026-11-14T22:20:13",
+  "change": "Notlar → zaman yönetimi: üst sekmeler Takvim · Aktiviteler · Görevler · Notlar · İstatistikler; aktivite sistemi (hızlı ekleme, kategoriler, durum), gün/hafta/ay takvimi, sürükle-bırak, görev listesi, istatistikler",
+  "scores": {
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "istatistik telefon": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Telefonda üst şerit taşıyordu (Library kesiliyordu)",
+    "fix": "Dar ekranda arama ve Workspace düğmesi gizleniyor (Notlar sekmesi = Workspace, arama panelde)"
+   },
+   {
+    "app": "notlar",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Aktivite listesinde süre iki satıra kırılıyordu",
+    "fix": "Süre sütunu genişletildi"
+   }
+  ]
  }
 ]

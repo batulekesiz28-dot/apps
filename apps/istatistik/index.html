@@ -12,10 +12,10 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#F7F7F5;--surface:#FFFFFF;--ink:#0B0B0B;--ink2:#52514E;--ink3:#6E6D69;--ink4:#C9C8C3;--line:rgba(10,10,10,.08);--line2:rgba(10,10,10,.14);
-  --s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--s4:#eda100;--grid:rgba(10,10,10,.07);--tip:#111;--tipink:#fff;
+  --s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--s4:#eda100;--s5:#e87ba4;--grid:rgba(10,10,10,.07);--tip:#111;--tipink:#fff;
   --font:'Geist',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;--mono:'Geist Mono',ui-monospace,Menlo,monospace;--out:cubic-bezier(.16,1,.3,1);color-scheme:light}
 [data-theme=dark]{--bg:#0F0F0E;--surface:#1A1A19;--ink:#F0EFEC;--ink2:#C3C2B7;--ink3:#9A998F;--ink4:#4A4944;--line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.14);
-  --s1:#3987e5;--s2:#d95926;--s3:#199e70;--s4:#c98500;--grid:rgba(255,255,255,.07);--tip:#F0EFEC;--tipink:#111;color-scheme:dark}
+  --s1:#3987e5;--s2:#d95926;--s3:#199e70;--s4:#c98500;--s5:#d55181;--grid:rgba(255,255,255,.07);--tip:#F0EFEC;--tipink:#111;color-scheme:dark}
 html,body{background:var(--bg)}body{font-family:var(--font);color:var(--ink);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
 button,input,select{font:inherit;color:inherit}button{background:none;border:0;cursor:pointer}:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
 .wrap{max-width:1180px;margin:0 auto;padding:28px 24px 64px}
@@ -116,9 +116,9 @@ const MEDIA={movie:'Film',series:'Dizi',anime:'Anime',game:'Oyun'},READ={book:'K
 const TYPEN={...MEDIA,...READ,...WATCH,web:'Web sitesi',image:'Görsel',file:'Dosya'};
 
 /* ── veri ── */
-const D={pages:[],sessions:[],study:{subjects:[],tasks:[]},items:[],src:''};
-async function loadLocal(){D.pages=lsg('notlar:v1',[])||[];const s=lsg('studylog:v1',null);D.sessions=s?.sessions||[];D.study={subjects:s?.set?.subjects||[],tasks:s?.set?.tasks||[]};D.items=lsg('kb:v1',{})?.items||[];D.src='Bu tarayıcıdaki yerel veriler'}
-async function loadCloud(fs){const [p,st,ss,it]=await Promise.all([fs.collection('hub').doc('notes').collection('pages').get(),fs.collection('hub').doc('studylog').get(),fs.collection('hub').doc('studylog').collection('sessions').get(),fs.collection('hub').doc('kb').collection('items').get()]);
+const D={pages:[],sessions:[],study:{subjects:[],tasks:[]},items:[],acts:[],src:''};
+async function loadLocal(){D.pages=lsg('notlar:v1',[])||[];const s=lsg('studylog:v1',null);D.sessions=s?.sessions||[];D.study={subjects:s?.set?.subjects||[],tasks:s?.set?.tasks||[]};D.items=lsg('kb:v1',{})?.items||[];D.acts=lsg('time:v1',{})?.acts||[];D.src='Bu tarayıcıdaki yerel veriler'}
+async function loadCloud(fs){const [p,st,ss,it,ac]=await Promise.all([fs.collection('hub').doc('notes').collection('pages').get(),fs.collection('hub').doc('studylog').get(),fs.collection('hub').doc('studylog').collection('sessions').get(),fs.collection('hub').doc('kb').collection('items').get(),fs.collection('hub').doc('time').collection('acts').get().catch(()=>({docs:[]}))]);D.acts=ac.docs.map(d=>d.data());
   D.pages=p.docs.map(d=>d.data());const v=st.data()||{};D.study={subjects:v.subjects||[],tasks:v.tasks||[]};D.sessions=ss.docs.map(d=>d.data());D.items=it.docs.map(d=>d.data());D.src='Buluttaki veriler (Firestore)'}
 let FS=null;async function load(){if(FS)await loadCloud(FS);else await loadLocal();derive();render()}
 
@@ -130,10 +130,11 @@ function derive(){EV=[];TODOS=[];
   for(const t of D.study.tasks||[]){TODOS.push({text:t.text,done:!!t.done,page:'Study Log',at:+t.at||0,src:'study'});if(t.done&&t.doneAt)EV.push({at:+t.doneAt,src:'task',t:`Görev tamamlandı: ${t.text}`})}
   for(const s of D.sessions){const at=s.start?+s.start:new Date(s.date+'T12:00').getTime();if(!isNaN(at))EV.push({at,src:'study',t:`Çalışma: ${subjName(s.subj)}${s.topic?' · '+s.topic:''} (${fm(s.min||0)})`,min:s.min||0,subj:s.subj,date:s.date})}
   for(const i of D.items){if(i.added)EV.push({at:+i.added,src:'lib',t:`Kütüphaneye eklendi: ${i.title}`,type:i.type})}
+  for(const a of D.acts){const at=new Date(a.date+'T'+(a.start||'12:00')).getTime();if(!isNaN(at))EV.push({at,src:'act',t:`Aktivite: ${a.title}${a.dur?' ('+fm(a.dur)+')':''}${a.status==='done'?'':' · planlandı'}`,min:a.dur||0})}
   const kids={};for(const p of D.pages)if(p.parent)kids[p.parent]=(kids[p.parent]||0)+1;PROJ=D.pages.filter(p=>!p.parent&&kids[p.id]&&Date.now()-(+p.updated||0)<30*DAY).map(p=>({...p,kids:kids[p.id]}))}
 const subjName=id=>D.study.subjects.find(s=>s.id===id)?.name||'Ders';
 const subjCol=id=>D.study.subjects.find(s=>s.id===id)?.color||css('--s1');
-const SRC={note:['Notlar','--s1'],study:['Çalışma','--s2'],lib:['Kütüphane','--s3'],task:['Görev','--s4']};
+const SRC={note:['Notlar','--s1'],study:['Çalışma','--s2'],lib:['Kütüphane','--s3'],task:['Görev','--s4'],act:['Aktivite','--s5']};
 
 /* ── aralık ── */
 const R={k:'week',a:null,b:null};
@@ -189,7 +190,7 @@ function render(){const r=range(),p=prevR(r),main=$('#main');
   const delta=(a,b,f=v=>v)=>{if(!a&&!b)return'<em>önceki dönemde de yok</em>';if(!b)return`<em class="up">önceki dönem: 0</em>`;const d=Math.round((a-b)/b*100);return`<em class="${d>=0?'up':'dn'}">${d>=0?'↑':'↓'} %${Math.abs(d)} · önceki ${f(b)}</em>`};
   const lbl={day:'bugün',week:'son 7 gün',month:'son 30 gün',year:'son 12 ay',custom:'seçilen aralık'}[R.k];
   $('#sub').textContent=`${new Date(r.a).toLocaleDateString('tr-TR',{day:'numeric',month:'long'})} – ${new Date(r.b-1).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'})} · ${lbl}`;
-  if(!D.pages.length&&!D.sessions.length&&!D.items.length){main.innerHTML=empty('Henüz veri yok','Notlar, Study Log ve Kütüphane kullanıldıkça istatistikler burada oluşur. Hiçbir sayı uydurulmaz.');$('#srcNote').textContent=D.src;return}
+  if(!D.pages.length&&!D.sessions.length&&!D.items.length&&!D.acts.length){main.innerHTML=empty('Henüz veri yok','Notlar, Study Log ve Kütüphane kullanıldıkça istatistikler burada oluşur. Hiçbir sayı uydurulmaz.');$('#srcNote').textContent=D.src;return}
   let h=`<div class="kpis">
     <button class="kpi fade" data-det="study"><small>Çalışma süresi · ${lbl}</small><b>${fm(mR)}</b>${delta(mR,mP,fm)}</button>
     <button class="kpi fade" data-det="todo"><small>Tamamlanan görevler · toplam</small><b>${tdone}<span style="font-size:15px;color:var(--ink3)"> / ${TODOS.length}</span></b><em>${TODOS.length?`%${Math.round(tdone/TODOS.length*100)} tamamlandı`:'görev yok'}</em></button>
@@ -199,7 +200,7 @@ function render(){const r=range(),p=prevR(r),main=$('#main');
   /* aktivite */
   const B=buckets(r),keys=Object.entries(SRC).map(([k,[n,v]])=>[k,n,`var(${v})`]);
   const rows=B.map(b=>{const o={label:b.label,full:b.full,a:b.a,b:b.b};for(const k of Object.keys(SRC))o[k]=evR.filter(e=>e.src===k&&e.at>=b.a&&e.at<b.b).length;return o});
-  h+=`<div class="grid">`+card('act','Günlük aktivite','Notlar, çalışma oturumları, kütüphane eklemeleri ve tamamlanan görevler · bir sütuna tıkla',evR.length?colChart('act',rows,keys,{aria:'Aktivite grafiği',col:'Dönem'}):empty('Bu aralıkta aktivite yok','Başka bir aralık seç.'),'w8',true,evR.length?legendOf(keys):'');
+  h+=`<div class="grid">`+card('act','Günlük aktivite','Notlar, çalışma oturumları, kütüphane, görevler ve aktiviteler · bir sütuna tıkla',evR.length?colChart('act',rows,keys,{aria:'Aktivite grafiği',col:'Dönem'}):empty('Bu aralıkta aktivite yok','Başka bir aralık seç.'),'w8',true,evR.length?legendOf(keys):'');
   /* kaynak dağılımı */
   const bySrc=Object.keys(SRC).map(k=>[k,evR.filter(e=>e.src===k).length]),tot=evR.length||1;
   h+=card('src','Aktivite kaynakları',lbl,evR.length?`<div class="bars">${bySrc.map(([k,v])=>`<button class="hb" data-det="src:${k}"><span class="n">${SRC[k][0]}</span><span class="tr"><i style="width:${100*v/tot}%;background:var(${SRC[k][1]})"></i></span><span class="v">${v}</span></button>`).join('')}</div>`:empty('Veri yok',''),'w4',false);

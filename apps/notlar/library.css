@@ -310,3 +310,19 @@
   .lmenu button,.lpick .lp-l button{min-height:44px}.rd-h b{max-width:30vw}}
 @media (prefers-reduced-motion:reduce){.lib *,.ld *{animation:none!important;transition:none!important}}
 [data-motion=off] .lib *,[data-motion=off] .ld *{animation:none!important;transition:none!important}
+
+/* ── film/dizi/oyun/anime ── */
+.cv-sc{position:absolute;z-index:3;left:8px;top:8px;padding:3px 7px;border-radius:7px;font:600 12px/1.2 var(--font);color:#fff;background:rgba(10,8,4,.72);backdrop-filter:blur(6px);font-variant-numeric:tabular-nums}
+.cv.mini .cv-sc{display:none}.lc:hover .cv-sc{opacity:0;transition:opacity .2s}
+.lm-st{color:var(--lib-ink3)}.lm-st.st-todo{color:color-mix(in srgb,var(--lib-acc) 80%,var(--lib-ink))}.lm-st.st-doing{color:color-mix(in srgb,#2563EB 75%,var(--lib-ink))}
+.ld-st{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:10px 0 2px}
+.ld-st button{height:34px;padding:0 13px;border-radius:999px;font-size:13px;font-weight:500;color:var(--lib-ink2);box-shadow:inset 0 0 0 1px var(--lib-line);transition:background .15s,color .15s}
+.ld-st button:hover{color:var(--lib-ink)}.ld-st button.on{background:var(--lib-ink);color:var(--lib-bg);box-shadow:none}
+.ld-sc{margin-left:6px;padding:5px 10px;border-radius:9px;font:600 13px var(--font);background:color-mix(in srgb,#F5C518 30%,var(--lib-card));color:var(--lib-ink);font-variant-numeric:tabular-nums}
+.imp{display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:16px;margin-bottom:22px;padding:16px 18px;border-radius:20px;background:var(--lib-card);box-shadow:0 0 0 1px var(--lib-line),var(--lib-sh)}
+.imp-ic{display:grid;place-items:center;width:48px;height:48px;border-radius:14px;background:color-mix(in srgb,#D97706 18%,transparent);color:#B45309}.imp-ic .li{width:24px;height:24px}
+.imp b{display:block;font:500 19px/1.25 var(--serif)}.imp small{display:block;margin-top:3px;font-size:13px;line-height:1.45;color:var(--lib-ink2)}
+[data-theme=dark] .imp-ic{color:#F0A04B}
+@media (max-width:760px){.imp{grid-template-columns:auto 1fr;padding:16px}.imp .btn{grid-column:span 1;justify-content:center}.imp .btn.pri{grid-column:1/-1}.imp .btn:not(.pri){grid-column:1/-1}.ld-st button{height:40px}}
+.lr-dot.sq{font-size:12px;color:var(--lib-ink)}.hero-try code{color:var(--lib-ink2)}
+.ld-by a{min-height:28px}@media (max-width:900px){.ld-by a{min-height:40px}}

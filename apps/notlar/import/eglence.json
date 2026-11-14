@@ -1,0 +1,1682 @@
+{
+"source": "Notion · List / eğlence (İzlenenler veritabanı, izlenmeyenler, yeni sezon geldi/beklemede)",
+"updated": "2026-11-14",
+"cols": {
+"done": {
+"name": "İzlenenler",
+"emoji": "🎬",
+"color": "#30A46C",
+"desc": "Bitirdiğim film, dizi, oyun ve animeler"
+},
+"todo": {
+"name": "İzlenecekler",
+"emoji": "🍿",
+"color": "#E5484D",
+"desc": "Sırada bekleyen film, dizi, oyun ve animeler"
+},
+"wait": {
+"name": "Yeni sezon / beklemede",
+"emoji": "⏳",
+"color": "#B45309",
+"desc": "Yeni sezonu ya da bölümü beklenenler"
+}
+},
+"items": [
+{
+"type": "movie",
+"title": "11 Oceans",
+"status": "done",
+"q": "Ocean's Eleven 2001 film",
+"cols": [
+"done"
+],
+"score": "IMDb 7.7"
+},
+{
+"type": "movie",
+"title": "12 Angry Men",
+"status": "done",
+"q": "12 Angry Men 1957 film",
+"cols": [
+"done"
+],
+"score": "IMDb 9.0"
+},
+{
+"type": "movie",
+"title": "500 Days of Summer",
+"status": "done",
+"q": "500 Days of Summer film",
+"cols": [
+"done"
+],
+"score": "IMDb 7.7"
+},
+{
+"type": "movie",
+"title": "A Bronx Tale",
+"status": "done",
+"q": "A Bronx Tale film",
+"cols": [
+"done"
+],
+"score": "IMDb 7.8"
+},
+{
+"type": "movie",
+"title": "Airport",
+"status": "done",
+"q": "Airport film",
+"cols": [
+"done"
+],
+"score": "IMDb 6.6"
+},
+{
+"type": "movie",
+"title": "Back to the Future",
+"status": "done",
+"q": "Back to the Future film",
+"cols": [
+"done"
+],
+"score": "IMDb 8.5"
+},
+{
+"type": "movie",
+"title": "Backrooms",
+"status": "done",
+"q": "Backrooms film",
+"cols": [
+"done"
+]
+},
+{
+"type": "movie",
+"title": "Batman v Superman",
+"status": "done",
+"q": "Batman v Superman: Dawn of Justice",
+"cols": [
+"done"
+],
+"score": "IMDb 6.4"
+},
+{
+"type": "movie",
+"title": "Ben Efsaneyim",
+"status": "done",
+"q": "I Am Legend film",
+"cols": [
+"done"
+],
+"score": "IMDb 7.2"
+},
+{
+"type": "movie",
+"title": "Bullet Train",
+"status": "done",
+"q": "Bullet Train 2022 film",
+"cols": [
+"done"
+],
+"score": "IMDb 7.3"
+},
+{
+"type": "movie",
+"title": "Coraline",
+"status": "done",
+"q": "Coraline film",
+"cols": [
+"done"
+],
+"score": "IMDb 7.8"
+},
+{
+"type": "movie",
+"title": "Demolition",
+"status": "done",
+"q": "Demolition 2015 film",
+"cols": [
+"done"
+],
+"score": "IMDb 7.0"
+},
+{
+"type": "movie",
+"title": "Diktatör",
+"status": "done",
+"q": "The Great Dictator",
+"cols": [
+"done"
+],
+"score": "IMDb 8.4"
+},
+{
+"type": "movie",
+"title": "Dune",
+"status": "done",
+"q": "Dune 2021 film",
+"cols": [
+"done"
+],
+"score": "IMDb 8.0"
+},
+{
+"type": "movie",
+"title": "Edge of Tomorrow",
+"status": "done",
+"q": "Edge of Tomorrow film",
+"cols": [
+"done"
+],
+"score": "IMDb 7.9"
+},
+{
+"type": "movie",
+"title": "Esaretin Bedeli",
+"status": "done",
+"q": "The Shawshank Redemption",
+"cols": [
+"done"
+],
+"score": "IMDb 9.3"
+},
+{
+"type": "movie",
+"title": "Fight Club",
+"status": "done",
+"q": "Fight Club film",
+"cols": [
+"done"
+],
+"score": "IMDb 8.8"
+},
+{
+"type": "movie",
+"title": "Forrest Gump",
+"status": "done",
+"q": "Forrest Gump film",
+"cols": [
+"done"
+],
+"score": "IMDb 8.8"
+},
+{
+"type": "movie",
+"title": "Free Guy",
+"status": "done",
+"q": "Free Guy film",
+"cols": [
+"done"
+],
+"score": "IMDb 7.1"
+},
+{
+"type": "movie",
+"title": "Gladyatör",
+"status": "done",
+"q": "Gladiator 2000 film",
+"cols": [
+"done"
+],
+"score": "IMDb 8.5"
+},
+{
+"type": "movie",
+"title": "I Mother",
+"status": "done",
+"q": "I Mother",
+"cols": [
+"done"
+],
+"score": "IMDb 6.8"
+},
+{
+"type": "movie",
+"title": "I Swear",
+"status": "done",
+"q": "I Swear 2025 film",
+"cols": [
+"done"
+],
+"score": "IMDb 8.2"
+},
+{
+"type": "movie",
+"title": "Inception",
+"status": "done",
+"q": "Inception film",
+"cols": [
+"done"
+],
+"score": "IMDb 8.8"
+},
+{
+"type": "movie",
+"title": "Interstellar",
+"status": "done",
+"q": "Interstellar film",
+"cols": [
+"done"
+],
+"score": "IMDb 8.7"
+},
+{
+"type": "movie",
+"title": "IT",
+"status": "done",
+"q": "It 2017 film",
+"cols": [
+"done"
+],
+"score": "IMDb 7.3"
+},
+{
+"type": "movie",
+"title": "Joker",
+"status": "done",
+"q": "Joker 2019 film",
+"cols": [
+"done"
+],
+"score": "IMDb 8.3"
+},
+{
+"type": "movie",
+"title": "Kan Sporu",
+"status": "done",
+"q": "Bloodsport film",
+"cols": [
+"done"
+],
+"score": "IMDb 6.8"
+},
+{
+"type": "movie",
+"title": "Kara Şövalye",
+"status": "done",
+"q": "The Dark Knight film",
+"cols": [
+"done"
+],
+"score": "IMDb 9.0"
+},
+{
+"type": "movie",
+"title": "Karate Kid",
+"status": "done",
+"q": "The Karate Kid",
+"cols": [
+"done"
+],
+"score": "IMDb 7.3"
+},
+{
+"type": "movie",
+"title": "Kolpaçino",
+"status": "done",
+"q": "tr:Kolpaçino",
+"cols": [
+"done"
+],
+"score": "IMDb 6.5"
+},
+{
+"type": "movie",
+"title": "Kötü Kedi Şerafettin",
+"status": "done",
+"q": "tr:Kötü Kedi Şerafettin (film)",
+"cols": [
+"done"
+],
+"score": "IMDb 7.6"
+},
+{
+"type": "movie",
+"title": "LEGO Batman",
+"status": "done",
+"q": "The Lego Batman Movie",
+"cols": [
+"done"
+],
+"score": "IMDb 7.3"
+},
+{
+"type": "movie",
+"title": "Mars",
+"status": "done",
+"q": "The Martian film",
+"cols": [
+"done"
+],
+"score": "IMDb 8.0"
+},
+{
+"type": "movie",
+"title": "Nefesini Tut",
+"status": "done",
+"q": "Don't Breathe film",
+"cols": [
+"done"
+],
+"score": "IMDb 7.1"
+},
+{
+"type": "movie",
+"title": "Next",
+"status": "done",
+"q": "Next 2007 film",
+"cols": [
+"done"
+],
+"score": "IMDb 6.2"
+},
+{
+"type": "movie",
+"title": "No Country for Old Men",
+"status": "done",
+"q": "No Country for Old Men film",
+"cols": [
+"done"
+],
+"score": "IMDb 8.2"
+},
+{
+"type": "movie",
+"title": "Nuremberg",
+"status": "done",
+"q": "Nuremberg 2025 film",
+"cols": [
+"done"
+]
+},
+{
+"type": "movie",
+"title": "Oppenheimer",
+"status": "done",
+"q": "Oppenheimer film",
+"cols": [
+"done"
+],
+"score": "IMDb 8.3"
+},
+{
+"type": "movie",
+"title": "Smile",
+"status": "done",
+"q": "Smile 2022 film",
+"cols": [
+"done"
+],
+"score": "IMDb 6.5"
+},
+{
+"type": "movie",
+"title": "Soysuzlar Çetesi",
+"status": "done",
+"q": "Inglourious Basterds",
+"cols": [
+"done"
+],
+"score": "IMDb 8.4"
+},
+{
+"type": "movie",
+"title": "Split",
+"status": "done",
+"q": "Split 2016 film",
+"cols": [
+"done"
+],
+"score": "IMDb 7.3"
+},
+{
+"type": "movie",
+"title": "Sıkıysa Yakala",
+"status": "done",
+"q": "Catch Me If You Can",
+"cols": [
+"done"
+],
+"score": "IMDb 8.1"
+},
+{
+"type": "movie",
+"title": "Taxi Driver",
+"status": "done",
+"q": "Taxi Driver film",
+"cols": [
+"done"
+],
+"score": "IMDb 8.2"
+},
+{
+"type": "movie",
+"title": "Terminator",
+"status": "done",
+"q": "The Terminator",
+"cols": [
+"done"
+],
+"score": "IMDb 8.1"
+},
+{
+"type": "movie",
+"title": "The Godfather",
+"status": "done",
+"q": "The Godfather film",
+"cols": [
+"done"
+],
+"score": "IMDb 9.2"
+},
+{
+"type": "movie",
+"title": "The Mask",
+"status": "done",
+"q": "The Mask 1994 film",
+"cols": [
+"done"
+],
+"score": "IMDb 7.0"
+},
+{
+"type": "movie",
+"title": "Truman Show",
+"status": "done",
+"q": "The Truman Show",
+"cols": [
+"done"
+],
+"score": "IMDb 8.2"
+},
+{
+"type": "movie",
+"title": "Uncharted",
+"status": "done",
+"q": "Uncharted film",
+"cols": [
+"done"
+],
+"score": "IMDb 6.3"
+},
+{
+"type": "movie",
+"title": "V for Vendetta",
+"status": "done",
+"q": "V for Vendetta film",
+"cols": [
+"done"
+],
+"score": "IMDb 8.1"
+},
+{
+"type": "movie",
+"title": "Whiplash",
+"status": "done",
+"q": "Whiplash 2014 film",
+"cols": [
+"done"
+],
+"score": "IMDb 8.5"
+},
+{
+"type": "movie",
+"title": "Yaşam Şifresi",
+"status": "done",
+"q": "Source Code film",
+"cols": [
+"done"
+],
+"score": "IMDb 7.5"
+},
+{
+"type": "movie",
+"title": "Zindan Adası",
+"status": "done",
+"q": "Shutter Island film",
+"cols": [
+"done"
+],
+"score": "IMDb 8.2"
+},
+{
+"type": "movie",
+"title": "Çelik Yumruklar",
+"status": "done",
+"q": "Real Steel",
+"cols": [
+"done"
+],
+"score": "IMDb 7.1"
+},
+{
+"type": "movie",
+"title": "Ölü Ozanlar Derneği",
+"status": "done",
+"q": "Dead Poets Society",
+"cols": [
+"done"
+],
+"score": "IMDb 8.1"
+},
+{
+"type": "movie",
+"title": "Şeker Henry",
+"status": "done",
+"q": "The Wonderful Story of Henry Sugar",
+"cols": [
+"done"
+],
+"score": "IMDb 7.8"
+},
+{
+"type": "series",
+"title": "Black Mirror",
+"status": "done",
+"q": "Black Mirror TV series",
+"cols": [
+"done"
+],
+"score": "IMDb 8.7"
+},
+{
+"type": "series",
+"title": "Breaking Bad",
+"status": "done",
+"q": "Breaking Bad",
+"cols": [
+"done"
+],
+"score": "IMDb 9.5"
+},
+{
+"type": "series",
+"title": "Dexter",
+"status": "done",
+"q": "Dexter TV series",
+"cols": [
+"done"
+],
+"score": "IMDb 8.6"
+},
+{
+"type": "series",
+"title": "Dispatch",
+"status": "done",
+"q": "Dispatch video game AdHoc",
+"cols": [
+"done"
+]
+},
+{
+"type": "series",
+"title": "From",
+"status": "done",
+"q": "From TV series",
+"cols": [
+"done"
+],
+"score": "IMDb 7.8"
+},
+{
+"type": "series",
+"title": "Gibi",
+"status": "done",
+"q": "tr:Gibi (dizi)",
+"cols": [
+"done"
+],
+"score": "IMDb 8.8"
+},
+{
+"type": "series",
+"title": "HIMYM",
+"status": "done",
+"q": "How I Met Your Mother",
+"cols": [
+"done"
+],
+"score": "IMDb 8.3"
+},
+{
+"type": "series",
+"title": "Invincible",
+"status": "done",
+"q": "Invincible TV series",
+"cols": [
+"done"
+],
+"score": "IMDb 8.7"
+},
+{
+"type": "series",
+"title": "Kurtlar Vadisi",
+"status": "done",
+"q": "tr:Kurtlar Vadisi",
+"cols": [
+"done"
+],
+"score": "IMDb 8.0"
+},
+{
+"type": "series",
+"title": "La Casa de Papel",
+"status": "done",
+"q": "Money Heist",
+"cols": [
+"done"
+],
+"score": "IMDb 8.2"
+},
+{
+"type": "series",
+"title": "Lost",
+"status": "done",
+"q": "Lost TV series",
+"cols": [
+"done"
+],
+"score": "IMDb 8.3"
+},
+{
+"type": "series",
+"title": "Mr. Robot",
+"status": "done",
+"q": "Mr. Robot",
+"cols": [
+"done"
+],
+"score": "IMDb 8.5"
+},
+{
+"type": "series",
+"title": "Prison Break",
+"status": "done",
+"q": "Prison Break",
+"cols": [
+"done"
+],
+"score": "IMDb 8.3"
+},
+{
+"type": "series",
+"title": "Regular Show",
+"status": "done",
+"q": "Regular Show",
+"cols": [
+"done"
+],
+"score": "IMDb 8.5"
+},
+{
+"type": "series",
+"title": "Rick and Morty",
+"status": "done",
+"q": "Rick and Morty",
+"cols": [
+"done"
+],
+"score": "IMDb 9.0"
+},
+{
+"type": "series",
+"title": "Severance",
+"status": "done",
+"q": "Severance TV series",
+"cols": [
+"done"
+],
+"score": "IMDb 8.7"
+},
+{
+"type": "series",
+"title": "Sherlock",
+"status": "done",
+"q": "Sherlock TV series",
+"cols": [
+"done"
+],
+"score": "IMDb 9.1"
+},
+{
+"type": "series",
+"title": "Squid Game",
+"status": "done",
+"q": "Squid Game",
+"cols": [
+"done"
+],
+"score": "IMDb 8.0"
+},
+{
+"type": "series",
+"title": "Supernatural",
+"status": "done",
+"q": "Supernatural TV series",
+"cols": [
+"done"
+],
+"score": "IMDb 8.4"
+},
+{
+"type": "series",
+"title": "The Blacklist",
+"status": "done",
+"q": "The Blacklist TV series",
+"cols": [
+"done"
+],
+"score": "IMDb 7.9"
+},
+{
+"type": "series",
+"title": "The Boys",
+"status": "done",
+"q": "The Boys TV series",
+"cols": [
+"done"
+],
+"score": "IMDb 8.6"
+},
+{
+"type": "series",
+"title": "The Mandalorian",
+"status": "done",
+"q": "The Mandalorian",
+"cols": [
+"done"
+],
+"score": "IMDb 8.6"
+},
+{
+"type": "series",
+"title": "True Detective",
+"status": "done",
+"q": "True Detective",
+"cols": [
+"done"
+],
+"score": "IMDb 8.9"
+},
+{
+"type": "series",
+"title": "Tulsa King",
+"status": "done",
+"q": "Tulsa King",
+"cols": [
+"done"
+],
+"score": "IMDb 7.9"
+},
+{
+"type": "series",
+"title": "You",
+"status": "done",
+"q": "You TV series",
+"cols": [
+"done"
+],
+"score": "IMDb 7.7"
+},
+{
+"type": "game",
+"title": "60 Seconds",
+"status": "done",
+"q": "60 Seconds! video game",
+"cols": [
+"done"
+]
+},
+{
+"type": "game",
+"title": "A Way Out",
+"status": "done",
+"q": "A Way Out video game",
+"cols": [
+"done"
+],
+"score": "MC 78"
+},
+{
+"type": "game",
+"title": "Age of History",
+"status": "done",
+"q": "Age of History video game",
+"cols": [
+"done"
+]
+},
+{
+"type": "game",
+"title": "Bad Parenting",
+"status": "done",
+"q": "Bad Parenting video game",
+"cols": [
+"done"
+]
+},
+{
+"type": "game",
+"title": "Bodycam",
+"status": "done",
+"q": "Bodycam video game",
+"cols": [
+"done"
+]
+},
+{
+"type": "game",
+"title": "Cyberpunk 2077",
+"status": "done",
+"q": "Cyberpunk 2077",
+"cols": [
+"done"
+],
+"score": "MC 86"
+},
+{
+"type": "game",
+"title": "Dead Cells",
+"status": "done",
+"q": "Dead Cells",
+"cols": [
+"done"
+],
+"score": "MC 89"
+},
+{
+"type": "game",
+"title": "Deltarune",
+"status": "done",
+"q": "Deltarune",
+"cols": [
+"done",
+"wait"
+],
+"note": "yeni bölümler bekleniyor"
+},
+{
+"type": "game",
+"title": "Detroit: Become Human",
+"status": "done",
+"q": "Detroit: Become Human",
+"cols": [
+"done"
+],
+"score": "MC 78"
+},
+{
+"type": "game",
+"title": "Dishonored",
+"status": "done",
+"q": "Dishonored video game",
+"cols": [
+"done"
+],
+"score": "MC 91"
+},
+{
+"type": "game",
+"title": "Fever",
+"status": "done",
+"q": "Fever video game",
+"cols": [
+"done"
+]
+},
+{
+"type": "game",
+"title": "Garten of Banban",
+"status": "done",
+"q": "Garten of Banban",
+"cols": [
+"done"
+]
+},
+{
+"type": "game",
+"title": "God of War",
+"status": "done",
+"q": "God of War 2018 video game",
+"cols": [
+"done"
+],
+"score": "MC 94"
+},
+{
+"type": "game",
+"title": "Half-Life",
+"status": "done",
+"q": "Half-Life video game",
+"cols": [
+"done"
+],
+"score": "MC 96"
+},
+{
+"type": "game",
+"title": "Hello Neighbor",
+"status": "done",
+"q": "Hello Neighbor",
+"cols": [
+"done"
+],
+"score": "MC 38"
+},
+{
+"type": "game",
+"title": "Hollow Knight",
+"status": "done",
+"q": "Hollow Knight",
+"cols": [
+"done"
+],
+"score": "MC 90"
+},
+{
+"type": "game",
+"title": "Hotline Miami",
+"status": "done",
+"q": "Hotline Miami",
+"cols": [
+"done"
+],
+"score": "MC 85"
+},
+{
+"type": "game",
+"title": "Inn Sanity",
+"status": "done",
+"q": "Inn Sanity video game",
+"cols": [
+"done"
+]
+},
+{
+"type": "game",
+"title": "Karma: The Dark World",
+"status": "done",
+"q": "Karma: The Dark World",
+"cols": [
+"done"
+]
+},
+{
+"type": "game",
+"title": "Katana ZERO",
+"status": "done",
+"q": "Katana Zero",
+"cols": [
+"done"
+],
+"score": "MC 83"
+},
+{
+"type": "game",
+"title": "Life Is Strange",
+"status": "done",
+"q": "Life Is Strange video game",
+"cols": [
+"done"
+],
+"score": "MC 85"
+},
+{
+"type": "game",
+"title": "Little Nightmares",
+"status": "done",
+"q": "Little Nightmares",
+"cols": [
+"done"
+],
+"score": "MC 78"
+},
+{
+"type": "game",
+"title": "No, I'm Not a Human",
+"status": "done",
+"q": "No, I'm Not a Human video game",
+"cols": [
+"done"
+]
+},
+{
+"type": "game",
+"title": "NSH",
+"status": "done",
+"q": "NSH video game",
+"cols": [
+"done"
+]
+},
+{
+"type": "game",
+"title": "Poppy Playtime",
+"status": "done",
+"q": "Poppy Playtime",
+"cols": [
+"done"
+]
+},
+{
+"type": "game",
+"title": "Ready or Not",
+"status": "done",
+"q": "Ready or Not video game",
+"cols": [
+"done"
+],
+"score": "MC 79"
+},
+{
+"type": "game",
+"title": "Red Dead Redemption 2",
+"status": "done",
+"q": "Red Dead Redemption 2",
+"cols": [
+"done"
+],
+"score": "MC 97"
+},
+{
+"type": "game",
+"title": "Resident Evil 2",
+"status": "done",
+"q": "Resident Evil 2 2019 remake",
+"cols": [
+"done"
+],
+"score": "MC 91"
+},
+{
+"type": "game",
+"title": "Resident Evil 4",
+"status": "done",
+"q": "Resident Evil 4",
+"cols": [
+"done"
+],
+"score": "MC 96"
+},
+{
+"type": "game",
+"title": "Resident Evil Village",
+"status": "done",
+"q": "Resident Evil Village",
+"cols": [
+"done"
+],
+"score": "MC 84"
+},
+{
+"type": "game",
+"title": "Sea of Thieves",
+"status": "done",
+"q": "Sea of Thieves",
+"cols": [
+"done"
+],
+"score": "MC 69"
+},
+{
+"type": "game",
+"title": "Sifu",
+"status": "done",
+"q": "Sifu video game",
+"cols": [
+"done"
+],
+"score": "MC 80"
+},
+{
+"type": "game",
+"title": "Hollow Knight: Silksong",
+"status": "done",
+"q": "Hollow Knight: Silksong",
+"cols": [
+"done",
+"wait"
+],
+"note": "beklemede"
+},
+{
+"type": "game",
+"title": "SUPERHOT",
+"status": "done",
+"q": "Superhot video game",
+"cols": [
+"done"
+],
+"score": "MC 82"
+},
+{
+"type": "game",
+"title": "The Last of Us",
+"status": "done",
+"q": "The Last of Us video game",
+"cols": [
+"done"
+],
+"score": "MC 95"
+},
+{
+"type": "game",
+"title": "The Witcher 3",
+"status": "done",
+"q": "The Witcher 3: Wild Hunt",
+"cols": [
+"done"
+],
+"score": "MC 92"
+},
+{
+"type": "game",
+"title": "The Walking Dead",
+"status": "done",
+"q": "The Walking Dead video game Telltale",
+"cols": [
+"done"
+]
+},
+{
+"type": "game",
+"title": "ULTRAKILL",
+"status": "done",
+"q": "Ultrakill video game",
+"cols": [
+"done"
+]
+},
+{
+"type": "game",
+"title": "Undertale",
+"status": "done",
+"q": "Undertale",
+"cols": [
+"done"
+],
+"score": "MC 92"
+},
+{
+"type": "game",
+"title": "Watch Dogs 2",
+"status": "done",
+"q": "Watch Dogs 2",
+"cols": [
+"done"
+],
+"score": "MC 82"
+},
+{
+"type": "game",
+"title": "Wolfenstein",
+"status": "done",
+"q": "Wolfenstein: The New Order",
+"cols": [
+"done"
+],
+"score": "MC 79"
+},
+{
+"type": "anime",
+"title": "ASV",
+"status": "done",
+"q": "ASV anime",
+"cols": [
+"done"
+]
+},
+{
+"type": "anime",
+"title": "Attack on Titan",
+"status": "done",
+"q": "Attack on Titan TV series",
+"cols": [
+"done"
+],
+"score": "IMDb 9.1"
+},
+{
+"type": "anime",
+"title": "Chainsaw Man",
+"status": "done",
+"q": "Chainsaw Man anime",
+"cols": [
+"done"
+],
+"score": "IMDb 8.4"
+},
+{
+"type": "anime",
+"title": "Cyberpunk: Edgerunners",
+"status": "done",
+"q": "Cyberpunk: Edgerunners",
+"cols": [
+"done",
+"wait"
+],
+"score": "IMDb 8.3",
+"note": "yeni sezon bekleniyor"
+},
+{
+"type": "anime",
+"title": "Death Note",
+"status": "done",
+"q": "Death Note TV series",
+"cols": [
+"done"
+],
+"score": "IMDb 8.9"
+},
+{
+"type": "anime",
+"title": "Demon Slayer",
+"status": "done",
+"q": "Demon Slayer anime",
+"cols": [
+"done"
+],
+"score": "IMDb 8.6"
+},
+{
+"type": "anime",
+"title": "Dr. Stone",
+"status": "done",
+"q": "Dr. Stone anime",
+"cols": [
+"done"
+],
+"score": "IMDb 8.1"
+},
+{
+"type": "anime",
+"title": "Erased",
+"status": "done",
+"q": "Erased manga anime",
+"cols": [
+"done"
+],
+"score": "IMDb 8.5"
+},
+{
+"type": "anime",
+"title": "Frieren",
+"status": "doing",
+"q": "Frieren anime",
+"cols": [
+"done"
+],
+"score": "IMDb 8.9"
+},
+{
+"type": "anime",
+"title": "I Want to Eat Your Pancreas",
+"status": "done",
+"q": "I Want to Eat Your Pancreas film",
+"cols": [
+"done"
+],
+"score": "IMDb 8.1"
+},
+{
+"type": "anime",
+"title": "Jujutsu Kaisen",
+"status": "done",
+"q": "Jujutsu Kaisen anime",
+"cols": [
+"done",
+"wait"
+],
+"score": "IMDb 8.5",
+"note": "son bölüm bekleniyor"
+},
+{
+"type": "anime",
+"title": "Monster",
+"status": "done",
+"q": "Monster manga anime",
+"cols": [
+"done"
+],
+"score": "IMDb 8.7"
+},
+{
+"type": "anime",
+"title": "Naruto",
+"status": "done",
+"q": "Naruto anime",
+"cols": [
+"done"
+],
+"score": "IMDb 8.4"
+},
+{
+"type": "anime",
+"title": "Neon Genesis Evangelion",
+"status": "done",
+"q": "Neon Genesis Evangelion",
+"cols": [
+"done"
+],
+"score": "IMDb 8.5"
+},
+{
+"type": "anime",
+"title": "One Piece",
+"status": "done",
+"q": "One Piece anime",
+"cols": [
+"done",
+"wait"
+],
+"score": "IMDb 8.4",
+"note": "yeni bölümler bekleniyor"
+},
+{
+"type": "anime",
+"title": "Re:Zero",
+"status": "done",
+"q": "Re:Zero anime",
+"cols": [
+"done",
+"wait"
+],
+"score": "IMDb 8.1",
+"note": "6. sezon bekleniyor"
+},
+{
+"type": "anime",
+"title": "Solo Leveling",
+"status": "done",
+"q": "Solo Leveling anime",
+"cols": [
+"done"
+],
+"score": "IMDb 8.3"
+},
+{
+"type": "anime",
+"title": "Steins;Gate",
+"status": "done",
+"q": "Steins;Gate anime",
+"cols": [
+"done"
+],
+"score": "IMDb 8.8"
+},
+{
+"type": "anime",
+"title": "Suzume",
+"status": "done",
+"q": "Suzume film",
+"cols": [
+"done"
+],
+"score": "IMDb 7.6"
+},
+{
+"type": "anime",
+"title": "The Disastrous Life of Saiki K.",
+"status": "done",
+"q": "The Disastrous Life of Saiki K.",
+"cols": [
+"done"
+],
+"score": "IMDb 8.2"
+},
+{
+"type": "anime",
+"title": "Vinland Saga",
+"status": "done",
+"q": "Vinland Saga anime",
+"cols": [
+"done"
+],
+"score": "IMDb 8.8"
+},
+{
+"type": "movie",
+"title": "Yeşil Yol",
+"status": "todo",
+"q": "The Green Mile film",
+"cols": [
+"todo"
+]
+},
+{
+"type": "movie",
+"title": "Project Hail Mary",
+"status": "todo",
+"q": "Project Hail Mary film",
+"cols": [
+"todo"
+]
+},
+{
+"type": "movie",
+"title": "Matrix",
+"status": "todo",
+"q": "The Matrix",
+"cols": [
+"todo"
+]
+},
+{
+"type": "movie",
+"title": "Er Ryan'ı Kurtarmak",
+"status": "todo",
+"q": "Saving Private Ryan",
+"cols": [
+"todo"
+]
+},
+{
+"type": "movie",
+"title": "The Wolf of Wall Street",
+"status": "todo",
+"q": "The Wolf of Wall Street film",
+"cols": [
+"todo"
+]
+},
+{
+"type": "movie",
+"title": "Rocky",
+"status": "todo",
+"q": "Rocky film",
+"cols": [
+"todo"
+]
+},
+{
+"type": "series",
+"title": "Game of Thrones",
+"status": "todo",
+"q": "Game of Thrones",
+"cols": [
+"todo"
+]
+},
+{
+"type": "series",
+"title": "The Mentalist",
+"status": "todo",
+"q": "The Mentalist",
+"cols": [
+"todo"
+]
+},
+{
+"type": "game",
+"title": "Modern Warfare 4",
+"status": "todo",
+"q": "Call of Duty 4: Modern Warfare",
+"cols": [
+"todo"
+]
+},
+{
+"type": "game",
+"title": "Onimusha",
+"status": "todo",
+"q": "Onimusha: Way of the Sword",
+"cols": [
+"todo"
+]
+},
+{
+"type": "game",
+"title": "The Blood of Dawnwalker",
+"status": "todo",
+"q": "The Blood of Dawnwalker",
+"cols": [
+"todo"
+]
+},
+{
+"type": "game",
+"title": "Resident Evil Requiem",
+"status": "todo",
+"q": "Resident Evil Requiem",
+"cols": [
+"todo"
+]
+},
+{
+"type": "game",
+"title": "007 First Light",
+"status": "todo",
+"q": "007 First Light",
+"cols": [
+"todo"
+]
+},
+{
+"type": "game",
+"title": "Uncharted",
+"status": "todo",
+"q": "Uncharted 4: A Thief's End",
+"cols": [
+"todo"
+]
+},
+{
+"type": "game",
+"title": "Zelda: Breath of the Wild",
+"status": "todo",
+"q": "The Legend of Zelda: Breath of the Wild",
+"cols": [
+"todo"
+]
+},
+{
+"type": "game",
+"title": "Baldur's Gate 3",
+"status": "todo",
+"q": "Baldur's Gate 3",
+"cols": [
+"todo"
+]
+},
+{
+"type": "game",
+"title": "Elden Ring",
+"status": "todo",
+"q": "Elden Ring",
+"cols": [
+"todo"
+]
+},
+{
+"type": "game",
+"title": "Hades II",
+"status": "todo",
+"q": "Hades II",
+"cols": [
+"todo"
+]
+},
+{
+"type": "game",
+"title": "Clair Obscur: Expedition 33",
+"status": "todo",
+"q": "Clair Obscur: Expedition 33",
+"cols": [
+"todo"
+]
+},
+{
+"type": "game",
+"title": "Bloodborne",
+"status": "todo",
+"q": "Bloodborne",
+"cols": [
+"todo"
+]
+},
+{
+"type": "game",
+"title": "Sekiro",
+"status": "todo",
+"q": "Sekiro: Shadows Die Twice",
+"cols": [
+"todo"
+]
+},
+{
+"type": "game",
+"title": "Ghost of Tsushima",
+"status": "todo",
+"q": "Ghost of Tsushima",
+"cols": [
+"todo"
+]
+},
+{
+"type": "game",
+"title": "Fallout",
+"status": "todo",
+"q": "Fallout 4",
+"cols": [
+"todo"
+]
+},
+{
+"type": "game",
+"title": "Omori",
+"status": "todo",
+"q": "Omori video game",
+"cols": [
+"todo"
+]
+},
+{
+"type": "game",
+"title": "Diablo",
+"status": "todo",
+"q": "Diablo IV",
+"cols": [
+"todo"
+]
+},
+{
+"type": "anime",
+"title": "Ruhların Kaçışı",
+"status": "todo",
+"q": "Spirited Away",
+"cols": [
+"todo"
+]
+},
+{
+"type": "anime",
+"title": "Cowboy Bebop",
+"status": "todo",
+"q": "Cowboy Bebop",
+"cols": [
+"todo"
+]
+}
+]
+}

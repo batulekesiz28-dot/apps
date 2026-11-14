@@ -27,6 +27,10 @@ const KB=(()=>{
     research:{n:'Araştırma',c:'#0091FF',ic:'<circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14M5 7h4M7 5v4"/>'},
     course:{n:'Eğitim',c:'#30A46C',ic:'<path d="M1.5 6L8 3l6.5 3L8 9z"/><path d="M4.5 7.5v3.5c1 1 2.2 1.5 3.5 1.5s2.5-.5 3.5-1.5V7.5"/>'},
     doc:{n:'Belge',c:'#6E56CF',ic:'<path d="M4 1.5h8v13H4z"/><path d="M6 5h4M6 7.5h4M6 10h2.5"/>'},
+    movie:{n:'Film',c:'#D97706',ic:'<rect x="2" y="3" width="12" height="10" rx="1.5"/><path d="M5 3v10M11 3v10M2 6h3M2 10h3M11 6h3M11 10h3"/>'},
+    series:{n:'Dizi',c:'#2563EB',ic:'<rect x="1.5" y="3.5" width="13" height="8.5" rx="1.5"/><path d="M5.5 14.5h5M6 1.5l2 2 2-2"/>'},
+    game:{n:'Oyun',c:'#7C3AED',ic:'<path d="M4.5 5h7a3 3 0 0 1 3 3v1.5a2 2 0 0 1-3.6 1.2L10 9.5H6l-.9 1.2A2 2 0 0 1 1.5 9.5V8a3 3 0 0 1 3-3z"/><path d="M5 6.8v2M4 7.8h2"/><circle cx="10.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="11.8" cy="8.6" r=".5" fill="currentColor"/>'},
+    anime:{n:'Anime',c:'#DB2777',ic:'<path d="M8 2l1.6 3.4 3.7.5-2.7 2.6.7 3.7L8 10.4l-3.3 1.8.7-3.7L2.7 5.9l3.7-.5z"/>'},
     file:{n:'Dosya',c:'#71717A',ic:'<path d="M3.5 1.5h6l3 3v10h-9z"/><path d="M9.5 1.5v3h3"/>'}};
 
   /* ── normalizasyon: Firestore 'undefined' kabul etmez, şekil hep aynı ── */
@@ -36,7 +40,7 @@ const KB=(()=>{
     tags:tagList(o.tags),cols:[...new Set(Array.isArray(o.cols)?o.cols:[])],fav:!!o.fav,added:+o.added||now(),updated:+o.updated||now(),opened:+o.opened||0,
     progress:Math.max(0,Math.min(1,+o.progress||0)),page:+o.page||0,pages:+o.pages||0,note:String(o.note||''),summary:String(o.summary||''),
     file:o.file&&typeof o.file==='object'?{name:String(o.file.name||''),size:+o.file.size||0,mime:String(o.file.mime||'')}:null,yt:String(o.yt||''),
-    color:String(o.color||''),dur:String(o.dur||'')}}
+    color:String(o.color||''),dur:String(o.dur||''),status:['todo','doing','done'].includes(o.status)?o.status:'',score:String(o.score||''),src:String(o.src||'')}}
   function normCol(o){return{id:String(o.id),name:String(o.name||'Yeni koleksiyon'),desc:String(o.desc||''),color:String(o.color||'#6E56CF'),emoji:String(o.emoji||''),
     cover:String(o.cover||''),order:+o.order||0,added:+o.added||now(),updated:+o.updated||now()}}
 

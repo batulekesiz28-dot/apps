@@ -25,7 +25,9 @@ const Library=(()=>{
   const hash=s=>{let h=7;for(const c of String(s))h=(h*31+c.charCodeAt(0))|0;return Math.abs(h)};
   const host=u=>{try{return new URL(u).hostname.replace(/^www\./,'')}catch{return''}};
   const ytId=u=>{const m=String(u).match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/|live\/)|youtu\.be\/)([\w-]{11})/);return m?m[1]:''};
-  const shape=t=>['book','pdf','doc','course','research'].includes(t)?'p':t==='image'?'s':'l';
+  const MEDIA=['movie','series','game','anime'],SUF={movie:'film',series:'TV series',game:'video game',anime:'anime'};
+  const stLabel=it=>{const g=it.type==='game';return it.status==='done'?(g?'Oynandı':'İzlendi'):it.status==='todo'?(g?'Oynanacak':'İzlenecek'):it.status==='doing'?'Devam ediyor':''};
+  const shape=t=>['book','pdf','doc','course','research','movie','series','game','anime'].includes(t)?'p':t==='image'?'s':'l';
   const fmtD=ts=>new Date(ts).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'});
   const size=b=>b>1e6?(b/1e6).toFixed(1)+' MB':Math.max(1,Math.round(b/1e3))+' KB';
   const all=()=>[...KB.items.values()];
@@ -36,8 +38,8 @@ const Library=(()=>{
   /* ── kapaklar: gerçek görsel yoksa (ya da yüklenemezse) tasarlanmış bir kapak ── */
   function genCover(it){const t=T[it.type]||T.file,h=hash(it.id)%360;
     return`<div class="gc gc-${shape(it.type)}" style="--c:${t.c};--h:${h}deg"><span class="gc-k">${tIc(it.type)}${esc(t.n)}</span><b class="gc-t">${esc(it.title)}</b><span class="gc-a">${esc(it.author||it.site||host(it.url)||'')}</span></div>`}
-  function cover(it,cls=''){const s=coverSrc(it);return`<div class="cv cv-${shape(it.type)} ${cls}">${genCover(it)}${s?`<img src="${esc(s)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()">`:''}${it.type==='youtube'?'<span class="cv-play"><svg viewBox="0 0 16 16"><path d="M5.5 3.5v9l7-4.5z" fill="currentColor"/></svg></span>':''}${it.progress>.01&&it.progress<.99?`<span class="cv-pr"><i style="width:${Math.round(it.progress*100)}%"></i></span>`:''}</div>`}
-  const metaLine=it=>{const t=T[it.type]||T.file;return`<span class="lm">${tIc(it.type)}<span>${esc(it.author||it.site||host(it.url)||t.n)}</span>${it.pages?`<span>· ${it.pages} sf</span>`:''}${it.dur?`<span>· ${esc(it.dur)}</span>`:''}</span>`};
+  function cover(it,cls=''){const s=coverSrc(it);return`<div class="cv cv-${shape(it.type)} ${cls}">${genCover(it)}${s?`<img src="${esc(s)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()">`:''}${it.score?`<span class="cv-sc">${esc(it.score.replace('IMDb ','★ '))}</span>`:''}${it.type==='youtube'?'<span class="cv-play"><svg viewBox="0 0 16 16"><path d="M5.5 3.5v9l7-4.5z" fill="currentColor"/></svg></span>':''}${it.progress>.01&&it.progress<.99?`<span class="cv-pr"><i style="width:${Math.round(it.progress*100)}%"></i></span>`:''}</div>`}
+  const metaLine=it=>{const t=T[it.type]||T.file;return`<span class="lm">${tIc(it.type)}<span>${esc(MEDIA.includes(it.type)?(it.author||t.n):(it.author||it.site||host(it.url)||t.n))}</span>${it.pages?`<span>· ${it.pages} sf</span>`:''}${it.dur?`<span>· ${esc(it.dur)}</span>`:''}${it.status&&MEDIA.includes(it.type)?`<span class="lm-st st-${it.status}">· ${stLabel(it)}</span>`:''}</span>`};
   function card(it,o={}){return`<article class="lc lc-${shape(it.type)}${o.big?' big':''}" data-open="${it.id}" tabindex="0" draggable="false" aria-label="${esc(it.title)}">
       ${cover(it)}<button class="lc-fav${it.fav?' on':''}" data-fav="${it.id}" aria-label="${it.fav?'Favorilerden çıkar':'Favorilere ekle'}" title="Favori">${sv('star')}</button>
       <div class="lc-b"><b class="lc-t">${esc(it.title)}</b>${metaLine(it)}</div></article>`}
@@ -76,8 +78,10 @@ const Library=(()=>{
     const favs=items.filter(i=>i.fav).sort((a,b)=>b.updated-a.updated),seen=items.filter(i=>i.opened).sort((a,b)=>b.opened-a.opened).slice(0,10);
     const cs=[...KB.cols.values()].sort((a,b)=>a.order-b.order),day=new Date().toDateString(),old=items.filter(i=>Date.now()-(i.opened||i.added)>12*864e5);
     const pick=old.length?old[hash(day)%old.length]:null,tags=KB.allTags().slice(0,24),types=Object.keys(T).map(t=>[t,items.filter(i=>i.type===t).length]).filter(x=>x[1]);
-    return hero()+(items.length?`
+    const queue=items.filter(i=>i.status==='todo'&&MEDIA.includes(i.type)).sort((a,b)=>b.added-a.added);
+    return impBanner()+hero()+(items.length?`
       ${shelf('Son eklenenler',byAdd.slice(0,14),'/all')}
+      ${queue.length?shelf('Sırada',queue.slice(0,16),'',{sub:'İzlenecek ve oynanacaklar'}):''}
       ${prog.length>1?shelf('Devam edilenler',prog.slice(1,14),'/reading',{sub:'Yarım bıraktıkların'}):''}
       <section class="shelf"><header><h2>Koleksiyonlar</h2><button class="lnk" data-act="newcol">${sv('plus')}Yeni koleksiyon</button></header>
         <div class="cols">${cs.map(colCard).join('')}<button class="col add" data-act="newcol"><span>${sv('plus')}</span><b>Koleksiyon oluştur</b><small>Örn. Computer Science, SAT Preparation, Books to Read</small></button></div></section>
@@ -125,7 +129,7 @@ const Library=(()=>{
   /* ── çizim ── */
   function root(){let r=q('#view .lib');if(!r){q('#view').innerHTML=`<div class="lib"><div class="lib-in"></div><div class="lib-drop" aria-hidden="true"><div><span>${sv('up')}</span><b>Bırak, kütüphaneye eklensin</b><small>PDF, görsel, belge ya da bağlantı</small></div></div></div>`;r=q('#view .lib');wire(r)}return r}
   function draw(){const r=root(),inner=q('.lib-in',r),scY=q('#scroll').scrollTop;
-    inner.innerHTML=rail()+`<div class="lmain">${st.sub==='home'?homeHTML():listHTML()}</div>`;
+    inner.innerHTML=rail()+`<div class="lmain">${st.sub==='home'?homeHTML():listHTML()}</div>`;setTimeout(autoCovers,1200);
     setCrumb(sv('read'),st.sub==='home'?'Kütüphane':listCtx().t.replace(/^#/,'#'),`<button class="tb" data-act="add" title="İçerik ekle (A)" aria-label="İçerik ekle">${sv('plus')}</button>`);
     return scY}
   function parse(parts){const[a='',b='']=parts;if(!a)return{sub:'home',arg:''};if(['all','fav','reading','recent'].includes(a))return{sub:a,arg:''};if(['type','tag','col'].includes(a))return{sub:a,arg:decodeURIComponent(b)};return{sub:'home',arg:''}}
@@ -138,7 +142,7 @@ const Library=(()=>{
     if(ov){closeDetail(true);closeReader(true);parts[0]==='i'?openDetail(parts[1]):openReader(parts[1]);return true}
     if(parts.join('/')===st.base&&(q('.ld-bg')||q('.rd-bg'))){closeDetail();closeReader();return true}return false}
   let rT=0;KB.on(w=>{if(typeof view==='undefined'||view!=='lib'||!q('#view .lib'))return;clearTimeout(rT);rT=setTimeout(()=>{if(view!=='lib'||!q('#view .lib'))return;const sc=q('#scroll'),y=sc.scrollTop,f=document.activeElement;
-    if(f&&f.closest?.('.lib [data-q],.lib [contenteditable],.ld,.la'))return;draw();sc.scrollTop=y;const d=q('.ld-bg');if(d)refreshDetail()},60)});
+    if(f&&f.closest?.('.lib [data-q],.lib [contenteditable],.ld input,.ld textarea,.ld [contenteditable],.la'))return;draw();sc.scrollTop=y;const d=q('.ld-bg');if(d)refreshDetail()},60)});
 
   /* ── olaylar ── */
   function wire(r){
@@ -180,7 +184,7 @@ const Library=(()=>{
     if(it.file&&it.type==='image')return open(id);
     if(it.file){KB.IDB.get(id).then(b=>{if(!b)return toast('Dosya bu cihazda değil');const u=URL.createObjectURL(b);window.open(u,'_blank','noopener');setTimeout(()=>URL.revokeObjectURL(u),6e4)});return}
     if(it.type==='youtube')return open(id);
-    if(it.url)window.open(it.url,'_blank','noopener');else open(id)}
+    if(it.url)window.open(it.url,'_blank','noopener');else if(MEDIA.includes(it.type))window.open('https://www.google.com/search?q='+encodeURIComponent(it.title+' '+SUF[it.type]),'_blank','noopener');else open(id)}
 
   /* ── detay ekranı ── */
   let dId=null;
@@ -196,8 +200,9 @@ const Library=(()=>{
       <div class="ld-info"><div class="ld-top"><span class="ld-type">${tIc(it.type)}${esc(t.n)}</span><span class="grow"></span>
           <button class="ib${it.fav?' on':''}" data-dfav title="Favori" aria-label="Favori">${sv('star')}</button><button class="ib" data-dgraph title="Second Brain'de gör" aria-label="Grafikte gör">${sv('graph')}</button><button class="ib" data-ddel title="Sil" aria-label="Sil">${sv('trash')}</button><button class="ib" data-dx title="Kapat (Esc)" aria-label="Kapat">${sv('x')}</button></div>
         <h1 class="ld-title" contenteditable="true" data-f="title" spellcheck="false">${esc(it.title)}</h1>
-        <p class="ld-by"><span contenteditable="true" data-f="author" data-ph="Yazar / kaynak">${esc(it.author)}</span>${it.year?` · ${esc(it.year)}`:''}${it.url?` · <a href="${esc(it.url)}" target="_blank" rel="noopener">${favIco(it)?`<img src="${esc(favIco(it))}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">`:''}${esc(host(it.url))}${sv('ext')}</a>`:''}</p>
-        <div class="ld-cta"><button class="btn pri" data-go="${it.id}">${it.type==='pdf'?sv('read')+'Oku':it.type==='youtube'?'İzle':it.file?'Dosyayı aç':it.url?sv('ext')+'Kaynağa git':'Aç'}</button>${it.type==='pdf'&&it.url&&!it.file?`<a class="btn" href="${esc(it.url)}" target="_blank" rel="noopener">${sv('ext')}Yeni sekmede</a>`:''}<button class="btn" data-dnote>${sv('note')}Bu kaynak için not</button></div>
+        <p class="ld-by"><span contenteditable="true" data-f="author" data-ph="${MEDIA.includes(it.type)?(it.type==='game'?'Stüdyo':'Yönetmen / yapımcı'):'Yazar / kaynak'}">${esc(it.author)}</span>${it.year?` · ${esc(it.year)}`:''}${it.url?` · <a href="${esc(it.url)}" target="_blank" rel="noopener">${favIco(it)?`<img src="${esc(favIco(it))}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">`:''}${esc(host(it.url))}${sv('ext')}</a>`:''}</p>
+        ${MEDIA.includes(it.type)?`<div class="ld-st" role="radiogroup" aria-label="Durum">${['todo','doing','done'].map(k=>`<button class="${it.status===k?'on':''}" data-sst="${k}" role="radio" aria-checked="${it.status===k}">${stLabel({...it,status:k})}</button>`).join('')}${it.score?`<span class="ld-sc">${esc(it.score)}</span>`:''}</div>`:''}
+        <div class="ld-cta"><button class="btn pri" data-go="${it.id}">${it.type==='pdf'?sv('read')+'Oku':it.type==='youtube'?'İzle':it.file?'Dosyayı aç':it.url?sv('ext')+'Kaynağa git':'Aç'}</button>${it.type==='pdf'&&it.url&&!it.file?`<a class="btn" href="${esc(it.url)}" target="_blank" rel="noopener">${sv('ext')}Yeni sekmede</a>`:''}<button class="btn" data-dnote>${sv('note')}Bu kaynak için not</button>${MEDIA.includes(it.type)||!coverSrc(it)?`<button class="btn" data-dcover>${sv('search')}${coverSrc(it)?'Kapağı yenile':'Kapak bul'}</button>`:''}</div>
         <p class="ld-desc" contenteditable="true" data-f="desc" data-ph="Kısa bir açıklama ekle…">${esc(it.desc)}</p>
         <section class="ld-s"><h3>${sv('tag')}Etiketler</h3><div class="ld-tags">${it.tags.map(x=>`<span class="tg"><a href="#brain/t:${encodeURIComponent(x)}">#${esc(x)}</a><button data-untag="${esc(x)}" aria-label="Etiketi kaldır">${sv('x')}</button></span>`).join('')}<input data-tagin placeholder="+ etiket" aria-label="Etiket ekle"></div></section>
         <section class="ld-s"><h3>${sv('folder')}Koleksiyonlar</h3><div class="ld-cols">${chipsCols(it)}</div></section>
@@ -220,6 +225,8 @@ const Library=(()=>{
     bg.addEventListener('click',async e=>{const t=e.target,it=KB.items.get(dId);if(!it)return;
       if(t===bg||t.closest('[data-dx]'))return back();
       if(t.closest('[data-dfav]')){it.fav=!it.fav;KB.saveItem(it);return}
+      const ss=t.closest('[data-sst]');if(ss){it.status=it.status===ss.dataset.sst?'':ss.dataset.sst;KB.saveItem(it);return}
+      if(t.closest('[data-dcover]')){findCovers([it],{force:true,say:true});return}
       if(t.closest('[data-dgraph]'))return go('#brain/'+it.id);
       if(t.closest('[data-ddel]')){const name=it.title;const snap=KB.delItem(it.id);back();toastUndo(`“${name}” silindi`,()=>KB.restoreItem(snap));return}
       const gg=t.closest('[data-go]');if(gg)return launch(gg.dataset.go);
@@ -306,7 +313,7 @@ const Library=(()=>{
     const close=()=>{LA=null;bg.remove()};
     bg.addEventListener('click',e=>{const t=e.target;if(t===bg||t.closest('[data-lx]'))return close();
       if(t.closest('[data-pick]')&&!t.matches('input'))return q('[data-file]',bg).click();
-      const lt=t.closest('[data-lt]');if(lt){LA.type=lt.dataset.lt;markType();if(LA.data){LA.data.type=LA.type;preview()}else if(inp.value.trim())lookup(inp.value.trim());return}
+      const lt=t.closest('[data-lt]');if(lt){LA.type=lt.dataset.lt;markType();if(MEDIA.includes(LA.type)&&inp.value.trim()&&!/^(https?:|www\.)/i.test(inp.value.trim())){lookup(inp.value.trim());return}if(LA.data){LA.data.type=LA.type;preview()}else if(inp.value.trim())lookup(inp.value.trim());return}
       const lc=t.closest('[data-lc]');if(lc){const id=lc.dataset.lc;LA.cols.has(id)?LA.cols.delete(id):LA.cols.add(id);lc.classList.toggle('on');return}
       const bk=t.closest('[data-bk]');if(bk){LA.data=LA.books[+bk.dataset.bk];LA.type='book';markType();preview();return}
       if(t.closest('[data-save]'))save()});
@@ -320,7 +327,10 @@ const Library=(()=>{
   async function lookup(v){if(!LA)return;const seq=++LA.seq,box=q('.la-prev',LA.bg),stt=q('[data-st]',LA.bg);if(!v){box.innerHTML='';return}
     const isUrl=/^(https?:\/\/|www\.)/i.test(v)||/^[\w-]+\.[a-z]{2,}(\/|$)/i.test(v);
     if(isUrl){const u=/^https?:/i.test(v)?v:'https://'+v;box.innerHTML=skel();stt.textContent='Önizleme hazırlanıyor…';const m=await meta(u);if(seq!==LA?.seq)return;if(LA.type&&LA.type!==m.type&&!['youtube'].includes(m.type))m.type=LA.type;LA.data=m;LA.type=m.type;markType();stt.textContent='';preview();return}
-    LA.type=LA.type||'book';markType();if(LA.type!=='book'){LA.data={type:LA.type,title:v,url:''};preview();return}
+    LA.type=LA.type||'book';markType();
+    if(MEDIA.includes(LA.type)){box.innerHTML=skel(true);stt.textContent='Kapak aranıyor…';const w=await wiki(v+' '+SUF[LA.type]).catch(()=>null);if(seq!==LA?.seq)return;stt.textContent=w?'':'Kapak bulunamadı — başlıkla eklenebilir';
+      LA.data={type:LA.type,title:v,cover:w?.cover||'',url:w?.url||'',desc:w?.desc||'',status:'todo'};preview();return}
+    if(LA.type!=='book'){LA.data={type:LA.type,title:v,url:''};preview();return}
     box.innerHTML=skel(true);stt.textContent='Kitap aranıyor…';const r=await books(v);if(seq!==LA?.seq)return;stt.textContent='';
     if(!r||!r.length){LA.data={type:'book',title:v};preview();if(!r)stt.textContent='Kitap araması şu an yapılamadı — başlıkla eklenebilir';return}
     LA.books=r;box.innerHTML=`<p class="la-k">Kitap sonuçları — birini seç</p><div class="la-books">${r.map((b,i)=>`<button class="lb" data-bk="${i}">${b.cover?`<img src="${esc(b.cover.replace('-L.','-M.'))}" alt="" loading="lazy" referrerpolicy="no-referrer">`:`<span class="lb-n">${tIc('book')}</span>`}<b>${esc(b.title)}</b><small>${esc(b.author)}${b.year?' · '+b.year:''}</small></button>`).join('')}</div>`}
@@ -356,11 +366,11 @@ const Library=(()=>{
     f.addEventListener('submit',e=>{e.preventDefault();const c=KB.addCol({name:f.n.value.trim()||'Yeni koleksiyon',desc:f.d.value.trim(),color:col,emoji:f.e.value.trim()});bg.remove();toast(`“${c.name}” oluşturuldu`);if(cb)cb(c);else go('#lib/col/'+c.id)})}
   function delCol(){const c=KB.cols.get(st.arg);if(!c)return;if(!confirm(`“${c.name}” koleksiyonu silinsin mi? İçindeki içerikler kütüphanede kalır.`))return;KB.delCol(c.id);go('#lib');toast('Koleksiyon silindi')}
   function itemMenu(id,x,y){q('.lmenu')?.remove();const it=KB.items.get(id);if(!it)return;const m=document.createElement('div');m.className='lmenu';m.setAttribute('role','menu');
-    m.innerHTML=`<button data-m="open">${sv('chev')}Ayrıntılar</button><button data-m="go">${sv('ext')}${it.type==='pdf'?'Oku':'Aç'}</button><button data-m="fav">${sv('star')}${it.fav?'Favorilerden çıkar':'Favorilere ekle'}</button><div class="sep"></div><p>Koleksiyona ekle</p>${[...KB.cols.values()].map(c=>`<button data-c="${c.id}">${it.cols.includes(c.id)?'✓ ':''}${esc(c.emoji)} ${esc(c.name)}</button>`).join('')||'<p class="muted">Koleksiyon yok</p>'}<div class="sep"></div><button data-m="graph">${sv('graph')}Second Brain'de gör</button><button data-m="del" class="danger">${sv('trash')}Sil</button>`;
+    m.innerHTML=`<button data-m="open">${sv('chev')}Ayrıntılar</button><button data-m="go">${sv('ext')}${it.type==='pdf'?'Oku':'Aç'}</button><button data-m="fav">${sv('star')}${it.fav?'Favorilerden çıkar':'Favorilere ekle'}</button><div class="sep"></div><p>Koleksiyona ekle</p>${[...KB.cols.values()].map(c=>`<button data-c="${c.id}">${it.cols.includes(c.id)?'✓ ':''}${esc(c.emoji)} ${esc(c.name)}</button>`).join('')||'<p class="muted">Koleksiyon yok</p>'}<div class="sep"></div><button data-m="cover">${sv('search')}Kapak bul</button><button data-m="graph">${sv('graph')}Second Brain'de gör</button><button data-m="del" class="danger">${sv('trash')}Sil</button>`;
     document.body.appendChild(m);m.style.left=Math.min(x,innerWidth-m.offsetWidth-10)+'px';m.style.top=Math.min(y,innerHeight-m.offsetHeight-10)+'px';
     const off=e=>{if(!m.contains(e.target)){m.remove();removeEventListener('pointerdown',off,true)}};setTimeout(()=>addEventListener('pointerdown',off,true));
     m.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;m.remove();const k=b.dataset.m;if(b.dataset.c)return KB.toggleCol(it,b.dataset.c);
-      if(k==='open')open(id);else if(k==='go')launch(id);else if(k==='fav'){it.fav=!it.fav;KB.saveItem(it)}else if(k==='graph')go('#brain/'+id);else if(k==='del'){const s=KB.delItem(id);toastUndo(`“${it.title}” silindi`,()=>KB.restoreItem(s))}})}
+      if(k==='open')open(id);else if(k==='go')launch(id);else if(k==='fav'){it.fav=!it.fav;KB.saveItem(it)}else if(k==='graph')go('#brain/'+id);else if(k==='cover')findCovers([it],{force:true,say:true});else if(k==='del'){const s=KB.delItem(id);toastUndo(`“${it.title}” silindi`,()=>KB.restoreItem(s))}})}
 
   /* ── seçiciler: sayfa seç / kaynak seç (Workspace bağları için) ── */
   function picker(anchor,title,list,cb){q('.lpick')?.remove();const m=document.createElement('div');m.className='lpick';m.innerHTML=`<p>${esc(title)}</p><input placeholder="Ara…" aria-label="Ara"><div class="lp-l"></div>`;document.body.appendChild(m);
@@ -394,5 +404,37 @@ const Library=(()=>{
   document.addEventListener('keydown',e=>{if(!e.target.matches?.('[data-ktag]'))return;if(e.key==='Enter'||e.key===','){e.preventDefault();const v=e.target.value.trim();if(v&&P){KB.setTags(P.id,[...KB.tagsOf(P.id),...v.split(',')]);setTimeout(()=>q('[data-ktag]')?.focus(),60)}}});
   KB.on(()=>{if(typeof view!=='undefined'&&view==='page'&&typeof P!=='undefined'&&P&&!document.activeElement?.matches?.('[data-ktag]'))pagePanel(P)});
 
+  /* ── film/dizi/oyun/anime kapakları: Wikipedia (CORS açık, anahtar istemez) ── */
+  async function wiki(qs){let lang='en';if(qs.startsWith('tr:')){lang='tr';qs=qs.slice(3)}
+    const u=`https://${lang}.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&generator=search&gsrsearch=${encodeURIComponent(qs)}&gsrlimit=1&prop=pageimages|description|info&inprop=url&piprop=thumbnail&pithumbsize=500&pilicense=any`;
+    const r=await fetch(u);if(!r.ok)throw new Error(r.status);const j=await r.json();const p=Object.values(j?.query?.pages||{})[0];
+    return p?{cover:p.thumbnail?.source||'',url:p.fullurl||'',desc:p.description||''}:null}
+  const tried=new Set(),Q=new Map();let covBusy=0;
+  async function findCovers(list,o={}){list=list.filter(it=>o.force||(!it.cover&&!tried.has(it.id)));if(!list.length){if(o.say)toast('Kapak aranacak içerik yok');return}
+    list.forEach(it=>tried.add(it.id));covBusy++;if(o.say)toast(list.length>1?`${list.length} kapak aranıyor…`:'Kapak aranıyor…');
+    let ok=0,fail=0,i=0;const work=async()=>{while(i<list.length){const it=list[i++];
+        const qs=Q.get(it.id)||Q.get(KB.low(it.type+'|'+it.title))||(it.title+' '+(SUF[it.type]||''));
+        try{const w=await wiki(qs.trim());const cur=KB.items.get(it.id);if(!cur)continue;
+          if(w&&w.cover){cur.cover=w.cover;if(!cur.url)cur.url=w.url;if(!cur.desc&&w.desc)cur.desc=w.desc[0].toLocaleUpperCase('tr')+w.desc.slice(1);KB.saveItem(cur,true);ok++;if(ok%8===0)KB.emit('items')}else fail++}catch{fail++}}};
+    await Promise.all([work(),work(),work(),work()]);covBusy--;KB.emit('items');
+    if(o.say||(list.length>3&&ok))toast(ok?`${ok} kapak bulundu${fail?` · ${fail} tanesi bulunamadı`:''}`:'Kapak bulunamadı — internet bağlantısını kontrol et')}
+  // açılışta: kapaksız medya içeriklerine sessizce bak (oturum başına bir kez)
+  function autoCovers(){if(covBusy)return;const l=all().filter(it=>MEDIA.includes(it.type)&&!it.cover&&!tried.has(it.id)).slice(0,60);if(l.length)findCovers(l)}
+
+  /* ── içe aktarma: Notion'dan hazırlanan paket (import/*.json) ── */
+  const PACK='import/eglence.json',srcKey=it=>'notion:'+it.type+':'+KB.low(it.title);let pack=null,packP=null;
+  function loadPack(){if(packP)return packP;packP=fetch(PACK,{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(j=>{pack=j;if(j)j.items.forEach(x=>Q.set(KB.low(x.type+'|'+x.title),x.q||''));
+      if(view==='lib'&&st.sub==='home'&&q('#view .lib'))draw();return j}).catch(()=>null);return packP}
+  const missing=()=>{if(!pack)return[];const have=new Set(all().map(i=>i.src||srcKey(i)));return pack.items.filter(x=>!have.has(srcKey(x)))};
+  function impBanner(){loadPack();if(!pack||!KB.ready)return'';const m=missing();if(!m.length||lsg('lib:imp-hide',0)===pack.updated)return'';
+    const by=t=>m.filter(x=>x.type===t).length;
+    return`<section class="imp"><span class="imp-ic">${tIc('movie')}</span><div><b>Notion'daki eğlence listen hazır</b><small>${[['movie','film'],['series','dizi'],['game','oyun'],['anime','anime']].map(([t,n])=>by(t)?by(t)+' '+n:'').filter(Boolean).join(' · ')} — izlediklerin, izleyeceklerin ve yeni sezon beklediklerin koleksiyonlarıyla gelir, kapaklar otomatik bulunur.</small></div>
+      <button class="btn pri" data-imp>İçe aktar</button><button class="btn" data-imp-no>Şimdi değil</button></section>`}
+  async function doImport(){await loadPack();const m=missing();if(!m.length)return toast('Hepsi zaten kütüphanede');
+    const cmap={};for(const[k,c]of Object.entries(pack.cols||{})){const ex=[...KB.cols.values()].find(x=>KB.low(x.name)===KB.low(c.name));cmap[k]=ex?ex.id:KB.addCol(c).id}
+    const now=Date.now(),added=[];m.forEach((x,i)=>{const it=KB.addItem({type:x.type,title:x.title,status:x.status,score:x.score||'',note:x.note||'',cols:(x.cols||[]).map(k=>cmap[k]).filter(Boolean),src:srcKey(x),tags:[KB.TYPES[x.type].n.toLocaleLowerCase('tr')]});added.push(it)});
+    toast(`${added.length} içerik eklendi`);findCovers(added)}
+  document.addEventListener('click',e=>{if(e.target.closest('[data-imp]')){e.preventDefault();doImport()}else if(e.target.closest('[data-imp-no]')){try{localStorage.setItem('lib:imp-hide',JSON.stringify(pack?.updated||1))}catch{}draw()}});
+
   function closeAll(){closeDetail(true);closeReader(true);q('.la-bg')?.remove();LA=null}
-  return{render,soft,closeAll,open,launch,addSheet,addFiles,libCard,pagePanel,itemPicker,pagePicker,cover,get st(){return st}}})();
+  return{render,soft,closeAll,findCovers,doImport,open,launch,addSheet,addFiles,libCard,pagePanel,itemPicker,pagePicker,cover,get st(){return st}}})();

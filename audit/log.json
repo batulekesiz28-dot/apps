@@ -1216,5 +1216,59 @@
     "text": "Kapak/başlık otomatik bulma dış servislere bağlı (YouTube, Open Library, microlink); erişilemezse tasarlanmış kapak kullanılıyor"
    }
   ]
+ },
+ {
+  "at": "2026-11-14T17:29:17",
+  "change": "Library: Notion'daki film/dizi/oyun/anime listesi içe aktarılabilir; yeni türler, durum (izlendi/izlenecek), puan rozeti, otomatik kapak",
+  "scores": {
+   "Notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   },
+   "Library (169 içerikle) telefon": {
+    "before": 0,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Notlar",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Detay ekranında Wikipedia bağlantısı dokunmak için çok küçüktü",
+    "fix": "Bağlantıya en az 28px (telefonda 40px) yükseklik verildi"
+   },
+   {
+    "app": "Notlar",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Detayda durum/favori düğmesine basınca ekran yenilenmiyordu",
+    "fix": "Yenileme artık sadece yazı alanındayken bekliyor"
+   },
+   {
+    "app": "Notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Kenar çubuğundaki koleksiyon simgeleri küçük ve soluktu",
+    "fix": "12px ve tam kontrast"
+   },
+   {
+    "app": "Notlar",
+    "sev": "uyarı",
+    "status": "open",
+    "text": "Oyun listesi gibi uzun listelerde sayfa büyüyor (58 kart)",
+    "fix": "Gerekirse ileride kaydırdıkça yükleme"
+   },
+   {
+    "app": "Notlar",
+    "sev": "uyarı",
+    "status": "open",
+    "text": "Kapaklar Wikipedia aramasıyla bulunuyor; az bilinen oyunlarda yanlış/eksik kapak çıkabilir — detayda 'Kapağı yenile' var"
+   }
+  ]
  }
 ]

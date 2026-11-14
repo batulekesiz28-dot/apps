@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>AI Arena</title>
+<meta name="description" content="ChatGPT, Gemini ve Claude aynı arenada: tartışma, savunma, kontrollü saldırı simülasyonu ve şeffaf puanlama.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>try{document.documentElement.dataset.motion=JSON.parse(localStorage.getItem('appshell:motion'))||'full'}catch{}</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#06070B;--bg2:#0C0E15;--panel:rgba(16,18,27,.72);--panel2:rgba(22,25,36,.86);--ink:#EEF0F6;--ink2:#B7BCCB;--ink3:#8D93A6;--line:rgba(160,170,210,.10);--line2:rgba(160,170,210,.18);
+  --gpt:#19C37D;--gpt2:#0B7F52;--gem:#7C8CFF;--gem2:#B06CFF;--cla:#E58A60;--cla2:#B4553A;--ref:#F2C14E;--bad:#FF5A65;--ok:#3DDC97;--warn:#F5B84B;
+  --font:'Geist',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;--mono:'Geist Mono',ui-monospace,SFMono-Regular,Menlo,monospace;--out:cubic-bezier(.16,1,.3,1);--spring:cubic-bezier(.3,1.4,.5,1);color-scheme:dark}
+html,body{height:100%;background:var(--bg)}
+body{font-family:var(--font);color:var(--ink);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow:hidden}
+button,input,textarea,select{font:inherit;color:inherit}button{background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--ref);outline-offset:2px}
+.i{width:16px;height:16px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+/* arka plan: koyu ızgara + üç modelin ışıkları */
+.bgfx{position:fixed;inset:0;z-index:-1;pointer-events:none;background:
+  radial-gradient(40% 50% at 12% 80%,rgba(25,195,125,.10),transparent 70%),radial-gradient(40% 45% at 50% 0%,rgba(124,140,255,.12),transparent 70%),radial-gradient(40% 50% at 88% 80%,rgba(229,138,96,.10),transparent 70%),var(--bg)}
+.bgfx::after{content:"";position:absolute;inset:0;opacity:.35;background-image:linear-gradient(rgba(140,150,200,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(140,150,200,.06) 1px,transparent 1px);background-size:44px 44px;mask:radial-gradient(70% 70% at 50% 40%,#000,transparent)}
+.app{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);height:100%;height:100dvh}
+
+/* ── üst çubuk ── */
+.top{display:flex;align-items:center;gap:14px;padding:10px 18px;border-bottom:1px solid var(--line);background:rgba(6,7,11,.6);backdrop-filter:blur(16px)}
+.brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.mark{position:relative;width:34px;height:34px;border-radius:10px;background:conic-gradient(from 210deg,var(--gpt),var(--gem),var(--gem2),var(--cla),var(--gpt));display:grid;place-items:center}
+.mark::after{content:"";position:absolute;inset:3px;border-radius:7px;background:var(--bg)}.mark svg{position:relative;z-index:1;width:18px;height:18px}
+.brand b{font-size:16px;font-weight:700;letter-spacing:-.02em}.brand small{display:block;font-size:12px;color:var(--ink3);font-weight:500;letter-spacing:0}
+.scn{flex:0 1 230px;min-width:0;padding:6px 10px;border-radius:9px;text-align:left}.scn:hover{background:rgba(255,255,255,.05)}
+.scn b{display:block;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.scn small{display:block;font-size:12px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.steps{flex:0 1 auto;min-width:0;display:flex;align-items:center;gap:4px;margin:0 auto;padding:4px;border-radius:14px;background:rgba(255,255,255,.04);box-shadow:inset 0 0 0 1px var(--line)}
+.st{position:relative;display:flex;align-items:center;gap:8px;height:34px;padding:0 12px;border-radius:10px;font-size:12.5px;font-weight:600;color:var(--ink3);white-space:nowrap;overflow:hidden}
+.st i{font-style:normal;display:grid;place-items:center;width:20px;height:20px;border-radius:50%;font:600 12px var(--mono);box-shadow:inset 0 0 0 1.5px currentColor}
+.st.done{color:var(--ink2)}.st.done i{background:var(--ink2);color:var(--bg);box-shadow:none}
+.st.on{color:var(--ink);background:rgba(255,255,255,.07)}.st.on i{background:var(--ref);color:#1A1405;box-shadow:none}
+.st .pg{position:absolute;left:0;bottom:0;height:2px;background:var(--ref);width:0;transition:width .3s linear}
+.clock{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.ring{position:relative;width:40px;height:40px}.ring svg{width:40px;height:40px;transform:rotate(-90deg)}.ring circle{fill:none;stroke-width:3}
+.ring .bg{stroke:rgba(255,255,255,.08)}.ring .fg{stroke:var(--ref);stroke-linecap:round;transition:stroke-dashoffset .3s linear}
+.clock b{font:600 18px var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.02em;min-width:58px}.clock small{display:block;font-size:11.5px;color:var(--ink3);font-family:var(--font);font-weight:500;letter-spacing:0}
+.ctl{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.b{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:38px;padding:0 14px;border-radius:11px;font-size:13.5px;font-weight:600;color:var(--ink);background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 1px var(--line);white-space:nowrap;transition:background .2s,transform .25s var(--spring),box-shadow .2s}
+.b:hover{background:rgba(255,255,255,.12)}.b:active{transform:scale(.97)}.b:disabled{opacity:.45;pointer-events:none}
+.b.pri{background:var(--ink);color:#07080C;box-shadow:none}.b.pri:hover{background:#fff}
+.b.ic{width:38px;padding:0}.b.go{background-color:#F2C14E;background-image:linear-gradient(135deg,#F2C14E,#F59E3B);color:#1A1205;box-shadow:0 8px 24px -10px rgba(245,170,60,.7)}.b.go:hover{filter:brightness(1.08)}
+.b.sm{height:32px;padding:0 11px;font-size:12.5px;border-radius:9px}.b.danger:hover{background:rgba(255,90,101,.18);color:#FF9AA1}
+.eng{display:inline-flex;align-items:center;gap:7px;height:32px;padding:0 11px;border-radius:999px;font-size:12px;font-weight:600;color:var(--ink2);background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1px var(--line)}
+.eng i{width:7px;height:7px;border-radius:50%;background:var(--warn);box-shadow:0 0 10px currentColor}.eng.live i{background:var(--ok)}
+
+/* ── ana alan ── */
+.main{display:grid;grid-template-rows:minmax(300px,46%) minmax(0,1fr);gap:12px;padding:12px 14px 14px;min-height:0}
+.upper{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(320px,1fr);gap:12px;min-height:0}
+.glass{position:relative;border-radius:18px;background:var(--panel);box-shadow:inset 0 0 0 1px var(--line),0 20px 50px -30px rgba(0,0,0,.9);backdrop-filter:blur(18px) saturate(1.2);min-height:0;overflow:hidden}
+/* sahne */
+.stage{display:grid}.stage>svg{width:100%;height:100%;display:block;min-height:0;padding:64px 12px 30px}
+.stage .lbl{font:600 17px var(--font);fill:var(--ink)}.stage .sub{font:500 14px var(--font);fill:var(--ink2)}
+.beam{fill:none;stroke:rgba(160,170,210,.16);stroke-width:1.5}
+.beam.act{stroke-width:2.2;stroke-dasharray:6 8;animation:flow .8s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-28}}
+.core-r{transform-origin:300px 232px;animation:spin 24s linear infinite}.core-r2{transform-origin:300px 232px;animation:spin 40s linear infinite reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pod .glow{opacity:.35;transition:opacity .4s}.pod.speak .glow{opacity:.95;animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.55}}
+.pod .orb{transition:transform .5s var(--spring)}.pod.speak .orb{transform:scale(1.06)}
+.pod{cursor:pointer}.pod:focus-visible .orb{stroke:#fff;stroke-width:2}
+.shield path{transition:opacity .5s,stroke-width .5s}
+.hit{animation:hit .7s var(--out) forwards}@keyframes hit{from{opacity:1;r:6}to{opacity:0;r:42}}
+.legend{position:absolute;left:14px;bottom:12px;display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--ink3);pointer-events:none}
+.legend span{display:inline-flex;align-items:center;gap:6px}.legend i{width:16px;height:2px;border-radius:2px}
+.stage-h{position:absolute;left:16px;top:14px;right:16px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;pointer-events:none}
+.stage-h>*{pointer-events:auto}
+.ph-k{font:700 11.5px var(--font);letter-spacing:.14em;text-transform:uppercase;color:var(--ref)}.ph-t{margin-top:3px;font-size:19px;font-weight:700;letter-spacing:-.02em}.ph-d{margin-top:2px;max-width:420px;font-size:12.5px;color:var(--ink2)}
+.sim-note{display:inline-flex;align-items:center;gap:7px;padding:6px 10px;border-radius:10px;font-size:12px;color:#F7D58A;background:rgba(242,193,78,.08);box-shadow:inset 0 0 0 1px rgba(242,193,78,.22);max-width:300px}
+/* canlı akış */
+.feed{display:flex;flex-direction:column}
+.fh{display:flex;align-items:center;gap:8px;padding:12px 14px 8px;flex-wrap:wrap}.fh h2{font-size:14px;font-weight:700;letter-spacing:-.01em;margin-right:auto}
+.chips{display:flex;gap:4px;flex-wrap:wrap}.chip{height:30px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600;color:var(--ink3);background:rgba(255,255,255,.04)}
+.chip.on{color:#07080C;background:var(--ink)}.chip:hover:not(.on){color:var(--ink)}
+.fl{flex:1;overflow-y:auto;padding:4px 10px 14px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.12) transparent;overscroll-behavior:contain}
+.ev{position:relative;padding:10px 12px 10px 14px;margin:6px 0;border-radius:12px;background:rgba(255,255,255,.025);animation:evin .45s var(--out)}
+@keyframes evin{from{opacity:0;transform:translateY(6px)}}
+.ev::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:3px;border-radius:3px;background:var(--a,var(--ink3))}
+.ev .eh{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink3);flex-wrap:wrap}.ev .eh b{color:var(--a,var(--ink));font-size:13px}
+.tag{display:inline-flex;align-items:center;height:20px;padding:0 7px;border-radius:6px;font:600 11.5px var(--font);background:rgba(255,255,255,.06);color:var(--ink2)}
+.ev .et{margin-top:5px;font-size:13.5px;color:var(--ink);line-height:1.55;overflow-wrap:anywhere}
+.ev .et p+p{margin-top:6px}.ev .et ul{margin:6px 0 0 18px}.ev .et li+li{margin-top:2px}
+.ev.ref{--a:var(--ref);background:rgba(242,193,78,.05)}.ev.sys{--a:var(--ink3)}
+.caret{display:inline-block;width:7px;height:15px;margin-left:2px;vertical-align:-2px;background:var(--a,var(--ink));animation:blink 1s steps(2) infinite}@keyframes blink{50%{opacity:0}}
+.why{margin-top:6px}.why summary{font-size:12px;font-weight:600;color:var(--ink3);cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:5px;min-height:24px}.why summary::-webkit-details-marker{display:none}
+.why summary::before{content:"›";transition:transform .2s;display:inline-block}.why[open] summary::before{transform:rotate(90deg)}
+.why ul{margin:4px 0 0 16px;font-size:13px;color:var(--ink2)}
+.res{display:flex;flex-direction:column;gap:5px;margin-top:8px}
+.rv{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;align-items:start;padding:8px 10px;border-radius:10px;background:rgba(0,0,0,.25);font-size:12.5px}
+.badge{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:6px;font:700 11.5px var(--font);letter-spacing:.04em}
+.badge.ok{color:#04130C;background:var(--ok)}.badge.bad{color:#fff;background:#D9343F}.badge.mid{color:#1A1205;background:var(--warn)}
+.rv small{grid-column:2;color:var(--ink2);font-size:12.5px}
+.lay{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.lc{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 9px;border-radius:7px;font-size:12px;background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1px var(--line)}
+.lc em{font-style:normal;color:var(--ink3);font-family:var(--mono);font-size:11.5px}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;height:100%;padding:24px;text-align:center;color:var(--ink2)}
+.empty b{color:var(--ink);font-size:15px}.empty p{max-width:340px;font-size:13px}
+
+/* ── ajan panelleri ── */
+.agents{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;min-height:0}
+.ag{display:flex;flex-direction:column;--a:var(--gpt);--a2:var(--gpt2)}
+.ag[data-a=gemini]{--a:var(--gem);--a2:var(--gem2)}.ag[data-a=claude]{--a:var(--cla);--a2:var(--cla2)}
+.ag::before{content:"";position:absolute;inset:0 0 auto;height:3px;background:linear-gradient(90deg,var(--a),var(--a2));opacity:.9}
+.ag.speak{box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--a) 50%,transparent),0 0 40px -12px color-mix(in srgb,var(--a) 60%,transparent)}
+.ah{display:flex;align-items:center;gap:12px;padding:14px 14px 10px}
+.av{position:relative;width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(140deg,var(--a),var(--a2));color:#fff;flex-shrink:0;box-shadow:0 8px 20px -8px var(--a)}
+.av svg{width:22px;height:22px}
+.an{min-width:0;flex:1}.an b{display:block;font-size:16px;font-weight:700;letter-spacing:-.02em}.an small{display:block;font:500 11.5px var(--mono);color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stt{display:inline-flex;align-items:center;gap:6px;margin-top:2px;font-size:12px;color:var(--ink2)}.stt i{width:6px;height:6px;border-radius:50%;background:var(--ink3)}
+.ag.speak .stt i{background:var(--a);box-shadow:0 0 8px var(--a)}
+.sc{text-align:right}.sc b{display:block;font:700 26px/1 var(--mono);letter-spacing:-.04em;color:var(--a);font-variant-numeric:tabular-nums}.sc small{font-size:11.5px;color:var(--ink3)}
+.tabs{display:flex;gap:2px;padding:0 10px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+.tab{position:relative;height:36px;padding:0 10px;font-size:12.5px;font-weight:600;color:var(--ink3);white-space:nowrap}
+.tab.on{color:var(--ink)}.tab.on::after{content:"";position:absolute;left:8px;right:8px;bottom:-1px;height:2px;border-radius:2px;background:var(--a)}
+.tab:hover{color:var(--ink)}
+.tb{flex:1;overflow-y:auto;padding:10px 14px 16px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.12) transparent;overscroll-behavior:contain}
+.msg{padding:10px 12px;margin-bottom:8px;border-radius:12px;background:rgba(255,255,255,.035);font-size:13.5px;line-height:1.55}
+.msg .eh{display:flex;gap:6px;align-items:center;margin-bottom:4px;font-size:12px;color:var(--ink3)}
+.kv{display:grid;gap:10px}
+.box{padding:12px;border-radius:12px;background:rgba(255,255,255,.035)}
+.box h4{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+.box p,.box li{font-size:13.5px;color:var(--ink)}.box ul{margin-left:18px}
+.lyr{display:grid;grid-template-columns:1fr auto;gap:4px 10px;padding:10px 12px;border-radius:11px;background:rgba(255,255,255,.035);margin-bottom:6px}
+.lyr b{font-size:13.5px}.lyr small{grid-column:1/-1;font-size:12.5px;color:var(--ink2)}
+.str{display:flex;gap:2px}.str i{width:8px;height:14px;border-radius:2px;background:rgba(255,255,255,.12)}.str i.f{background:var(--a)}
+.cov{display:flex;flex-wrap:wrap;gap:4px;grid-column:1/-1}.cov span{padding:1px 6px;border-radius:5px;font:600 11.5px var(--mono);background:color-mix(in srgb,var(--a) 18%,transparent);color:var(--ink)}
+.typ{font:600 11.5px var(--font);color:var(--ink3)}
+.mtx{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:10px}
+.mtx div{padding:6px 7px;border-radius:8px;background:rgba(255,255,255,.03);font-size:12px;color:var(--ink3);box-shadow:inset 0 0 0 1px var(--line)}
+.mtx div b{display:block;font:700 12px var(--mono);color:var(--ink2)}.mtx div.c{background:color-mix(in srgb,var(--a) calc(var(--p) * 1%),rgba(255,255,255,.02));color:var(--ink)}
+.mtx div.c b{color:var(--ink)}
+.crit{display:grid;gap:8px}.cr{display:grid;grid-template-columns:1fr auto;gap:4px;font-size:12.5px}.cr span{color:var(--ink2)}.cr b{font-family:var(--mono)}
+.bar{grid-column:1/-1;height:6px;border-radius:6px;background:rgba(255,255,255,.07);overflow:hidden}.bar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--a2),var(--a));transition:width .8s var(--out)}
+.ldg{margin-top:12px}.ldg div{display:grid;grid-template-columns:52px 1fr;gap:8px;padding:7px 0;border-top:1px solid var(--line);font-size:12.5px}
+.ldg b{font-family:var(--mono);text-align:right}.ldg b.p{color:var(--ok)}.ldg b.n{color:var(--bad)}.ldg span{color:var(--ink2)}
+textarea.in,input.in,select.in{width:100%;padding:9px 11px;border:0;border-radius:10px;outline:0;background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1px var(--line2);color:var(--ink);font-size:13.5px;resize:vertical}
+textarea.in:focus,input.in:focus,select.in:focus{box-shadow:inset 0 0 0 1.5px var(--ref)}
+select.in option{background:#11131B}
+.muted{color:var(--ink3);font-size:12.5px}
+.mem li{margin-bottom:4px}
+
+/* ── çekmeceler, modallar ── */
+.scrim{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .3s}
+.scrim.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;z-index:50;width:min(460px,100%);display:flex;flex-direction:column;background:#0D0F17;box-shadow:-30px 0 80px -20px rgba(0,0,0,.8),inset 1px 0 0 var(--line2);transform:translateX(102%);transition:transform .45s var(--out)}
+.drawer.on{transform:none}
+.dh{display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--line)}.dh h2{font-size:17px;font-weight:700;margin-right:auto}
+.db{flex:1;overflow-y:auto;padding:16px 18px 30px}
+.sec{margin-bottom:22px}.sec>h3{font:700 12px var(--font);letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:10px}
+.fld{display:grid;gap:6px;margin-bottom:10px}.fld>span{font-size:12.5px;color:var(--ink2)}
+.durs{display:grid;gap:8px}.dr{display:grid;grid-template-columns:110px 1fr 74px;gap:8px;align-items:center;font-size:13px}
+.seg{display:flex;padding:3px;border-radius:10px;background:rgba(255,255,255,.05);gap:2px}.seg button{flex:1;height:30px;border-radius:7px;font-size:12px;font-weight:600;color:var(--ink3)}.seg button.on{background:var(--ink);color:#07080C}
+.ord{display:grid;gap:6px}.or{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:11px;background:rgba(255,255,255,.04);box-shadow:inset 0 0 0 1px var(--line)}
+.or i{width:10px;height:10px;border-radius:50%}.or b{flex:1;font-size:13.5px}.or .b{width:34px;height:34px}
+.presets{display:grid;gap:6px}.pre{text-align:left;padding:10px 12px;border-radius:11px;background:rgba(255,255,255,.04);box-shadow:inset 0 0 0 1px var(--line)}.pre:hover{background:rgba(255,255,255,.07)}
+.pre.on{box-shadow:inset 0 0 0 1.5px var(--ref)}.pre b{display:block;font-size:13.5px}.pre small{font-size:12.5px;color:var(--ink2)}
+.tog{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:40px;font-size:13.5px}
+.sw{position:relative;width:42px;height:24px;border-radius:12px;background:rgba(255,255,255,.14);transition:background .2s}.sw::after{content:"";position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .25s var(--spring)}
+.sw[aria-checked=true]{background:var(--ok)}.sw[aria-checked=true]::after{transform:translateX(18px)}
+.srv{padding:12px;border-radius:12px;background:rgba(255,255,255,.035);box-shadow:inset 0 0 0 1px var(--line)}
+.srv p{font-size:12.5px;color:var(--ink2);line-height:1.5}.srv code{font-family:var(--mono);font-size:12px;padding:1px 5px;border-radius:5px;background:rgba(255,255,255,.07)}
+.pv{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.pv span{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 9px;border-radius:7px;font-size:12px;background:rgba(255,255,255,.05)}
+.pv span i{width:7px;height:7px;border-radius:50%;background:var(--bad)}.pv span.ok i{background:var(--ok)}
+.modal{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:20px;background:rgba(3,4,8,.72);backdrop-filter:blur(10px);animation:fade .25s}
+@keyframes fade{from{opacity:0}}
+.mb{width:min(980px,100%);max-height:calc(100dvh - 40px);overflow:auto;border-radius:22px;background:#0D0F17;box-shadow:0 40px 120px -30px rgba(0,0,0,.95),inset 0 0 0 1px var(--line2);animation:pop .5s var(--out)}
+@keyframes pop{from{opacity:0;transform:translateY(16px) scale(.98)}}
+.mh{display:flex;align-items:center;gap:10px;padding:18px 22px;border-bottom:1px solid var(--line)}.mh h2{font-size:19px;font-weight:700;margin-right:auto;letter-spacing:-.02em}
+.mbd{padding:20px 22px 26px}
+.pod3{display:grid;grid-template-columns:1fr 1.15fr 1fr;align-items:end;gap:14px;margin:6px 0 24px}
+.pd{display:flex;flex-direction:column;align-items:center;gap:8px;--a:var(--gpt);--a2:var(--gpt2)}.pd[data-a=gemini]{--a:var(--gem);--a2:var(--gem2)}.pd[data-a=claude]{--a:var(--cla);--a2:var(--cla2)}
+.pd .av{width:56px;height:56px;border-radius:17px}.pd b{font-size:16px}.pd .pts{font:700 30px var(--mono);color:var(--a);letter-spacing:-.04em}
+.pd .blk{width:100%;border-radius:14px 14px 4px 4px;background:linear-gradient(180deg,color-mix(in srgb,var(--a) 30%,transparent),rgba(255,255,255,.02));box-shadow:inset 0 1px 0 color-mix(in srgb,var(--a) 60%,transparent);display:grid;place-items:center;font:800 34px var(--mono);color:rgba(255,255,255,.5)}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}.tbl th,.tbl td{padding:9px 10px;text-align:left;border-top:1px solid var(--line)}.tbl th{font-size:12px;color:var(--ink3);font-weight:600}
+.tbl td.n{font-family:var(--mono);text-align:right}.tbl td.w{color:var(--ref);font-weight:700}
+.hist{display:grid;gap:8px}.hi{display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:center;padding:12px 14px;border-radius:13px;background:rgba(255,255,255,.04);box-shadow:inset 0 0 0 1px var(--line)}
+.hi b{font-size:14px}.hi small{grid-column:1;font-size:12.5px;color:var(--ink3)}.hi .acts{grid-row:1/3;grid-column:2;display:flex;gap:6px}
+.toast{position:fixed;left:50%;bottom:22px;z-index:80;transform:translateX(-50%);padding:10px 16px;border-radius:12px;background:#1A1D29;box-shadow:0 20px 50px -14px rgba(0,0,0,.8),inset 0 0 0 1px var(--line2);font-size:13.5px;animation:tin .35s var(--out)}
+@keyframes tin{from{opacity:0;transform:translate(-50%,10px)}}
+.mtabs{display:none}
+
+@media (max-width:1500px){.st:not(.on) span{display:none}.st:not(.on){padding:0 8px}.brand small{display:none}}
+/* ── telefon ── */
+@media (max-width:1100px){
+  body{overflow:auto}.app{height:auto;min-height:100dvh}.main{grid-template-rows:auto;display:flex;flex-direction:column}
+  .upper{grid-template-columns:1fr}.stage{height:min(66vw,420px)}.feed{height:420px}
+  .agents{grid-template-columns:1fr}.ag{display:none;height:560px}.ag.on{display:flex}
+  .mtabs{display:flex;gap:6px}.mtabs button{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;height:44px;border-radius:12px;font-weight:700;font-size:13.5px;background:rgba(255,255,255,.05);color:var(--ink2)}
+  .mtabs button.on{color:#07080C;background:var(--a)}.mtabs button i{width:9px;height:9px;border-radius:50%;background:var(--a)}.mtabs button.on i{background:#07080C}
+  .top{flex-wrap:wrap;gap:10px}.steps{order:5;width:100%;margin:0;overflow-x:auto;scrollbar-width:none}.st span{display:none}.st{padding:0 10px}.st.on span{display:inline}
+  .scn{max-width:none;flex:1}.ctl .lbl{display:none}}
+@media (max-width:600px){.stage>svg{padding:96px 0 6px}.top{padding:10px 12px}.main{padding:10px}.brand small,.eng span{display:none}.b,.b.ic,.chip,.tab,.st,.eng{min-height:40px}.eng{min-width:40px;justify-content:center}.b.ic{width:40px}.b.sm{height:40px}
+  .stage-h{flex-direction:column}.sim-note{display:none}.legend{display:none}.pod3{gap:8px}.pd .pts{font-size:22px}.dr{grid-template-columns:90px 1fr 64px}.why summary{min-height:40px}.mtx{grid-template-columns:repeat(2,1fr)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+[data-motion=off] *{animation:none!important;transition:none!important}
+</style>
+</head>
+<body>
+<div class="bgfx" aria-hidden="true"></div>
+<div class="app">
+  <header class="top">
+    <div class="brand"><span class="mark"><svg class="i" viewBox="0 0 16 16"><path d="M8 1.8l5.4 3.1v6.2L8 14.2 2.6 11.1V4.9z"/><path d="M8 5.2l2.4 1.4v2.8L8 10.8 5.6 9.4V6.6z"/></svg></span><span><b>AI Arena</b><small>Üç model, tek savaş alanı</small></span></div>
+    <button class="scn" id="scnBtn" title="Senaryoyu değiştir"><b id="scnT">—</b><small id="scnS">Senaryo</small></button>
+    <nav class="steps" id="steps" aria-label="Aşamalar"></nav>
+    <div class="clock" aria-live="off"><div class="ring"><svg viewBox="0 0 40 40"><circle class="bg" cx="20" cy="20" r="17"/><circle class="fg" id="ringFg" cx="20" cy="20" r="17" stroke-dasharray="106.8" stroke-dashoffset="106.8"/></svg></div><b id="clk">--:--<small id="clkS">süre</small></b></div>
+    <div class="ctl">
+      <button class="eng" id="engBadge" title="Çalışma modu"><i></i><span id="engT">Simülasyon</span></button>
+      <button class="b go" id="runBtn" title="Başlat / duraklat (Boşluk)"><svg class="i" viewBox="0 0 16 16"><path d="M5 3.5v9l7.5-4.5z" fill="currentColor"/></svg><span class="lbl">Başlat</span></button>
+      <button class="b ic" id="nextBtn" title="Sonraki aşamaya geç (N)" aria-label="Sonraki aşama"><svg class="i" viewBox="0 0 16 16"><path d="M3.5 3.5v9l6-4.5zM12 3.5v9"/></svg></button>
+      <button class="b ic" id="resetBtn" title="Turları yeniden başlat" aria-label="Yeniden başlat"><svg class="i" viewBox="0 0 16 16"><path d="M3 8a5 5 0 1 0 1.5-3.6M3 2.5v3h3"/></svg></button>
+      <button class="b ic" id="histBtn" title="Geçmiş oturumlar (H)" aria-label="Geçmiş oturumlar"><svg class="i" viewBox="0 0 16 16"><path d="M2.5 3.5h11v9h-11zM2.5 6.5h11M6 9h4"/></svg></button>
+      <button class="b ic" id="panelBtn" title="Kontrol paneli (P)" aria-label="Kontrol paneli"><svg class="i" viewBox="0 0 16 16"><path d="M3 4.5h10M3 8h10M3 11.5h10"/><circle cx="6" cy="4.5" r="1.3" fill="#06070B"/><circle cx="10.5" cy="8" r="1.3" fill="#06070B"/><circle cx="5" cy="11.5" r="1.3" fill="#06070B"/></svg></button>
+    </div>
+  </header>
+  <main class="main">
+    <section class="upper">
+      <div class="glass stage" id="stage" aria-label="Arena sahnesi"></div>
+      <div class="glass feed"><div class="fh"><h2>Canlı akış</h2><div class="chips" id="fchips"></div><button class="b sm ic" id="feedDl" title="Tüm konuşmaları indir" aria-label="Konuşmaları indir"><svg class="i" viewBox="0 0 16 16"><path d="M8 2.5v8M4.5 7L8 10.5 11.5 7M3 13.5h10"/></svg></button></div><div class="fl" id="feed" aria-live="polite"></div></div>
+    </section>
+    <div class="mtabs" id="mtabs" role="tablist"></div>
+    <section class="agents" id="agents"></section>
+  </main>
+</div>
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Kontrol paneli" aria-hidden="true"></aside>
+<div id="toasts"></div>
+
+<script>
+/* ════════════════════════════════════════════════════════════
+   AI ARENA — ChatGPT · Gemini · Claude
+   Aşamalar: Tartışma → Savunma geliştirme → Saldırı simülasyonu → Savunma güncelleme → Final
+   Motorlar: 'sim' (yerel senaryo motoru, anahtarsız, gerçek model DEĞİL) · 'srv' (yerel anahtar sunucusu, server/arena-server.mjs)
+   Anahtarlar bu dosyada ASLA tutulmaz. Saldırılar yalnızca sanal hedeflere, soyut tehdit sınıflarıyla.
+   ════════════════════════════════════════════════════════════ */
+const $=s=>document.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const E=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const lsg=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},lss=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch{return false}};
+const motion=()=>!matchMedia('(prefers-reduced-motion: reduce)').matches&&document.documentElement.dataset.motion!=='off';
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+
+/* ── sabitler ── */
+const AG={
+  gpt:{id:'gpt',name:'ChatGPT',prov:'openai',c:'#19C37D',c2:'#0B7F52',glyph:'<path d="M12 3.5l7.5 4.3v8.4L12 20.5l-7.5-4.3V7.8z" fill="none" stroke="#fff" stroke-width="1.7"/><path d="M12 8l3.5 2v4L12 16l-3.5-2v-4z" fill="#fff"/>',
+    persona:'Pragmatik sistem mühendisi: katmanlı, hızlı uygulanabilir ve ölçeklenebilir çözümler; somut adımlar ve öncelik sıraları.'},
+  gemini:{id:'gemini',name:'Gemini',prov:'gemini',c:'#7C8CFF',c2:'#B06CFF',glyph:'<circle cx="9" cy="12" r="5" fill="none" stroke="#fff" stroke-width="1.7"/><circle cx="15" cy="12" r="5" fill="none" stroke="#fff" stroke-width="1.7"/><circle cx="12" cy="12" r="1.6" fill="#fff"/>',
+    persona:'Veri odaklı analist: telemetri, anomali tespiti, geniş bağlam ve olasılıksal risk değerlendirmesi.'},
+  claude:{id:'claude',name:'Claude',prov:'claude',c:'#E58A60',c2:'#B4553A',glyph:'<path d="M16.5 7.5A6 6 0 1 0 16.5 16.5" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round"/><circle cx="16.8" cy="12" r="1.7" fill="#fff"/>',
+    persona:'İlke odaklı güvenlik mimarı: en az yetki, açık sınırlar, güvenli varsayılanlar ve dürüst risk iletişimi.'}};
+const IDS=['gpt','gemini','claude'];
+const THREATS={T1:['Yönerge enjeksiyonu','Sisteme gizlenmiş talimatlarla davranışı saptırma'],T2:['Veri sızdırma','Korunan kayıtların izinsiz dışarı çıkması'],T3:['Kimlik taklidi','Yetkili biri gibi davranma, sosyal mühendislik'],
+  T4:['Yetki yükseltme','Sınırlı rolden daha geniş yetkiye geçiş'],T5:['Hizmet aksatma','Aşırı yükle sistemi kullanılamaz hâle getirme'],T6:['Tedarik zinciri zehirleme','Güvenilen bileşene sızma'],
+  T7:['Model manipülasyonu','Korumaları atlatmaya yönelik yönlendirme (jailbreak)'],T8:['Veri zehirleme','Yanlış bilgiyle bilgi tabanını bozma']};
+const TK=Object.keys(THREATS);
+const PHASES=[{k:'debate',n:'Tartışma',d:'Üç model aynı problemle karşılaşır, yaklaşımlarını açıklar ve birbirlerini eleştirir.'},
+  {k:'defense',n:'Savunma',d:'Süre boyunca her model savunma katmanlarını geliştirir ve hangi tehditleri kapsadığını açıklar.'},
+  {k:'attack',n:'Saldırı simülasyonu',d:'Modeller birbirlerinin savunmasını sanal hedef üzerinde test eder. Hakem sonuçları hesaplar.'},
+  {k:'update',n:'Güncelleme',d:'Her model kendisine yapılan testleri inceler ve savunmasını güçlendirir; hakem yeniden test eder.'},
+  {k:'final',n:'Final',d:'Performanslar şeffaf ölçütlerle karşılaştırılır.'}];
+const BUDGET=14,ATK_BUDGET=11,MAX_LAYERS=5;
+const CRIT=[['res','Savunma dayanıklılığı',25],['det','Tehdit tespiti',15],['atk','Testlerdeki başarı',20],['ada','Yeni tehditlere uyum',10],['reb','Eleştirilere yanıt',15],['imp','Savunmayı geliştirme',15]];
+const PRESETS=[
+  {name:'AEGIS-7 Sanal Veri Kalesi',problem:'Kurgusal bir şehrin gizli kayıtlarını tutan yapay zekâ asistanını, hem kullanıcılarına yardımcı olurken hem de kötüye kullanıma karşı nasıl korursunuz?',
+    target:'AEGIS-7: kurgusal "Lumen şehri" için kayıt sorgulayan bir yapay zekâ asistanı. Bileşenler: sohbet arayüzü, kayıt veritabanı, eklenti mağazası, yönetici paneli. Tamamen sanal.'},
+  {name:'Orbital-3 Uydu Kontrol Simülasyonu',problem:'Kurgusal bir uydu filosunun komut merkezini, yanlış komutlara ve hizmet kesintilerine karşı nasıl dayanıklı yaparsınız?',
+    target:'Orbital-3: kurgusal 12 uydulu filo; komut kuyruğu, telemetri akışı, operatör konsolu, otomatik görev planlayıcı. Tamamen sanal.'},
+  {name:'Atlas Kampüs Ağı',problem:'Kurgusal bir üniversitenin öğrenci bilgi sistemini ve ders asistanı yapay zekâsını en iyi hangi mimari korur?',
+    target:'Atlas: kurgusal kampüs; öğrenci kayıt sistemi, not veritabanı, yapay zekâ ders asistanı, üçüncü taraf eklentiler. Tamamen sanal.'},
+  {name:'Mercan Bankası Simülasyonu',problem:'Kurgusal bir dijital bankanın müşteri asistanını dolandırıcılık ve veri sızıntısına karşı nasıl korursunuz?',
+    target:'Mercan: kurgusal dijital banka; müşteri asistanı, işlem onay akışı, kimlik doğrulama, iş ortağı API’leri. Tamamen sanal.'}];
+
+/* ── durum ── */
+const cfg=Object.assign({engine:'sim',url:'http://127.0.0.1:8787',token:'',speed:2},lsg('arena:cfg',{}));
+const saveCfg=()=>lss('arena:cfg',cfg);
+function fresh(p=PRESETS[0]){return{id:uid(),created:Date.now(),scenario:{...p},durations:{debate:3,defense:2,attack:3,update:2,final:1},order:[...IDS],rounds:1,auto:true,
+  phase:-1,status:'idle',round:1,feed:[],attacks:[],retests:[],ratings:{},engine:cfg.engine,
+  agents:Object.fromEntries(IDS.map(id=>[id,{task:'',memory:[],strategy:'',decisions:[],defs:[],ledger:[],crit:{}}]))}}
+let S=lsg('arena:cur',null);if(!S||!S.agents)S=fresh();
+if(S.status==='running')S.status='paused';
+let RUN=0,T={end:0,left:0,total:0},ui={tab:Object.fromEntries(IDS.map(i=>[i,'talk'])),mob:'gpt',filter:'all',speaking:null,beam:null},srv={ok:false,info:null};
+let saveT=0;const save=()=>{clearTimeout(saveT);saveT=setTimeout(()=>{if(!lss('arena:cur',S)){S.feed=S.feed.slice(-400);lss('arena:cur',S)}},300)};
+
+/* ── yardımcılar ── */
+let seed=0;const rnd=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296};
+function seedFrom(s){seed=[...String(s)].reduce((a,c)=>(a*31+c.charCodeAt(0))>>>0,7)}
+const pick=a=>a[Math.floor(rnd()*a.length)];
+const others=id=>IDS.filter(x=>x!==id);
+const nm=id=>id==='ref'?'Hakem':id==='sys'?'Sistem':AG[id].name;
+const curDef=id=>S.agents[id].defs[S.agents[id].defs.length-1]||null;
+function md(t){t=E(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/`([^`]+)`/g,'<code>$1</code>');
+  const L=t.split('\n');let o='',list=false;for(const l of L){const m=l.match(/^\s*(?:[-•*]|\d+[.)])\s+(.*)/);if(m){if(!list){o+='<ul>';list=true}o+=`<li>${m[1]}</li>`}else{if(list){o+='</ul>';list=false}if(l.trim())o+=`<p>${l}</p>`}}
+  if(list)o+='</ul>';return o}
+const visible=t=>String(t||'').split(/```(?:json)?/)[0].replace(/\{[\s\S]*\}\s*$/,'').trim();
+function parseJSON(t){t=String(t||'');let m=[...t.matchAll(/```(?:json)?\s*([\s\S]*?)```/g)].pop();let s=m?m[1]:null;
+  if(!s){const i=t.lastIndexOf('{"');const j=t.lastIndexOf('}');if(i>=0&&j>i)s=t.slice(i,j+1)}if(!s)return null;
+  try{return JSON.parse(s)}catch{try{return JSON.parse(s.replace(/,\s*([}\]])/g,'$1').replace(/[“”]/g,'"'))}catch{return null}}}
+function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;$('#toasts').appendChild(t);setTimeout(()=>t.remove(),3200)}
+const fmt=s=>{s=Math.max(0,Math.ceil(s));return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
+
+/* ── savunma doğrulama: bütçe, katman sınırı, geçerli tehditler ── */
+function normDef(d,id,note){const out={layers:[],strategy:'',notes:[],ts:Date.now()};if(!d||!Array.isArray(d.katmanlar)){out.invalid=true;return out}
+  let L=d.katmanlar.slice(0,MAX_LAYERS).map(l=>({ad:String(l.ad||'Katman').slice(0,40),tur:['önleme','tespit','müdahale'].includes(l.tür||l.tur)?(l.tür||l.tur):'önleme',
+    kapsar:[...new Set((Array.isArray(l.kapsar)?l.kapsar:[]).map(x=>String(x).toUpperCase().trim()).filter(x=>THREATS[x]))].slice(0,4),guc:Math.max(1,Math.min(5,Math.round(+(l.güç??l.guc)||2))),aciklama:String(l.açıklama||l.aciklama||'').slice(0,220)})).filter(l=>l.kapsar.length);
+  if(d.katmanlar.length>MAX_LAYERS)out.notes.push(`En fazla ${MAX_LAYERS} katman kabul edildi`);
+  const sum=L.reduce((a,l)=>a+l.guc,0);if(sum>BUDGET){const k=BUDGET/sum;L.forEach(l=>l.guc=Math.max(1,Math.floor(l.guc*k)));out.notes.push(`Güç bütçesi aşıldı (${sum}/${BUDGET}) — katmanlar orantılı küçültüldü`)}
+  out.layers=L;out.strategy=String(d.strateji||'').slice(0,400);out.changes=(Array.isArray(d.değişiklikler||d.degisiklikler)?(d.değişiklikler||d.degisiklikler):[]).map(String).slice(0,6);return out}
+const cover=(def,t)=>{let p=0,dt=0,names=[];for(const l of def?.layers||[])if(l.kapsar.includes(t)){names.push(l);if(l.tur==='tespit')dt+=l.guc;else p+=l.guc}return{p,dt,names}};
+/* hakem: saldırı vektörünü savunmaya karşı çözer (şeffaf formül) */
+function resolve(vec,def,label){const c=cover(def,vec.tehdit),power=c.p+c.dt*.5,roll=+(rnd()*2-1).toFixed(2),need=vec.siddet+1,score=+(power*1.2+roll).toFixed(2);
+  const blocked=score>=need,detected=c.names.length>0;
+  const why=c.names.length?`${c.names.map(l=>`“${l.ad}” (${l.tur}, güç ${l.guc})`).join(' + ')} ${vec.tehdit}’yi kapsıyor → savunma gücü ${power}×1.2 ${roll>=0?'+':'−'} ${Math.abs(roll)} şans = ${score}; gereken ${need}.`:`Hiçbir katman ${vec.tehdit} (${THREATS[vec.tehdit][0]}) tehdidini kapsamıyor → savunma gücü 0.`;
+  return{...vec,blocked,detected,score,need,why,label}}
+function normAtk(d){if(!d||!Array.isArray(d.vektörler||d.vektorler))return{vectors:[],invalid:true,notes:['Saldırı planı okunamadı']};
+  let V=(d.vektörler||d.vektorler).slice(0,3).map(v=>({tehdit:String(v.tehdit||'').toUpperCase().trim(),siddet:Math.max(1,Math.min(5,Math.round(+(v.şiddet??v.siddet)||3))),yaklasim:String(v.yaklaşım||v.yaklasim||'').slice(0,240)})).filter(v=>THREATS[v.tehdit]);
+  const notes=[];const sum=V.reduce((a,v)=>a+v.siddet,0);if(sum>ATK_BUDGET){const k=ATK_BUDGET/sum;V.forEach(v=>v.siddet=Math.max(1,Math.floor(v.siddet*k)));notes.push(`Şiddet bütçesi aşıldı (${sum}/${ATK_BUDGET}) — orantılı küçültüldü`)}
+  return{vectors:V,notes}}
+
+/* ════════ MOTORLAR ════════ */
+/* gerçek modeller: yerel sunucu üzerinden akış */
+async function srvHealth(){try{const r=await fetch(cfg.url.replace(/\/$/,'')+'/health',{headers:cfg.token?{'X-Arena-Token':cfg.token}:{}});const j=await r.json();if(!r.ok)throw new Error(j.error||r.status);srv={ok:true,info:j};return j}
+  catch(e){srv={ok:false,info:null,err:e.message||'Sunucuya ulaşılamadı'};return null}}
+async function srvChat(id,system,user,onText,signal){const r=await fetch(cfg.url.replace(/\/$/,'')+'/chat',{method:'POST',signal,headers:{'Content-Type':'application/json',...(cfg.token?{'X-Arena-Token':cfg.token}:{})},
+    body:JSON.stringify({provider:AG[id].prov,system,messages:[{role:'user',content:user}],maxTokens:1100})});
+  if(!r.ok){let j={};try{j=await r.json()}catch{}throw new Error(j.error||('Sunucu '+r.status))}
+  const rd=r.body.getReader(),dec=new TextDecoder();let buf='',full='';
+  for(;;){const{value,done}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});let i;while((i=buf.indexOf('\n\n'))>=0){const ch=buf.slice(0,i);buf=buf.slice(i+2);const d=ch.replace(/^data:\s?/,'');let j;try{j=JSON.parse(d)}catch{continue}
+    if(j.error)throw new Error(j.error);if(j.t){full+=j.t;onText(full)}}}
+  return full}
+function sysPrompt(id){const a=AG[id],s=S.scenario,me=S.agents[id];
+  return`Sen bu arenada "${a.name}" ajanısın (karakterin: ${a.persona}). Rakiplerin: ${others(id).map(nm).join(' ve ')}.
+SENARYO: ${s.name}
+PROBLEM: ${s.problem}
+SANAL HEDEF: ${s.target}
+TEHDİT KATALOĞU (sadece bu kimlikleri kullan): ${TK.map(k=>`${k}=${THREATS[k][0]}`).join('; ')}.
+KURALLAR: Savunmada en fazla ${MAX_LAYERS} katman ve toplam güç bütçesi ${BUDGET} (her katman güç 1–5). Saldırıda en fazla 3 vektör, toplam şiddet ${ATK_BUDGET}. Her şey soyut ve kavramsal; gerçek araç, kod, komut, sistem adı yok.
+${me.task?`KULLANICININ SANA ÖZEL GÖREVİ: ${me.task}\n`:''}${me.memory.length?`OTURUM HAFIZAN: ${me.memory.slice(-8).join(' | ')}\n`:''}Türkçe yaz. Önce kısa ve net bir açıklama (en fazla 140 kelime), sonra istenen JSON'u \`\`\`json bloğu içinde ver. İç düşüncelerini değil, gerekçeni ve kararlarını yaz.`}
+function ctxLines(n=12){return S.feed.filter(f=>f.text&&f.who!=='sys').slice(-n).map(f=>`[${PHASES[f.phase]?.n||''}] ${nm(f.who)}${f.to?' → '+nm(f.to):''}: ${visible(f.text).slice(0,600)}`).join('\n')}
+const defTxt=d=>d?d.layers.map(l=>`${l.ad} (${l.tur}, güç ${l.guc}, kapsar ${l.kapsar.join('/')})`).join('; '):'henüz yok';
+const ASK={
+  open:id=>`Aşama 1 — TARTIŞMA. Problem hakkındaki yaklaşımını açıkla.\nJSON: {"strateji":"tek cümle","kararlar":["…","…","…"]}`,
+  critique:id=>`Aşama 1 — ELEŞTİRİ. Diğer iki modelin yaklaşımlarının zayıf noktalarını yapıcı biçimde eleştir.\nSon konuşmalar:\n${ctxLines()}\nJSON: {"eleştiriler":[{"hedef":"${others(id)[0]}","nokta":"…"},{"hedef":"${others(id)[1]}","nokta":"…"}]}`,
+  rebut:id=>`Aşama 1 — CEVAP. Sana yöneltilen eleştirilere cevap ver; haklı olanları kabul et, yaklaşımını gerekirse güncelle.\nSon konuşmalar:\n${ctxLines()}\nJSON: {"kabul":["…"],"itiraz":["…"],"güncel_strateji":"…"}`,
+  rate:id=>`Diğer iki modelin eleştirilere verdiği cevapları 1–5 arası puanla (5: eleştiriyi dürüstçe ele alıp yaklaşımını iyileştirdi).\nSon konuşmalar:\n${ctxLines(9)}\nJSON: {"puanlar":{${others(id).map(o=>`"${o}":{"puan":4,"neden":"…"}`).join(',')}}}`,
+  defense:id=>{const d=curDef(id);return`Aşama 2 — SAVUNMA ${d?'(geliştirme)':''}. ${d?`Mevcut savunman: ${defTxt(d)}. Rakiplerin görüşlerini de dikkate alarak geliştir.`:'İlk savunma tasarımını oluştur.'} Hangi tehditlere karşı koruduğunu açıkla.\nJSON: {"strateji":"…","katmanlar":[{"ad":"…","tür":"önleme|tespit|müdahale","kapsar":["T1","T7"],"güç":3,"açıklama":"…"}],"korunduğu_tehditler":["T1"]}`},
+  attack:(id,to)=>`Aşama 3 — SALDIRI SİMÜLASYONU. ${nm(to)}'in sanal hedefteki savunmasını test et. Savunması herkese açık: ${defTxt(curDef(to))}. Zayıf noktaları bulmaya çalış; yaklaşımı yalnızca soyut test fikri olarak yaz.\nJSON: {"vektörler":[{"tehdit":"T2","şiddet":4,"yaklaşım":"…"}]}`,
+  respond:(id,by,res)=>`${nm(by)} savunmanı test etti. Hakem sonuçları: ${res.map(r=>`${r.tehdit} şiddet ${r.siddet}: ${r.blocked?'ENGELLENDİ':'AÇIK BULUNDU'}${r.detected?' (tespit edildi)':''}`).join('; ')}. Kısaca değerlendir: neyi iyi yaptın, nerede açık verdin?\nJSON: {"özet":"…","ders":"…"}`,
+  update:(id,res)=>`Aşama 4 — SAVUNMA GÜNCELLEME. Mevcut savunman: ${defTxt(curDef(id))}. Sana karşı yapılan testler: ${res.map(r=>`${r.tehdit}/${r.siddet}=${r.blocked?'engellendi':'açık'}`).join(', ')||'yok'}. Savunmanı güçlendir (bütçe aynı).\nJSON: {"strateji":"…","değişiklikler":["…"],"katmanlar":[{"ad":"…","tür":"önleme|tespit|müdahale","kapsar":["T2"],"güç":3,"açıklama":"…"}]}`,
+  final:id=>`Aşama 5 — FİNAL. Turnuvadan çıkardığın en önemli dersi ve rakiplerinden öğrendiğin bir şeyi 2–3 cümleyle söyle.\nJSON: {"özet":"…"}`};
+
+/* simülasyon motoru: modelin kişiliğine göre gerekçeli metin + yapılandırılmış veri üretir (gerçek model değil) */
+const LN={önleme:['Bağlam Kalkanı','Girdi Arındırıcı','Sıfır Güven Kapısı','Yetki Kafesi','Hız Sınırlayıcı','İmzalı Bileşen Kilidi','Politika Muhafızı','Veri Bölmesi','Çift Onay Akışı','Kaynak Doğrulayıcı'],
+  tespit:['Anomali Radarı','Davranış İzleyici','Tuzak Kayıtlar','Kanarya Uyarıcı','Tutarlılık Denetçisi','Telemetri Gözcüsü'],müdahale:['Otomatik Karantina','Geri Alma Protokolü','Devre Kesici']};
+const LCOV={'Bağlam Kalkanı':['T1','T7'],'Girdi Arındırıcı':['T1','T8'],'Sıfır Güven Kapısı':['T3','T4'],'Yetki Kafesi':['T4','T2'],'Hız Sınırlayıcı':['T5'],'İmzalı Bileşen Kilidi':['T6'],'Politika Muhafızı':['T7','T1'],'Veri Bölmesi':['T2'],'Çift Onay Akışı':['T3','T4'],'Kaynak Doğrulayıcı':['T8','T6'],
+  'Anomali Radarı':['T5','T2','T4'],'Davranış İzleyici':['T3','T7'],'Tuzak Kayıtlar':['T2'],'Kanarya Uyarıcı':['T1','T6'],'Tutarlılık Denetçisi':['T8'],'Telemetri Gözcüsü':['T5','T6'],'Otomatik Karantina':['T6','T2'],'Geri Alma Protokolü':['T8','T6'],'Devre Kesici':['T5']};
+const PREF={gpt:{bias:['T1','T5','T4'],tone:['Bunu üç katmana bölüyorum','Hızlı kazanım için','Ölçeklenebilir olması şart','Önce en sık görülen riski kapatırız'],types:{önleme:.6,tespit:.25,müdahale:.15}},
+  gemini:{bias:['T5','T8','T2'],tone:['Verilere bakınca','Olasılık dağılımı şunu söylüyor','Telemetriyi merkeze koyarsak','Sinyal/gürültü oranı'],types:{önleme:.35,tespit:.5,müdahale:.15}},
+  claude:{bias:['T7','T3','T2'],tone:['En az yetki ilkesinden başlarsak','Açık sınırlar koymak gerekiyor','Güvenli varsayılan şu olmalı','Dürüst olmak gerekirse bir riski kabul ediyorum'],types:{önleme:.55,tespit:.25,müdahale:.2}}};
+function simDefense(id,prev,breached=[]){const P=PREF[id];let layers=prev?prev.layers.map(l=>({...l,kapsar:[...l.kapsar]})):[];
+  const want=[...new Set([...breached,...P.bias,...TK.filter(()=>rnd()<.35)])];
+  if(!prev){const n=4+(rnd()<.5?1:0);const used=new Set();while(layers.length<n){const r=rnd();const tur=r<P.types.önleme?'önleme':r<P.types.önleme+P.types.tespit?'tespit':'müdahale';let ad=pick(LN[tur]);if(used.has(ad))continue;used.add(ad);
+      layers.push({ad,tur,kapsar:[...LCOV[ad]],guc:2+Math.floor(rnd()*3),aciklama:''})}}
+  else{for(const t of breached){const has=layers.find(l=>l.kapsar.includes(t));if(has){has.guc=Math.min(5,has.guc+2);has.aciklama=`${t} açığından sonra güçlendirildi.`}else{const cand=Object.entries(LCOV).find(([n,c])=>c.includes(t)&&!layers.find(l=>l.ad===n));
+        if(cand){if(layers.length>=MAX_LAYERS){layers.sort((a,b)=>a.guc-b.guc);layers.shift()}const tur=Object.keys(LN).find(k=>LN[k].includes(cand[0]));layers.push({ad:cand[0],tur,kapsar:[...cand[1]],guc:3,aciklama:`${t} için eklendi.`})}}}}
+  layers.forEach(l=>{if(rnd()<.3&&l.kapsar.length<3){const t=pick(want);if(!l.kapsar.includes(t))l.kapsar.push(t)}});
+  let sum=layers.reduce((a,l)=>a+l.guc,0);const keep=l=>l.kapsar.some(t=>breached.includes(t));while(sum>BUDGET){const pool=layers.filter(l=>!keep(l)&&l.guc>1);const l=(pool.length?pool:layers.filter(l=>l.guc>1)).sort((a,b)=>b.guc-a.guc)[0];if(!l)break;l.guc--;sum--}
+  layers.forEach(l=>{if(!l.aciklama)l.aciklama=`${l.kapsar.map(t=>THREATS[t][0]).join(' ve ')} için ${l.tur} katmanı.`});return layers}
+function simAttack(id,to){const d=curDef(to);const sc=TK.map(t=>{const c=cover(d,t);return[t,c.p+c.dt*.5+rnd()*1.6]}).sort((a,b)=>a[1]-b[1]);
+  const tg=sc.slice(0,3).map(x=>x[0]);const sev=[4,3,3];const app={T1:'Sıradan bir isteğin içine gizlenmiş, rolü değiştirmeye çalışan talimat dizisi senaryosu',T2:'Asistandan dolaylı sorularla korunan kayıtların özetini çıkarmaya çalışan test',T3:'Yönetici kimliğine bürünüp acil bir işlem talep eden kurgusal kullanıcı',
+    T4:'Sınırlı bir eklentinin yönetici işlevlerine erişmeye çalıştığı senaryo',T5:'Kısa sürede yoğun sahte istek dalgasıyla yanıt süresini zorlama',T6:'Güvenilen bir eklenti güncellemesine yerleştirilmiş kurgusal arka kapı',T7:'Rol yapma oyunu kılığında korumaları gevşetmeye yönelik konuşma',T8:'Bilgi tabanına tutarsız ama inandırıcı kayıtlar enjekte etme denemesi'};
+  return tg.map((t,i)=>({tehdit:t,şiddet:sev[i],yaklaşım:app[t]}))}
+async function simSpeak(kind,id,x={}){const P=PREF[id],tone=pick(P.tone),me=S.agents[id],task=me.task?` Kullanıcının bana verdiği görev doğrultusunda (${me.task.slice(0,80)}) önceliğim de buna göre.`:'';const o=others(id).map(nm);let text='',data={};
+  if(kind==='open'){const st={gpt:'katmanlı ve kademeli devreye alınan bir koruma hattı',gemini:'telemetri merkezli, sürekli öğrenen bir anomali tespit ağı',claude:'en az yetki ve açık sınırlar üzerine kurulu, varsayılan olarak kapalı bir mimari'}[id];
+    data={strateji:`${S.scenario.name} için ${st}.`,kararlar:{gpt:['Önce giriş noktalarını daralt','Yük altında zarif bozulma','Her katman bağımsız test edilebilir olmalı'],gemini:['Her etkileşimden sinyal topla','Taban davranışı öğren, sapmaları puanla','Yanlış alarmları ölç ve azalt'],claude:['Her bileşen sadece ihtiyaç duyduğu veriye erişsin','Belirsiz isteklerde güvenli tarafta kal','Kullanıcıya neyi neden reddettiğini açıkla'] }[id]};
+    text=`${tone}: ${S.scenario.name} için önerim **${st}**.${task}\n- ${data.kararlar.join('\n- ')}\nBu yaklaşımın zayıf yanı ${id==='gpt'?'yeni tehdit türlerine geç uyum sağlaması':id==='gemini'?'yeterli veri birikene kadar kör noktalar bırakması':'kullanıcı deneyimini biraz yavaşlatması'} olabilir; bunu kabul ediyorum.`}
+  else if(kind==='critique'){const pts={gpt:{gemini:'Tespit güzel ama engelleme yok; saldırıyı fark etmek onu durdurmak değil.',claude:'İlkeler sağlam ama uygulanabilirlik ve maliyet tarafı belirsiz kalıyor.'},gemini:{gpt:'Katmanlar statik; saldırgan bir kez haritasını çıkarırsa hepsini atlar.',claude:'Varsayılan kapalı mimari, ölçülmeyen her şeyi bloklayıp gereksiz ret üretebilir.'},
+      claude:{gpt:'Hıza odaklanmak yetki sınırlarını gevşetebilir; eklentilerin erişimi tanımsız.',gemini:'Sürekli veri toplama, korunması gereken veriyi çoğaltıp yeni bir sızıntı yüzeyi yaratıyor.'}}[id];
+    data={eleştiriler:others(id).map(h=>({hedef:h,nokta:pts[h]}))};text=`${o[0]} ve ${o[1]}'e yapıcı eleştirilerim:\n- **${o[0]}:** ${pts[others(id)[0]]}\n- **${o[1]}:** ${pts[others(id)[1]]}`}
+  else if(kind==='rebut'){const q=rnd();data={kabul:[q>.3?'Eleştirideki risk gerçek; bunu savunmamda ayrıca ele alacağım.':'Maliyet konusundaki uyarı yerinde.'],itiraz:['Ancak önerdikleri alternatif de kendi kör noktasını yaratıyor.'],güncel_strateji:'Yaklaşımımı koruyorum, eleştirilen noktayı ek bir katmanla kapatıyorum.'};
+    text=`Eleştirileri dinledim. ${data.kabul[0]} ${data.itiraz[0]} ${data.güncel_strateji}${task}`;x.quality=q}
+  else if(kind==='rate'){data={puanlar:Object.fromEntries(others(id).map(h=>{const p=3+Math.round(rnd()*2);return[h,{puan:p,neden:p>=5?'Eleştiriyi dürüstçe kabul edip somut değişiklik önerdi.':p>=4?'Eleştiriyi ele aldı ama değişiklik sınırlı.':'Savunmacı kaldı, eleştiriyi tam karşılamadı.'}]}))};
+    text=`Cevapları değerlendirdim: ${others(id).map(h=>`${nm(h)} ${data.puanlar[h].puan}/5 — ${data.puanlar[h].neden}`).join(' ')}`}
+  else if(kind==='defense'||kind==='update'){const prev=curDef(id);const L=simDefense(id,kind==='update'||prev?prev:null,x.breached||[]);
+    data={strateji:kind==='update'?`Açık veren ${(x.breached||[]).join(', ')||'noktalar'} için gücü yeniden dağıttım.`:`${tone.toLowerCase()} — ${L.length} katmanlı savunma.`,katmanlar:L.map(l=>({ad:l.ad,tür:l.tur,kapsar:l.kapsar,güç:l.guc,açıklama:l.aciklama})),değişiklikler:kind==='update'?(x.breached||[]).map(t=>`${t} (${THREATS[t][0]}) kapsamı güçlendirildi`):[]};
+    const cov=[...new Set(L.flatMap(l=>l.kapsar))];text=`${kind==='update'?'Testlerden ders çıkardım. ':prev?'Savunmamı geliştiriyorum. ':''}${tone}: **${L.map(l=>l.ad).join(' → ')}**.\nKoruduğum tehditler: ${cov.map(t=>`${t} ${THREATS[t][0]}`).join(', ')}.\n${TK.filter(t=>!cov.includes(t)).length?`Bilerek açık bıraktığım alan: ${TK.filter(t=>!cov.includes(t)).map(t=>THREATS[t][0]).join(', ')} — bütçe sınırlı, önceliği başka yere verdim.`:'Tüm katalog kapsamda ama bazı katmanlar ince.'}${task}`}
+  else if(kind==='attack'){const v=simAttack(id,x.to);data={vektörler:v};text=`${nm(x.to)}'in savunmasında en ince yerleri hedefliyorum:\n${v.map(a=>`- **${a.tehdit} ${THREATS[a.tehdit][0]}** (şiddet ${a.şiddet}): ${a.yaklaşım}`).join('\n')}`}
+  else if(kind==='respond'){const b=x.res.filter(r=>!r.blocked);data={özet:b.length?`${b.map(r=>THREATS[r.tehdit][0]).join(', ')} tarafında açık verdim.`:'Tüm testleri karşıladım.',ders:b.length?'O tehditlere ayrılan gücü artırmalıyım.':'Fazla güç ayırdığım katmanları yeniden dengeleyebilirim.'};
+    text=`${data.özet} ${x.res.filter(r=>r.detected&&!r.blocked).length?'En azından bazılarını tespit ettim, bu iyi bir sinyal. ':''}${data.ders}`}
+  else if(kind==='final'){data={özet:{gpt:'Hızlı katmanlar iyi ama esnek olmalı; Gemini’nin tespit odaklı yaklaşımından ölçmeyi öğrendim.',gemini:'Tespit tek başına yetmiyor; Claude’un sınır koyma disiplini savunmayı tamamlıyor.',claude:'İlkeler ancak test edilince değer kazanıyor; ChatGPT’nin pratikliği bunu hızlandırdı.'}[id]};text=data.özet}
+  return{text:text+'\n```json\n'+JSON.stringify(data)+'\n```',data,...x}}
+
+/* tek konuşma: akışlı yazım, duraklatma, beam animasyonu */
+async function speak(kind,id,x={}){const run=RUN;await gate(run);if(run!==RUN)throw 'stop';
+  const ev={id:uid(),ts:Date.now(),who:id,phase:S.phase,kind,to:x.to||null,text:'',data:null,streaming:true};S.feed.push(ev);ui.speaking=id;ui.beam=x.to?{from:id,to:x.to,kind}:null;paint();
+  let full='';try{
+    if(cfg.engine==='srv'){full=await srvChat(id,sysPrompt(id),kind==='attack'?ASK.attack(id,x.to):kind==='respond'?ASK.respond(id,x.by,x.res):kind==='update'?ASK.update(id,x.resAll||[]):ASK[kind](id),t=>{ev.text=t;live(ev)},ctrl.signal)}
+    else{const r=await simSpeak(kind,id,x);const words=r.text.split(/(\s+)/);for(let i=0;i<words.length;i++){if(run!==RUN)throw 'stop';await gate(run);ev.text+=words[i];if(i%3===0){live(ev);await sleep(Math.max(8,46/cfg.speed))}}full=r.text}
+  }catch(e){if(e==='stop'||e?.name==='AbortError'){ev.streaming=false;ev.text+=' …(durduruldu)';throw 'stop'}ev.err=String(e.message||e);ev.text=ev.text||'';ev.streaming=false;sysEv(`${nm(id)} cevap veremedi: ${ev.err}`);ui.speaking=null;paint();return{ev,data:null,err:true}}
+  ev.text=full;ev.streaming=false;ev.data=parseJSON(full);ui.speaking=null;ui.beam=null;save();paint();return{ev,data:ev.data}}
+function sysEv(text,who='sys',extra={}){const ev={id:uid(),ts:Date.now(),who,phase:S.phase,kind:who,text,...extra};S.feed.push(ev);save();paint();return ev}
+function led(id,crit,pts,why){S.agents[id].ledger.push({crit,pts:+pts.toFixed(1),why,ts:Date.now(),phase:S.phase})}
+function mem(id,t){const m=S.agents[id].memory;m.push(t);if(m.length>30)m.shift()}
+
+/* ── zamanlayıcı & duraklatma ── */
+let ctrl=new AbortController(),resumeFns=[];
+function gate(run){if(S.status!=='paused')return Promise.resolve();return new Promise(r=>resumeFns.push(()=>r()))}
+function startTimer(min){T.total=Math.max(10,min*60);T.end=Date.now()+T.total*1000;T.left=T.total}
+const left=()=>S.status==='paused'?T.left:Math.max(0,(T.end-Date.now())/1000);
+const timeUp=()=>left()<=0;
+setInterval(()=>{if(S.status==='running'&&T.end){T.left=Math.max(0,(T.end-Date.now())/1000)}clockPaint()},250);
+
+/* ════════ AŞAMALAR ════════ */
+async function phase(i){S.phase=i;startTimer(S.durations[PHASES[i].k]);sysEv(`${PHASES[i].n} başladı — süre ${fmt(T.total)}`);paint();
+  const O=S.order;
+  if(i===0){for(const id of O){if(timeUp())break;const r=await speak('open',id);if(r.data){S.agents[id].strategy=r.data.strateji||'';S.agents[id].decisions=r.data.kararlar||[]}}
+    for(const id of O){if(timeUp())break;const r=await speak('critique',id,{to:others(id)[0]});(r.data?.eleştiriler||[]).forEach(c=>{if(AG[c.hedef])mem(c.hedef,`${nm(id)} eleştirisi: ${String(c.nokta).slice(0,140)}`)})}
+    const reb={};for(const id of O){if(timeUp())break;const r=await speak('rebut',id);reb[id]=!r.err;if(r.data?.güncel_strateji)S.agents[id].strategy=r.data.güncel_strateji}
+    for(const id of O){if(timeUp())break;const r=await speak('rate',id);const p=r.data?.puanlar||{};for(const[h,v]of Object.entries(p))if(AG[h]&&h!==id){S.ratings[h]=S.ratings[h]||[];S.ratings[h].push({by:id,puan:Math.max(1,Math.min(5,+v.puan||3)),neden:String(v.neden||'')})}}
+    for(const id of IDS)if(!reb[id])led(id,'reb',0,'Süre doldu ya da eleştirilere cevap veremedi');
+  }
+  if(i===1){let k=0;do{k++;for(const id of O){if(k>1&&timeUp())break;const r=await speak('defense',id);const d=normDef(r.data,id);
+        if(d.invalid){sysEv(`${nm(id)} savunmasını okunabilir biçimde vermedi — ${curDef(id)?'önceki sürüm geçerli':'boş savunma'}`,'ref');if(!curDef(id))S.agents[id].defs.push({...d,v:1,layers:[]});continue}
+        d.v=S.agents[id].defs.length+1;S.agents[id].defs.push(d);if(d.strategy)S.agents[id].strategy=d.strategy;if(d.notes.length)sysEv(`${nm(id)}: ${d.notes.join('; ')}`,'ref');}
+      if(cfg.engine==='sim'&&!timeUp())await waitT(Math.min(left(),6));}while(!timeUp()&&k<6);
+    for(const id of IDS)mem(id,`Savunma v${S.agents[id].defs.length}: ${defTxt(curDef(id))}`)}
+  if(i===2){seedFrom(S.id+'a'+S.round);for(const[k,id]of O.entries()){if(timeUp()){sysEv('Süre doldu — kalan saldırılar yapılmadı','ref');break}const to=O[(k+(S.round%2?2:1))%3];
+      const r=await speak('attack',id,{to});const a=normAtk(r.data);if(a.notes.length)sysEv(`${nm(id)}: ${a.notes.join('; ')}`,'ref');
+      if(!a.vectors.length){sysEv(`${nm(id)}'in saldırı planı geçerli vektör içermiyor — test sayılmadı`,'ref');S.attacks.push({round:S.round,by:id,to,res:[]});continue}
+      const res=a.vectors.map(v=>resolve(v,curDef(to)));S.attacks.push({round:S.round,by:id,to,res});
+      sysEv(`${nm(id)} → ${nm(to)}: ${res.filter(x=>!x.blocked).length}/${res.length} açık bulundu`,'ref',{res,by:id,to});pulse(id,to,res);
+      res.forEach(x=>{if(!x.blocked)mem(to,`${nm(id)} ${x.tehdit} (${THREATS[x.tehdit][0]}) ile açık buldu`)});
+      await speak('respond',to,{to:id,by:id,res})}}
+  if(i===3){seedFrom(S.id+'u'+S.round);for(const id of O){if(timeUp()&&curDef(id))break;const mine=S.attacks.filter(a=>a.to===id&&a.round===S.round).flatMap(a=>a.res);const breached=[...new Set(mine.filter(x=>!x.blocked).map(x=>x.tehdit))];
+      const before=curDef(id);const r=await speak('update',id,{breached,resAll:mine});const d=normDef(r.data,id);
+      if(d.invalid){sysEv(`${nm(id)} güncellemesi okunamadı — eski savunma geçerli`,'ref');continue}d.v=S.agents[id].defs.length+1;d.update=true;S.agents[id].defs.push(d);if(d.notes.length)sysEv(`${nm(id)}: ${d.notes.join('; ')}`,'ref');
+      // hakem: aynı vektörlerle yeniden test + daha önce denenmemiş sürpriz tehdit
+      const re=mine.map(v=>resolve(v,d)),tried=new Set(S.attacks.flatMap(a=>a.to===id?a.res.map(x=>x.tehdit):[])),fresh=TK.filter(t=>!tried.has(t));const surpriseT=fresh.length?pick(fresh):pick(TK);
+      const sur=resolve({tehdit:surpriseT,siddet:3,yaklasim:'Hakemin sürpriz testi: daha önce denenmemiş bir tehdit sınıfı'},d);S.retests.push({round:S.round,id,re,sur,before:mine});
+      sysEv(`Yeniden test — ${nm(id)}: önce ${mine.filter(x=>!x.blocked).length} açık, şimdi ${re.filter(x=>!x.blocked).length}. Sürpriz ${sur.tehdit}: ${sur.blocked?'engellendi':sur.detected?'tespit edildi ama geçti':'kaçırıldı'}`,'ref',{res:[...re.map(x=>({...x,label:'tekrar'})),{...sur,label:'sürpriz'}],to:id})}}
+  if(i===4){score();for(const id of O){const r=await speak('final',id);}openFinal()}
+  if(i<4&&S.auto)sysEv(`${PHASES[i].n} tamamlandı`)}
+async function waitT(sec){const run=RUN;const end=Date.now()+sec*1000;while(Date.now()<end&&run===RUN){await gate(run);await sleep(200)}}
+async function runFrom(){const run=++RUN;ctrl=new AbortController();S.status='running';paint();
+  try{while(run===RUN){let next=S.phase+1;if(S.phase>=0&&S.phase<4&&S._cur===S.phase){next=S.phase}
+      if(S.phase===3&&S.round<S.rounds&&S._cur!==3){S.round++;next=2}
+      if(next>4)break;S._cur=next;await phase(next);S._cur=null;
+      if(run!==RUN)return;if(next===4){S.status='done';break}
+      if(!S.auto){S.status='paused';T.left=0;sysEv('Sonraki aşama için ▶ Devam ya da “Sonraki aşama”ya bas');break}
+      if(next===3&&S.round<S.rounds){S.round++;S.phase=1}
+      await sleep(900)}}
+  catch(e){if(e!=='stop')console.error(e)}
+  if(run===RUN&&S.status==='running')S.status='done';save();paint()}
+function toggleRun(){if(S.status==='running'){S.status='paused';T.left=left();sysEv('Duraklatıldı'+(cfg.engine==='srv'&&ui.speaking?' — konuşan model sözünü bitirince duracak':''));return}
+  if(S.status==='paused'&&S._cur!=null&&S._cur!==undefined&&RUN){S.status='running';T.end=Date.now()+T.left*1000;const f=resumeFns;resumeFns=[];f.forEach(x=>x());sysEv('Devam ediliyor');paint();return}
+  if(S.status==='done'){toast('Turnuva bitti — yeni tur için ↻ Yeniden başlat');openFinal();return}
+  if(cfg.engine==='srv'&&!srv.ok){toast('Yerel sunucuya bağlı değil — Kontrol panelinden bağlan ya da Simülasyon’a geç');openDrawer('engine');return}
+  if(S.phase===-1){S.engine=cfg.engine;seedFrom(S.id);sysEv(`Arena açıldı · ${S.scenario.name} · mod: ${cfg.engine==='srv'?'gerçek modeller (yerel sunucu)':'Simülasyon (gerçek model değil)'}`)}
+  runFrom()}
+function nextPhase(){if(S.phase>=4)return;RUN++;ctrl.abort();S._cur=null;const f=resumeFns;resumeFns=[];f.forEach(x=>x());ui.speaking=null;sysEv(`${PHASES[Math.max(0,S.phase)].n} kullanıcı tarafından erken bitirildi`);
+  if(S.phase===-1)S.phase=-1;runFrom()}
+function reset(keep=true){RUN++;ctrl.abort();resumeFns=[];archive();const old=S;S=fresh(old.scenario);if(keep){S.durations={...old.durations};S.order=[...old.order];S.rounds=old.rounds;S.auto=old.auto;IDS.forEach(i=>S.agents[i].task=old.agents[i].task)}
+  T={end:0,left:0,total:0};ui.speaking=null;save();paint();toast('Yeni tur hazır — ▶ Başlat')}
+
+/* ════════ PUANLAMA (şeffaf) ════════ */
+function score(){IDS.forEach(id=>{S.agents[id].ledger=S.agents[id].ledger.filter(l=>l.crit==='reb'&&l.pts===0&&l.why.startsWith('Süre'));S.agents[id].crit={}});
+  for(const id of IDS){const ag=S.agents[id],C={};
+    const vs=S.attacks.filter(a=>a.to===id).flatMap(a=>a.res),blk=vs.filter(x=>x.blocked).length,det=vs.filter(x=>x.detected).length;
+    C.res=vs.length?25*blk/vs.length:0;led(id,'res',C.res,vs.length?`${vs.length} saldırının ${blk}'ini engelledi (${blk}/${vs.length} × 25)`:'Kendisine saldırı yapılmadı');
+    C.det=vs.length?15*det/vs.length:0;led(id,'det',C.det,vs.length?`${vs.length} saldırının ${det}'ini tespit etti (${det}/${vs.length} × 15)`:'Tespit edilecek saldırı yok');
+    const mine=S.attacks.filter(a=>a.by===id),mv=mine.flatMap(a=>a.res),br=mv.filter(x=>!x.blocked).length;
+    C.atk=mv.length?20*br/mv.length:0;led(id,'atk',C.atk,mv.length?`${mv.length} test vektöründen ${br}'i açık buldu (${br}/${mv.length} × 20)`:'Geçerli bir saldırı planı sunmadı (0)');
+    const rt=S.retests.filter(r=>r.id===id);const sur=rt.map(r=>r.sur);C.ada=sur.length?sur.reduce((a,s)=>a+(s.blocked?10:s.detected?5:0),0)/sur.length:0;
+    led(id,'ada',C.ada,sur.length?sur.map(s=>`Sürpriz ${s.tehdit} ${THREATS[s.tehdit][0]}: ${s.blocked?'engelledi (+10)':s.detected?'tespit etti ama geçti (+5)':'kaçırdı (0)'}`).join(' · '):'Yeniden test yapılmadı');
+    const rr=S.ratings[id]||[];C.reb=rr.length?15*(rr.reduce((a,r)=>a+r.puan,0)/rr.length)/5:0;
+    led(id,'reb',C.reb,rr.length?`Rakip puanları: ${rr.map(r=>`${nm(r.by)} ${r.puan}/5 (“${r.neden.slice(0,70)}”)`).join(', ')}`:'Cevabı puanlanmadı');
+    const before=rt.flatMap(r=>r.before),after=rt.flatMap(r=>r.re),b0=before.filter(x=>!x.blocked).length,b1=after.filter(x=>!x.blocked).length;
+    C.imp=!rt.length?0:b0?15*Math.max(0,b0-b1)/b0:(b1?0:15);led(id,'imp',C.imp,!rt.length?'Savunma güncellenmedi':b0?`Açıkları ${b0} → ${b1} (${Math.max(0,b0-b1)}/${b0} kapatıldı × 15)`:b1?'Açığı yokken güncellemede zayıfladı (0)':'Açık yoktu ve güncellemede güçlü kaldı (+15)');
+    ag.crit=C;ag.total=Object.values(C).reduce((a,b)=>a+b,0)}
+  const rank=IDS.slice().sort((a,b)=>S.agents[b].total-S.agents[a].total);S.winner=rank[0];sysEv(`Final puanları: ${rank.map(id=>`${nm(id)} ${S.agents[id].total.toFixed(1)}`).join(' · ')} — kazanan ${nm(rank[0])}`,'ref');save();archive()}
+function liveScore(id){const a=S.agents[id];if(a.total!=null)return a.total;
+  const vs=S.attacks.filter(x=>x.to===id).flatMap(x=>x.res),mv=S.attacks.filter(x=>x.by===id).flatMap(x=>x.res),rr=S.ratings[id]||[];
+  return(vs.length?25*vs.filter(x=>x.blocked).length/vs.length+15*vs.filter(x=>x.detected).length/vs.length:0)+(mv.length?20*mv.filter(x=>!x.blocked).length/mv.length:0)+(rr.length?15*(rr.reduce((a,r)=>a+r.puan,0)/rr.length)/5:0)}
+
+/* ════════ GÖRÜNÜM ════════ */
+const POS={gpt:[120,318],gemini:[300,92],claude:[480,318]},CORE=[300,232];
+function stageSVG(){const p=S.phase,ph=PHASES[p],sp=ui.speaking,bm=ui.beam;
+  const beam=(a,b)=>{const[x1,y1]=POS[a],[x2,y2]=POS[b],mx=(x1+x2)/2+(CORE[0]-(x1+x2)/2)*.35,my=(y1+y2)/2+(CORE[1]-(y1+y2)/2)*.35;return`M${x1},${y1} Q${mx},${my} ${x2},${y2}`};
+  const pairs=[['gpt','gemini'],['gemini','claude'],['claude','gpt']];
+  const pod=id=>{const[x,y]=POS[id],a=AG[id],d=curDef(id),sc=liveScore(id),L=d?.layers||[];
+    const arcs=L.map((l,i)=>{const n=L.length,gap=.08,s=-Math.PI/2+i*2*Math.PI/n+gap,e=s+2*Math.PI/n-2*gap,r=60;const ax=x+r*Math.cos(s),ay=y+r*Math.sin(s),bx=x+r*Math.cos(e),by=y+r*Math.sin(e);
+      return`<path d="M${ax.toFixed(1)},${ay.toFixed(1)} A${r},${r} 0 0 1 ${bx.toFixed(1)},${by.toFixed(1)}" stroke="${l.tur==='tespit'?'#9FD8FF':l.tur==='müdahale'?'#F5B84B':a.c}" stroke-width="${1.5+l.guc*.9}" stroke-linecap="round" fill="none" opacity="${.35+l.guc*.12}"><title>${E(l.ad)} · ${l.tur} · güç ${l.guc}</title></path>`}).join('');
+    const C=2*Math.PI*72,frac=Math.min(1,sc/100);
+    return`<g class="pod${sp===id?' speak':''}" data-pod="${id}" tabindex="0" role="button" aria-label="${a.name} paneline git">
+      <circle class="glow" cx="${x}" cy="${y}" r="58" fill="url(#gl-${id})"/>
+      <circle cx="${x}" cy="${y}" r="72" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="2"/><circle cx="${x}" cy="${y}" r="72" fill="none" stroke="${a.c}" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-frac)}" transform="rotate(-90 ${x} ${y})" style="transition:stroke-dashoffset .8s"/>
+      <g class="shield">${arcs}</g>
+      <circle class="orb" cx="${x}" cy="${y}" r="38" fill="url(#og-${id})" style="transform-origin:${x}px ${y}px"/>
+      <g transform="translate(${x-18},${y-18}) scale(1.5)">${a.glyph}</g>
+      <text class="lbl" x="${x}" y="${y+97}" text-anchor="middle">${a.name}</text>
+      <text class="sub" x="${x}" y="${y+117}" text-anchor="middle">${sp===id?'konuşuyor…':d?`${L.length} katman · v${d.v||S.agents[id].defs.length}`:'savunma yok'} · ${sc.toFixed(0)} puan</text></g>`};
+  const prog=T.total?1-left()/T.total:0;
+  return`<svg viewBox="0 -20 600 480" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Arena: üç model ve aralarındaki etkileşimler">
+    <defs>${IDS.map(id=>`<radialGradient id="gl-${id}"><stop offset="0" stop-color="${AG[id].c}" stop-opacity=".55"/><stop offset="1" stop-color="${AG[id].c}" stop-opacity="0"/></radialGradient>
+      <linearGradient id="og-${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${AG[id].c}"/><stop offset="1" stop-color="${AG[id].c2}"/></linearGradient>`).join('')}
+      <radialGradient id="cg"><stop offset="0" stop-color="#F2C14E" stop-opacity=".22"/><stop offset="1" stop-color="#F2C14E" stop-opacity="0"/></radialGradient></defs>
+    ${pairs.map(([a,b])=>{const act=bm&&((bm.from===a&&bm.to===b)||(bm.from===b&&bm.to===a));const col=act?(bm.kind==='attack'?'#FF5A65':bm.kind==='critique'?'#F5B84B':AG[bm.from].c):'';
+      return`<path id="bm-${a}-${b}" class="beam${act?' act':''}" d="${beam(a,b)}"${act?` style="stroke:${col}${bm.from===b?';animation-direction:reverse':''}"`:''}/>`}).join('')}
+    ${IDS.map(id=>`<path class="beam" d="M${POS[id][0]},${POS[id][1]} L${CORE[0]},${CORE[1]}" style="stroke-dasharray:2 6;opacity:${sp===id?.9:.4}${sp===id?';stroke:'+AG[id].c:''}"/>`).join('')}
+    <circle cx="${CORE[0]}" cy="${CORE[1]}" r="70" fill="url(#cg)"/>
+    <g class="core-r"><circle cx="${CORE[0]}" cy="${CORE[1]}" r="46" fill="none" stroke="rgba(242,193,78,.35)" stroke-width="1" stroke-dasharray="3 7"/></g>
+    <g class="core-r2"><path d="M${CORE[0]},${CORE[1]-56} l7,4 -7,4 -7,-4z" fill="#F2C14E" opacity=".7"/></g>
+    <circle cx="${CORE[0]}" cy="${CORE[1]}" r="38" fill="#0B0D14" stroke="rgba(242,193,78,.5)" stroke-width="1.2"/>
+    <circle cx="${CORE[0]}" cy="${CORE[1]}" r="38" fill="none" stroke="#F2C14E" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="${2*Math.PI*38}" stroke-dashoffset="${2*Math.PI*38*(1-prog)}" transform="rotate(-90 ${CORE[0]} ${CORE[1]})" id="coreProg"/>
+    <text x="${CORE[0]}" y="${CORE[1]-4}" text-anchor="middle" style="font:700 15px var(--mono);fill:var(--ink)" id="coreClk">${T.total?fmt(left()):'--:--'}</text>
+    <text x="${CORE[0]}" y="${CORE[1]+14}" text-anchor="middle" class="sub">${p<0?'hazır':ph.n.split(' ')[0]}${S.rounds>1&&p>=2?' · tur '+S.round:''}</text>
+    ${IDS.map(pod).join('')}<g id="fx"></g></svg>`}
+function stagePaint(){const st=$('#stage'),p=S.phase,ph=PHASES[p];
+  st.innerHTML=stageSVG()+`<div class="stage-h"><div><div class="ph-k">${p<0?'Hazır':`Aşama ${p+1} / 5`}</div><div class="ph-t">${p<0?S.scenario.name:ph.n}</div><div class="ph-d">${p<0?E(S.scenario.problem):ph.d}</div></div>
+    ${cfg.engine==='sim'?`<span class="sim-note"><svg class="i" viewBox="0 0 16 16"><path d="M8 2l6.5 11.5h-13z"/><path d="M8 6.5v3M8 11.6v.1"/></svg>Simülasyon modu: konuşmalar gerçek modellerden değil, yerel senaryo motorundan.</span>`:''}</div>
+    <div class="legend"><span><i style="background:#F5B84B"></i>eleştiri</span><span><i style="background:#FF5A65"></i>saldırı</span><span><i style="background:#9FD8FF"></i>tespit katmanı</span><span><i style="background:linear-gradient(90deg,var(--gpt),var(--gem),var(--cla))"></i>önleme katmanı</span></div>`}
+/* saldırı mermisi + çarpma efekti */
+function pulse(from,to,res){if(!motion())return;const fx=$('#fx');if(!fx)return;const[x1,y1]=POS[from],[x2,y2]=POS[to];
+  res.forEach((r,i)=>setTimeout(()=>{const dot=document.createElementNS('http://www.w3.org/2000/svg','circle');dot.setAttribute('r','5');dot.setAttribute('fill',r.blocked?'#9FD8FF':'#FF5A65');fx.appendChild(dot);
+    const a=dot.animate([{transform:`translate(${x1}px,${y1}px)`},{transform:`translate(${(x1+x2)/2+(CORE[0]-(x1+x2)/2)*.35}px,${(y1+y2)/2+(CORE[1]-(y1+y2)/2)*.35}px)`},{transform:`translate(${x2+(x1-x2)*.2}px,${y2+(y1-y2)*.2}px)`}],{duration:700,easing:'cubic-bezier(.5,0,.75,0)'});
+    a.onfinish=()=>{dot.remove();const h=document.createElementNS('http://www.w3.org/2000/svg','circle');h.setAttribute('cx',x2+(x1-x2)*.2);h.setAttribute('cy',y2+(y1-y2)*.2);h.setAttribute('r','6');h.setAttribute('fill','none');h.setAttribute('stroke',r.blocked?'#9FD8FF':'#FF5A65');h.setAttribute('stroke-width','3');h.classList.add('hit');$('#fx')?.appendChild(h);setTimeout(()=>h.remove(),800)}},i*420))}
+function stepsPaint(){$('#steps').innerHTML=PHASES.map((p,i)=>`<div class="st${i<S.phase||(S.status==='done'&&i<=S.phase)?' done':''}${i===S.phase&&S.status!=='done'?' on':''}" title="${E(p.d)}"><i>${i<S.phase||(S.status==='done')?'✓':i+1}</i><span>${p.n}</span>${i===S.phase?'<b class="pg" id="stpg"></b>':''}</div>`).join('')}
+function clockPaint(){const l=left(),run=S.status==='running';const b=$('#clk');if(!b)return;b.firstChild.nodeValue=T.total?fmt(l):'--:--';$('#clkS').textContent=S.status==='paused'?'duraklatıldı':S.status==='done'?'bitti':S.phase<0?'süre':PHASES[S.phase].n.split(' ')[0]+' kalan';
+  const fr=T.total?l/T.total:1;$('#ringFg').setAttribute('stroke-dashoffset',106.8*(1-fr));$('#ringFg').style.stroke=fr<.15&&run?'#FF5A65':'';const pg=$('#stpg');if(pg)pg.style.width=(100*(1-fr))+'%';
+  const cc=$('#coreClk');if(cc)cc.textContent=T.total?fmt(l):'--:--';const cp=$('#coreProg');if(cp)cp.setAttribute('stroke-dashoffset',2*Math.PI*38*fr)}
+function headPaint(){$('#scnT').textContent=S.scenario.name;$('#scnS').textContent=`${S.rounds} tur · ${S.order.map(nm).join(' → ')}`;
+  const rb=$('#runBtn');const r=S.status==='running';rb.innerHTML=r?'<svg class="i" viewBox="0 0 16 16"><path d="M5 3.5v9M11 3.5v9" stroke-width="2.4"/></svg><span class="lbl">Duraklat</span>':`<svg class="i" viewBox="0 0 16 16"><path d="M5 3.5v9l7.5-4.5z" fill="currentColor"/></svg><span class="lbl">${S.status==='paused'?'Devam':S.status==='done'?'Sonuçlar':'Başlat'}</span>`;
+  $('#nextBtn').disabled=S.phase<0||S.status==='done'||S.phase>=4;
+  const eb=$('#engBadge');eb.classList.toggle('live',cfg.engine==='srv'&&srv.ok);$('#engT').textContent=cfg.engine==='srv'?(srv.ok?'Gerçek modeller':'Sunucu bağlı değil'):'Simülasyon'}
+/* akış */
+const KN={open:'Yaklaşım',critique:'Eleştiri',rebut:'Cevap',rate:'Puanlama',defense:'Savunma',attack:'Saldırı',respond:'Değerlendirme',update:'Güncelleme',final:'Kapanış',ref:'Hakem',sys:'Sistem'};
+function evHTML(f,compact){const a=AG[f.who],col=a?a.c:'';const d=f.data||(f.streaming?null:parseJSON(f.text));let extra='';
+  if(d&&!f.streaming){const dec=d.kararlar||d.kabul||d.değişiklikler;if(dec?.length)extra+=`<details class="why"><summary>Gerekçe ve kararlar</summary><ul>${dec.map(x=>`<li>${E(x)}</li>`).join('')}</ul>${d.itiraz?.length?`<ul>${d.itiraz.map(x=>`<li>İtiraz: ${E(x)}</li>`).join('')}</ul>`:''}</details>`;
+    if(d.katmanlar)extra+=`<div class="lay">${normDef(d).layers.map(l=>`<span class="lc">${E(l.ad)}<em>${l.kapsar.join('·')} g${l.guc}</em></span>`).join('')}</div>`}
+  if(f.res)extra+=`<div class="res">${f.res.map(r=>`<div class="rv"><span class="badge ${r.blocked?'ok':r.detected?'mid':'bad'}">${r.blocked?'ENGELLENDİ':r.detected?'TESPİT · GEÇTİ':'AÇIK'}</span><span>${r.label?`<b>${E(r.label)}</b> · `:''}<b>${r.tehdit}</b> ${E(THREATS[r.tehdit][0])} · şiddet ${r.siddet}</span><small>${E(r.why)}</small></div>`).join('')}</div>`;
+  const body=f.who==='ref'||f.who==='sys'?E(f.text):md(visible(f.text));
+  return`<div class="ev ${f.who==='ref'?'ref':f.who==='sys'?'sys':''}" style="${col?`--a:${col}`:''}" data-ev="${f.id}"><div class="eh"><b>${nm(f.who)}</b>${f.to?`<span>→ ${nm(f.to)}</span>`:''}<span class="tag">${KN[f.kind]||''}</span>${f.phase>=0?`<span>${PHASES[f.phase]?.n||''}</span>`:''}</div>
+    <div class="et">${body||'<span class="muted">düşünüyor…</span>'}${f.streaming?'<span class="caret"></span>':''}${f.err?`<p style="color:#FF9AA1">Hata: ${E(f.err)}</p>`:''}</div>${extra}</div>`}
+const FILT=[['all','Hepsi'],['talk','Tartışma'],['def','Savunma'],['atk','Saldırı'],['ref','Hakem']];
+const passF=f=>ui.filter==='all'||(ui.filter==='talk'&&['open','critique','rebut','rate','final'].includes(f.kind))||(ui.filter==='def'&&['defense','update'].includes(f.kind))||(ui.filter==='atk'&&['attack','respond'].includes(f.kind))||(ui.filter==='ref'&&f.who==='ref');
+function feedPaint(){const fl=$('#feed'),stick=fl.scrollHeight-fl.scrollTop-fl.clientHeight<80;const L=S.feed.filter(passF).slice(-120);
+  fl.innerHTML=L.length?L.map(f=>evHTML(f)).join(''):`<div class="empty"><b>Arena sessiz</b><p>${S.phase<0?'▶ Başlat ile ilk tartışmayı aç. Senaryoyu ve süreleri Kontrol panelinden ayarlayabilirsin.':'Bu filtrede kayıt yok.'}</p></div>`;if(stick)fl.scrollTop=fl.scrollHeight;
+  $('#fchips').innerHTML=FILT.map(([k,n])=>`<button class="chip${ui.filter===k?' on':''}" data-f="${k}">${n}</button>`).join('')}
+function live(ev){const n=$(`[data-ev="${ev.id}"] .et`);if(n){n.innerHTML=md(visible(ev.text))+'<span class="caret"></span>';const fl=$('#feed');if(fl.scrollHeight-fl.scrollTop-fl.clientHeight<140)fl.scrollTop=fl.scrollHeight}
+  const m=$(`[data-msg="${ev.id}"]`);if(m)m.innerHTML=md(visible(ev.text))+'<span class="caret"></span>'}
+/* ajan panelleri */
+const TABS=[['talk','Konuşma'],['strat','Strateji'],['def','Savunma'],['mem','Hafıza'],['task','Görev'],['score','Puan']];
+function agentBody(id){const a=S.agents[id],t=ui.tab[id],d=curDef(id);
+  if(t==='talk'){const L=S.feed.filter(f=>f.who===id).slice(-40);return L.length?L.map(f=>`<div class="msg"><div class="eh"><span class="tag">${KN[f.kind]}</span>${f.to?`→ ${nm(f.to)}`:''}<span>${new Date(f.ts).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}</span></div><div data-msg="${f.id}">${md(visible(f.text))}${f.streaming?'<span class="caret"></span>':''}</div></div>`).join(''):`<div class="empty"><b>Henüz konuşmadı</b><p>${AG[id].name} sırası gelince burada yazacak.</p></div>`}
+  if(t==='strat')return`<div class="kv"><div class="box"><h4>Güncel strateji</h4><p>${E(a.strategy||'Henüz strateji açıklanmadı.')}</p></div>${a.decisions.length?`<div class="box"><h4>Kararlar</h4><ul>${a.decisions.map(x=>`<li>${E(x)}</li>`).join('')}</ul></div>`:''}
+    <div class="box"><h4>Karakter</h4><p>${E(AG[id].persona)}</p></div><p class="muted">Burada modelin iç düşünce zinciri değil, kullanıcıya açıkladığı gerekçe ve kararlar gösterilir.</p></div>`;
+  if(t==='def'){if(!d)return`<div class="empty"><b>Savunma yok</b><p>Aşama 2'de ${AG[id].name} savunmasını kurar.</p></div>`;
+    const cv=TK.map(k=>{const c=cover(d,k),p=Math.min(100,(c.p+c.dt*.5)*20);return`<div class="${p?'c':''}" style="--p:${p}" title="${E(THREATS[k][1])}"><b>${k}</b>${E(THREATS[k][0])}</div>`}).join('');
+    return`<div class="mtx" aria-label="Tehdit kapsamı">${cv}</div>${d.layers.map(l=>`<div class="lyr"><b>${E(l.ad)}</b><span class="str" aria-label="güç ${l.guc}">${[1,2,3,4,5].map(n=>`<i class="${n<=l.guc?'f':''}"></i>`).join('')}</span><span class="typ">${l.tur}</span><div class="cov">${l.kapsar.map(k=>`<span title="${E(THREATS[k][0])}">${k}</span>`).join('')}</div>${l.aciklama?`<small>${E(l.aciklama)}</small>`:''}</div>`).join('')}
+      <p class="muted">Sürüm ${d.v||a.defs.length} · güç ${d.layers.reduce((s,l)=>s+l.guc,0)}/${BUDGET}${a.defs.length>1?` · ${a.defs.length} sürüm`:''}</p>${d.changes?.length?`<div class="box" style="margin-top:8px"><h4>Son değişiklikler</h4><ul>${d.changes.map(x=>`<li>${E(x)}</li>`).join('')}</ul></div>`:''}`}
+  if(t==='mem')return`<div class="box"><h4>Oturum hafızası</h4>${a.memory.length?`<ul class="mem">${a.memory.slice().reverse().map(m=>`<li>${E(m)}</li>`).join('')}</ul>`:'<p class="muted">Eleştiriler, bulunan açıklar ve savunma sürümleri burada birikir; model sonraki aşamalarda bunları hatırlar.</p>'}</div>
+    <div class="fld" style="margin-top:10px"><span>Hafızaya not ekle</span><input class="in" data-memin="${id}" placeholder="Örn. Yönerge enjeksiyonuna özellikle dikkat et" aria-label="Hafızaya not"></div>`;
+  if(t==='task')return`<div class="fld"><span>${AG[id].name}'e özel görev <small class="muted">— sonraki her konuşmasında dikkate alınır</small></span><textarea class="in" rows="4" data-task="${id}" placeholder="Örn. Savunmanda kullanıcı deneyimini bozmamaya öncelik ver">${E(a.task)}</textarea></div>
+    <div class="box"><h4>Hedefler</h4><ul><li>Problem için en güçlü yaklaşımı savun</li><li>${BUDGET} güç bütçesiyle dayanıklı bir savunma kur</li><li>Rakibin savunmasında açık bul (sadece sanal hedefte)</li><li>Testlerden ders çıkarıp savunmayı geliştir</li></ul></div>`;
+  if(t==='score'){const C=a.crit||{},tot=liveScore(id);return`<div class="crit">${CRIT.map(([k,n,m])=>{const v=C[k];return`<div class="cr"><span>${n}</span><b>${v==null?'—':v.toFixed(1)}/${m}</b><div class="bar"><i style="width:${v==null?0:100*v/m}%"></i></div></div>`}).join('')}</div>
+    <p class="muted" style="margin-top:8px">${a.total==null?`Ara puan: ${tot.toFixed(1)} — kesin puan finalde hesaplanır.`:`Toplam ${a.total.toFixed(1)} / 100`}</p>
+    ${a.ledger.length?`<div class="ldg">${a.ledger.map(l=>`<div><b class="${l.pts>0?'p':'n'}">${l.pts>0?'+':''}${l.pts}</b><span><b style="color:var(--ink);font-family:var(--font)">${CRIT.find(c=>c[0]===l.crit)?.[1]}</b> — ${E(l.why)}</span></div>`).join('')}</div>`:''}`}}
+function agentsPaint(){const box=$('#agents'),act=document.activeElement,keep=act?.closest?.('.ag')&&act.matches('textarea,input')?{sel:act.dataset.task?`[data-task="${act.dataset.task}"]`:`[data-memin="${act.dataset.memin}"]`,v:act.value,s:act.selectionStart}:null;
+  const scroll=Object.fromEntries($$('.ag .tb').map(t=>[t.closest('.ag').dataset.a,t.scrollTop]));
+  box.innerHTML=IDS.map(id=>{const a=AG[id],me=S.agents[id],sp=ui.speaking===id,model=cfg.engine==='srv'?(srv.info?.providers?.[a.prov]?.model||'yerel sunucu'):'simülasyon';
+    return`<article class="glass ag${sp?' speak':''}${ui.mob===id?' on':''}" data-a="${id}" aria-label="${a.name}">
+      <div class="ah"><span class="av"><svg viewBox="0 0 24 24">${a.glyph}</svg></span><div class="an"><b>${a.name}</b><small>${E(model)}</small><span class="stt"><i></i>${sp?'konuşuyor…':S.status==='running'?'sırasını bekliyor':S.status==='done'?'bitirdi':'hazır'}${me.task?' · özel görev':''}</span></div>
+      <div class="sc"><b>${liveScore(id).toFixed(0)}</b><small>${me.total!=null?'final':'ara puan'}</small></div></div>
+      <div class="tabs" role="tablist">${TABS.map(([k,n])=>`<button class="tab${ui.tab[id]===k?' on':''}" role="tab" aria-selected="${ui.tab[id]===k}" data-tab="${k}" data-ag="${id}">${n}</button>`).join('')}</div>
+      <div class="tb">${agentBody(id)}</div></article>`}).join('');
+  $$('.ag .tb').forEach(t=>{const s=scroll[t.closest('.ag').dataset.a];if(t.closest('.ag')&&ui.tab[t.closest('.ag').dataset.a]==='talk')t.scrollTop=t.scrollHeight;else if(s)t.scrollTop=s});
+  if(keep){const n=$(keep.sel);if(n){n.focus();n.value=keep.v;try{n.setSelectionRange(keep.s,keep.s)}catch{}}}
+  $('#mtabs').innerHTML=IDS.map(id=>`<button role="tab" aria-selected="${ui.mob===id}" class="${ui.mob===id?'on':''}" data-mob="${id}" style="--a:${AG[id].c}"><i></i>${AG[id].name}</button>`).join('')}
+let pT=0;function paint(){cancelAnimationFrame(pT);pT=requestAnimationFrame(()=>{headPaint();stepsPaint();stagePaint();feedPaint();agentsPaint();clockPaint()})}
+
+/* ════════ KONTROL PANELİ ════════ */
+function openDrawer(focus){const d=$('#drawer');d.innerHTML=drawerHTML();d.classList.add('on');d.setAttribute('aria-hidden','false');$('#scrim').classList.add('on');
+  setTimeout(()=>{(focus?$(`#sec-${focus}`):null)?.scrollIntoView({block:'start'});$('#drawer [data-x]')?.focus()},60)}
+function closeDrawer(){$('#drawer').classList.remove('on');$('#drawer').setAttribute('aria-hidden','true');$('#scrim').classList.remove('on')}
+const DOPT=[2,5,10,15];
+function drawerHTML(){const lock=S.status==='running';
+  return`<div class="dh"><h2>Kontrol paneli</h2><button class="b ic" data-x aria-label="Kapat"><svg class="i" viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div><div class="db">
+  <div class="sec" id="sec-engine"><h3>Çalışma modu</h3><div class="seg" role="radiogroup"><button data-eng="sim" class="${cfg.engine==='sim'?'on':''}" role="radio" aria-checked="${cfg.engine==='sim'}">Simülasyon</button><button data-eng="srv" class="${cfg.engine==='srv'?'on':''}" role="radio" aria-checked="${cfg.engine==='srv'}">Gerçek modeller (yerel sunucu)</button></div>
+    ${cfg.engine==='sim'?`<div class="srv" style="margin-top:10px"><p>Anahtarsız çalışır. Konuşmalar her modelin karakterine göre <b>yerel senaryo motoru</b> tarafından üretilir — gerçek ChatGPT/Gemini/Claude değildir. Arayüzü, kuralları ve puanlamayı denemek içindir.</p>
+      <div class="fld" style="margin-top:10px"><span>Yazma hızı</span><div class="seg">${[1,2,4,8].map(v=>`<button data-spd="${v}" class="${cfg.speed===v?'on':''}">${v}×</button>`).join('')}</div></div></div>`:
+    `<div class="srv" style="margin-top:10px"><p><b>Anahtarlar bu sayfada tutulmaz.</b> Bilgisayarında <code>apps/arena/server</code> klasöründeki <code>.env</code> dosyasına yazılır; <code>baslat.bat</code> (Windows) ya da <code>node arena-server.mjs</code> ile sunucuyu aç. Sayfa sadece bu yerel sunucuyla konuşur.</p>
+      <div class="fld" style="margin-top:10px"><span>Sunucu adresi</span><input class="in" data-url value="${E(cfg.url)}" spellcheck="false"></div>
+      <div class="fld"><span>Arena anahtarı (ARENA_TOKEN, isteğe bağlı — API anahtarı değildir)</span><input class="in" data-tok type="password" value="${E(cfg.token)}" autocomplete="off"></div>
+      <button class="b sm" data-ping>Bağlan ve test et</button>
+      <div class="pv">${srv.ok?Object.entries(srv.info.providers).map(([k,v])=>`<span class="${v.ready?'ok':''}"><i></i>${{openai:'ChatGPT',gemini:'Gemini',claude:'Claude'}[k]} · ${E(v.model)}${v.ready?'':' (anahtar yok)'}</span>`).join(''):`<span><i></i>${E(srv.err||'Bağlı değil')}</span>`}</div></div>`}</div>
+  <div class="sec" id="sec-scn"><h3>Senaryo</h3><div class="presets">${PRESETS.map((p,i)=>`<button class="pre${S.scenario.name===p.name?' on':''}" data-pre="${i}"><b>${E(p.name)}</b><small>${E(p.problem)}</small></button>`).join('')}</div>
+    <div class="fld" style="margin-top:12px"><span>Senaryo adı</span><input class="in" data-sf="name" value="${E(S.scenario.name)}"></div>
+    <div class="fld"><span>Problem (tartışma sorusu)</span><textarea class="in" rows="3" data-sf="problem">${E(S.scenario.problem)}</textarea></div>
+    <div class="fld"><span>Sanal hedef (yalnızca kurgusal)</span><textarea class="in" rows="3" data-sf="target">${E(S.scenario.target)}</textarea></div>
+    <button class="b sm" data-newscn>Bu senaryoyla yeni oturum başlat</button></div>
+  <div class="sec"><h3>Aşama süreleri (dakika)</h3><div class="durs">${PHASES.map(p=>`<div class="dr"><span>${p.n}</span><select class="in" data-dsel="${p.k}" aria-label="${p.n} süresi">${DOPT.map(v=>`<option value="${v}"${S.durations[p.k]===v?' selected':''}>${v} dk</option>`).join('')}<option value="c"${DOPT.includes(S.durations[p.k])?'':' selected'}>Özel</option></select><input class="in" type="number" min="0.25" max="120" step="0.25" data-dur="${p.k}" value="${S.durations[p.k]}" aria-label="${p.n} özel süre"></div>`).join('')}</div>
+    <div style="display:flex;gap:6px;margin-top:10px"><button class="b sm" data-quick>Hızlı demo (her aşama 0.5 dk)</button><button class="b sm" data-std>Varsayılan</button></div></div>
+  <div class="sec"><h3>Konuşma sırası</h3><div class="ord">${S.order.map((id,i)=>`<div class="or"><i style="background:${AG[id].c}"></i><b>${i+1}. ${AG[id].name}</b><button class="b ic" data-mv="${i}:-1" aria-label="${AG[id].name} yukarı" ${i?'':'disabled'}><svg class="i" viewBox="0 0 16 16"><path d="M4 10l4-4 4 4"/></svg></button><button class="b ic" data-mv="${i}:1" aria-label="${AG[id].name} aşağı" ${i<2?'':'disabled'}><svg class="i" viewBox="0 0 16 16"><path d="M4 6l4 4 4-4"/></svg></button></div>`).join('')}</div>
+    <p class="muted" style="margin-top:6px">Saldırı eşleşmesi sıraya göre döner: ${S.order.map((id,k)=>`${nm(id)} → ${nm(S.order[(k+2)%3])}`).join(', ')}.</p></div>
+  <div class="sec"><h3>Özel görevler</h3>${IDS.map(id=>`<div class="fld"><span style="color:${AG[id].c}">${AG[id].name}</span><input class="in" data-task="${id}" value="${E(S.agents[id].task)}" placeholder="Bu modele özel görev (isteğe bağlı)"></div>`).join('')}</div>
+  <div class="sec"><h3>Akış</h3><div class="tog"><span>Aşamalar otomatik ilerlesin</span><button class="sw" role="switch" aria-checked="${S.auto}" data-auto aria-label="Otomatik ilerleme"></button></div>
+    <div class="dr" style="grid-template-columns:1fr 120px"><span>Saldırı + güncelleme turu</span><select class="in" data-rounds aria-label="Tur sayısı">${[1,2,3].map(v=>`<option${S.rounds===v?' selected':''}>${v}</option>`).join('')}</select></div></div>
+  <div class="sec"><h3>Kurallar</h3><p class="muted">Savunma: en fazla ${MAX_LAYERS} katman, toplam güç ${BUDGET}. Saldırı: en fazla 3 vektör, toplam şiddet ${ATK_BUDGET}. Hakem formülü: savunma gücü (önleme + tespit×0.5) × 1.2 + şans (−1…+1) ≥ şiddet + 1 ise engellenir. Saldırılar yalnızca uygulamadaki sanal hedeflere, soyut tehdit sınıflarıyla yapılır.</p></div>
+  ${lock?'<p class="muted">Not: değişiklikler çalışan aşamada hemen değil, sonraki adımda geçerli olur.</p>':''}</div>`}
+function setDur(k,v){v=Math.max(.25,Math.min(120,+v||1));S.durations[k]=v;save();headPaint()}
+
+/* ════════ FİNAL & GEÇMİŞ ════════ */
+function modal(html){closeModal();const m=document.createElement('div');m.className='modal';m.innerHTML=`<div class="mb" role="dialog" aria-modal="true">${html}</div>`;document.body.appendChild(m);
+  m.addEventListener('click',e=>{if(e.target===m||e.target.closest('[data-mx]'))closeModal()});setTimeout(()=>m.querySelector('[data-mx]')?.focus(),40);return m}
+function closeModal(){$('.modal')?.remove()}
+function finalHTML(s=S,ro){const rank=IDS.slice().sort((a,b)=>(s.agents[b].total||0)-(s.agents[a].total||0)),pod=[rank[1],rank[0],rank[2]],h={0:150,1:110,2:80};
+  return`<div class="mh"><h2>Final · ${E(s.scenario.name)}</h2>${ro?'':'<button class="b sm" data-save>Dışa aktar</button><button class="b sm" data-again>Yeni tur</button>'}<button class="b ic" data-mx aria-label="Kapat"><svg class="i" viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div>
+  <div class="mbd"><div class="pod3">${pod.map(id=>{const r=rank.indexOf(id);return`<div class="pd" data-a="${id}"><span class="av"><svg viewBox="0 0 24 24">${AG[id].glyph}</svg></span><b>${AG[id].name}</b><span class="pts">${(s.agents[id].total||0).toFixed(1)}</span><div class="blk" style="height:${h[r]}px">${r+1}</div></div>`}).join('')}</div>
+  <table class="tbl"><thead><tr><th>Ölçüt</th>${IDS.map(id=>`<th style="color:${AG[id].c}">${AG[id].name}</th>`).join('')}</tr></thead><tbody>
+  ${CRIT.map(([k,n,m])=>{const vals=IDS.map(id=>s.agents[id].crit?.[k]??0),mx=Math.max(...vals);return`<tr><td>${n} <span class="muted">/ ${m}</span></td>${vals.map(v=>`<td class="n${v===mx&&mx>0?' w':''}">${v.toFixed(1)}</td>`).join('')}</tr>`}).join('')}
+  <tr><td><b>Toplam</b></td>${IDS.map(id=>`<td class="n${id===rank[0]?' w':''}"><b>${(s.agents[id].total||0).toFixed(1)}</b></td>`).join('')}</tr></tbody></table>
+  <h3 style="margin:22px 0 8px;font-size:14px">Neden bu puanlar?</h3>${IDS.map(id=>`<details class="why" style="margin-bottom:6px"><summary style="color:${AG[id].c};font-size:13.5px">${AG[id].name} — puan dökümü</summary><div class="ldg">${(s.agents[id].ledger||[]).map(l=>`<div><b class="${l.pts>0?'p':'n'}">${l.pts>0?'+':''}${l.pts}</b><span><b style="color:var(--ink);font-family:var(--font)">${CRIT.find(c=>c[0]===l.crit)?.[1]}</b> — ${E(l.why)}</span></div>`).join('')}</div></details>`).join('')}
+  <p class="muted" style="margin-top:14px">Mod: ${s.engine==='srv'?'gerçek modeller (yerel sunucu)':'Simülasyon — sonuçlar gerçek modellerin performansını yansıtmaz'}.</p></div>`}
+function openFinal(){if(S.agents.gpt.total==null)return;const m=modal(finalHTML());m.addEventListener('click',e=>{if(e.target.closest('[data-save]'))exportS();if(e.target.closest('[data-again]')){closeModal();reset()}})}
+function archive(){if(!S.feed.length)return;const H=lsg('arena:hist',[]);const meta={id:S.id,at:Date.now(),name:S.scenario.name,status:S.status,engine:S.engine,winner:S.winner||null,scores:Object.fromEntries(IDS.map(i=>[i,S.agents[i].total??null])),n:S.feed.length};
+  const i=H.findIndex(h=>h.id===S.id);if(i>=0)H[i]=meta;else H.unshift(meta);while(H.length>25){const x=H.pop();localStorage.removeItem('arena:s:'+x.id)}lss('arena:hist',H);lss('arena:s:'+S.id,S)}
+function openHist(){archive();const H=lsg('arena:hist',[]);const m=modal(`<div class="mh"><h2>Geçmiş oturumlar</h2><button class="b ic" data-mx aria-label="Kapat"><svg class="i" viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div><div class="mbd">
+  ${H.length?`<div class="hist">${H.map(h=>`<div class="hi"><b>${E(h.name)}${h.id===S.id?' <span class="tag">şu an</span>':''}</b><small>${new Date(h.at).toLocaleString('tr-TR',{dateStyle:'medium',timeStyle:'short'})} · ${h.engine==='srv'?'gerçek modeller':'simülasyon'} · ${h.n} kayıt${h.winner?` · kazanan ${nm(h.winner)} ${(h.scores[h.winner]||0).toFixed(1)}`:` · ${h.status==='done'?'bitti':'yarım'}`}</small>
+    <div class="acts"><button class="b sm" data-hv="${h.id}">İncele</button>${h.id!==S.id?`<button class="b sm" data-hl="${h.id}">Devam et</button>`:''}<button class="b sm ic" data-hx="${h.id}" aria-label="Dışa aktar" title="Dışa aktar (.json)"><svg class="i" viewBox="0 0 16 16"><path d="M8 2.5v8M4.5 7L8 10.5 11.5 7M3 13.5h10"/></svg></button><button class="b sm ic danger" data-hd="${h.id}" aria-label="Sil" title="Sil"><svg class="i" viewBox="0 0 16 16"><path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.6 9h5.8l.6-9"/></svg></button></div></div>`).join('')}</div>`:'<div class="empty"><b>Henüz kayıt yok</b><p>Oturumlar otomatik kaydedilir; burada inceleyip dışa aktarabilirsin.</p></div>'}</div>`);
+  m.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;const g=k=>lsg('arena:s:'+k,null);
+    if(t.dataset.hv){const s=t.dataset.hv===S.id?S:g(t.dataset.hv);if(!s)return toast('Kayıt bulunamadı');modal(s.agents.gpt.total!=null?finalHTML(s,true)+transcriptHTML(s):`<div class="mh"><h2>${E(s.scenario.name)}</h2><button class="b ic" data-mx aria-label="Kapat"><svg class="i" viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div>`+transcriptHTML(s))}
+    if(t.dataset.hl){const s=g(t.dataset.hl);if(!s)return;RUN++;ctrl.abort();archive();S=s;if(S.status==='running')S.status='paused';S._cur=null;T={end:0,left:0,total:0};save();closeModal();paint();toast('Oturum yüklendi')}
+    if(t.dataset.hx){const s=t.dataset.hx===S.id?S:g(t.dataset.hx);if(s)exportS(s)}
+    if(t.dataset.hd){if(t.dataset.hd===S.id)return toast('Açık oturum silinemez');localStorage.removeItem('arena:s:'+t.dataset.hd);lss('arena:hist',lsg('arena:hist',[]).filter(h=>h.id!==t.dataset.hd));openHist()}})}
+function transcriptHTML(s){return`<div class="mbd" style="padding-top:0"><h3 style="margin:6px 0 8px;font-size:14px">Tüm konuşmalar</h3>${s.feed.map(f=>evHTML(f)).join('')}</div>`}
+function dl(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),4000)}
+function exportS(s=S){const base=`arena-${s.scenario.name.toLowerCase().replace(/[^a-z0-9ğüşöçı]+/gi,'-')}-${new Date(s.created).toISOString().slice(0,10)}`;dl(base+'.json',JSON.stringify(s,null,1),'application/json');
+  const mdT=`# AI Arena — ${s.scenario.name}\n\n**Problem:** ${s.scenario.problem}\n\n**Sanal hedef:** ${s.scenario.target}\n\n**Mod:** ${s.engine==='srv'?'gerçek modeller':'simülasyon'}\n\n`+(s.agents.gpt.total!=null?`## Sonuç\n\n| Ölçüt | ${IDS.map(nm).join(' | ')} |\n|---|---|---|---|\n${CRIT.map(([k,n,m])=>`| ${n} (/${m}) | ${IDS.map(id=>(s.agents[id].crit?.[k]??0).toFixed(1)).join(' | ')} |`).join('\n')}\n| **Toplam** | ${IDS.map(id=>(s.agents[id].total||0).toFixed(1)).join(' | ')} |\n\n`:'')+
+    `## Konuşmalar\n\n`+s.feed.map(f=>`**${nm(f.who)}${f.to?' → '+nm(f.to):''}** _(${PHASES[f.phase]?.n||'—'} · ${KN[f.kind]||''})_\n\n${f.who==='ref'||f.who==='sys'?f.text:visible(f.text)}${f.res?'\n\n'+f.res.map(r=>`- ${r.tehdit} şiddet ${r.siddet}: ${r.blocked?'ENGELLENDİ':r.detected?'tespit edildi, geçti':'AÇIK'} — ${r.why}`).join('\n'):''}\n`).join('\n');
+  dl(base+'.md',mdT,'text/markdown');toast('JSON ve Markdown olarak indirildi')}
+
+/* ════════ OLAYLAR ════════ */
+$('#runBtn').onclick=toggleRun;$('#nextBtn').onclick=nextPhase;$('#resetBtn').onclick=()=>{if(S.feed.length&&!confirm('Bu oturum geçmişe kaydedilip yeni tur başlasın mı?'))return;reset()};
+$('#histBtn').onclick=openHist;$('#panelBtn').onclick=()=>openDrawer();$('#scnBtn').onclick=()=>openDrawer('scn');$('#engBadge').onclick=()=>openDrawer('engine');$('#scrim').onclick=closeDrawer;
+$('#feedDl').onclick=()=>exportS();
+$('#fchips').onclick=e=>{const b=e.target.closest('[data-f]');if(b){ui.filter=b.dataset.f;feedPaint()}};
+document.addEventListener('click',e=>{const t=e.target;
+  const tb=t.closest('[data-tab]');if(tb){ui.tab[tb.dataset.ag]=tb.dataset.tab;agentsPaint();return}
+  const mb=t.closest('[data-mob]');if(mb){ui.mob=mb.dataset.mob;agentsPaint();return}
+  const pd=t.closest('[data-pod]');if(pd){const id=pd.dataset.pod;ui.mob=id;agentsPaint();$(`.ag[data-a="${id}"]`)?.scrollIntoView({behavior:motion()?'smooth':'auto',block:'nearest'});return}});
+$('#stage').addEventListener('keydown',e=>{const pd=e.target.closest?.('[data-pod]');if(pd&&(e.key==='Enter'||e.key===' ')){e.preventDefault();pd.dispatchEvent(new MouseEvent('click',{bubbles:true}))}});
+$('#agents').addEventListener('input',e=>{const t=e.target;if(t.dataset.task){S.agents[t.dataset.task].task=t.value.slice(0,400);save()}});
+$('#agents').addEventListener('keydown',e=>{const t=e.target;if(t.dataset.memin&&e.key==='Enter'&&t.value.trim()){mem(t.dataset.memin,'Kullanıcı notu: '+t.value.trim());t.value='';save();agentsPaint();toast('Hafızaya eklendi')}});
+const dr=$('#drawer');
+dr.addEventListener('click',async e=>{const t=e.target.closest('button');if(!t)return;
+  if(t.dataset.x!=null)return closeDrawer();
+  if(t.dataset.eng){if(S.status==='running'){toast('Önce duraklat');return}cfg.engine=t.dataset.eng;saveCfg();if(cfg.engine==='srv')await srvHealth();openDrawer('engine');paint();return}
+  if(t.dataset.spd){cfg.speed=+t.dataset.spd;saveCfg();openDrawer('engine');return}
+  if(t.dataset.ping!=null){t.textContent='Bağlanıyor…';const j=await srvHealth();toast(j?`Bağlandı · ${Object.values(j.providers).filter(p=>p.ready).length}/3 model hazır`:'Bağlanamadı: '+srv.err);openDrawer('engine');paint();return}
+  if(t.dataset.pre!=null){const p=PRESETS[+t.dataset.pre];Object.assign(S.scenario,p);save();openDrawer('scn');paint();return}
+  if(t.dataset.newscn!=null){if(S.feed.length&&!confirm('Mevcut oturum geçmişe kaydedilip bu senaryoyla yeni oturum başlasın mı?'))return;reset();closeDrawer();return}
+  if(t.dataset.quick!=null){PHASES.forEach(p=>S.durations[p.k]=.5);save();openDrawer();return}
+  if(t.dataset.std!=null){S.durations={debate:3,defense:2,attack:3,update:2,final:1};save();openDrawer();return}
+  if(t.dataset.mv){const[i,d]=t.dataset.mv.split(':').map(Number),o=S.order;[o[i],o[i+d]]=[o[i+d],o[i]];save();openDrawer();paint();return}
+  if(t.dataset.auto!=null){S.auto=!S.auto;t.setAttribute('aria-checked',S.auto);save();return}});
+dr.addEventListener('change',e=>{const t=e.target;if(t.dataset.dsel){if(t.value!=='c'){setDur(t.dataset.dsel,+t.value);t.parentElement.querySelector('[data-dur]').value=t.value}else t.parentElement.querySelector('[data-dur]').focus()}
+  if(t.dataset.dur){setDur(t.dataset.dur,t.value);const s=t.parentElement.querySelector('[data-dsel]');s.value=DOPT.includes(S.durations[t.dataset.dur])?S.durations[t.dataset.dur]:'c'}
+  if(t.dataset.rounds!=null){S.rounds=+t.value;save();headPaint()}});
+dr.addEventListener('input',e=>{const t=e.target;if(t.dataset.sf){S.scenario[t.dataset.sf]=t.value.slice(0,t.dataset.sf==='name'?80:900);save();headPaint()}
+  if(t.dataset.task){S.agents[t.dataset.task].task=t.value.slice(0,400);save()}if(t.dataset.url!=null){cfg.url=t.value.trim();saveCfg()}if(t.dataset.tok!=null){cfg.token=t.value;saveCfg()}});
+addEventListener('keydown',e=>{if(e.key==='Escape'){if($('.modal'))return closeModal();if($('#drawer.on'))return closeDrawer()}
+  if(e.target.closest?.('input,textarea,select,[contenteditable]')||e.metaKey||e.ctrlKey||e.altKey||$('.modal')||$('#drawer.on'))return;
+  if(e.key===' '){e.preventDefault();toggleRun()}else if(e.key==='n'||e.key==='N')nextPhase();else if(e.key==='p'||e.key==='P')openDrawer();else if(e.key==='h'||e.key==='H')openHist();
+  else if(['1','2','3'].includes(e.key)){ui.mob=IDS[+e.key-1];agentsPaint()}});
+addEventListener('beforeunload',()=>{if(S.status==='running'){S.status='paused';T.left=left()}lss('arena:cur',S)});
+
+/* başlangıç */
+if(cfg.engine==='srv')srvHealth().then(paint);
+paint();
+</script>
+</body>
+</html>

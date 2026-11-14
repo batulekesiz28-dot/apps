@@ -66,6 +66,14 @@
    "color": "blue",
    "desc": "Yarım yamalak yazdığın isteği yapay zekâ yardımıyla Claude'un en iyi anlayacağı net bir isteğe çevirir",
    "ai": true
+  },
+  {
+   "slug": "arena",
+   "name": "AI Arena",
+   "icon": "spark",
+   "color": "violet",
+   "desc": "ChatGPT, Gemini ve Claude yapay zekâ modelleri tartışır, savunma kurar ve sanal hedefte kontrollü saldırı simülasyonu yapar; şeffaf puanlama",
+   "ai": true
   }
  ]
 }

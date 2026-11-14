@@ -1349,5 +1349,48 @@
     "text": "Anahtarsız modda film arka planları yok (poster bulanıklaştırılarak kullanılıyor); TMDB anahtarı eklenirse büyük arka planlar gelir"
    }
   ]
+ },
+ {
+  "at": "2026-11-14T18:30:45",
+  "change": "Yeni uygulama: AI Arena (ChatGPT · Gemini · Claude; tartışma, savunma, saldırı simülasyonu, güncelleme, final; yerel anahtar sunucusu)",
+  "scores": {
+   "arena masaüstü": {
+    "before": 95,
+    "after": 100
+   },
+   "arena telefon": {
+    "before": 96,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "arena",
+    "sev": "error",
+    "status": "fixed",
+    "text": "“Başlat” düğmesinin yazısı zor okunuyordu",
+    "fix": "Düğmeye düz sarı zemin rengi eklendi"
+   },
+   {
+    "app": "arena",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Telefonda çalışma modu düğmesi küçüktü",
+    "fix": "40px dokunma alanı"
+   },
+   {
+    "app": "arena",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Aşama numaraları çok küçüktü",
+    "fix": "12px yapıldı"
+   },
+   {
+    "app": "arena",
+    "sev": "info",
+    "status": "open",
+    "text": "Gerçek modellerle tam tur, ancak bilgisayarda yerel sunucu açıkken test edilebilir (buradan internete çıkılamıyor)"
+   }
+  ]
  }
 ]

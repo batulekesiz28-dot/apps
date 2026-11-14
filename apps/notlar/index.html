@@ -440,6 +440,7 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
 <script src="../../shared/skin.js"></script>
 <link rel="stylesheet" href="library.css">
 <link rel="stylesheet" href="brain.css">
+<link rel="stylesheet" href="media.css">
 </head>
 <body>
 <div class="app" id="app">
@@ -478,6 +479,7 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
 <div class="toasts" id="toasts"></div>
 <script src="kb.js"></script>
 <script src="library.js"></script>
+<script src="media.js"></script>
 <script src="brain.js"></script>
 
 <script>
@@ -683,7 +685,7 @@ let secParts=[],lastWs='#home',curMode='ws';
 function setMode(m,was){const app=$('#app'),prev=curMode;curMode=m;app.dataset.mode=m;
   $$('#modes a').forEach(a=>{const on=a.dataset.mode===m;a.classList.toggle('on',on);a.toggleAttribute('aria-current',on);if(a.dataset.mode==='ws')a.setAttribute('href',lastWs)});
   modeMark();
-  if(m!=='lib')Library.closeAll();
+  if(m!=='lib'){Library.closeAll();app.classList.remove('mc-on')}
   if(m==='ws')return;
   const paint=()=>{hideFloat(true);closeDrawer();m==='lib'?Library.render(secParts):Brain.render(secParts);$('#scroll').scrollTop=0;onScroll()};
   if(prev!==m&&document.startViewTransition&&!REDUCED&&document.documentElement.dataset.motion!=='off')document.startViewTransition(paint);else{paint();if(prev===m||was===m)return;anim($('#view'),[{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'none'}],{duration:460,easing:OUT})}}

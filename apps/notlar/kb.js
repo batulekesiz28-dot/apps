@@ -40,7 +40,11 @@ const KB=(()=>{
     tags:tagList(o.tags),cols:[...new Set(Array.isArray(o.cols)?o.cols:[])],fav:!!o.fav,added:+o.added||now(),updated:+o.updated||now(),opened:+o.opened||0,
     progress:Math.max(0,Math.min(1,+o.progress||0)),page:+o.page||0,pages:+o.pages||0,note:String(o.note||''),summary:String(o.summary||''),
     file:o.file&&typeof o.file==='object'?{name:String(o.file.name||''),size:+o.file.size||0,mime:String(o.file.mime||'')}:null,yt:String(o.yt||''),
-    color:String(o.color||''),dur:String(o.dur||''),status:['todo','doing','done'].includes(o.status)?o.status:'',score:String(o.score||''),src:String(o.src||'')}}
+    color:String(o.color||''),dur:String(o.dur||''),status:['todo','doing','done','played'].includes(o.status)?o.status:'',score:String(o.score||''),src:String(o.src||''),
+    genres:(Array.isArray(o.genres)?o.genres:[]).map(String).slice(0,6),platforms:(Array.isArray(o.platforms)?o.platforms:[]).map(String).slice(0,8),rating:Math.max(0,Math.min(10,+o.rating||0)),
+    season:Math.max(0,+o.season||0),ep:Math.max(0,+o.ep||0),eps:Math.max(0,+o.eps||0),cover2:String(o.cover2||''),backdrop:String(o.backdrop||''),wide:String(o.wide||''),
+    mid:String(o.mid||''),imdb:String(o.imdb||''),steam:String(o.steam||''),mal:String(o.mal||''),wiki:String(o.wiki||''),
+    match:['ok','unsure','none','manual'].includes(o.match)?o.match:'',metaAt:+o.metaAt||0,flag:String(o.flag||''),flagWhy:String(o.flagWhy||''),flagTo:String(o.flagTo||''),reviewed:!!o.reviewed}}
   function normCol(o){return{id:String(o.id),name:String(o.name||'Yeni koleksiyon'),desc:String(o.desc||''),color:String(o.color||'#6E56CF'),emoji:String(o.emoji||''),
     cover:String(o.cover||''),order:+o.order||0,added:+o.added||now(),updated:+o.updated||now()}}
 

@@ -1270,5 +1270,84 @@
     "text": "Kapaklar Wikipedia aramasıyla bulunuyor; az bilinen oyunlarda yanlış/eksik kapak çıkabilir — detayda 'Kapağı yenile' var"
    }
   ]
+ },
+ {
+  "at": "2026-11-14T18:13:58",
+  "change": "Library → Medya merkezi: Film & Dizi · Anime · Oyunlar ayrı bölümler, kimlikle poster eşleştirme (Wikidata + Steam/MAL/TVmaze/iTunes/Wikipedia), Netflix tarzı raflar, sinematik detay ekranı, inceleme sayfası",
+  "scores": {
+   "Medya ana sayfa telefon": {
+    "before": 0,
+    "after": 100
+   },
+   "Medya ana sayfa masaüstü": {
+    "before": 0,
+    "after": 100
+   },
+   "Film & Dizi / Anime / Oyunlar (telefon+masaüstü)": {
+    "before": 0,
+    "after": 100
+   },
+   "Notlar telefon": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Notlar",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Ana sayfada 3000'den fazla öğe vardı (çok büyük sayfa)",
+    "fix": "Alttaki raflar ekrana yaklaşınca çiziliyor, kartların üzerine gelince açılan düğmeler ilk üzerine gelişte oluşuyor"
+   },
+   {
+    "app": "Notlar",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "İçe aktarma kartı koyu zeminde okunmuyordu ve düğmeleri küçüktü",
+    "fix": "Medya temasına uyarlandı, düğmeler 40px"
+   },
+   {
+    "app": "Notlar",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Notta gömülü kaynak varken Kütüphane'ye geçince sayfa çiziminde hata oluyordu",
+    "fix": "Kütüphane kökü artık sadece doğrudan görünüm öğesine bakıyor"
+   },
+   {
+    "app": "Notlar",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Simge sınıfı Notlar'ın menü sınıfıyla çakışıp ikonlar görünmüyordu",
+    "fix": "Medya simgeleri ayrı sınıfa (mvi) taşındı"
+   },
+   {
+    "app": "Notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Kırmızı düğmede beyaz yazı kontrastı sınırdaydı",
+    "fix": "Yazı taşıyan zeminlerde koyu kırmızı (#C62A31)"
+   },
+   {
+    "app": "Notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Telefonda marka düğmesi, slayt noktaları ve bölüm bağlantısı 40px altındaydı",
+    "fix": "Hepsi 40–44px"
+   },
+   {
+    "app": "Notlar",
+    "sev": "uyarı",
+    "status": "open",
+    "text": "Posterler gerçek internette denenemedi (test ortamında dış ağ kapalı); servislerin cevap biçimleri taklit edilerek test edildi",
+    "fix": "İlk açılışta eşleşme sayacını ve İnceleme sayfasını kontrol et"
+   },
+   {
+    "app": "Notlar",
+    "sev": "uyarı",
+    "status": "open",
+    "text": "Anahtarsız modda film arka planları yok (poster bulanıklaştırılarak kullanılıyor); TMDB anahtarı eklenirse büyük arka planlar gelir"
+   }
+  ]
  }
 ]

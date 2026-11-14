@@ -30,7 +30,7 @@ const Library=(()=>{
   const shape=t=>['book','pdf','doc','course','research','movie','series','game','anime'].includes(t)?'p':t==='image'?'s':'l';
   const fmtD=ts=>new Date(ts).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'});
   const size=b=>b>1e6?(b/1e6).toFixed(1)+' MB':Math.max(1,Math.round(b/1e3))+' KB';
-  const all=()=>[...KB.items.values()];
+  const all=()=>[...KB.items.values()].filter(i=>!MEDIA.includes(i.type)),every=()=>[...KB.items.values()];
   const favIco=it=>it.favicon||(it.url&&!it.file?`https://www.google.com/s2/favicons?domain=${host(it.url)}&sz=64`:'');
   const coverSrc=it=>it.cover||(it.yt?`https://i.ytimg.com/vi/${it.yt}/hqdefault.jpg`:'');
   const motionOK=()=>!REDUCED&&document.documentElement.dataset.motion!=='off';
@@ -45,12 +45,12 @@ const Library=(()=>{
       <div class="lc-b"><b class="lc-t">${esc(it.title)}</b>${metaLine(it)}</div></article>`}
 
   /* ── kenar çubuğu (kütüphanenin kendi gezinmesi) ── */
-  function rail(){const items=all(),cnt=t=>items.filter(i=>i.type===t).length,c=[...KB.cols.values()].sort((a,b)=>a.order-b.order);
+  function rail(){const items=all(),cnt=t=>items.filter(i=>i.type===t).length,c=[...KB.cols.values()].filter(x=>!every().some(i=>i.cols.includes(x.id)&&MEDIA.includes(i.type))).sort((a,b)=>a.order-b.order);
     const ni=(h,ic,l,on,n='')=>`<a class="lr-i${on?' on':''}" href="#lib${h}">${ic}<span>${esc(l)}</span>${n!==''?`<em>${n}</em>`:''}</a>`;
     const S=st.sub,A=st.arg;
     return`<aside class="lrail"><div class="lr-brand"><span class="lr-mark">${sv('read')}</span><span><b>Kütüphane</b><small>${items.length} içerik</small></span></div>
       <button class="lr-add" data-act="add">${sv('plus')}İçerik ekle<kbd>A</kbd></button>
-      <nav>${ni('',sv('home'),'Keşfet',S==='home')}${ni('/all',sv('all'),'Tümü',S==='all',items.length)}${ni('/reading',sv('read'),'Devam edilenler',S==='reading',items.filter(i=>i.progress>.01&&i.progress<.99).length||'')}${ni('/fav',sv('star'),'Favoriler',S==='fav',items.filter(i=>i.fav).length||'')}${ni('/recent',sv('clock'),'Son görüntülenen',S==='recent')}</nav>
+      <nav><a class="lr-i lr-back" href="#lib">${sv('back')}<span>Medya merkezi</span></a>${ni('/docs',sv('home'),'Keşfet',S==='home')}${ni('/all',sv('all'),'Tümü',S==='all',items.length)}${ni('/reading',sv('read'),'Devam edilenler',S==='reading',items.filter(i=>i.progress>.01&&i.progress<.99).length||'')}${ni('/fav',sv('star'),'Favoriler',S==='fav',items.filter(i=>i.fav).length||'')}${ni('/recent',sv('clock'),'Son görüntülenen',S==='recent')}</nav>
       <div class="lr-g">Türler</div><nav>${Object.keys(T).filter(t=>cnt(t)).map(t=>ni('/type/'+t,`<i class="lr-dot" style="--c:${T[t].c}"></i>`,T[t].n,S==='type'&&A===t,cnt(t))).join('')||'<p class="lr-e">İçerik ekleyince türler burada görünür</p>'}</nav>
       <div class="lr-g">Koleksiyonlar<button data-act="newcol" title="Yeni koleksiyon" aria-label="Yeni koleksiyon">${sv('plus')}</button></div>
       <nav>${c.map(x=>ni('/col/'+x.id,`<i class="lr-dot sq" style="--c:${esc(x.color)}">${esc(x.emoji)}</i>`,x.name,S==='col'&&A===x.id,items.filter(i=>i.cols.includes(x.id)).length)).join('')||'<p class="lr-e">Henüz koleksiyon yok</p>'}</nav>
@@ -127,21 +127,26 @@ const Library=(()=>{
       ${l.length?rows(l):`<div class="nores">${c.l.length?`<b>Eşleşen içerik yok</b><p>Aramayı ya da filtreleri değiştir.</p><button class="btn" data-act="clearf">Filtreleri temizle</button>`:`<b>${col?'Bu koleksiyon boş':'Burada henüz bir şey yok'}</b><p>${col?'İçerik eklerken bu koleksiyonu seç ya da bir içeriğin ayrıntılarından ekle.':'İlk içeriğini ekle — bağlantı, kitap ya da dosya.'}</p><button class="btn pri" data-act="add">${sv('plus')}İçerik ekle</button>`}</div>`}`}
 
   /* ── çizim ── */
-  function root(){let r=q('#view .lib');if(!r){q('#view').innerHTML=`<div class="lib"><div class="lib-in"></div><div class="lib-drop" aria-hidden="true"><div><span>${sv('up')}</span><b>Bırak, kütüphaneye eklensin</b><small>PDF, görsel, belge ya da bağlantı</small></div></div></div>`;r=q('#view .lib');wire(r)}return r}
+  function root(){let r=q('#view>.lib');if(!r){q('#view').innerHTML=`<div class="lib"><div class="lib-in"></div><div class="lib-drop" aria-hidden="true"><div><span>${sv('up')}</span><b>Bırak, kütüphaneye eklensin</b><small>PDF, görsel, belge ya da bağlantı</small></div></div></div>`;r=q('#view>.lib');wire(r)}return r}
   function draw(){const r=root(),inner=q('.lib-in',r),scY=q('#scroll').scrollTop;
     inner.innerHTML=rail()+`<div class="lmain">${st.sub==='home'?homeHTML():listHTML()}</div>`;setTimeout(autoCovers,1200);
     setCrumb(sv('read'),st.sub==='home'?'Kütüphane':listCtx().t.replace(/^#/,'#'),`<button class="tb" data-act="add" title="İçerik ekle (A)" aria-label="İçerik ekle">${sv('plus')}</button>`);
     return scY}
   function parse(parts){const[a='',b='']=parts;if(!a)return{sub:'home',arg:''};if(['all','fav','reading','recent'].includes(a))return{sub:a,arg:''};if(['type','tag','col'].includes(a))return{sub:a,arg:decodeURIComponent(b)};return{sub:'home',arg:''}}
+  const isMediaRoute=p=>!p.length||p[0]==='m';
+  const bgView=()=>q('#view>.lib')?'lib':q('#view>.mc')?'mc':'';
   function render(parts){parts=parts||[];const ov=parts[0]==='i'||parts[0]==='read';const base=ov?st.base||'':parts.join('/');
-    if(!ov||!q('#view .lib')){const p=parse(ov?(st.base?st.base.split('/'):[]):parts);if(p.sub!==st.sub||p.arg!==st.arg){st.q='';st.type='';st.tag=''}Object.assign(st,p);st.base=base;draw();if(!ov){q('#scroll').scrollTop=0}}
+    const bp=ov?(st.base?st.base.split('/'):[]):parts;
+    if((!ov||!bgView())&&isMediaRoute(bp)){closeDetail(true);closeReader(true);st.base=base;Media.render(bp);if(parts[0]==='i')openDetail(parts[1]);else if(parts[0]==='read')openReader(parts[1]);return}
+    if(!ov||!bgView()){document.getElementById('app')?.classList.remove('mc-on');const p=parse(bp[0]==='docs'?bp.slice(1):bp);if(p.sub!==st.sub||p.arg!==st.arg){st.q='';st.type='';st.tag=''}Object.assign(st,p);st.base=base;draw();if(!ov){q('#scroll').scrollTop=0}}
     closeDetail(true);closeReader(true);
     if(parts[0]==='i')openDetail(parts[1]);else if(parts[0]==='read')openReader(parts[1])}
   /* aynı liste üstünde sadece detay açılıp kapanıyorsa tüm görünümü yeniden çizme */
-  function soft(parts){parts=parts||[];if(!q('#view .lib'))return false;const ov=parts[0]==='i'||parts[0]==='read';
+  function soft(parts){parts=parts||[];const bv=bgView();if(!bv)return false;const ov=parts[0]==='i'||parts[0]==='read';
     if(ov){closeDetail(true);closeReader(true);parts[0]==='i'?openDetail(parts[1]):openReader(parts[1]);return true}
-    if(parts.join('/')===st.base&&(q('.ld-bg')||q('.rd-bg'))){closeDetail();closeReader();return true}return false}
-  let rT=0;KB.on(w=>{if(typeof view==='undefined'||view!=='lib'||!q('#view .lib'))return;clearTimeout(rT);rT=setTimeout(()=>{if(view!=='lib'||!q('#view .lib'))return;const sc=q('#scroll'),y=sc.scrollTop,f=document.activeElement;
+    if(parts.join('/')===st.base&&(q('.ld-bg')||q('.rd-bg')||q('.mx-bg'))){closeDetail();closeReader();return true}
+    if(bv==='mc'&&isMediaRoute(parts)){closeDetail(true);st.base=parts.join('/');Media.render(parts,{soft:true});return true}return false}
+  let rT=0;KB.on(w=>{if(typeof view==='undefined'||view!=='lib'||!q('#view>.lib'))return;clearTimeout(rT);rT=setTimeout(()=>{if(view!=='lib'||!q('#view>.lib'))return;const sc=q('#scroll'),y=sc.scrollTop,f=document.activeElement;
     if(f&&f.closest?.('.lib [data-q],.lib [contenteditable],.ld input,.ld textarea,.ld [contenteditable],.la'))return;draw();sc.scrollTop=y;const d=q('.ld-bg');if(d)refreshDetail()},60)});
 
   /* ── olaylar ── */
@@ -213,13 +218,13 @@ const Library=(()=>{
         <section class="ld-s ai"><h3>${sv('spark')}Akıllı yardımcı <em>${KB.AI.ok()?'Claude':'yerel'}</em></h3><div class="ai-b"><button class="chip" data-ai="sum">Özetle</button><button class="chip" data-ai="tags">Etiket öner</button><button class="chip" data-ai="links">Bağlantı öner</button></div><div class="ai-out" aria-live="polite">${it.summary?`<div class="ai-r"><b>Kayıtlı özet</b><p>${esc(it.summary)}</p></div>`:''}</div>
           <p class="hint">${KB.AI.ok()?'Öneriler sadece sen onaylarsan uygulanır.':'Claude anahtarı yok; yerel öneriler çalışır. Anahtarı Netleştir uygulamasından ekleyebilirsin.'}</p></section>
         <footer class="ld-f">${esc(fmtD(it.added))} tarihinde eklendi${it.opened?` · son açılış ${esc(rel(it.opened))}`:''}${it.file?` · ${esc(it.file.name)} (${size(it.file.size)}) — dosya bu cihazda`:''}</footer></div></article>`}
-  function openDetail(id){const it=KB.items.get(id);if(!it){toast('İçerik bulunamadı');return go('#lib'+(st.base?'/'+st.base:''))}dId=id;touchOpened(it);
+  function openDetail(id){const it=KB.items.get(id);if(!it){toast('İçerik bulunamadı');return go('#lib'+(st.base?'/'+st.base:''))}if(MEDIA.includes(it.type))return Media.detail(id);dId=id;touchOpened(it);
     const bg=document.createElement('div');bg.className='ld-bg';bg.innerHTML=detailHTML(it);document.body.appendChild(bg);wireDetail(bg);
     if(motionOK()){bg.animate([{opacity:0},{opacity:1}],{duration:200,easing:EASE});q('.ld',bg).animate([{opacity:0,transform:'translateY(24px) scale(.985)'},{opacity:1,transform:'none'}],{duration:520,easing:OUT})}
     setTimeout(()=>q('[data-dx]',bg)?.focus({preventScroll:true}),60)}
   function refreshDetail(){const bg=q('.ld-bg');if(!bg||!dId)return;const it=KB.items.get(dId);if(!it)return closeDetail();const a=document.activeElement;if(a&&bg.contains(a)&&a.matches('textarea,input,[contenteditable]'))return;
     const sc=q('.ld-info',bg)?.scrollTop||0,yt=q('.ld-yt',bg);bg.innerHTML=detailHTML(it);if(yt)q('.ld-media .ld-yt',bg)?.replaceWith(yt);q('.ld-info',bg).scrollTop=sc}
-  function closeDetail(instant){const bg=q('.ld-bg');if(!bg)return;dId=null;if(instant||!motionOK())return bg.remove();bg.animate([{opacity:1},{opacity:0}],{duration:160,easing:EASE}).finished.then(()=>bg.remove(),()=>bg.remove())}
+  function closeDetail(instant){Media.close(instant);const bg=q('.ld-bg');if(!bg)return;dId=null;if(instant||!motionOK())return bg.remove();bg.animate([{opacity:1},{opacity:0}],{duration:160,easing:EASE}).finished.then(()=>bg.remove(),()=>bg.remove())}
   const back=()=>{history.length>1&&location.hash.startsWith('#lib/i/')?history.back():go('#lib'+(st.base?'/'+st.base:''))};
   function wireDetail(bg){
     bg.addEventListener('click',async e=>{const t=e.target,it=KB.items.get(dId);if(!it)return;
@@ -381,7 +386,7 @@ const Library=(()=>{
     inp.addEventListener('input',()=>{sel=0;draw()});inp.addEventListener('keydown',e=>{if(e.key==='ArrowDown'){e.preventDefault();sel=Math.min(cur.length-1,sel+1);draw()}else if(e.key==='ArrowUp'){e.preventDefault();sel=Math.max(0,sel-1);draw()}else if(e.key==='Enter'){e.preventDefault();done(cur[sel])}else if(e.key==='Escape'){e.preventDefault();e.stopPropagation();done()}});
     box.addEventListener('click',e=>{const b=e.target.closest('[data-i]');if(b)done(cur[+b.dataset.i])});draw();inp.focus()}
   const pagePicker=(a,cb)=>picker(a,'Hangi nota bağlansın?',()=>sorted().map(p=>({id:p.id,t:titleOf(p),s:(firstText(p)||'').slice(0,60),ic:`<span class="pe">${esc(iconOf(p))}</span>`})),cb);
-  const itemPicker=(a,cb)=>picker(a,'Kütüphaneden kaynak seç',()=>all().sort((x,y)=>(y.opened||y.added)-(x.opened||x.added)).map(it=>({id:it.id,t:it.title,s:(T[it.type]||T.file).n+(it.author?' · '+it.author:''),ic:cover(it,'mini')})),cb);
+  const itemPicker=(a,cb)=>picker(a,'Kütüphaneden kaynak seç',()=>every().sort((x,y)=>(y.opened||y.added)-(x.opened||x.added)).map(it=>({id:it.id,t:it.title,s:(T[it.type]||T.file).n+(it.author?' · '+it.author:''),ic:cover(it,'mini')})),cb);
 
   /* ── Workspace: not içine gömülü kaynak kartı (/kaynak) ve not altındaki bağlantılar paneli ── */
   function libCard(b){const it=KB.items.get(b.lid);if(!it)return`<span class="pgb gone lib" data-act="libopen" tabindex="0" contenteditable="false"><span class="pgi">🗑️</span><span class="pgt"><b>Silinmiş kaynak</b><small>Bu bağlantıyı kaldırabilirsin</small></span></span>`;
@@ -424,17 +429,17 @@ const Library=(()=>{
   /* ── içe aktarma: Notion'dan hazırlanan paket (import/*.json) ── */
   const PACK='import/eglence.json',srcKey=it=>'notion:'+it.type+':'+KB.low(it.title);let pack=null,packP=null;
   function loadPack(){if(packP)return packP;packP=fetch(PACK,{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(j=>{pack=j;if(j)j.items.forEach(x=>Q.set(KB.low(x.type+'|'+x.title),x.q||''));
-      if(view==='lib'&&st.sub==='home'&&q('#view .lib'))draw();return j}).catch(()=>null);return packP}
-  const missing=()=>{if(!pack)return[];const have=new Set(all().map(i=>i.src||srcKey(i)));return pack.items.filter(x=>!have.has(srcKey(x)))};
+      if(view==='lib'&&st.sub==='home'&&q('#view>.lib'))draw();if(q('#view>.mc'))Media.refresh();return j}).catch(()=>null);return packP}
+  const missing=()=>{if(!pack)return[];const have=new Set(every().map(i=>i.src||srcKey(i)));return pack.items.filter(x=>!have.has(srcKey(x)))};
   function impBanner(){loadPack();if(!pack||!KB.ready)return'';const m=missing();if(!m.length||lsg('lib:imp-hide',0)===pack.updated)return'';
     const by=t=>m.filter(x=>x.type===t).length;
     return`<section class="imp"><span class="imp-ic">${tIc('movie')}</span><div><b>Notion'daki eğlence listen hazır</b><small>${[['movie','film'],['series','dizi'],['game','oyun'],['anime','anime']].map(([t,n])=>by(t)?by(t)+' '+n:'').filter(Boolean).join(' · ')} — izlediklerin, izleyeceklerin ve yeni sezon beklediklerin koleksiyonlarıyla gelir, kapaklar otomatik bulunur.</small></div>
       <button class="btn pri" data-imp>İçe aktar</button><button class="btn" data-imp-no>Şimdi değil</button></section>`}
   async function doImport(){await loadPack();const m=missing();if(!m.length)return toast('Hepsi zaten kütüphanede');
     const cmap={};for(const[k,c]of Object.entries(pack.cols||{})){const ex=[...KB.cols.values()].find(x=>KB.low(x.name)===KB.low(c.name));cmap[k]=ex?ex.id:KB.addCol(c).id}
-    const now=Date.now(),added=[];m.forEach((x,i)=>{const it=KB.addItem({type:x.type,title:x.title,status:x.status,score:x.score||'',note:x.note||'',cols:(x.cols||[]).map(k=>cmap[k]).filter(Boolean),src:srcKey(x),tags:[KB.TYPES[x.type].n.toLocaleLowerCase('tr')]});added.push(it)});
-    toast(`${added.length} içerik eklendi`);findCovers(added)}
+    const now=Date.now(),added=[];m.forEach((x,i)=>{const it=KB.addItem({type:x.type,title:x.title,status:x.status,score:x.score||'',note:x.note||'',cols:(x.cols||[]).map(k=>cmap[k]).filter(Boolean),src:srcKey(x),flag:x.flag||'',flagWhy:x.why||'',flagTo:x.to||'',tags:[KB.TYPES[x.type].n.toLocaleLowerCase('tr')]});added.push(it)});
+    toast(`${added.length} içerik eklendi — posterler eşleşiyor`);loadPack().then(()=>Media.queue())}
   document.addEventListener('click',e=>{if(e.target.closest('[data-imp]')){e.preventDefault();doImport()}else if(e.target.closest('[data-imp-no]')){try{localStorage.setItem('lib:imp-hide',JSON.stringify(pack?.updated||1))}catch{}draw()}});
 
   function closeAll(){closeDetail(true);closeReader(true);q('.la-bg')?.remove();LA=null}
-  return{render,soft,closeAll,findCovers,doImport,open,launch,addSheet,addFiles,libCard,pagePanel,itemPicker,pagePicker,cover,get st(){return st}}})();
+  return{render,soft,closeAll,findCovers,doImport,impBanner,loadPack,toastUndo,open,launch,addSheet,addFiles,libCard,pagePanel,itemPicker,pagePicker,cover,get st(){return st}}})();

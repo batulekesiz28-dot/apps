@@ -1,6 +1,6 @@
 {
 "source": "Notion · List / eğlence (İzlenenler veritabanı, izlenmeyenler, yeni sezon geldi/beklemede)",
-"updated": "2026-11-14",
+"updated": "2026-11-14b",
 "cols": {
 "done": {
 "name": "İzlenenler",
@@ -26,1657 +26,1853 @@
 "type": "movie",
 "title": "11 Oceans",
 "status": "done",
-"q": "Ocean's Eleven 2001 film",
 "cols": [
 "done"
 ],
-"score": "IMDb 7.7"
+"score": "IMDb 7.7",
+"en": "Ocean's Eleven",
+"y": 2001
 },
 {
 "type": "movie",
 "title": "12 Angry Men",
 "status": "done",
-"q": "12 Angry Men 1957 film",
 "cols": [
 "done"
 ],
-"score": "IMDb 9.0"
+"score": "IMDb 9.0",
+"en": "12 Angry Men",
+"y": 1957
 },
 {
 "type": "movie",
 "title": "500 Days of Summer",
 "status": "done",
-"q": "500 Days of Summer film",
 "cols": [
 "done"
 ],
-"score": "IMDb 7.7"
+"score": "IMDb 7.7",
+"en": "500 Days of Summer",
+"y": 2009
 },
 {
 "type": "movie",
 "title": "A Bronx Tale",
 "status": "done",
-"q": "A Bronx Tale film",
 "cols": [
 "done"
 ],
-"score": "IMDb 7.8"
+"score": "IMDb 7.8",
+"en": "A Bronx Tale",
+"y": 1993
 },
 {
 "type": "movie",
 "title": "Airport",
 "status": "done",
-"q": "Airport film",
 "cols": [
 "done"
 ],
-"score": "IMDb 6.6"
+"score": "IMDb 6.6",
+"en": "Airport",
+"y": 1970
 },
 {
 "type": "movie",
 "title": "Back to the Future",
 "status": "done",
-"q": "Back to the Future film",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.5"
+"score": "IMDb 8.5",
+"en": "Back to the Future",
+"y": 1985
 },
 {
 "type": "movie",
 "title": "Backrooms",
 "status": "done",
-"q": "Backrooms film",
 "cols": [
 "done"
-]
+],
+"en": "Backrooms",
+"y": 2026,
+"flag": "match",
+"why": "“Backrooms” filmi mi yoksa aynı adlı web dizisi/oyun mu belli değil.",
+"to": ""
 },
 {
 "type": "movie",
 "title": "Batman v Superman",
 "status": "done",
-"q": "Batman v Superman: Dawn of Justice",
 "cols": [
 "done"
 ],
-"score": "IMDb 6.4"
+"score": "IMDb 6.4",
+"en": "Batman v Superman: Dawn of Justice",
+"y": 2016
 },
 {
 "type": "movie",
 "title": "Ben Efsaneyim",
 "status": "done",
-"q": "I Am Legend film",
 "cols": [
 "done"
 ],
-"score": "IMDb 7.2"
+"score": "IMDb 7.2",
+"en": "I Am Legend",
+"y": 2007
 },
 {
 "type": "movie",
 "title": "Bullet Train",
 "status": "done",
-"q": "Bullet Train 2022 film",
 "cols": [
 "done"
 ],
-"score": "IMDb 7.3"
+"score": "IMDb 7.3",
+"en": "Bullet Train",
+"y": 2022
 },
 {
 "type": "movie",
 "title": "Coraline",
 "status": "done",
-"q": "Coraline film",
 "cols": [
 "done"
 ],
-"score": "IMDb 7.8"
+"score": "IMDb 7.8",
+"en": "Coraline",
+"y": 2009
 },
 {
 "type": "movie",
 "title": "Demolition",
 "status": "done",
-"q": "Demolition 2015 film",
 "cols": [
 "done"
 ],
-"score": "IMDb 7.0"
+"score": "IMDb 7.0",
+"en": "Demolition",
+"y": 2015
 },
 {
 "type": "movie",
 "title": "Diktatör",
 "status": "done",
-"q": "The Great Dictator",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.4"
+"score": "IMDb 8.4",
+"en": "The Great Dictator",
+"y": 1940
 },
 {
 "type": "movie",
 "title": "Dune",
 "status": "done",
-"q": "Dune 2021 film",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.0"
+"score": "IMDb 8.0",
+"en": "Dune",
+"y": 2021
 },
 {
 "type": "movie",
 "title": "Edge of Tomorrow",
 "status": "done",
-"q": "Edge of Tomorrow film",
 "cols": [
 "done"
 ],
-"score": "IMDb 7.9"
+"score": "IMDb 7.9",
+"en": "Edge of Tomorrow",
+"y": 2014
 },
 {
 "type": "movie",
 "title": "Esaretin Bedeli",
 "status": "done",
-"q": "The Shawshank Redemption",
 "cols": [
 "done"
 ],
-"score": "IMDb 9.3"
+"score": "IMDb 9.3",
+"en": "The Shawshank Redemption",
+"y": 1994
 },
 {
 "type": "movie",
 "title": "Fight Club",
 "status": "done",
-"q": "Fight Club film",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.8"
+"score": "IMDb 8.8",
+"en": "Fight Club",
+"y": 1999
 },
 {
 "type": "movie",
 "title": "Forrest Gump",
 "status": "done",
-"q": "Forrest Gump film",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.8"
+"score": "IMDb 8.8",
+"en": "Forrest Gump",
+"y": 1994
 },
 {
 "type": "movie",
 "title": "Free Guy",
 "status": "done",
-"q": "Free Guy film",
 "cols": [
 "done"
 ],
-"score": "IMDb 7.1"
+"score": "IMDb 7.1",
+"en": "Free Guy",
+"y": 2021
 },
 {
 "type": "movie",
 "title": "Gladyatör",
 "status": "done",
-"q": "Gladiator 2000 film",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.5"
+"score": "IMDb 8.5",
+"en": "Gladiator",
+"y": 2000
 },
 {
 "type": "movie",
 "title": "I Mother",
 "status": "done",
-"q": "I Mother",
 "cols": [
 "done"
 ],
-"score": "IMDb 6.8"
+"score": "IMDb 6.8",
+"en": "I Mother",
+"y": 2019,
+"flag": "match",
+"why": "Tam adı muhtemelen “I Am Mother” (2019) — doğrula.",
+"to": ""
 },
 {
 "type": "movie",
 "title": "I Swear",
 "status": "done",
-"q": "I Swear 2025 film",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.2"
+"score": "IMDb 8.2",
+"en": "I Swear",
+"y": 2025
 },
 {
 "type": "movie",
 "title": "Inception",
 "status": "done",
-"q": "Inception film",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.8"
+"score": "IMDb 8.8",
+"en": "Inception",
+"y": 2010
 },
 {
 "type": "movie",
 "title": "Interstellar",
 "status": "done",
-"q": "Interstellar film",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.7"
+"score": "IMDb 8.7",
+"en": "Interstellar",
+"y": 2014
 },
 {
 "type": "movie",
 "title": "IT",
 "status": "done",
-"q": "It 2017 film",
 "cols": [
 "done"
 ],
-"score": "IMDb 7.3"
+"score": "IMDb 7.3",
+"en": "It",
+"y": 2017
 },
 {
 "type": "movie",
 "title": "Joker",
 "status": "done",
-"q": "Joker 2019 film",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.3"
+"score": "IMDb 8.3",
+"en": "Joker",
+"y": 2019
 },
 {
 "type": "movie",
 "title": "Kan Sporu",
 "status": "done",
-"q": "Bloodsport film",
 "cols": [
 "done"
 ],
-"score": "IMDb 6.8"
+"score": "IMDb 6.8",
+"en": "Bloodsport",
+"y": 1988
 },
 {
 "type": "movie",
 "title": "Kara Şövalye",
 "status": "done",
-"q": "The Dark Knight film",
 "cols": [
 "done"
 ],
-"score": "IMDb 9.0"
+"score": "IMDb 9.0",
+"en": "The Dark Knight",
+"y": 2008
 },
 {
 "type": "movie",
 "title": "Karate Kid",
 "status": "done",
-"q": "The Karate Kid",
 "cols": [
 "done"
 ],
-"score": "IMDb 7.3"
+"score": "IMDb 7.3",
+"en": "The Karate Kid",
+"y": 1984
 },
 {
 "type": "movie",
 "title": "Kolpaçino",
 "status": "done",
-"q": "tr:Kolpaçino",
 "cols": [
 "done"
 ],
-"score": "IMDb 6.5"
+"score": "IMDb 6.5",
+"en": "Kolpaçino",
+"y": 2009
 },
 {
 "type": "movie",
 "title": "Kötü Kedi Şerafettin",
 "status": "done",
-"q": "tr:Kötü Kedi Şerafettin (film)",
 "cols": [
 "done"
 ],
-"score": "IMDb 7.6"
+"score": "IMDb 7.6",
+"en": "Kötü Kedi Şerafettin",
+"y": 2016
 },
 {
 "type": "movie",
 "title": "LEGO Batman",
 "status": "done",
-"q": "The Lego Batman Movie",
 "cols": [
 "done"
 ],
-"score": "IMDb 7.3"
+"score": "IMDb 7.3",
+"en": "The Lego Batman Movie",
+"y": 2017
 },
 {
 "type": "movie",
 "title": "Mars",
 "status": "done",
-"q": "The Martian film",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.0"
+"score": "IMDb 8.0",
+"en": "The Martian",
+"y": 2015
 },
 {
 "type": "movie",
 "title": "Nefesini Tut",
 "status": "done",
-"q": "Don't Breathe film",
 "cols": [
 "done"
 ],
-"score": "IMDb 7.1"
+"score": "IMDb 7.1",
+"en": "Don't Breathe",
+"y": 2016
 },
 {
 "type": "movie",
 "title": "Next",
 "status": "done",
-"q": "Next 2007 film",
 "cols": [
 "done"
 ],
-"score": "IMDb 6.2"
+"score": "IMDb 6.2",
+"en": "Next",
+"y": 2007
 },
 {
 "type": "movie",
 "title": "No Country for Old Men",
 "status": "done",
-"q": "No Country for Old Men film",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.2"
+"score": "IMDb 8.2",
+"en": "No Country for Old Men",
+"y": 2007
 },
 {
 "type": "movie",
 "title": "Nuremberg",
 "status": "done",
-"q": "Nuremberg 2025 film",
 "cols": [
 "done"
-]
+],
+"en": "Nuremberg",
+"y": 2025
 },
 {
 "type": "movie",
 "title": "Oppenheimer",
 "status": "done",
-"q": "Oppenheimer film",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.3"
+"score": "IMDb 8.3",
+"en": "Oppenheimer",
+"y": 2023
 },
 {
 "type": "movie",
 "title": "Smile",
 "status": "done",
-"q": "Smile 2022 film",
 "cols": [
 "done"
 ],
-"score": "IMDb 6.5"
+"score": "IMDb 6.5",
+"en": "Smile",
+"y": 2022
 },
 {
 "type": "movie",
 "title": "Soysuzlar Çetesi",
 "status": "done",
-"q": "Inglourious Basterds",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.4"
+"score": "IMDb 8.4",
+"en": "Inglourious Basterds",
+"y": 2009
 },
 {
 "type": "movie",
 "title": "Split",
 "status": "done",
-"q": "Split 2016 film",
 "cols": [
 "done"
 ],
-"score": "IMDb 7.3"
+"score": "IMDb 7.3",
+"en": "Split",
+"y": 2016
 },
 {
 "type": "movie",
 "title": "Sıkıysa Yakala",
 "status": "done",
-"q": "Catch Me If You Can",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.1"
+"score": "IMDb 8.1",
+"en": "Catch Me If You Can",
+"y": 2002
 },
 {
 "type": "movie",
 "title": "Taxi Driver",
 "status": "done",
-"q": "Taxi Driver film",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.2"
+"score": "IMDb 8.2",
+"en": "Taxi Driver",
+"y": 1976
 },
 {
 "type": "movie",
 "title": "Terminator",
 "status": "done",
-"q": "The Terminator",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.1"
+"score": "IMDb 8.1",
+"en": "The Terminator",
+"y": 1984
 },
 {
 "type": "movie",
 "title": "The Godfather",
 "status": "done",
-"q": "The Godfather film",
 "cols": [
 "done"
 ],
-"score": "IMDb 9.2"
+"score": "IMDb 9.2",
+"en": "The Godfather",
+"y": 1972
 },
 {
 "type": "movie",
 "title": "The Mask",
 "status": "done",
-"q": "The Mask 1994 film",
 "cols": [
 "done"
 ],
-"score": "IMDb 7.0"
+"score": "IMDb 7.0",
+"en": "The Mask",
+"y": 1994
 },
 {
 "type": "movie",
 "title": "Truman Show",
 "status": "done",
-"q": "The Truman Show",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.2"
+"score": "IMDb 8.2",
+"en": "The Truman Show",
+"y": 1998
 },
 {
 "type": "movie",
 "title": "Uncharted",
 "status": "done",
-"q": "Uncharted film",
 "cols": [
 "done"
 ],
-"score": "IMDb 6.3"
+"score": "IMDb 6.3",
+"en": "Uncharted",
+"y": 2022
 },
 {
 "type": "movie",
 "title": "V for Vendetta",
 "status": "done",
-"q": "V for Vendetta film",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.1"
+"score": "IMDb 8.1",
+"en": "V for Vendetta",
+"y": 2005
 },
 {
 "type": "movie",
 "title": "Whiplash",
 "status": "done",
-"q": "Whiplash 2014 film",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.5"
+"score": "IMDb 8.5",
+"en": "Whiplash",
+"y": 2014
 },
 {
 "type": "movie",
 "title": "Yaşam Şifresi",
 "status": "done",
-"q": "Source Code film",
 "cols": [
 "done"
 ],
-"score": "IMDb 7.5"
+"score": "IMDb 7.5",
+"en": "Source Code",
+"y": 2011
 },
 {
 "type": "movie",
 "title": "Zindan Adası",
 "status": "done",
-"q": "Shutter Island film",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.2"
+"score": "IMDb 8.2",
+"en": "Shutter Island",
+"y": 2010
 },
 {
 "type": "movie",
 "title": "Çelik Yumruklar",
 "status": "done",
-"q": "Real Steel",
 "cols": [
 "done"
 ],
-"score": "IMDb 7.1"
+"score": "IMDb 7.1",
+"en": "Real Steel",
+"y": 2011
 },
 {
 "type": "movie",
 "title": "Ölü Ozanlar Derneği",
 "status": "done",
-"q": "Dead Poets Society",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.1"
+"score": "IMDb 8.1",
+"en": "Dead Poets Society",
+"y": 1989
 },
 {
 "type": "movie",
 "title": "Şeker Henry",
 "status": "done",
-"q": "The Wonderful Story of Henry Sugar",
 "cols": [
 "done"
 ],
-"score": "IMDb 7.8"
+"score": "IMDb 7.8",
+"en": "The Wonderful Story of Henry Sugar",
+"y": 2023,
+"flag": "match",
+"why": "Muhtemelen “The Wonderful Story of Henry Sugar” (2023) — puan (7.8) tam uyuşmuyor, doğrula.",
+"to": ""
 },
 {
 "type": "series",
 "title": "Black Mirror",
 "status": "done",
-"q": "Black Mirror TV series",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.7"
+"score": "IMDb 8.7",
+"en": "Black Mirror",
+"y": 2011
 },
 {
 "type": "series",
 "title": "Breaking Bad",
 "status": "done",
-"q": "Breaking Bad",
 "cols": [
 "done"
 ],
-"score": "IMDb 9.5"
+"score": "IMDb 9.5",
+"en": "Breaking Bad",
+"y": 2008
 },
 {
 "type": "series",
 "title": "Dexter",
 "status": "done",
-"q": "Dexter TV series",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.6"
+"score": "IMDb 8.6",
+"en": "Dexter",
+"y": 2006
 },
 {
 "type": "series",
 "title": "Dispatch",
 "status": "done",
-"q": "Dispatch video game AdHoc",
 "cols": [
 "done"
-]
+],
+"en": "Dispatch",
+"flag": "type",
+"why": "Notion’da dizi olarak duruyor ama AdHoc Studio’nun 2025 bölümlü oyunu “Dispatch” olabilir.",
+"to": "game"
 },
 {
 "type": "series",
 "title": "From",
 "status": "done",
-"q": "From TV series",
 "cols": [
 "done"
 ],
-"score": "IMDb 7.8"
+"score": "IMDb 7.8",
+"en": "From",
+"y": 2022
 },
 {
 "type": "series",
 "title": "Gibi",
 "status": "done",
-"q": "tr:Gibi (dizi)",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.8"
+"score": "IMDb 8.8",
+"en": "Gibi",
+"y": 2021
 },
 {
 "type": "series",
 "title": "HIMYM",
 "status": "done",
-"q": "How I Met Your Mother",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.3"
+"score": "IMDb 8.3",
+"en": "How I Met Your Mother",
+"y": 2005
 },
 {
 "type": "series",
 "title": "Invincible",
 "status": "done",
-"q": "Invincible TV series",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.7"
+"score": "IMDb 8.7",
+"en": "Invincible",
+"y": 2021
 },
 {
 "type": "series",
 "title": "Kurtlar Vadisi",
 "status": "done",
-"q": "tr:Kurtlar Vadisi",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.0"
+"score": "IMDb 8.0",
+"en": "Kurtlar Vadisi",
+"y": 2003
 },
 {
 "type": "series",
 "title": "La Casa de Papel",
 "status": "done",
-"q": "Money Heist",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.2"
+"score": "IMDb 8.2",
+"en": "Money Heist",
+"y": 2017
 },
 {
 "type": "series",
 "title": "Lost",
 "status": "done",
-"q": "Lost TV series",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.3"
+"score": "IMDb 8.3",
+"en": "Lost",
+"y": 2004
 },
 {
 "type": "series",
 "title": "Mr. Robot",
 "status": "done",
-"q": "Mr. Robot",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.5"
+"score": "IMDb 8.5",
+"en": "Mr. Robot",
+"y": 2015
 },
 {
 "type": "series",
 "title": "Prison Break",
 "status": "done",
-"q": "Prison Break",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.3"
+"score": "IMDb 8.3",
+"en": "Prison Break",
+"y": 2005
 },
 {
 "type": "series",
 "title": "Regular Show",
 "status": "done",
-"q": "Regular Show",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.5"
+"score": "IMDb 8.5",
+"en": "Regular Show",
+"y": 2010
 },
 {
 "type": "series",
 "title": "Rick and Morty",
 "status": "done",
-"q": "Rick and Morty",
 "cols": [
 "done"
 ],
-"score": "IMDb 9.0"
+"score": "IMDb 9.0",
+"en": "Rick and Morty",
+"y": 2013
 },
 {
 "type": "series",
 "title": "Severance",
 "status": "done",
-"q": "Severance TV series",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.7"
+"score": "IMDb 8.7",
+"en": "Severance",
+"y": 2022
 },
 {
 "type": "series",
 "title": "Sherlock",
 "status": "done",
-"q": "Sherlock TV series",
 "cols": [
 "done"
 ],
-"score": "IMDb 9.1"
+"score": "IMDb 9.1",
+"en": "Sherlock",
+"y": 2010
 },
 {
 "type": "series",
 "title": "Squid Game",
 "status": "done",
-"q": "Squid Game",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.0"
+"score": "IMDb 8.0",
+"en": "Squid Game",
+"y": 2021
 },
 {
 "type": "series",
 "title": "Supernatural",
 "status": "done",
-"q": "Supernatural TV series",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.4"
+"score": "IMDb 8.4",
+"en": "Supernatural",
+"y": 2005
 },
 {
 "type": "series",
 "title": "The Blacklist",
 "status": "done",
-"q": "The Blacklist TV series",
 "cols": [
 "done"
 ],
-"score": "IMDb 7.9"
+"score": "IMDb 7.9",
+"en": "The Blacklist",
+"y": 2013
 },
 {
 "type": "series",
 "title": "The Boys",
 "status": "done",
-"q": "The Boys TV series",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.6"
+"score": "IMDb 8.6",
+"en": "The Boys",
+"y": 2019
 },
 {
 "type": "series",
 "title": "The Mandalorian",
 "status": "done",
-"q": "The Mandalorian",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.6"
+"score": "IMDb 8.6",
+"en": "The Mandalorian",
+"y": 2019
 },
 {
 "type": "series",
 "title": "True Detective",
 "status": "done",
-"q": "True Detective",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.9"
+"score": "IMDb 8.9",
+"en": "True Detective",
+"y": 2014
 },
 {
 "type": "series",
 "title": "Tulsa King",
 "status": "done",
-"q": "Tulsa King",
 "cols": [
 "done"
 ],
-"score": "IMDb 7.9"
+"score": "IMDb 7.9",
+"en": "Tulsa King",
+"y": 2022
 },
 {
 "type": "series",
 "title": "You",
 "status": "done",
-"q": "You TV series",
 "cols": [
 "done"
 ],
-"score": "IMDb 7.7"
+"score": "IMDb 7.7",
+"en": "You",
+"y": 2018
 },
 {
 "type": "game",
 "title": "60 Seconds",
 "status": "done",
-"q": "60 Seconds! video game",
 "cols": [
 "done"
-]
+],
+"en": "60 Seconds!",
+"y": 2015
 },
 {
 "type": "game",
 "title": "A Way Out",
 "status": "done",
-"q": "A Way Out video game",
 "cols": [
 "done"
 ],
-"score": "MC 78"
+"score": "MC 78",
+"en": "A Way Out",
+"y": 2018
 },
 {
 "type": "game",
 "title": "Age of History",
 "status": "done",
-"q": "Age of History video game",
 "cols": [
 "done"
-]
+],
+"en": "Age of History"
 },
 {
 "type": "game",
 "title": "Bad Parenting",
 "status": "done",
-"q": "Bad Parenting video game",
 "cols": [
 "done"
-]
+],
+"en": "Bad Parenting"
 },
 {
 "type": "game",
 "title": "Bodycam",
 "status": "done",
-"q": "Bodycam video game",
 "cols": [
 "done"
-]
+],
+"en": "Bodycam"
 },
 {
 "type": "game",
 "title": "Cyberpunk 2077",
 "status": "done",
-"q": "Cyberpunk 2077",
 "cols": [
 "done"
 ],
-"score": "MC 86"
+"score": "MC 86",
+"en": "Cyberpunk 2077",
+"y": 2020
 },
 {
 "type": "game",
 "title": "Dead Cells",
 "status": "done",
-"q": "Dead Cells",
 "cols": [
 "done"
 ],
-"score": "MC 89"
+"score": "MC 89",
+"en": "Dead Cells",
+"y": 2018
 },
 {
 "type": "game",
 "title": "Deltarune",
 "status": "done",
-"q": "Deltarune",
 "cols": [
 "done",
 "wait"
 ],
-"note": "yeni bölümler bekleniyor"
+"note": "yeni bölümler bekleniyor",
+"en": "Deltarune",
+"y": 2018
 },
 {
 "type": "game",
 "title": "Detroit: Become Human",
 "status": "done",
-"q": "Detroit: Become Human",
 "cols": [
 "done"
 ],
-"score": "MC 78"
+"score": "MC 78",
+"en": "Detroit: Become Human",
+"y": 2018
 },
 {
 "type": "game",
 "title": "Dishonored",
 "status": "done",
-"q": "Dishonored video game",
 "cols": [
 "done"
 ],
-"score": "MC 91"
+"score": "MC 91",
+"en": "Dishonored",
+"y": 2012
 },
 {
 "type": "game",
 "title": "Fever",
 "status": "done",
-"q": "Fever video game",
 "cols": [
 "done"
-]
+],
+"en": "Fever",
+"flag": "match",
+"why": "“Fever” adında birden çok oyun var; hangisi olduğu belli değil.",
+"to": ""
 },
 {
 "type": "game",
 "title": "Garten of Banban",
 "status": "done",
-"q": "Garten of Banban",
 "cols": [
 "done"
-]
+],
+"en": "Garten of Banban",
+"y": 2023
 },
 {
 "type": "game",
 "title": "God of War",
 "status": "done",
-"q": "God of War 2018 video game",
 "cols": [
 "done"
 ],
-"score": "MC 94"
+"score": "MC 94",
+"en": "God of War",
+"y": 2018
 },
 {
 "type": "game",
 "title": "Half-Life",
 "status": "done",
-"q": "Half-Life video game",
 "cols": [
 "done"
 ],
-"score": "MC 96"
+"score": "MC 96",
+"en": "Half-Life",
+"y": 1998
 },
 {
 "type": "game",
 "title": "Hello Neighbor",
 "status": "done",
-"q": "Hello Neighbor",
 "cols": [
 "done"
 ],
-"score": "MC 38"
+"score": "MC 38",
+"en": "Hello Neighbor",
+"y": 2017
 },
 {
 "type": "game",
 "title": "Hollow Knight",
 "status": "done",
-"q": "Hollow Knight",
 "cols": [
 "done"
 ],
-"score": "MC 90"
+"score": "MC 90",
+"en": "Hollow Knight",
+"y": 2017
 },
 {
 "type": "game",
 "title": "Hotline Miami",
 "status": "done",
-"q": "Hotline Miami",
 "cols": [
 "done"
 ],
-"score": "MC 85"
+"score": "MC 85",
+"en": "Hotline Miami",
+"y": 2012
 },
 {
 "type": "game",
 "title": "Inn Sanity",
 "status": "done",
-"q": "Inn Sanity video game",
 "cols": [
 "done"
-]
+],
+"en": "Inn Sanity"
 },
 {
 "type": "game",
 "title": "Karma: The Dark World",
 "status": "done",
-"q": "Karma: The Dark World",
 "cols": [
 "done"
-]
+],
+"en": "Karma: The Dark World"
 },
 {
 "type": "game",
 "title": "Katana ZERO",
 "status": "done",
-"q": "Katana Zero",
 "cols": [
 "done"
 ],
-"score": "MC 83"
+"score": "MC 83",
+"en": "Katana Zero",
+"y": 2019
 },
 {
 "type": "game",
 "title": "Life Is Strange",
 "status": "done",
-"q": "Life Is Strange video game",
 "cols": [
 "done"
 ],
-"score": "MC 85"
+"score": "MC 85",
+"en": "Life Is Strange",
+"y": 2015
 },
 {
 "type": "game",
 "title": "Little Nightmares",
 "status": "done",
-"q": "Little Nightmares",
 "cols": [
 "done"
 ],
-"score": "MC 78"
+"score": "MC 78",
+"en": "Little Nightmares",
+"y": 2017
 },
 {
 "type": "game",
 "title": "No, I'm Not a Human",
 "status": "done",
-"q": "No, I'm Not a Human video game",
 "cols": [
 "done"
-]
+],
+"en": "No, I'm Not a Human"
 },
 {
 "type": "game",
 "title": "NSH",
 "status": "done",
-"q": "NSH video game",
 "cols": [
 "done"
-]
+],
+"en": "NSH",
+"flag": "match",
+"why": "“NSH” kısaltmasının hangi oyun olduğu belli değil.",
+"to": ""
 },
 {
 "type": "game",
 "title": "Poppy Playtime",
 "status": "done",
-"q": "Poppy Playtime",
 "cols": [
 "done"
-]
+],
+"en": "Poppy Playtime",
+"y": 2021
 },
 {
 "type": "game",
 "title": "Ready or Not",
 "status": "done",
-"q": "Ready or Not video game",
 "cols": [
 "done"
 ],
-"score": "MC 79"
+"score": "MC 79",
+"en": "Ready or Not",
+"y": 2023
 },
 {
 "type": "game",
 "title": "Red Dead Redemption 2",
 "status": "done",
-"q": "Red Dead Redemption 2",
 "cols": [
 "done"
 ],
-"score": "MC 97"
+"score": "MC 97",
+"en": "Red Dead Redemption 2",
+"y": 2018
 },
 {
 "type": "game",
 "title": "Resident Evil 2",
 "status": "done",
-"q": "Resident Evil 2 2019 remake",
 "cols": [
 "done"
 ],
-"score": "MC 91"
+"score": "MC 91",
+"en": "Resident Evil 2",
+"y": 2019
 },
 {
 "type": "game",
 "title": "Resident Evil 4",
 "status": "done",
-"q": "Resident Evil 4",
 "cols": [
 "done"
 ],
-"score": "MC 96"
+"score": "MC 96",
+"en": "Resident Evil 4",
+"y": 2005
 },
 {
 "type": "game",
 "title": "Resident Evil Village",
 "status": "done",
-"q": "Resident Evil Village",
 "cols": [
 "done"
 ],
-"score": "MC 84"
+"score": "MC 84",
+"en": "Resident Evil Village",
+"y": 2021
 },
 {
 "type": "game",
 "title": "Sea of Thieves",
 "status": "done",
-"q": "Sea of Thieves",
 "cols": [
 "done"
 ],
-"score": "MC 69"
+"score": "MC 69",
+"en": "Sea of Thieves",
+"y": 2018
 },
 {
 "type": "game",
 "title": "Sifu",
 "status": "done",
-"q": "Sifu video game",
 "cols": [
 "done"
 ],
-"score": "MC 80"
+"score": "MC 80",
+"en": "Sifu",
+"y": 2022
 },
 {
 "type": "game",
 "title": "Hollow Knight: Silksong",
 "status": "done",
-"q": "Hollow Knight: Silksong",
 "cols": [
 "done",
 "wait"
 ],
-"note": "beklemede"
+"note": "beklemede",
+"en": "Hollow Knight: Silksong",
+"y": 2025
 },
 {
 "type": "game",
 "title": "SUPERHOT",
 "status": "done",
-"q": "Superhot video game",
 "cols": [
 "done"
 ],
-"score": "MC 82"
+"score": "MC 82",
+"en": "Superhot",
+"y": 2016
 },
 {
 "type": "game",
 "title": "The Last of Us",
 "status": "done",
-"q": "The Last of Us video game",
 "cols": [
 "done"
 ],
-"score": "MC 95"
+"score": "MC 95",
+"en": "The Last of Us",
+"y": 2013
 },
 {
 "type": "game",
 "title": "The Witcher 3",
 "status": "done",
-"q": "The Witcher 3: Wild Hunt",
 "cols": [
 "done"
 ],
-"score": "MC 92"
+"score": "MC 92",
+"en": "The Witcher 3: Wild Hunt",
+"y": 2015
 },
 {
 "type": "game",
 "title": "The Walking Dead",
 "status": "done",
-"q": "The Walking Dead video game Telltale",
 "cols": [
 "done"
-]
+],
+"en": "The Walking Dead",
+"y": 2012,
+"flag": "match",
+"why": "Notion’da “TWD” yazıyor — Telltale’in The Walking Dead oyunu tahmin edildi.",
+"to": ""
 },
 {
 "type": "game",
 "title": "ULTRAKILL",
 "status": "done",
-"q": "Ultrakill video game",
 "cols": [
 "done"
-]
+],
+"en": "Ultrakill",
+"y": 2020
 },
 {
 "type": "game",
 "title": "Undertale",
 "status": "done",
-"q": "Undertale",
 "cols": [
 "done"
 ],
-"score": "MC 92"
+"score": "MC 92",
+"en": "Undertale",
+"y": 2015
 },
 {
 "type": "game",
 "title": "Watch Dogs 2",
 "status": "done",
-"q": "Watch Dogs 2",
 "cols": [
 "done"
 ],
-"score": "MC 82"
+"score": "MC 82",
+"en": "Watch Dogs 2",
+"y": 2016
 },
 {
 "type": "game",
 "title": "Wolfenstein",
 "status": "done",
-"q": "Wolfenstein: The New Order",
 "cols": [
 "done"
 ],
-"score": "MC 79"
+"score": "MC 79",
+"en": "Wolfenstein: The New Order",
+"y": 2014,
+"flag": "match",
+"why": "Seride çok oyun var; MC 79 puanına göre “The New Order” (2014) tahmin edildi.",
+"to": ""
 },
 {
 "type": "anime",
 "title": "ASV",
 "status": "done",
-"q": "ASV anime",
 "cols": [
 "done"
-]
+],
+"en": "ASV",
+"flag": "match",
+"why": "“ASV” kısaltmasının hangi anime olduğu belli değil — adını düzeltirsen kapak bulunur.",
+"to": ""
 },
 {
 "type": "anime",
 "title": "Attack on Titan",
 "status": "done",
-"q": "Attack on Titan TV series",
 "cols": [
 "done"
 ],
-"score": "IMDb 9.1"
+"score": "IMDb 9.1",
+"en": "Attack on Titan",
+"y": 2013
 },
 {
 "type": "anime",
 "title": "Chainsaw Man",
 "status": "done",
-"q": "Chainsaw Man anime",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.4"
+"score": "IMDb 8.4",
+"en": "Chainsaw Man",
+"y": 2022
 },
 {
 "type": "anime",
 "title": "Cyberpunk: Edgerunners",
 "status": "done",
-"q": "Cyberpunk: Edgerunners",
 "cols": [
 "done",
 "wait"
 ],
 "score": "IMDb 8.3",
-"note": "yeni sezon bekleniyor"
+"note": "yeni sezon bekleniyor",
+"en": "Cyberpunk: Edgerunners",
+"y": 2022
 },
 {
 "type": "anime",
 "title": "Death Note",
 "status": "done",
-"q": "Death Note TV series",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.9"
+"score": "IMDb 8.9",
+"en": "Death Note",
+"y": 2006
 },
 {
 "type": "anime",
 "title": "Demon Slayer",
 "status": "done",
-"q": "Demon Slayer anime",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.6"
+"score": "IMDb 8.6",
+"en": "Demon Slayer",
+"y": 2019
 },
 {
 "type": "anime",
 "title": "Dr. Stone",
 "status": "done",
-"q": "Dr. Stone anime",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.1"
+"score": "IMDb 8.1",
+"en": "Dr. Stone",
+"y": 2019
 },
 {
 "type": "anime",
 "title": "Erased",
 "status": "done",
-"q": "Erased manga anime",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.5"
+"score": "IMDb 8.5",
+"en": "Erased",
+"y": 2016
 },
 {
 "type": "anime",
 "title": "Frieren",
 "status": "doing",
-"q": "Frieren anime",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.9"
+"score": "IMDb 8.9",
+"en": "Frieren",
+"y": 2023
 },
 {
 "type": "anime",
 "title": "I Want to Eat Your Pancreas",
 "status": "done",
-"q": "I Want to Eat Your Pancreas film",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.1"
+"score": "IMDb 8.1",
+"en": "I Want to Eat Your Pancreas",
+"y": 2018
 },
 {
 "type": "anime",
 "title": "Jujutsu Kaisen",
 "status": "done",
-"q": "Jujutsu Kaisen anime",
 "cols": [
 "done",
 "wait"
 ],
 "score": "IMDb 8.5",
-"note": "son bölüm bekleniyor"
+"note": "son bölüm bekleniyor",
+"en": "Jujutsu Kaisen",
+"y": 2020
 },
 {
 "type": "anime",
 "title": "Monster",
 "status": "done",
-"q": "Monster manga anime",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.7"
+"score": "IMDb 8.7",
+"en": "Monster",
+"y": 2004
 },
 {
 "type": "anime",
 "title": "Naruto",
 "status": "done",
-"q": "Naruto anime",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.4"
+"score": "IMDb 8.4",
+"en": "Naruto",
+"y": 2002
 },
 {
 "type": "anime",
 "title": "Neon Genesis Evangelion",
 "status": "done",
-"q": "Neon Genesis Evangelion",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.5"
+"score": "IMDb 8.5",
+"en": "Neon Genesis Evangelion",
+"y": 1995
 },
 {
 "type": "anime",
 "title": "One Piece",
 "status": "done",
-"q": "One Piece anime",
 "cols": [
 "done",
 "wait"
 ],
 "score": "IMDb 8.4",
-"note": "yeni bölümler bekleniyor"
+"note": "yeni bölümler bekleniyor",
+"en": "One Piece",
+"y": 1999
 },
 {
 "type": "anime",
 "title": "Re:Zero",
 "status": "done",
-"q": "Re:Zero anime",
 "cols": [
 "done",
 "wait"
 ],
 "score": "IMDb 8.1",
-"note": "6. sezon bekleniyor"
+"note": "6. sezon bekleniyor",
+"en": "Re:Zero",
+"y": 2016
 },
 {
 "type": "anime",
 "title": "Solo Leveling",
 "status": "done",
-"q": "Solo Leveling anime",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.3"
+"score": "IMDb 8.3",
+"en": "Solo Leveling",
+"y": 2024
 },
 {
 "type": "anime",
 "title": "Steins;Gate",
 "status": "done",
-"q": "Steins;Gate anime",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.8"
+"score": "IMDb 8.8",
+"en": "Steins;Gate",
+"y": 2011
 },
 {
 "type": "anime",
 "title": "Suzume",
 "status": "done",
-"q": "Suzume film",
 "cols": [
 "done"
 ],
-"score": "IMDb 7.6"
+"score": "IMDb 7.6",
+"en": "Suzume",
+"y": 2022
 },
 {
 "type": "anime",
 "title": "The Disastrous Life of Saiki K.",
 "status": "done",
-"q": "The Disastrous Life of Saiki K.",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.2"
+"score": "IMDb 8.2",
+"en": "The Disastrous Life of Saiki K.",
+"y": 2016
 },
 {
 "type": "anime",
 "title": "Vinland Saga",
 "status": "done",
-"q": "Vinland Saga anime",
 "cols": [
 "done"
 ],
-"score": "IMDb 8.8"
+"score": "IMDb 8.8",
+"en": "Vinland Saga",
+"y": 2019
 },
 {
 "type": "movie",
 "title": "Yeşil Yol",
 "status": "todo",
-"q": "The Green Mile film",
 "cols": [
 "todo"
-]
+],
+"en": "The Green Mile",
+"y": 1999
 },
 {
 "type": "movie",
 "title": "Project Hail Mary",
 "status": "todo",
-"q": "Project Hail Mary film",
 "cols": [
 "todo"
-]
+],
+"en": "Project Hail Mary",
+"y": 2026
 },
 {
 "type": "movie",
 "title": "Matrix",
 "status": "todo",
-"q": "The Matrix",
 "cols": [
 "todo"
-]
+],
+"en": "The Matrix",
+"y": 1999
 },
 {
 "type": "movie",
 "title": "Er Ryan'ı Kurtarmak",
 "status": "todo",
-"q": "Saving Private Ryan",
 "cols": [
 "todo"
-]
+],
+"en": "Saving Private Ryan",
+"y": 1998
 },
 {
 "type": "movie",
 "title": "The Wolf of Wall Street",
 "status": "todo",
-"q": "The Wolf of Wall Street film",
 "cols": [
 "todo"
-]
+],
+"en": "The Wolf of Wall Street",
+"y": 2013
 },
 {
 "type": "movie",
 "title": "Rocky",
 "status": "todo",
-"q": "Rocky film",
 "cols": [
 "todo"
-]
+],
+"en": "Rocky",
+"y": 1976
 },
 {
 "type": "series",
 "title": "Game of Thrones",
 "status": "todo",
-"q": "Game of Thrones",
 "cols": [
 "todo"
-]
+],
+"en": "Game of Thrones",
+"y": 2011
 },
 {
 "type": "series",
 "title": "The Mentalist",
 "status": "todo",
-"q": "The Mentalist",
 "cols": [
 "todo"
-]
+],
+"en": "The Mentalist",
+"y": 2008
 },
 {
 "type": "game",
 "title": "Modern Warfare 4",
 "status": "todo",
-"q": "Call of Duty 4: Modern Warfare",
 "cols": [
 "todo"
-]
+],
+"en": "Call of Duty 4: Modern Warfare",
+"flag": "match",
+"why": "Hangi Call of Duty olduğu belli değil (“Modern Warfare 4” henüz çıkmamış olabilir).",
+"to": ""
 },
 {
 "type": "game",
 "title": "Onimusha",
 "status": "todo",
-"q": "Onimusha: Way of the Sword",
 "cols": [
 "todo"
-]
+],
+"en": "Onimusha: Way of the Sword",
+"flag": "match",
+"why": "Seride çok oyun var; yeni “Way of the Sword” tahmin edildi.",
+"to": ""
 },
 {
 "type": "game",
 "title": "The Blood of Dawnwalker",
 "status": "todo",
-"q": "The Blood of Dawnwalker",
 "cols": [
 "todo"
-]
+],
+"en": "The Blood of Dawnwalker"
 },
 {
 "type": "game",
 "title": "Resident Evil Requiem",
 "status": "todo",
-"q": "Resident Evil Requiem",
 "cols": [
 "todo"
-]
+],
+"en": "Resident Evil Requiem",
+"y": 2026
 },
 {
 "type": "game",
 "title": "007 First Light",
 "status": "todo",
-"q": "007 First Light",
 "cols": [
 "todo"
-]
+],
+"en": "007 First Light",
+"y": 2026
 },
 {
 "type": "game",
 "title": "Uncharted",
 "status": "todo",
-"q": "Uncharted 4: A Thief's End",
 "cols": [
 "todo"
-]
+],
+"en": "Uncharted 4: A Thief's End",
+"y": 2016,
+"flag": "match",
+"why": "Seride çok oyun var (Uncharted 4 tahmin edildi).",
+"to": ""
 },
 {
 "type": "game",
 "title": "Zelda: Breath of the Wild",
 "status": "todo",
-"q": "The Legend of Zelda: Breath of the Wild",
 "cols": [
 "todo"
-]
+],
+"en": "The Legend of Zelda: Breath of the Wild",
+"y": 2017
 },
 {
 "type": "game",
 "title": "Baldur's Gate 3",
 "status": "todo",
-"q": "Baldur's Gate 3",
 "cols": [
 "todo"
-]
+],
+"en": "Baldur's Gate 3",
+"y": 2023
 },
 {
 "type": "game",
 "title": "Elden Ring",
 "status": "todo",
-"q": "Elden Ring",
 "cols": [
 "todo"
-]
+],
+"en": "Elden Ring",
+"y": 2022
 },
 {
 "type": "game",
 "title": "Hades II",
 "status": "todo",
-"q": "Hades II",
 "cols": [
 "todo"
-]
+],
+"en": "Hades II",
+"y": 2025
 },
 {
 "type": "game",
 "title": "Clair Obscur: Expedition 33",
 "status": "todo",
-"q": "Clair Obscur: Expedition 33",
 "cols": [
 "todo"
-]
+],
+"en": "Clair Obscur: Expedition 33",
+"y": 2025
 },
 {
 "type": "game",
 "title": "Bloodborne",
 "status": "todo",
-"q": "Bloodborne",
 "cols": [
 "todo"
-]
+],
+"en": "Bloodborne",
+"y": 2015
 },
 {
 "type": "game",
 "title": "Sekiro",
 "status": "todo",
-"q": "Sekiro: Shadows Die Twice",
 "cols": [
 "todo"
-]
+],
+"en": "Sekiro: Shadows Die Twice",
+"y": 2019
 },
 {
 "type": "game",
 "title": "Ghost of Tsushima",
 "status": "todo",
-"q": "Ghost of Tsushima",
 "cols": [
 "todo"
-]
+],
+"en": "Ghost of Tsushima",
+"y": 2020
 },
 {
 "type": "game",
 "title": "Fallout",
 "status": "todo",
-"q": "Fallout 4",
 "cols": [
 "todo"
-]
+],
+"en": "Fallout 4",
+"flag": "match",
+"why": "Seride çok oyun var; hangisini oynamak istediğin belli değil (Fallout 4 tahmin edildi).",
+"to": ""
 },
 {
 "type": "game",
 "title": "Omori",
 "status": "todo",
-"q": "Omori video game",
 "cols": [
 "todo"
-]
+],
+"en": "Omori",
+"y": 2020
 },
 {
 "type": "game",
 "title": "Diablo",
 "status": "todo",
-"q": "Diablo IV",
 "cols": [
 "todo"
-]
+],
+"en": "Diablo IV",
+"flag": "match",
+"why": "Seride çok oyun var (Diablo IV tahmin edildi).",
+"to": ""
 },
 {
 "type": "anime",
 "title": "Ruhların Kaçışı",
 "status": "todo",
-"q": "Spirited Away",
 "cols": [
 "todo"
-]
+],
+"en": "Spirited Away",
+"y": 2001
 },
 {
 "type": "anime",
 "title": "Cowboy Bebop",
 "status": "todo",
-"q": "Cowboy Bebop",
 "cols": [
 "todo"
-]
+],
+"en": "Cowboy Bebop",
+"y": 1998
 }
 ]
 }

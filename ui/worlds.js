@@ -307,13 +307,13 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
     const c=root.querySelector('.sp-crown'),pc=Math.round(v*100);c.setAttribute('aria-valuenow',pc);c.setAttribute('aria-valuetext','%'+pc);c.querySelector('span').textContent=pc;
     const r=root.querySelector('.sp-imm input');r.value=pc;root.querySelector('.sp-imm b').textContent='%'+pc},
   envp(root,open){const p=root.querySelector('.sp-envp'),b=root.querySelector('[data-sp=envp]');open=open??p.hidden;p.hidden=!open;b.setAttribute('aria-expanded',open);b.classList.toggle('on',open);if(open)p.querySelector('.on,[data-env]')?.focus({preventScroll:true})},
-  center(root){SP.cfg.off={};setTimeout(()=>SP.fit(root),550);SP.save();root.querySelectorAll('.sp-side').forEach(s=>{s.style.removeProperty('--ox');s.style.removeProperty('--oy')});
+  center(root){SP.cfg.off={};requestAnimationFrame(()=>SP.orient(root));setTimeout(()=>SP.fit(root),550);SP.save();root.querySelectorAll('.sp-side').forEach(s=>{s.style.removeProperty('--ox');s.style.removeProperty('--oy')});
     const sc=root.querySelector('.sp-scene');sc.style.setProperty('--rx','0deg');sc.style.setProperty('--ry','0deg');SP.rotTo(root,0);if(SP.cfg.mode==='izgara')SP.goTo(root,0);
     if(!calmMotion())root.querySelector('.sp-scene').animate([{transform:'scale(.94)',opacity:.6},{transform:'none',opacity:1}],{duration:500,easing:'cubic-bezier(.16,1,.3,1)'})},
   find(root,ch){clearTimeout(SP.bt);SP.buf+=ch;SP.bt=setTimeout(()=>{SP.buf='';root.querySelector('.sp-find').classList.remove('on')},900);
     const q=SP.buf.toLocaleLowerCase('tr-TR'),apps=SP.list,i=apps.findIndex(a=>a.name.toLocaleLowerCase('tr-TR').startsWith(q)),j=i<0?apps.findIndex(a=>a.name.toLocaleLowerCase('tr-TR').includes(q)):i;
     const f=root.querySelector('.sp-find');f.innerHTML=`<kbd>${esc(SP.buf)}</kbd> ${j<0?'<span>bulunamadı</span>':esc(apps[j].name)}`;f.classList.add('on');if(j>=0)SP.goTo(root,j)},
-  mount(root){SP.deg=0;SP.layout(root);SP.light(root);if(SP.renameKey){const k=SP.renameKey;SP.renameKey=null;setTimeout(()=>{const gi=SP.G.findIndex(g=>g.apps.some(x=>x.key===k)),l=root.querySelector(`.sp-gh[data-g="${gi}"]`)||root.querySelector(`.sp-gt[data-g="${gi}"]`);if(l&&root.isConnected)SP.rename(root,gi,l)},60)}if(SP.keep){const i=SP.list.findIndex(a=>a.key===SP.keep);if(i>=0){SP.deg=SP.ang[i];SP.sel=i;SP.apply(root)}SP.keep=null}SP.env(root,SP.cfg.env);SP.imm(root,SP.cfg.imm,1);SP.mode(root,SP.cfg.mode);
+  mount(root){SP.deg=0;SP.layout(root);SP.light(root);requestAnimationFrame(()=>SP.orient(root));if(SP.renameKey){const k=SP.renameKey;SP.renameKey=null;setTimeout(()=>{const gi=SP.G.findIndex(g=>g.apps.some(x=>x.key===k)),l=root.querySelector(`.sp-gh[data-g="${gi}"]`)||root.querySelector(`.sp-gt[data-g="${gi}"]`);if(l&&root.isConnected)SP.rename(root,gi,l)},60)}if(SP.keep){const i=SP.list.findIndex(a=>a.key===SP.keep);if(i>=0){SP.deg=SP.ang[i];SP.sel=i;SP.apply(root)}SP.keep=null}SP.env(root,SP.cfg.env);SP.imm(root,SP.cfg.imm,1);SP.mode(root,SP.cfg.mode);
     root.querySelectorAll('.sp-side').forEach(s=>{const o=SP.cfg.off[s.dataset.side];if(o){s.style.setProperty('--ox',o[0]+'px');s.style.setProperty('--oy',o[1]+'px')}});
     const ring=root.querySelector('.sp-ring'),scene=root.querySelector('.sp-scene'),stage=root.querySelector('.sp-stage'),crown=root.querySelector('.sp-crown');
     root.addEventListener('click',e=>{const r=e.target.closest('[data-rot]');if(r)return SP.cfg.mode==='izgara'?SP.goTo(root,(SP.sel+(+r.dataset.rot)+SP.n)%SP.n):SP.turn(root,+r.dataset.rot);
@@ -330,11 +330,11 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
     stage.addEventListener('pointerdown',e=>{if(e.button||e.target.closest('.sp-side,.sp-hi,.sp-gt'))return;st={x:e.clientX,d:SP.deg,id:e.pointerId};SP.dragged=false});
     root.querySelectorAll('.sp-grab').forEach(g=>{const s=g.closest('.sp-side');
       g.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();g.setPointerCapture(e.pointerId);const o=SP.cfg.off[s.dataset.side]||[0,0];gr={s,x:e.clientX-o[0],y:e.clientY-o[1],id:e.pointerId};s.classList.add('moving')});
-      g.addEventListener('dblclick',()=>{delete SP.cfg.off[s.dataset.side];SP.save();s.style.removeProperty('--ox');s.style.removeProperty('--oy')})});
+      g.addEventListener('dblclick',()=>{delete SP.cfg.off[s.dataset.side];SP.save();requestAnimationFrame(()=>SP.orient(root));s.style.removeProperty('--ox');s.style.removeProperty('--oy')})});
     crown.addEventListener('pointerdown',e=>{crown.setPointerCapture(e.pointerId);cr={y:e.clientY,v:SP.cfg.imm,id:e.pointerId,moved:false}});
     crown.addEventListener('wheel',e=>{e.preventDefault();SP.imm(root,SP.cfg.imm-e.deltaY*.0012)},{passive:false});
     addEventListener('pointermove',SP.pm=e=>{
-      if(gr&&gr.id===e.pointerId){const x=Math.round(e.clientX-gr.x),y=Math.round(e.clientY-gr.y);gr.s.style.setProperty('--ox',x+'px');gr.s.style.setProperty('--oy',y+'px');SP.cfg.off[gr.s.dataset.side]=[x,y];return}
+      if(gr&&gr.id===e.pointerId){const x=Math.round(e.clientX-gr.x),y=Math.round(e.clientY-gr.y);gr.s.style.setProperty('--ox',x+'px');gr.s.style.setProperty('--oy',y+'px');SP.cfg.off[gr.s.dataset.side]=[x,y];SP.orient(root);return}
       if(cr&&cr.id===e.pointerId){const dy=cr.y-e.clientY;if(Math.abs(dy)>3)cr.moved=true;if(cr.moved)SP.imm(root,cr.v+dy/220);return}
       if(st&&st.id===e.pointerId&&SP.cfg.mode==='halka'&&!SP.lift){const dx=e.clientX-st.x;if(Math.abs(dx)>6){SP.dragged=true;ring.style.transition='none';SP.deg=st.d-dx/(mobile()?160:260)*SP.step;SP.apply(root)}}
       if(e.pointerType!=='mouse'||calmMotion()||SP.raf)return;
@@ -426,7 +426,12 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
     else if(iz&&(k==='ArrowDown'||k==='ArrowUp')){e.preventDefault();const p=SP.pos[SP.sel],dn=k==='ArrowDown';let bi=-1,bs=1e9;SP.pos.forEach((q,i)=>{const dy=q.y-p.y;if(dn?dy>20:dy<-20){const sc=Math.abs(dy)+Math.abs(q.x-p.x)*2;if(sc<bs){bs=sc;bi=i}}});if(bi>=0)SP.goTo(root,bi)}
     else if(k==='Enter'&&!e.target.closest?.('button')){e.preventDefault();const a=SP.list[SP.sel];a&&H().open(a.key)}
     else if(k.length===1&&/\p{L}/u.test(k)){e.preventDefault();SP.find(root,k)}},
-  resize(root){SP.layout(root)},
+  /* yan pencereler bulundukları yere göre sana döner (visionOS gibi): solda sağa, sağda sola, ortada karşıya bakar */
+  orient(root){const cx=innerWidth/2,cy=innerHeight*.44;root.querySelectorAll('.sp-side').forEach(s=>{if(!s.offsetParent)return;
+    const o=SP.cfg.off[s.dataset.side]||[0,0],xc=s.offsetLeft+s.offsetWidth/2+o[0],yc=s.offsetTop+s.offsetHeight/2+o[1],
+      ry=Math.max(-34,Math.min(34,-(xc-cx)/(innerWidth/2)*34)),rx=Math.max(-14,Math.min(14,(yc-cy)/(innerHeight/2)*14));
+    s.style.setProperty('--sry',ry.toFixed(1)+'deg');s.style.setProperty('--srx',rx.toFixed(1)+'deg')})},
+  resize(root){SP.layout(root);SP.orient(root)},
   /* imleç ışığı: galaksideki çekim gibi yumuşak takip, ama sadece ışık */
   light(root){const Ls=root.querySelector('.sp-light'),L=SP.L={x:innerWidth/2,y:innerHeight/2,tx:innerWidth/2,ty:innerHeight/2,a:0,ta:0,raf:0};
     const els=()=>[...root.querySelectorAll('.sp-win,.sp-glass,.sp-hb,.sp-gt,.sp-orn,.sp-crown,.sp-cap')].filter(e=>e.offsetParent&&getComputedStyle(e).visibility!=='hidden');

@@ -1009,5 +1009,28 @@
     "text": "Yeni efektler 60 FPS'te çalışıyor; hafif modda yıldız sayısı ve iz ayrıntısı azalıyor, animasyon kapalıyken yıldızlar duruyor"
    }
   ]
+ },
+ {
+  "at": "2026-11-14T13:03:01",
+  "change": "Mekânsal: yan pencereler (Bugün, Son sayfalar) bulundukları yere göre sana dönüyor; sola taşıyınca sağa, sağa taşıyınca sola, ortada karşıya bakıyor",
+  "scores": {
+   "Mekânsal telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Mekânsal masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Mekânsal",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Taşınan yan pencereler hep aynı yöne bakıyordu",
+    "fix": "Açı pencerenin ekrandaki yerine göre hesaplanıyor"
+   }
+  ]
  }
 ]

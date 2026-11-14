@@ -356,7 +356,7 @@ body.locked .world{display:none}
 @keyframes spPop{from{opacity:0;translate:0 0 -260px}}
 /* yan pencereler: taşınır, bakınca öne gelir */
 .sp-side{position:absolute;top:18%;width:250px;pointer-events:auto;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.16,1,.3,1)}
-.sp-left{left:4%;transform:translate3d(var(--ox,0px),var(--oy,0px),var(--oz,-80px)) rotateY(22deg)}.sp-right{right:4%;transform:translate3d(var(--ox,0px),var(--oy,0px),var(--oz,-80px)) rotateY(-22deg)}
+.sp-left{left:4%;transform:translate3d(var(--ox,0px),var(--oy,0px),var(--oz,-80px)) rotateY(var(--sry,22deg)) rotateX(var(--srx,0deg))}.sp-right{right:4%;transform:translate3d(var(--ox,0px),var(--oy,0px),var(--oz,-80px)) rotateY(var(--sry,-22deg)) rotateX(var(--srx,0deg))}
 .sp-side:hover,.sp-side:focus-within{--oz:-10px}.sp-side.moving{transition:none;--oz:20px}
 .sp[data-mode=izgara] .sp-side{--oz:-160px;opacity:.85}
 .sp-grab{display:block;width:120px;height:32px;margin:6px auto 0;border-radius:999px;cursor:grab;touch-action:none;position:relative}

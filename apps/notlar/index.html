@@ -455,6 +455,7 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
 .top .modes a{height:30px;padding:0 11px}
 .tb.tsrch{margin-left:auto}
 #saved{order:0}
+.tb.sbt{width:34px;height:34px;border-radius:10px;color:var(--ink2);flex-shrink:0}.tb.sbt:hover,.tb.sbt.on{color:var(--ink);background:color-mix(in srgb,var(--ink) 7%,transparent)}
 .crumbbar{max-width:752px;margin:0 auto;padding:10px 0 0;min-height:12px}.crumbbar .crumb{margin-left:-6px}
 .crumbbar .crumb{flex:none;min-height:28px}
 .app[data-mode=lib] .crumbbar,.app[data-mode=brain] .crumbbar{display:none}
@@ -467,7 +468,7 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
 .tb.burger{display:none!important}
 @media (max-width:1100px){.tnav a span,.tnav button span{display:none}.tnav .on span{display:inline}}
 @media (max-width:760px){.top{height:54px;gap:4px;padding:0 6px}.tnav a,.tnav button,.top .modes a{height:40px;min-width:40px;padding:0 10px;justify-content:center}.tnav .on span,.top .modes a span{display:none}.tnav .li,.top .modes .li{width:17px;height:17px}
-  .tb.tsrch{width:40px;height:40px}.side{top:62px;left:6px;bottom:6px}#saved{display:none}.app.drawer .scrim{background:rgba(0,0,0,.18)}.crumbbar{padding:8px 20px 0}}
+  .tb.tsrch,.tb.sbt{width:40px;height:40px}.side{top:62px;left:6px;bottom:6px}#saved{display:none}.app.drawer .scrim{background:rgba(0,0,0,.18)}.crumbbar{padding:8px 20px 0}}
 @media (max-width:420px){.tnav a,.tnav button,.top .modes a{padding:0 8px;min-width:38px}.tb.tsrch{margin-left:0}}
 @media (prefers-reduced-motion:reduce){.tnav .tk,.side{transition:none}}
 </style>
@@ -487,10 +488,10 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
   <main class="main">
     <header class="top" id="top">
       <button class="tb burger" id="burger" title="Menü" hidden><svg class="i" viewBox="0 0 16 16"><path d="M2.5 5h11M2.5 11h11"/></svg></button>
+      <button class="tb sbt" id="sbt" title="Sayfalar paneli" aria-label="Sayfalar paneli" aria-expanded="false" aria-controls="side"><svg class="i" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" rx="2.5"/><path d="M6 3v10"/></svg></button>
       <nav class="tnav" id="tnav" aria-label="Ana gezinme"><i class="tk"></i>
-        <a href="#home" data-tn="home" title="Ana Sayfa"><svg class="li" viewBox="0 0 16 16"><path d="M2.5 7.2L8 2.8l5.5 4.4V13a.5.5 0 0 1-.5.5H9.5V10h-3v3.5H3a.5.5 0 0 1-.5-.5z"/></svg><span>Ana Sayfa</span></a>
         <a href="#todo" data-tn="todo" title="Yapılacaklar"><svg class="li" viewBox="0 0 16 16"><rect x="2.5" y="2.5" width="11" height="11" rx="3"/><path d="M5.5 8.2l1.8 1.8 3.4-3.6"/></svg><span>Yapılacaklar</span></a>
-        <button type="button" data-tn="notes" title="Notlar — sayfaların" aria-expanded="false" aria-controls="side"><svg class="li" viewBox="0 0 16 16"><path d="M4 2h5.5L12 4.5V14H4z"/><path d="M9.5 2v2.5H12M6 8h4M6 10.5h4"/></svg><span>Notlar</span></button>
+        <a href="#home" data-tn="notes" title="Notlar — ana sayfa"><svg class="li" viewBox="0 0 16 16"><path d="M4 2h5.5L12 4.5V14H4z"/><path d="M9.5 2v2.5H12M6 8h4M6 10.5h4"/></svg><span>Notlar</span></a>
         <a href="../istatistik/" data-tn="stats" title="İstatistikler"><svg class="li" viewBox="0 0 16 16"><path d="M3 13.5V8.5M6.5 13.5V4.5M10 13.5V7M13.5 13.5V2.5"/></svg><span>İstatistikler</span></a>
         <a href="#brain" data-tn="ai" title="AI Center — Second Brain ve yapay zekâ önerileri"><svg class="li" viewBox="0 0 16 16"><path d="M8 1.8l1.5 3.7 3.7 1.5-3.7 1.5L8 12.2 6.5 8.5 2.8 7l3.7-1.5z"/><path d="M12.8 11.3l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z"/></svg><span>AI Center</span></a>
       </nav>
@@ -745,7 +746,7 @@ function renderSide(){
   const op=openId&&pages.get(openId);if(op)for(const a of ancestors(op))treeOpen.add(a.id);
   const hasToday=all.some(p=>p.tpl==='daily'&&p.date===today());
   $('#nav').innerHTML=`<div class="hl" id="hl"></div>`+
-    navItem('#home',IC.home,'Ana sayfa',view==='home')+
+    navItem('#home',IC.home,'Notlar',view==='home')+
     navItem('#today',IC.sun,'Bugün',view==='page'&&pages.get(openId)?.tpl==='daily'&&pages.get(openId)?.date===today(),hasToday?'':'<span class="cnt">+</span>')+
     navItem('#cal',IC.cal,'Takvim',view==='cal')+
     navItem('#timeline',IC.tl,'Zaman çizelgesi',view==='timeline')+
@@ -777,12 +778,12 @@ $('#burger').onclick=()=>$('#app').classList.add('drawer');
 /* üst gezinme: Ana Sayfa · Yapılacaklar · Notlar (sayfa paneli) · İstatistikler · AI Center */
 function openPages(){const app=$('#app');if(curMode!=='ws'){go(lastWs);setTimeout(()=>app.classList.add('drawer'),60)}else app.classList.toggle('drawer');tnavPaint()}
 $('#tnav').addEventListener('click',e=>{const t=e.target.closest('[data-tn]');if(!t)return;
-  if(t.dataset.tn==='notes'){e.preventDefault();openPages();return}
   if(t.dataset.tn==='stats'){e.preventDefault();try{if(window.parent!==window&&parent.HUB?.open){parent.HUB.open('p:istatistik');return}}catch{}location.href='../istatistik/'+(CLOUD?'':'?local')}});
 $('#topSrch').onclick=()=>palette();
+$('#sbt').onclick=openPages;
 function tnavPaint(){const p=openId&&pages.get(openId),dr=$('#app').classList.contains('drawer');
-  const cur=curMode==='brain'?'ai':curMode==='lib'?'':dr?'notes':view==='home'?'home':p&&(p.tpl==='todo'||(p.tpl==='daily'&&p.date===today()))?'todo':view==='page'||view==='cal'||view==='timeline'||view==='tpl'?'notes':'';
-  $$('#tnav [data-tn]').forEach(a=>{const on=a.dataset.tn===cur;a.classList.toggle('on',on);on?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current')});$('#tnav [data-tn=notes]').setAttribute('aria-expanded',dr);
+  const cur=curMode==='brain'?'ai':curMode==='lib'?'':p&&(p.tpl==='todo'||(p.tpl==='daily'&&p.date===today()))?'todo':'notes';
+  $$('#tnav [data-tn]').forEach(a=>{const on=a.dataset.tn===cur;a.classList.toggle('on',on);on?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current')});$('#sbt').setAttribute('aria-expanded',dr);$('#sbt').classList.toggle('on',dr);
   const on=$('#tnav .on'),k=$('#tnav .tk');if(k){k.style.opacity=on?1:0;if(on){k.style.width=on.offsetWidth+'px';k.style.transform=`translateX(${on.offsetLeft}px)`}}}
 addEventListener('resize',tnavPaint);
 $('#scrim').onclick=closeDrawer;
@@ -800,12 +801,12 @@ function renderView(soft){
 const sc=$('#scroll');
 function onScroll(){$('#top').style.setProperty('--topline',sc.scrollTop>4?1:0)}
 sc.addEventListener('scroll',()=>{onScroll();hideFloat(true)},{passive:true});
-function setCrumb(ic,label,act=''){$('#crumb').innerHTML=`<span class="ic">${ic}</span><span>${esc(label)}</span>`;$('#topAct').innerHTML=act}
+function setCrumb(ic,label,act=''){$('#crumb').innerHTML=label?`<span class="ic">${ic}</span><span>${esc(label)}</span>`:'';$('#topAct').innerHTML=act}
 
 /* Home */
 function greet(){const h=new Date().getHours();return h<6?'İyi geceler':h<12?'Günaydın':h<18?'İyi günler':'İyi akşamlar'}
 function renderHome(){
-  setCrumb(IC.home,'Ana sayfa');
+  setCrumb('','');
   const t=today(),all=sorted();
   const daily=all.find(p=>p.tpl==='daily'&&p.date===t);
   const open=daily?daily.blocks.filter(b=>b.t==='todo'&&!b.c&&plain(b.h).trim()).length:0;
@@ -1467,7 +1468,7 @@ function palette(){
     {ic:'🗓️',l:'Takvim',run:()=>go('#cal')},
     {ic:'🧭',l:'Zaman çizelgesi',run:()=>go('#timeline')},
     {ic:'🧩',l:'Şablonlar',run:()=>go('#tpl')},
-    {ic:'🏠',l:'Ana sayfa',run:()=>go('#home')},
+    {ic:'🏠',l:'Notlar',run:()=>go('#home')},
     {ic:'📚',l:'Library',run:()=>go('#lib')},
     {ic:'➕',l:'Library’ye içerik ekle',run:()=>{go('#lib');setTimeout(()=>Library.addSheet(),60)}},
     {ic:'🕸️',l:'Second Brain — bilgi grafiği',run:()=>go('#brain')},

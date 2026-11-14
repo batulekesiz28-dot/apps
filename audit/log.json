@@ -1548,5 +1548,16 @@
     "fix": "Uygulama adresine 5 dakikada bir değişen ?v= eki"
    }
   ]
+ },
+ {
+  "at": "2026-11-14T22:05:00",
+  "change": "Notlar: 'Ana Sayfa' kaldırıldı, Notlar ana sayfa oldu; sayfa paneli soldaki küçük panel düğmesiyle açılıyor",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": []
  }
 ]

@@ -861,5 +861,28 @@
     "fix": "Boş 3B katmanlar tıklamayı geçiriyor"
    }
   ]
+ },
+ {
+  "at": "2026-11-14T10:53:02",
+  "change": "Mekânsal: uygulamalar galaksideki gruplara göre yan yana diziliyor (halkada grup boşlukları ve adları, ızgarada küme başlıkları)",
+  "scores": {
+   "Mekânsal telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Mekânsal masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Mekânsal",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Gruplar arası boşlukla halka genişleyince uçtaki camlar yan pencerelere biniyordu",
+    "fix": "Geniş ekranda sadece öndeki ve komşuları görünüyor"
+   }
+  ]
  }
 ]

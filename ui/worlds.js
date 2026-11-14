@@ -41,7 +41,7 @@ function D(){const h=H(),now=new Date(),k=h.dayKey(now);
     days.push({d,k:dk,m:i===0?today:Math.round((st.sess||[]).reduce((a,s)=>a+(s.date===dk?s.min||0:0),0))})}
   const items=(h.items()||[]).filter(x=>x.k!=='apps'&&x.k!=='today');
   const focus=items.find(x=>x.k==='focus');
-  return{now,apps,todos,notes,today,goal,days,items,focus,open:todos.filter(t=>!t.done).length,week:days.slice(-7).reduce((a,x)=>a+x.m,0)}}
+  return{now,apps,groups:(h.groups?h.groups():[])||[],todos,notes,today,goal,days,items,focus,open:todos.filter(t=>!t.done).length,week:days.slice(-7).reduce((a,x)=>a+x.m,0)}}
 const ago=t=>{if(!t)return'';const m=Math.round((Date.now()-t)/6e4);return m<1?'az önce':m<60?m+' dk önce':m<1440?Math.round(m/60)+' sa önce':Math.round(m/1440)+' gün önce'};
 const appIcon=(a,cls='')=>`<span class="w-ic ${cls}" style="${a.ic.style}">${a.ic.html}</span>`;
 
@@ -211,11 +211,15 @@ const SW={
 /* ═════════════ 5 · MEKÂNSAL ═════════════
    visionOS/Horizon'dan: dalma kadranı (Digital Crown), ortamlar, ana görünüm, taşınabilir pencereler, ortala. */
 const SPK='appshell:sp',SPD={env:'studyo',imm:.8,last:.8,mode:'halka',off:{}};
-const SP={rot:0,n:1,sel:0,buf:'',
+const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
+  order(d){const by=new Map(d.apps.map(a=>[a.key,a])),gs=d.groups.map(g=>({id:g.id,name:g.name,color:g.color,apps:g.keys.map(k=>by.get(k)).filter(Boolean)})).filter(g=>g.apps.length),
+      seen=new Set(gs.flatMap(g=>g.apps.map(a=>a.key))),rest=d.apps.filter(a=>!seen.has(a.key));
+    if(rest.length){const o=gs.find(g=>g.id==='_other');o?o.apps.push(...rest):gs.push({id:'_other',name:gs.length?'Diğer':'Uygulamalar',color:'#8E8E99',apps:rest})}
+    let i=0;gs.forEach((g,gi)=>g.apps.forEach(a=>{a.gi=gi;a.si=i++}));SP.G=gs;SP.list=gs.flatMap(g=>g.apps);return gs},
   cfg:(()=>{try{return Object.assign({},SPD,JSON.parse(localStorage.getItem(SPK))||{})}catch{return{...SPD}}})(),
   save(){clearTimeout(SP.st);SP.st=setTimeout(()=>{try{localStorage.setItem(SPK,JSON.stringify(SP.cfg))}catch{}},250)},
   ENVS:[['studyo','Stüdyo'],['gece','Gece'],['gol','Gün batımı'],['jupiter','Jüpiter']],
-  html:d=>`<div class="sp" data-env="${SP.cfg.env}" data-mode="${SP.cfg.mode}">
+  html:d=>{SP.order(d);return`<div class="sp" data-env="${SP.cfg.env}" data-mode="${SP.cfg.mode}">
     <div class="sp-env" aria-hidden="true"><div class="sp-room"></div>
       <div class="sp-scenery"><div class="env env-studyo"><i class="o1"></i><i class="o2"></i></div>
         <div class="env env-gece"><i class="stars"></i><i class="moon"></i><i class="mtn"></i></div>
@@ -224,8 +228,9 @@ const SP={rot:0,n:1,sel:0,buf:'',
         <div class="sp-floor"></div></div></div>
     <div class="sp-stage"><div class="sp-scene">
       <aside class="sp-side sp-left" data-side="left"><div data-live="today"></div><button class="sp-grab" aria-label="Bugün penceresini taşı (çift tık: yerine koy)"></button></aside>
-      <div class="sp-ringw"><div class="sp-shadow" aria-hidden="true"></div><div class="sp-ring" role="listbox" aria-label="Uygulamalar halkası">${d.apps.map((a,i)=>`<button class="sp-win" role="option" data-i="${i}" data-key="${esc(a.key)}"><span class="sp-ic">${appIcon(a)}</span><b>${esc(a.name)}</b><small>${esc(a.desc.slice(0,80))}</small></button>`).join('')}</div></div>
-      <div class="sp-home" role="list" aria-label="Ana görünüm">${d.apps.map((a,i)=>`<button class="sp-hi" role="listitem" data-i="${i}" data-key="${esc(a.key)}" title="${esc(a.desc)}"><span class="sp-hb">${appIcon(a)}</span><b>${esc(a.name)}</b></button>`).join('')}</div>
+      <div class="sp-ringw"><div class="sp-shadow" aria-hidden="true"></div><div class="sp-ring" role="listbox" aria-label="Gruplara göre uygulamalar halkası">${SP.list.map((a,i)=>{const g=SP.G[a.gi];return`<button class="sp-win" role="option" data-i="${i}" data-key="${esc(a.key)}" style="--gc:${esc(g.color)}" aria-label="${esc(a.name)} — ${esc(g.name)}"><em class="sp-tag"><i></i>${esc(g.name)}</em><span class="sp-ic">${appIcon(a)}</span><b>${esc(a.name)}</b><small>${esc(a.desc.slice(0,80))}</small></button>`}).join('')}
+        ${SP.G.length>1?SP.G.map((g,gi)=>`<button class="sp-gt" data-g="${gi}" style="--gc:${esc(g.color)}" tabindex="-1"><i></i>${esc(g.name)}<small>${g.apps.length}</small></button>`).join(''):''}</div></div>
+      <div class="sp-home" role="list" aria-label="Ana görünüm, gruplara göre">${SP.G.length>1?SP.G.map((g,gi)=>`<p class="sp-gh" data-g="${gi}" style="--gc:${esc(g.color)}"><i></i>${esc(g.name)}</p>`).join(''):''}${SP.list.map((a,i)=>`<button class="sp-hi" role="listitem" data-i="${i}" data-key="${esc(a.key)}" title="${esc(a.desc)}" style="--gc:${esc(SP.G[a.gi].color)}"><span class="sp-hb">${appIcon(a)}</span><b>${esc(a.name)}</b></button>`).join('')}</div>
       <aside class="sp-side sp-right" data-side="right"><div data-live="notes"></div><button class="sp-grab" aria-label="Son sayfalar penceresini taşı (çift tık: yerine koy)"></button></aside></div></div>
     <div class="sp-find" aria-live="polite"></div>
     <div class="sp-cap" aria-live="polite"></div>
@@ -236,31 +241,46 @@ const SP={rot:0,n:1,sel:0,buf:'',
       <button class="sp-recenter" data-sp="center">Ortala <kbd>0</kbd></button></div>
     <nav class="sp-orn" aria-label="Mekânsal gezinme"><button data-rot="-1" class="sp-arr" aria-label="Önceki uygulama">‹</button>
       <span class="sp-seg" role="group" aria-label="Görünüm"><button data-sp="halka" aria-pressed="false">Halka</button><button data-sp="izgara" aria-pressed="false">Izgara</button></span>
-      <button data-act="ara">Ara</button><button data-act="today">Bugün</button><button data-sp="envp" aria-expanded="false">Ortam</button><button data-act="world">Arayüz</button><button data-rot="1" class="sp-arr" aria-label="Sonraki uygulama">›</button></nav></div>`,
+      <button data-act="ara">Ara</button><button data-act="today">Bugün</button><button data-sp="envp" aria-expanded="false">Ortam</button><button data-act="world">Arayüz</button><button data-rot="1" class="sp-arr" aria-label="Sonraki uygulama">›</button></nav></div>`},
   live:{
     today:d=>{const r=[...d.items.map(x=>[x.t,x.sub]),...d.todos.map(t=>[t.t,t.done?'oldu':'açık'])].slice(0,5);
       return`<div class="sp-glass"><p class="sp-k">Bugün</p><p class="sp-t" data-clock="hm"></p><p class="sp-s">${esc(trDate(d.now,{weekday:'long',day:'numeric',month:'long'}))}</p>
       <div class="sp-ring2" style="--p:${Math.min(1,d.goal?d.today/d.goal:0)}"><span>${fmt(d.today)}</span></div>
       <ul class="sp-l">${r.map(([t,s])=>`<li><span>${esc(t)}</span><small>${esc(s||'')}</small></li>`).join('')||'<li><span>Bugün boş</span></li>'}</ul></div>`},
     notes:d=>`<div class="sp-glass"><p class="sp-k">Son sayfalar</p><ul class="sp-l">${d.notes.slice(0,5).map(n=>`<li><button data-note="${esc(n.id)}"><span>${esc(n.icon)} ${esc(n.title)}</span><small>${ago(n.up)}</small></button></li>`).join('')||'<li><span>Henüz sayfa yok</span></li>'}</ul></div>`},
-  /* halka */
-  layout(root){const ws=[...root.querySelectorAll('.sp-win')],n=SP.n=ws.length||1,m=mobile(),w=m?200:250,R=Math.max(m?230:340,(w+(m?18:46))*n/(2*Math.PI));
+  /* halka: aynı gruptakiler yan yana, gruplar arası boşluk */
+  layout(root){const ws=[...root.querySelectorAll('.sp-win')],n=SP.n=ws.length||1,m=mobile(),w=m?200:250,gap=SP.G.length>1?.7:0,slots=n+gap*SP.G.length,step=SP.step=360/slots,
+      R=Math.max(m?230:340,(w+(m?18:46))*slots/(2*Math.PI));
     root.style.setProperty('--R',R+'px');root.style.setProperty('--pw',w+'px');
-    ws.forEach((el,i)=>{el.style.transform=`rotateY(${i*360/n}deg) translateZ(${R}px) rotateX(var(--tx,0deg)) rotateY(var(--ty,0deg))`});
+    let p=0;SP.ang=[];SP.G.forEach(g=>{const a0=p*step;g.apps.forEach(()=>{SP.ang.push(p*step);p++});g.mid=(a0+(p-1)*step)/2;p+=gap});
+    ws.forEach((el,i)=>{el.style.transform=`rotateY(${SP.ang[i]}deg) translateZ(${R}px) rotateX(var(--tx,0deg)) rotateY(var(--ty,0deg))`});
+    root.querySelectorAll('.sp-gt').forEach(el=>{el.style.transform=`rotateY(${SP.G[+el.dataset.g].mid}deg) translateZ(${R+30}px) translate(-50%,${m?-168:-200}px)`});
     SP.home(root);SP.apply(root)},
-  front:()=>((Math.round(SP.rot)%SP.n)+SP.n)%SP.n,
-  apply(root){const n=SP.n,ring=root.querySelector('.sp-ring');ring.style.transform=`translateZ(calc(var(--R) * -1)) rotateY(${-SP.rot*360/n}deg)`;
-    const f=SP.front();root.querySelectorAll('.sp-win').forEach((el,i)=>{let a=Math.abs(((i-SP.rot)%n+n)%n);a=Math.min(a,n-a);const k=Math.min(1,a/(n/2));
-      const far=a>n/4+.01,side=i!==f&&mobile();el.style.opacity=(1-k*.3).toFixed(2);el.style.visibility=far?'hidden':'';el.style.pointerEvents=side?'none':'';el.classList.toggle('front',i===f);
+  dist:a=>Math.abs(((a-SP.deg)%360+540)%360-180),
+  front:()=>SP.f,
+  apply(root){const ring=root.querySelector('.sp-ring');ring.style.transform=`translateZ(calc(var(--R) * -1)) rotateY(${-SP.deg}deg)`;
+    let f=0,best=1e9;SP.ang.forEach((a,i)=>{const d=SP.dist(a);if(d<best){best=d;f=i}});SP.f=f;
+    root.querySelectorAll('.sp-win').forEach((el,i)=>{const a=SP.dist(SP.ang[i]),k=Math.min(1,a/180);
+      const far=a>(innerWidth>=900?Math.max(50,SP.step*1.6):92),side=i!==f&&mobile();el.style.opacity=(1-k*.3).toFixed(2);el.style.visibility=far?'hidden':'';el.style.pointerEvents=side?'none':'';el.classList.toggle('front',i===f);
       if(i!==f){el.setAttribute('aria-hidden','true');el.style.removeProperty('--tx');el.style.removeProperty('--ty')}else el.removeAttribute('aria-hidden');el.setAttribute('aria-selected',i===f);el.tabIndex=i===f?0:-1});
+    root.querySelectorAll('.sp-gt').forEach(el=>{const gi=+el.dataset.g,a=SP.dist(SP.G[gi].mid);el.style.visibility=a>(innerWidth>=900?45:70)?'hidden':'';el.style.opacity=(1-Math.min(1,a/60)*.5).toFixed(2);el.classList.toggle('on',SP.list[f]?.gi===gi)});
     if(SP.cfg.mode==='halka'){SP.sel=f;SP.cap(root)}},
-  cap(root){const a=D().apps[SP.sel];root.querySelector('.sp-cap').innerHTML=a?`<b>${esc(a.name)}</b><span>${esc(a.desc)}</span><button data-app="${esc(a.key)}" class="sp-open">Aç ↵</button>`:''},
-  turn(root,dx){SP.rot=Math.round(SP.rot)+dx;SP.apply(root)},
-  goTo(root,i){if(SP.cfg.mode==='izgara'){SP.sel=i;root.querySelectorAll('.sp-hi')[i]?.focus({preventScroll:true});SP.cap(root);return}let dl=((i-SP.front())%SP.n+SP.n)%SP.n;if(dl>SP.n/2)dl-=SP.n;SP.turn(root,dl)},
+  cap(root){const a=SP.list[SP.sel],g=a&&SP.G[a.gi];root.querySelector('.sp-cap').innerHTML=a?`<b>${esc(a.name)}</b><span>${SP.G.length>1?`<em style="--gc:${esc(g.color)}"><i></i>${esc(g.name)}</em> `:''}${esc(a.desc)}</span><button data-app="${esc(a.key)}" class="sp-open">Aç ↵</button>`:''},
+  rotTo(root,i){SP.deg+=((SP.ang[i]-SP.deg)%360+540)%360-180;SP.apply(root)},
+  turn(root,dx){SP.rotTo(root,(SP.f+dx+SP.n)%SP.n)},
+  goTo(root,i){if(SP.cfg.mode==='izgara'){SP.sel=i;root.querySelectorAll('.sp-hi')[i]?.focus({preventScroll:true});SP.cap(root);return}SP.rotTo(root,i)},
   /* ana görünüm: hafif kavisli petek */
-  home(root){const it=[...root.querySelectorAll('.sp-hi')],n=it.length,m=mobile(),cols=m?3:Math.min(5,Math.max(3,Math.ceil(Math.sqrt(n*1.7)))),sx=m?104:150,sy=m?120:150,rows=Math.ceil(n/cols);
-    it.forEach((el,i)=>{const r=Math.floor(i/cols),c=i%cols,inRow=Math.min(cols,n-r*cols),x=(c-(inRow-1)/2)*sx,y=(r-(rows-1)/2)*sy,u=x/(sx*cols/2);
-      el.style.transform=`translate3d(${x}px,${y}px,${(-u*u*(m?40:110)).toFixed(0)}px) rotateY(${(-u*(m?10:18)).toFixed(1)}deg)`;el.style.setProperty('--d',(i*45)+'ms')})},
+  home(root){const m=mobile(),sx=m?100:140,sy=m?116:140,lh=m?32:42,gx=m?18:64,gy=m?14:30,maxW=m?330:Math.max(560,Math.min(1120,innerWidth*.6)),multi=SP.G.length>1;
+    const bl=SP.G.map(g=>{const c=Math.min(m?3:(multi?3:5),g.apps.length),rw=Math.ceil(g.apps.length/c);return{g,c,w:c*sx,h:(multi?lh:0)+rw*sy}});
+    const rows=[];let cur=[],cw=0;bl.forEach(b=>{if(cur.length&&cw+gx+b.w>maxW){rows.push(cur);cur=[];cw=0}cw+=(cur.length?gx:0)+b.w;cur.push(b)});if(cur.length)rows.push(cur);
+    const rh=rows.map(r=>Math.max(...r.map(b=>b.h))),H=rh.reduce((a,b)=>a+b,0)+gy*(rows.length-1);
+    const it=[...root.querySelectorAll('.sp-hi')],gh=[...root.querySelectorAll('.sp-gh')],curve=(x,y,z)=>{const u=x/(maxW/2);return[(-u*u*(m?30:110)+(z||0)).toFixed(0),(-u*(m?8:16)).toFixed(1)]};
+    let y=-H/2;SP.pos=[];rows.forEach((row,ri)=>{let x=-(row.reduce((a,b)=>a+b.w,0)+gx*(row.length-1))/2;
+      row.forEach(b=>{const cx=x+b.w/2,[z,ry]=curve(cx);const L=gh[SP.G.indexOf(b.g)];if(L)L.style.transform=`translate3d(calc(${cx.toFixed(0)}px - 50%),${(y).toFixed(0)}px,${z}px) rotateY(${ry}deg)`;
+        b.g.apps.forEach((a,j)=>{const c=j%b.c,r=Math.floor(j/b.c),inRow=Math.min(b.c,b.g.apps.length-r*b.c),ix=x+(b.w-inRow*sx)/2+c*sx+sx/2,iy=y+(multi?lh:0)+r*sy+sy/2,[zz,rr]=curve(ix);
+          SP.pos[a.si]={x:ix,y:iy};const el=it[a.si];if(el){el.style.transform=`translate3d(${ix.toFixed(0)}px,${iy.toFixed(0)}px,${zz}px) rotateY(${rr}deg)`;el.style.setProperty('--d',(a.si*45)+'ms')}});
+        x+=b.w+gx});y+=rh[ri]+gy});
+    const avail=Math.max(260,innerHeight-(m?300:330)),sc=Math.min(1,avail/H);root.querySelector('.sp-home').style.setProperty('--hs',sc.toFixed(3))},
   mode(root,m){SP.cfg.mode=m;SP.save();const sp=root.querySelector('.sp');sp.dataset.mode=m;
     root.querySelectorAll('[data-sp=halka],[data-sp=izgara]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.sp===m));
     if(m==='izgara'){SP.sel=SP.front();SP.cap(root)}else SP.apply(root)},
@@ -272,15 +292,16 @@ const SP={rot:0,n:1,sel:0,buf:'',
     const r=root.querySelector('.sp-imm input');r.value=pc;root.querySelector('.sp-imm b').textContent='%'+pc},
   envp(root,open){const p=root.querySelector('.sp-envp'),b=root.querySelector('[data-sp=envp]');open=open??p.hidden;p.hidden=!open;b.setAttribute('aria-expanded',open);b.classList.toggle('on',open);if(open)p.querySelector('.on,[data-env]')?.focus({preventScroll:true})},
   center(root){SP.cfg.off={};SP.save();root.querySelectorAll('.sp-side').forEach(s=>{s.style.removeProperty('--ox');s.style.removeProperty('--oy')});
-    const sc=root.querySelector('.sp-scene');sc.style.setProperty('--rx','0deg');sc.style.setProperty('--ry','0deg');SP.rot=0;SP.apply(root);if(SP.cfg.mode==='izgara')SP.goTo(root,0);
+    const sc=root.querySelector('.sp-scene');sc.style.setProperty('--rx','0deg');sc.style.setProperty('--ry','0deg');SP.rotTo(root,0);if(SP.cfg.mode==='izgara')SP.goTo(root,0);
     if(!calmMotion())root.querySelector('.sp-scene').animate([{transform:'scale(.94)',opacity:.6},{transform:'none',opacity:1}],{duration:500,easing:'cubic-bezier(.16,1,.3,1)'})},
   find(root,ch){clearTimeout(SP.bt);SP.buf+=ch;SP.bt=setTimeout(()=>{SP.buf='';root.querySelector('.sp-find').classList.remove('on')},900);
-    const q=SP.buf.toLocaleLowerCase('tr-TR'),apps=D().apps,i=apps.findIndex(a=>a.name.toLocaleLowerCase('tr-TR').startsWith(q)),j=i<0?apps.findIndex(a=>a.name.toLocaleLowerCase('tr-TR').includes(q)):i;
+    const q=SP.buf.toLocaleLowerCase('tr-TR'),apps=SP.list,i=apps.findIndex(a=>a.name.toLocaleLowerCase('tr-TR').startsWith(q)),j=i<0?apps.findIndex(a=>a.name.toLocaleLowerCase('tr-TR').includes(q)):i;
     const f=root.querySelector('.sp-find');f.innerHTML=`<kbd>${esc(SP.buf)}</kbd> ${j<0?'<span>bulunamadı</span>':esc(apps[j].name)}`;f.classList.add('on');if(j>=0)SP.goTo(root,j)},
-  mount(root){SP.rot=0;SP.layout(root);SP.env(root,SP.cfg.env);SP.imm(root,SP.cfg.imm,1);SP.mode(root,SP.cfg.mode);
+  mount(root){SP.deg=0;SP.layout(root);SP.env(root,SP.cfg.env);SP.imm(root,SP.cfg.imm,1);SP.mode(root,SP.cfg.mode);
     root.querySelectorAll('.sp-side').forEach(s=>{const o=SP.cfg.off[s.dataset.side];if(o){s.style.setProperty('--ox',o[0]+'px');s.style.setProperty('--oy',o[1]+'px')}});
     const ring=root.querySelector('.sp-ring'),scene=root.querySelector('.sp-scene'),stage=root.querySelector('.sp-stage'),crown=root.querySelector('.sp-crown');
     root.addEventListener('click',e=>{const r=e.target.closest('[data-rot]');if(r)return SP.cfg.mode==='izgara'?SP.goTo(root,(SP.sel+(+r.dataset.rot)+SP.n)%SP.n):SP.turn(root,+r.dataset.rot);
+      const gt=e.target.closest('.sp-gt');if(gt){SP.rotTo(root,SP.G[+gt.dataset.g].apps[0].si);return}
       const x=e.target.closest('[data-sp]');if(x){const k=x.dataset.sp;if(k==='halka'||k==='izgara')SP.mode(root,k);else if(k==='envp')SP.envp(root);else if(k==='center')SP.center(root);return}
       const ev=e.target.closest('.sp-envs [data-env]');if(ev){SP.env(root,ev.dataset.env);if(SP.cfg.imm<.3)SP.imm(root,.8);return}
       if(!e.target.closest('.sp-envp,[data-sp=envp]')&&!root.querySelector('.sp-envp').hidden)SP.envp(root,false);
@@ -290,7 +311,7 @@ const SP={rot:0,n:1,sel:0,buf:'',
     root.querySelector('.sp-imm input').addEventListener('input',e=>SP.imm(root,e.target.value/100));
     /* halka sürükleme + sahne paralaksı + öndeki camda ışık */
     let st=null,gr=null,cr=null;
-    stage.addEventListener('pointerdown',e=>{if(e.button||e.target.closest('.sp-side,.sp-hi'))return;st={x:e.clientX,r:SP.rot,id:e.pointerId};SP.dragged=false});
+    stage.addEventListener('pointerdown',e=>{if(e.button||e.target.closest('.sp-side,.sp-hi,.sp-gt'))return;st={x:e.clientX,d:SP.deg,id:e.pointerId};SP.dragged=false});
     root.querySelectorAll('.sp-grab').forEach(g=>{const s=g.closest('.sp-side');
       g.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();g.setPointerCapture(e.pointerId);const o=SP.cfg.off[s.dataset.side]||[0,0];gr={s,x:e.clientX-o[0],y:e.clientY-o[1],id:e.pointerId};s.classList.add('moving')});
       g.addEventListener('dblclick',()=>{delete SP.cfg.off[s.dataset.side];SP.save();s.style.removeProperty('--ox');s.style.removeProperty('--oy')})});
@@ -299,7 +320,7 @@ const SP={rot:0,n:1,sel:0,buf:'',
     addEventListener('pointermove',SP.pm=e=>{
       if(gr&&gr.id===e.pointerId){const x=Math.round(e.clientX-gr.x),y=Math.round(e.clientY-gr.y);gr.s.style.setProperty('--ox',x+'px');gr.s.style.setProperty('--oy',y+'px');SP.cfg.off[gr.s.dataset.side]=[x,y];return}
       if(cr&&cr.id===e.pointerId){const dy=cr.y-e.clientY;if(Math.abs(dy)>3)cr.moved=true;if(cr.moved)SP.imm(root,cr.v+dy/220);return}
-      if(st&&st.id===e.pointerId&&SP.cfg.mode==='halka'){const dx=e.clientX-st.x;if(Math.abs(dx)>6){SP.dragged=true;ring.style.transition='none';SP.rot=st.r-dx/(mobile()?160:260);SP.apply(root)}}
+      if(st&&st.id===e.pointerId&&SP.cfg.mode==='halka'){const dx=e.clientX-st.x;if(Math.abs(dx)>6){SP.dragged=true;ring.style.transition='none';SP.deg=st.d-dx/(mobile()?160:260)*SP.step;SP.apply(root)}}
       if(e.pointerType!=='mouse'||calmMotion()||SP.raf)return;
       SP.raf=requestAnimationFrame(()=>{SP.raf=0;scene.style.setProperty('--ry',((e.clientX/innerWidth-.5)*7).toFixed(2)+'deg');scene.style.setProperty('--rx',((.5-e.clientY/innerHeight)*5).toFixed(2)+'deg');
         const fw=root.querySelector('.sp-win.front');if(!fw||st)return;const b=fw.getBoundingClientRect(),u=(e.clientX-b.left)/b.width,v=(e.clientY-b.top)/b.height,inside=u>=0&&u<=1&&v>=0&&v<=1;
@@ -308,7 +329,7 @@ const SP={rot:0,n:1,sel:0,buf:'',
     addEventListener('pointerup',SP.pu=e=>{
       if(gr&&gr.id===e.pointerId){gr.s.classList.remove('moving');gr=null;SP.save();return}
       if(cr&&cr.id===e.pointerId){if(!cr.moved)SP.imm(root,SP.cfg.imm>.05?0:(SP.cfg.last||.8),SP.cfg.imm>.05);cr=null;return}
-      if(!st||st.id!==e.pointerId)return;st=null;ring.style.transition='';if(SP.dragged){SP.rot=Math.round(SP.rot);SP.apply(root);setTimeout(()=>SP.dragged=false,0)}});
+      if(!st||st.id!==e.pointerId)return;st=null;ring.style.transition='';if(SP.dragged){SP.rotTo(root,SP.f);setTimeout(()=>SP.dragged=false,0)}});
     root.querySelectorAll('.sp-hi').forEach(h=>{h.addEventListener('pointerenter',()=>{SP.sel=+h.dataset.i;SP.cap(root)});h.addEventListener('focus',()=>{SP.sel=+h.dataset.i;SP.cap(root)})});
     stage.addEventListener('wheel',e=>{if(SP.cfg.mode!=='halka'||e.target.closest('.sp-side')||Math.abs(e.deltaX)+Math.abs(e.deltaY)<8||SP.wl)return;SP.wl=1;setTimeout(()=>SP.wl=0,260);SP.turn(root,(e.deltaY||e.deltaX)>0?1:-1)},{passive:true})},
   launch(el,key){if(!calmMotion()){const t=el.style.transform||'';el.animate([{transform:t},{transform:t+' translateZ(140px) scale(1.06)',opacity:0}],{duration:280,easing:'cubic-bezier(.4,0,.2,1)'})}setTimeout(()=>H().open(key),calmMotion()?0:220)},
@@ -320,8 +341,8 @@ const SP={rot:0,n:1,sel:0,buf:'',
     if(e.target.closest?.('.sp-envp'))return;
     const iz=SP.cfg.mode==='izgara';
     if(k==='ArrowRight'||k==='ArrowLeft'){e.preventDefault();const d=k==='ArrowRight'?1:-1;iz?SP.goTo(root,(SP.sel+d+SP.n)%SP.n):SP.turn(root,d)}
-    else if(iz&&(k==='ArrowDown'||k==='ArrowUp')){e.preventDefault();const c=mobile()?3:Math.min(5,Math.max(3,Math.ceil(Math.sqrt(SP.n*1.7))));SP.goTo(root,Math.max(0,Math.min(SP.n-1,SP.sel+(k==='ArrowDown'?c:-c))))}
-    else if(k==='Enter'&&!e.target.closest?.('button')){e.preventDefault();const a=D().apps[SP.sel];a&&H().open(a.key)}
+    else if(iz&&(k==='ArrowDown'||k==='ArrowUp')){e.preventDefault();const p=SP.pos[SP.sel],dn=k==='ArrowDown';let bi=-1,bs=1e9;SP.pos.forEach((q,i)=>{const dy=q.y-p.y;if(dn?dy>20:dy<-20){const sc=Math.abs(dy)+Math.abs(q.x-p.x)*2;if(sc<bs){bs=sc;bi=i}}});if(bi>=0)SP.goTo(root,bi)}
+    else if(k==='Enter'&&!e.target.closest?.('button')){e.preventDefault();const a=SP.list[SP.sel];a&&H().open(a.key)}
     else if(k.length===1&&/\p{L}/u.test(k)){e.preventDefault();SP.find(root,k)}},
   resize(root){SP.layout(root)},
   unmount(){removeEventListener('pointermove',SP.pm);removeEventListener('pointerup',SP.pu)}};

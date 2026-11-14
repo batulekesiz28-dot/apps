@@ -2766,7 +2766,12 @@ buildMesh();introStart=performance.now();wake();
 window.HUB={apps:()=>pub,open:k=>{const a=find(k);if(a)openApp(a,nodes.get(k)?.el)},openNotes:h=>openNotes(h),palette:()=>palette(),
   items:()=>{try{return islandItems()}catch{return[]}},notes:()=>NOTES,study:()=>STUDY,studyToday:()=>{try{return studyToday()}catch{return 0}},dayKey,
   icon:a=>miniIcon(a),themeMenu:()=>themeMenu(),tabs:()=>TABS.length,booted:()=>booted,
-  pause:on=>{if(on)setPaused(true);else setPaused(document.hidden||(!!W.app&&!W.min))},esc};
+  pause:on=>{if(on)setPaused(true);else setPaused(document.hidden||(!!W.app&&!W.min))},esc,
+  /* galaksideki kümeler: [{id,name,color,keys}] — sıra: yapay zekâ yörüngesi, adlı kümeler, Diğer */
+  groups:()=>{try{GX.poke=true;galaxyModel()}catch{}const col=c=>GCOL[c]||c||GCOL.violet;
+    const out=(GX.sys||[]).map(s=>s.g==='_other'?{id:'_other',name:'Diğer',color:GCOL.gray,keys:s.ms.map(n=>n.a.key)}:{id:s.g,name:groups[s.g]?.name||'Küme',color:col(groups[s.g]?.color),keys:s.ms.map(n=>n.a.key)});
+    const ai=[BH_KEY,...(GX.loose||[]).flatMap(r=>r.ms.map(n=>n.a.key))].filter(k=>nodes.has(k));if(ai.length)out.unshift({id:'_ai',name:'Yapay zekâ',color:'#8B7BFF',keys:ai});
+    const o=out.findIndex(g=>g.id==='_other');if(o>=0)out.push(out.splice(o,1)[0]);return out}};
 addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.shiftKey&&(e.key==='u'||e.key==='U')){e.preventDefault();window.Worlds?.picker()}});
 </script>
 <link rel="stylesheet" href="ui/worlds.css">

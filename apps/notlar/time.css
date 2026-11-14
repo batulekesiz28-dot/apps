@@ -213,3 +213,76 @@
   .cal .tm-g.wk .tm-ev small{display:none}
 }
 @media (prefers-reduced-motion:reduce){.cal .cd::before{transition:none}}
+
+/* ══ Takvim · devlerin düzeni (Apple Takvim, Google Takvim, Outlook) ═══════════
+   Tek satır başlık (ay · ‹ Bugün › · Gün/Hafta/Ay), ızgara pencereyi doldurur,
+   tek vurgu rengi (bugün + şimdi = kırmızı), yan panel = yaz-ekle + mini ay + günün ajandası. */
+.app:has(.view .cal) .crumbbar{display:none}
+.view:has(.cal){padding-bottom:24px}
+.cal{--today:#E5372C;padding-top:18px;gap:32px;grid-template-columns:minmax(0,1fr) 272px}
+.cal.tm-cal{grid-template-columns:minmax(0,1fr) 272px}
+.cal .cal-h{display:flex;align-items:center;gap:12px;height:40px;margin:0 0 14px}
+.cal .cal-h h1{flex:1;min-width:0;font-size:24px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal .cal-h .tm-mseg{margin:0}
+.cal-nav{display:inline-flex;align-items:center;height:32px;padding:2px;border-radius:999px;background:color-mix(in srgb,var(--ink) 5%,transparent)}
+.cal .cal-h .cal-nav .tb{height:28px;min-width:28px;padding:0 6px;border-radius:999px;color:var(--ink2);font-size:13px;font-weight:500}
+.cal .cal-h .cal-nav .tb[data-cal="0"],.cal .cal-h .cal-nav .tb[data-gnav="0"]{padding:0 12px}
+.cal .cal-h .cal-nav .tb:hover{background:var(--hover2);color:var(--ink)}
+.cal .cal-h .cal-nav .tb.now{color:var(--ink3)}
+/* ay: satırlar pencereyi doldurur */
+.cal .grid{grid-template-rows:repeat(var(--wk,6),minmax(92px,1fr));height:calc(100dvh - 186px);min-height:calc(var(--wk,6) * 92px)}
+.cal .cd .dn{margin-bottom:2px}.cal .cd .chips{gap:0}
+.cal .cd{min-height:0;overflow:hidden}
+.cal .cd.today .dn{background:var(--today);color:#fff}
+/* hafta/gün: kaydırma alanı pencereyi doldurur, şimdi kırmızı + saati solda */
+.cal .tm-gs{height:calc(100dvh - 226px);min-height:360px}
+.cal .tm-ad{min-height:26px}
+.cal .tm-dh.today b{background:var(--today);color:#fff}.cal .tm-dh.today small{color:var(--today);font-weight:600}
+.cal .tm-now{background:var(--today)}.cal .tm-now::before{background:var(--today)}
+.tm-hrs span.hide{visibility:hidden}
+.cal .tm-hrs span.now{display:block;color:var(--today);font-weight:600;z-index:2}
+/* yan panel */
+.cal .dp{top:0;max-height:calc(100dvh - 76px);overflow-y:auto;scrollbar-width:none;padding-bottom:24px}
+.cal .dp::-webkit-scrollbar{display:none}
+.cal .dp>.tm-qa{height:38px;margin:2px 0 20px;padding:0 6px 0 10px;border-radius:10px;background:color-mix(in srgb,var(--ink) 5%,transparent);box-shadow:none}
+.cal .dp>.tm-qa:focus-within{background:var(--card);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ink) 18%,transparent)}
+.cal .dp>.tm-qa .tm-qa-b{display:none;height:28px}.cal .dp>.tm-qa:focus-within .tm-qa-b{display:inline-flex;align-items:center}
+.tmc{margin:0 0 18px}
+.tmc-h{display:flex;align-items:center;gap:2px;height:28px;margin:0 0 4px 6px}.tmc-h b{flex:1;font-size:13px;font-weight:600}.tmc-h em{font-style:normal;font-weight:400;color:var(--ink3)}
+.tmc-h .tb{width:28px;height:28px;border-radius:8px}
+.tmc-w,.tmc-g{display:grid;grid-template-columns:repeat(7,1fr);justify-items:center}
+.tmc-w span{height:22px;line-height:22px;font-size:12px;color:var(--ink3)}
+.tmc-d{position:relative;width:32px;height:32px;border-radius:50%;font-size:12.5px;color:var(--ink);font-variant-numeric:tabular-nums;transition:background .15s,color .15s}
+.tmc-d:hover{background:var(--hover2)}.tmc-d.out{color:var(--ink4)}
+.tmc-d.sel{background:var(--ink);color:var(--bg);font-weight:600}
+.tmc-d.today{color:var(--today);font-weight:600}.tmc-d.today.sel{background:var(--today);color:#fff}
+.tmc-d i{position:absolute;left:50%;bottom:3px;width:3px;height:3px;margin-left:-1.5px;border-radius:50%;background:var(--ink3)}.tmc-d.sel i{background:currentColor}
+.cal .dp .dp-h{margin:0 0 12px}.cal .dp .dp-h .wd{margin:0;font-size:12.5px}.cal .dp .dp-h h2{margin-top:1px;font-size:20px}
+.ag-sec{padding:12px 0 8px;border-top:.5px solid var(--line)}
+.ag-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:0 0 4px;font-size:12px;font-weight:600;color:var(--ink3)}.ag-h span{font-weight:400}
+.ag-none{padding:3px 0 6px;font-size:12.5px;line-height:1.45;color:var(--ink3)}
+.ag-ev{display:grid;grid-template-columns:40px 3px minmax(0,1fr);gap:10px;align-items:start;width:calc(100% + 12px);margin:0 -6px;padding:7px 6px;border-radius:9px;text-align:left;transition:background .15s}
+.ag-ev:hover{background:var(--hover)}
+.ag-tm{font-size:12.5px;font-weight:500;line-height:1.35;color:var(--ink);font-variant-numeric:tabular-nums}.ag-tm small{display:block;font-size:12px;font-weight:400;color:var(--ink3)}
+.ag-ev i{align-self:stretch;min-height:30px;border-radius:2px;background:var(--c)}.ag-ev.st-plan i{opacity:.6}
+.ag-nm{min-width:0;font-size:13.5px;font-weight:500;line-height:1.35;color:var(--ink)}.ag-nm small{display:block;font-size:12px;font-weight:400;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ag-ev.st-done .ag-nm{color:var(--ink2)}
+.cal .dp .tk-list{margin:0}
+.cal .dp .tk-row{min-height:36px;padding:7px 0;gap:10px;align-items:center}.cal .dp .tk-row::after{display:none}.cal .dp .tk-row .tk-grip{display:none}
+.cal .dp .tk-row>.tk-chk{width:18px;height:18px}.cal .dp .tk-t{font-size:13.5px}.cal .dp .tk-none{padding:3px 0 6px;font-size:12.5px}
+.cal .dp .tk-qday{height:34px;margin:0;padding:0 0 0 1px;border-radius:0;background:none;box-shadow:none}
+.cal .dp .tk-qday:focus-within{background:none;box-shadow:inset 0 -1px 0 var(--line2)}
+.cal .dp .tk-qday input{font-size:13px}
+.cal .dp .lst{margin:0}
+.dp-f{display:flex;flex-wrap:wrap;gap:2px;margin:4px -6px 0;padding-top:10px;border-top:.5px solid var(--line)}
+.dp-a{display:inline-flex;align-items:center;gap:5px;height:30px;padding:0 8px;border-radius:8px;font-size:12.5px;color:var(--ink2);transition:background .15s,color .15s}
+.dp-a:hover{background:var(--hover);color:var(--ink)}.dp-a svg{width:13px;height:13px}
+@media (max-width:1000px){.cal,.cal.tm-cal{grid-template-columns:1fr}.cal .dp{max-height:none;overflow:visible}}
+@media (max-width:760px){
+  .cal{padding-top:8px}
+  .cal .cal-h{flex-wrap:wrap;height:auto;row-gap:10px}.cal .cal-h h1{flex-basis:100%;font-size:22px}.cal .cal-h .cal-nav{margin-right:auto}
+  .cal-nav{height:42px}.cal .cal-h .cal-nav .tb{height:38px;min-width:40px}.cal .cal-h .tm-mseg button{min-height:38px}
+  .cal .grid{grid-template-rows:repeat(var(--wk,6),minmax(60px,1fr));height:auto;min-height:0}
+  .cal .tm-gs{height:62vh}
+  .tmc-d{width:40px;height:40px;font-size:13px}.tmc-h .tb{width:40px;height:40px}.dp-a{height:40px}.ag-ev{min-height:44px}
+}

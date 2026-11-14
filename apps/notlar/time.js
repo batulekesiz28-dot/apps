@@ -144,18 +144,18 @@ const Time=(()=>{
   const modeSeg=()=>`<div class="tm-mseg" role="radiogroup" aria-label="Takvim görünümü">${[['day','Gün'],['week','Hafta'],['month','Ay']].map(([k,l])=>`<button data-calmode="${k}" class="${calMode===k?'on':''}" role="radio" aria-checked="${calMode===k}">${l}</button>`).join('')}</div>`;
   function weekStart(d){return addDays(d,-((pd(d).getDay()+6)%7))}
   function renderGrid(){const sd=selDayOr(),days=calMode==='day'?[sd]:[...Array(7)].map((_,i)=>addDays(weekStart(sd),i)),t=today();
-    const title=calMode==='day'?`${fmtShort(sd)} <em>${E(fmtWd(sd))}</em>`:`${fmtShort(days[0])} – ${fmtShort(days[6])}`;
+    const y=pd(days[days.length-1]).getFullYear(),same=pd(days[0]).getMonth()===pd(days[days.length-1]).getMonth();
+    const title=calMode==='day'?`${fmtShort(sd)} <em>${E(fmtWd(sd))}</em>`:`${same?pd(days[0]).getDate():fmtShort(days[0])} – ${fmtShort(days[6])} <em>${y}</em>`;
     const allday=d=>{const ta=Tasks.forDay(d),un=TM.onDay(d).filter(a=>!a.start);return`${un.map(a=>`<button class="tm-chip" data-act-open="${a.id}" style="--c:${TM.cat(a.cat).color}">${E(TM.cat(a.cat).icon)} ${E(a.title)}</button>`).join('')}${Tasks.monthChips(d)}`};
     let cols='';for(const d of days){const ev=TM.onDay(d).filter(a=>a.start);
       cols+=`<div class="tm-col${d===t?' today':''}${d===sd&&calMode==='week'?' sel':''}" data-gday="${d}">${ev.map(a=>{const s=TM.hm(a.start),du=Math.max(20,a.dur||60),c=TM.cat(a.cat);
         return`<div class="tm-ev st-${a.status}" data-ev="${a.id}" style="--c:${c.color};top:${s*PX}px;height:${du*PX-2}px" tabindex="0" title="${E(a.title)} · ${a.start}${a.end?'–'+a.end:''}"><b>${E(a.title)}</b><small>${a.start}${a.end?'–'+a.end:''} · ${E(c.name)}</small><i class="tm-rs" data-rs></i></div>`}).join('')}
         ${d===t?`<div class="tm-now" style="top:${(new Date().getHours()*60+new Date().getMinutes())*PX}px"></div>`:''}</div>`}
     $('#view').innerHTML=`<div class="wide cal tm-cal"><div class="tm-gwrap">
-      <div class="cal-h"><h1>${title}</h1>${modeSeg()}<button class="tb" data-gnav="-1" title="Önceki">${I.l}</button><button class="tb" data-gnav="0">Bugün</button><button class="tb" data-gnav="1" title="Sonraki">${I.r}</button></div>
-      ${qaHTML('Aktivite ekle — ör. “Spor 18:00-19:00 koşu” ya da “yarın 10-12 İş toplantı”',calMode==='day'?sd:'')}
+      <div class="cal-h"><h1>${title}</h1>${navGrp('gnav',calMode==='day'?'Önceki gün':'Önceki hafta',calMode==='day'?'Sonraki gün':'Sonraki hafta',days.includes(t))}${modeSeg()}</div>
       <div class="tm-g${days.length>1?' wk':''}" style="--n:${days.length}"><div class="tm-gh"><span></span>${days.map(d=>`<button class="tm-dh${d===t?' today':''}${d===sd?' sel':''}" data-gpick="${d}"><small>${DOW[(pd(d).getDay()+6)%7]}</small><b>${pd(d).getDate()}</b></button>`).join('')}</div>
         <div class="tm-ad"><span>tüm gün</span>${days.map(d=>`<div class="tm-adc" data-gday-ad="${d}">${allday(d)}</div>`).join('')}</div>
-        <div class="tm-gs" id="tmScroll"><div class="tm-gb" style="height:${1440*PX}px"><div class="tm-hrs">${[...Array(24)].map((_,h)=>`<span style="top:${h*60*PX}px">${String(h).padStart(2,'0')}:00</span>`).join('')}</div>${cols}</div></div></div></div>
+        <div class="tm-gs" id="tmScroll"><div class="tm-gb" style="height:${1440*PX}px"><div class="tm-hrs">${(()=>{const n=new Date(),nm=n.getHours()*60+n.getMinutes(),on=days.includes(t);return[...Array(24)].map((_,h)=>`<span style="top:${h*60*PX}px"${on&&Math.abs(h*60-nm)<14?' class="hide"':''}>${String(h).padStart(2,'0')}:00</span>`).join('')+(on?`<span class="now" style="top:${nm*PX}px">${TM.fmtHM(nm)}</span>`:'')})()}</div>${cols}</div></div></div></div>
       <aside class="dp" id="dp"></aside></div>`;
     renderDay();const sc=$('#tmScroll');if(sc)sc.scrollTop=Math.max(0,(Math.min(...days.flatMap(d=>TM.onDay(d).filter(a=>a.start).map(a=>TM.hm(a.start))),new Date().getHours()*60-90,7*60))*PX-10)}
   /* sürükle-bırak: taşı (15 dk adım, haftada günler arası) ve alttan uzat */
@@ -174,10 +174,18 @@ const Time=(()=>{
     newAct({date:c.dataset.gday,start:TM.fmtHM(min),end:TM.fmtHM(min+60)})}
 
   /* gün paneli (her takvim görünümünde sağda): aktiviteler, görevler, notlar */
-  function dayPanelExtra(d){const L=TM.onDay(d),tk=tasks().filter(o=>o.date===d),tot=L.reduce((s,a)=>s+(a.status==='done'?a.dur:0),0);
-    return`<div class="sh"><span>Aktiviteler${tot?` · ${fm(tot)} tamamlandı`:''}</span><span class="rule"></span></div>${qaHTML('Ekle — ör. 14:00-15:30 Eğitim SAT',d)}
-      <div class="tm-dl">${L.length?L.map(a=>actRow(a)).join(''):'<div class="none">Bu gün için aktivite yok.</div>'}</div>
-      <div class="sh"><span>Görevler</span><span class="rule"></span></div><div class="tm-dl tk-list" data-drop-day="${d}">${Tasks.dayList(d)}</div>${tk.length?`<div class="sh"><span>Notlardaki yapılacaklar</span><span class="rule"></span></div><div class="tm-dl">${tk.map(taskRow).join('')}</div>`:''}`}
+  const agRow=a=>{const c=TM.cat(a.cat);return`<button class="ag-ev st-${a.status}" data-act-open="${a.id}" style="--c:${c.color}" title="${E(a.title)}"><span class="ag-tm">${a.start?`${a.start}${a.end?`<small>${a.end}</small>`:''}`:'<small>gün boyu</small>'}</span><i aria-hidden="true"></i><span class="ag-nm">${E(a.title)}<small>${E(c.name)}${a.status==='done'?' · tamamlandı':a.status==='doing'?' · devam ediyor':''}</small></span></button>`};
+  /* mini ay takvimi (gün/hafta görünümünde yan panelin üstünde) */
+  function miniCal(sel){const b=pd(sel),y=b.getFullYear(),m=b.getMonth(),off=(new Date(y,m,1).getDay()+6)%7,t=today();let h='';
+    for(let i=0;i<42;i++){const d=ymd(new Date(y,m,1-off+i)),o=pd(d).getMonth()!==m,has=TM.onDay(d).length||Tasks.forDay(d).length;
+      h+=`<button class="tmc-d${o?' out':''}${d===t?' today':''}${d===sel?' sel':''}" data-mpick="${d}" aria-label="${E(fmtShort(d))}"${d===sel?' aria-current="date"':''}>${pd(d).getDate()}${has?'<i></i>':''}</button>`}
+    return`<div class="tmc"><div class="tmc-h"><b>${MONTHS[m]} <em>${y}</em></b><button class="tb" data-mnav="-1" aria-label="Önceki ay">${I.l}</button><button class="tb" data-mnav="1" aria-label="Sonraki ay">${I.r}</button></div>
+      <div class="tmc-w">${DOW.map(x=>`<span>${x.slice(0,2)}</span>`).join('')}</div><div class="tmc-g">${h}</div></div>`}
+  const navGrp=(k,pl,nl,isNow)=>`<div class="cal-nav"><button class="tb" data-${k}="-1" title="${pl}" aria-label="${pl}">${I.l}</button><button class="tb${isNow?' now':''}" data-${k}="0">Bugün</button><button class="tb" data-${k}="1" title="${nl}" aria-label="${nl}">${I.r}</button></div>`;
+  function dayPanelExtra(d){const L=TM.onDay(d).sort((a,b)=>(a.start||'').localeCompare(b.start||'')),tk=tasks().filter(o=>o.date===d),tot=L.reduce((s,a)=>s+(a.status==='done'?a.dur:0),0);
+    return`<div class="ag-sec"><div class="ag-h">Etkinlikler${tot?`<span>${fm(tot)} tamamlandı</span>`:''}</div>
+      <div class="ag-l">${L.length?L.map(agRow).join(''):'<div class="ag-none">Etkinlik yok — ızgarada boş bir saate tıkla ya da yukarıya yaz.</div>'}</div></div>
+      <div class="ag-sec"><div class="ag-h">Görevler</div><div class="tm-dl tk-list" data-drop-day="${d}">${Tasks.dayList(d)}</div></div>${tk.length?`<div class="ag-sec"><div class="ag-h">Notlardaki yapılacaklar</div><div class="tm-dl">${tk.map(taskRow).join('')}</div></div>`:''}`}
 
   /* ═════ AKTİVİTELER ═════ */
   let F={st:'all',cat:'',q:''};
@@ -240,6 +248,8 @@ const Time=(()=>{
       const tl=t.closest('[data-tlater]');if(tl){e.stopPropagation();const o=findTask(tl.dataset.tlater);if(o){const d=addDays(o.date&&o.date>today()?o.date:today(),1);postpone(o,d);toast(`Ertelendi → ${dayLabel(d)}`);rerender()}return}
       const cm=t.closest('[data-calmode]');if(cm){e.stopPropagation();calMode=cm.dataset.calmode;lss('time:calmode',calMode);rerender(true);return}
       const gn=t.closest('[data-gnav]');if(gn){const n=+gn.dataset.gnav;selDay=n===0?today():addDays(selDayOr(),n*(calMode==='day'?1:7));rerender(true);return}
+      const mp=t.closest('[data-mpick]');if(mp){selDay=mp.dataset.mpick;rerender(true);return}
+      const mn=t.closest('[data-mnav]');if(mn){const b=pd(selDayOr()),n=new Date(b.getFullYear(),b.getMonth()+ +mn.dataset.mnav,1);selDay=ymd(n);rerender(true);return}
       const gp=t.closest('[data-gpick]');if(gp){selDay=gp.dataset.gpick;if(calMode==='week'){$$('.tm-dh.sel,.tm-col.sel').forEach(x=>x.classList.remove('sel'));gp.classList.add('sel');$(`.tm-col[data-gday="${selDay}"]`)?.classList.add('sel');renderDay(true)}else rerender();return}
       if(t.closest('[data-newact]')){newAct({date:today()});return}
       const qc=t.closest('[data-qcat]');if(qc){const inp=$('.tm-qa[data-qa] input');lss('time:lastcat',qc.dataset.qcat);if(inp&&inp.value.trim()){const f=inp.form;f.dataset.cat=qc.dataset.qcat;f.requestSubmit();delete f.dataset.cat}else newAct({cat:qc.dataset.qcat,date:today()});return}
@@ -262,4 +272,4 @@ const Time=(()=>{
   function rerender(soft){if(typeof renderView==='function'&&['cal','acts','tasks','stats'].includes(cur()))renderView(!soft)}
   /* ay görünümü hücrelerine aktivite şeritleri */
   function monthChips(d){const L=TM.onDay(d);if(!L.length)return'';return L.slice(0,3).map(a=>{const c=TM.cat(a.cat);return`<div class="tm-mc st-${a.status}" draggable="true" data-mact="${a.id}" data-act-open="${a.id}" style="--c:${c.color}" title="${E(a.title)}${a.start?' · '+a.start:''}"><i></i><span>${a.start?`<em>${a.start}</em> `:''}${E(a.title)}</span></div>`}).join('')+(L.length>3?`<div class="more">+${L.length-3} aktivite</div>`:'')}
-  return{get calMode(){return calMode},renderGrid,dayPanelExtra,monthChips,renderActs,renderTasks,renderStats,bind,newAct,quickAdd,parse,tasks,modeSeg}})();
+  return{get calMode(){return calMode},renderGrid,dayPanelExtra,monthChips,miniCal,navGrp,qaHTML,renderActs,renderTasks,renderStats,bind,newAct,quickAdd,parse,tasks,modeSeg}})();

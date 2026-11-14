@@ -869,12 +869,9 @@ function renderCal(dir,quiet){
     cells+=`<div class="cd${dd.getMonth()!==m?' out':''}${s===t?' today':''}${s===selDay?' sel':''}${i%7>4?' wk':''}" data-day="${s}"><span class="dn">${dd.getDate()}</span><div class="chips">${Time.monthChips(s)}${Tasks.monthChips(s)}${its.slice(0,3).map(p=>`<div class="c2" draggable="true" data-pid="${p.id}" title="${esc(titleOf(p))}">${iconOf(p)}<span>${esc(titleOf(p))}</span></div>`).join('')}${its.length>3?`<div class="more">+${its.length-3}</div>`:''}${fdn?`<div class="more fdn">📌 ${fdn} tarihli satır</div>`:''}</div></div>`}
   const isCur=y===new Date().getFullYear()&&m===new Date().getMonth();
   $('#view').innerHTML=`<div class="wide cal"><div>
-    <div class="cal-h"><h1>${MONTHS[m]} <em>${y}</em></h1>
-      ${Time.modeSeg()}<button class="tb" data-cal="-1" title="Önceki ay">${IC.chevL}</button>
-      <button class="tb" data-cal="0"${isCur?' style="opacity:.45"':''}>Bugün</button>
-      <button class="tb" data-cal="1" title="Sonraki ay">${IC.chevR}</button></div>
+    <div class="cal-h"><h1>${MONTHS[m]} <em>${y}</em></h1>${Time.navGrp('cal','Önceki ay','Sonraki ay',isCur)}${Time.modeSeg()}</div>
     <div class="dow">${DOW.map(d=>`<span>${d}</span>`).join('')}</div>
-    <div class="grid" id="grid">${cells}</div></div>
+    <div class="grid" id="grid" style="--wk:${weeks}">${cells}</div></div>
     <aside class="dp" id="dp"></aside></div>`;
   renderDay();
   if(dir)anim($('#grid'),[{opacity:0,transform:`translateX(${dir*28}px)`},{opacity:1,transform:'none'}],{duration:480,easing:OUT});
@@ -883,12 +880,11 @@ function renderCal(dir,quiet){
 function renderDay(animate){
   const its=[...pages.values()].filter(p=>p.date===selDay).sort((a,b)=>a.created-b.created);
   const quick=['daily','meet','todo','client','class','week'];
-  $('#dp').innerHTML=`<h2>${esc(fmtShort(selDay))}</h2><div class="wd">${esc(fmtWd(selDay))}${selDay===today()?' · bugün':''}</div>
-    ${Time.dayPanelExtra(selDay)}<div class="sh"><span>Notlar</span><span class="rule"></span></div><div class="lst">${its.length?its.map(p=>`<button class="row" data-pid="${p.id}"><span class="e">${iconOf(p)}</span><b>${esc(titleOf(p))}</b><small>${rel(p.updated)}</small></button>`).join(''):'<div class="none">Bu güne bağlı not yok.</div>'}</div>
+  $('#dp').innerHTML=`${Time.qaHTML('Yeni etkinlik — ör. Spor 18:00 yarın',selDay)}${Time.calMode!=='month'?Time.miniCal(selDay):''}
+    <div class="dp-h"><div class="wd">${esc(fmtWd(selDay))}${selDay===today()?' · bugün':''}</div><h2>${esc(fmtShort(selDay))}</h2></div>
+    ${Time.dayPanelExtra(selDay)}<div class="ag-sec"><div class="ag-h">Notlar</div><div class="lst">${its.length?its.map(p=>`<button class="row" data-pid="${p.id}"><span class="e">${iconOf(p)}</span><b>${esc(titleOf(p))}</b><small>${rel(p.updated)}</small></button>`).join(''):'<div class="ag-none">Bu güne bağlı not yok.</div>'}</div></div>
     ${(()=>{const e=dateIndex().get(selDay);return e&&e.blocks.length?`<div class="sh"><span>Bu güne tarihli satırlar</span><span class="rule"></span></div><div class="lst">${e.blocks.slice(0,8).map(o=>`<button class="row" data-pid="${o.p.id}"><span class="e">${o.b.t==='todo'?(o.b.c?'☑️':'⬜'):'📌'}</span><b>${esc(plain(o.b.h).slice(0,60))}</b><small>${esc(titleOf(o.p))}</small></button>`).join('')}</div>`:''})()}
-    <button class="pill" data-day-open="${selDay}" style="margin:6px 0 14px">📓 Bu günün notunu aç</button>
-    <div class="sh"><span>Bu güne ekle</span><span class="rule"></span></div>
-    <div class="tchips"><span class="pill" data-addday="">${IC.plus} Boş sayfa</span>${quick.map(k=>{const t=TPL.find(x=>x.k===k);return`<span class="pill" data-addday="${k}">${t.e} ${esc(t.n)}</span>`}).join('')}<span class="pill" data-addmore>Diğer…</span></div>`;
+    <div class="dp-f"><button class="dp-a" data-day-open="${selDay}">${IC.plus} Günün notu</button><button class="dp-a" data-addday="">${IC.plus} Boş sayfa</button><button class="dp-a" data-addmore>Şablon…</button></div>`;
   if(animate)anim($('#dp'),[{opacity:.3,transform:'translateY(4px)'},{opacity:1,transform:'none'}],{duration:360,easing:OUT});
 }
 function addOnDay(k,day){const t=TPL.find(x=>x.k===k);const p=newPage({tpl:k||undefined,date:day,title:k==='daily'?fmtLong(day):undefined});go('#p/'+p.id)}

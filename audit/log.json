@@ -1774,5 +1774,41 @@
     "text": "Hub'da bir tema evreni (Evren, Neon…) seçiliyse renkleri o tema belirler; yüzey ve yazı kuralları yine uygulanır"
    }
   ]
+ },
+ {
+  "at": "2026-11-14T21:02:57",
+  "change": "Takvim Apple/Google/Outlook düzenine getirildi: tek satır başlık (ay · ‹ Bugün › · Gün/Hafta/Ay), ızgara pencereyi dolduruyor, bugün+şimdi kırmızı (şimdi saati solda), yan panel = yaz-ekle + mini ay takvimi + günün ajandası; ızgara üstündeki ekleme kutusu, yol çubuğu ve 9 şablon hapı kaldırıldı",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Takvimde iki ayrı ekleme kutusu ve 9 şablon hapı vardı, ekran kalabalıktı",
+    "fix": "Tek yaz-ekle alanı + 'Şablon…' menüsü"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Ay ve hafta ızgarası pencereyi doldurmuyordu",
+    "fix": "Izgara yüksekliği pencereye göre"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "open",
+    "text": "Yan panelde etkinlik durumunu tek tıkla değiştirme kalktı; durum, etkinliğe tıklayınca açılan pencereden ve Aktiviteler sayfasından değişiyor"
+   }
+  ]
  }
 ]

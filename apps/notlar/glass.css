@@ -142,3 +142,17 @@ html[data-theme=dark] .cal .tm-chip{background:rgba(255,255,255,.06)}
   html[data-theme=dark] .tnav a,html[data-theme=dark] .tnav button,html[data-theme=dark] .top .modes a{height:36px;min-width:36px;padding:0 10px}
   .cal-h h1,.cal .cal-h h1,.tm-ph h1,.tk-head h1{font-size:22px}.hello h1{font-size:26px}.pg-title{font-size:28px}
 }
+
+/* ── 12. Takvim düzeni · koyu cam ayarları ── */
+html[data-theme=dark] .cal{--today:#FF453A}
+html[data-theme=dark] .cal-nav{background:var(--field);box-shadow:inset 0 0 0 .5px var(--glass-line)}
+html[data-theme=dark] .cal .tm-ev{background:color-mix(in srgb,var(--c) 24%,transparent);color:var(--ink)}
+html[data-theme=dark] .cal .tm-ev.st-plan{background:color-mix(in srgb,var(--c) 16%,transparent)}
+html[data-theme=dark] .cal .tm-ev.st-done{background:color-mix(in srgb,var(--c) 30%,transparent)}
+html[data-theme=dark] .cal .tm-ev:hover{background:color-mix(in srgb,var(--c) 34%,transparent)}
+html[data-theme=dark] .cal .tm-ev small{color:color-mix(in srgb,var(--c) 40%,#fff)}
+html[data-theme=dark] .cal .dp>.tm-qa{background:var(--field);box-shadow:inset 0 0 0 .5px var(--glass-line)}
+html[data-theme=dark] .cal .dp>.tm-qa:focus-within{background:var(--field-hi);box-shadow:inset 0 0 0 .5px rgba(255,255,255,.22)}
+html[data-theme=dark] .cal .dp .tk-qday{background:none;box-shadow:none}
+html[data-theme=dark] .cal .dp .tk-qday:focus-within{background:none;box-shadow:inset 0 -1px 0 var(--line2)}
+html[data-theme=dark] .cal .dp .tk-row:hover,html[data-theme=dark] .cal .dp .tk-row.sel{background:none}

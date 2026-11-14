@@ -824,5 +824,42 @@
     "text": "Dünyaların yazı tipleri ilk açılışta internetten iniyor; bir an yedek yazı tipi görünebilir"
    }
   ]
+ },
+ {
+  "at": "2026-11-14T10:42:58",
+  "change": "Mekânsal arayüz geliştirildi: 4 ortam, dalma kadranı, ana görünüm (ızgara), taşınabilir pencereler, ortala, yazarak bul, camda ışık",
+  "scores": {
+   "Mekânsal telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Mekânsal masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Mekânsal",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Pencereleri taşıma tutamağı yandan bakınca çok küçük kalıyordu",
+    "fix": "Tutamak 120×32'ye büyütüldü"
+   },
+   {
+    "app": "Mekânsal",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Telefonda dalma kaydırıcısı alçaktı",
+    "fix": "40px yükseklik"
+   },
+   {
+    "app": "Mekânsal",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Yan pencerelere tıklanamıyordu (3B katman üstlerini örtüyordu)",
+    "fix": "Boş 3B katmanlar tıklamayı geçiriyor"
+   }
+  ]
  }
 ]

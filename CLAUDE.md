@@ -25,7 +25,7 @@ Her işte bu dosyadaki standarda uy. Özet:
   - Kamera/ızgara: `w2sx`, `cam`, `drawMesh`, `buildMesh` · akıcılık: `TIER`, `perfSample`, `frame()` içindeki kare hızı sınırı
   - Galaksi: `galaxyModel`, `drawGalaxy`, `drawSun`, `nebula`, `BH_KEY='p:denetci'` · kara delik `drawBH` (Doppler disk, hale, foton halkası) · yörünge izi `drawTrail` (`n.orb`) · uygulamalar yuvarlak mini gezegen (`#nodes .node .tile` CSS, 48px küre), küme yörüngeleri `100+j*88` (çakışmasın diye) · küme dünyaları `drawWorld`/`worldOf`/`WORLD_KINDS` (gaz, okyanus, pulsar, ikili, sarmal, yildiz, ay; `groups[g].world`, küme menüsünden seçilir) · derin uzay `drawStars`/`STARS` (koyu temalar, 'evren' hariç; `TIER`'e göre azalır)
   - Widget'lar: `const WT={` (clock, weather, focus, rss, gcal, today, timer, cal, streak, links, countdown, habits, word, noise…), `cleanW` kaydedilen alanlar
-  - Sekmeli uygulamalar (OS gibi): `TABS`, `openApp`, `switchTo`, `goHome`, `closeTab`, `switcher` (Alt+Q), `#dock`
+  - Sekmeli uygulamalar (OS gibi): `TABS`, `openApp`, `switchTo`, `goHome`, `closeTab`, `switcher` (Alt+Q ve Shift+Tab — `osKeys`/`osKeyUp`, `SW.shift`), `#dock` · kaydırma `startPan` imleci sahneye kilitler (`setPointerCapture`), `body.panning iframe{pointer-events:none}`
   - Canlı ada `paintFocusBar`/`islandItems`, radyal menü `radial`, Sakin mod `calm`, komut paleti `palette`/`cmds`
   - Temalar `THEMES` + `themeMenu` (eski seçici, tema düğmesi), `themeStudio` (paletten), Firebase senkron `saveMeta` (Firestore `hub/meta`)
   - Köprü `window.HUB` (dosyanın sonunda) → `ui/worlds.js` bunu kullanır

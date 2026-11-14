@@ -92,6 +92,7 @@ canvas{position:fixed;inset:0;pointer-events:none}
 #widgets.moving .wg,.wg.drag{will-change:transform}
 #nodes{position:fixed;inset:0;z-index:3;pointer-events:none}
 body.panning,body.panning #stage,body.panning .node,body.panning .wg{cursor:grabbing!important}
+body.panning iframe,body.dragging iframe,body.panning .peek{pointer-events:none!important}
 body.far .nlabel{opacity:0}
 body.far .port{display:none}
 /* far away, apps shrink to coloured dots so the galaxy reads as clusters */
@@ -790,7 +791,7 @@ body,.btn,.mi,.pal-in,input,textarea,button{font-family:var(--font)}
   <span class="psep"></span>
   <div class="tabs" id="tabs" role="tablist" aria-label="Açık uygulamalar"></div>
   <span class="psep"></span>
-  <button data-w="sw" title="Tüm açık uygulamalar · Alt+Q" aria-label="Uygulama değiştirici"><svg viewBox="0 0 16 16"><rect x="2.5" y="3.5" width="5" height="9" rx="1.5"/><rect x="9.5" y="3.5" width="4" height="9" rx="1.5"/></svg></button>
+  <button data-w="sw" title="Tüm açık uygulamalar · Shift+Tab ya da Alt+Q" aria-label="Uygulama değiştirici"><svg viewBox="0 0 16 16"><rect x="2.5" y="3.5" width="5" height="9" rx="1.5"/><rect x="9.5" y="3.5" width="4" height="9" rx="1.5"/></svg></button>
   <button data-w="reload" title="Yenile"><svg viewBox="0 0 16 16"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2.5v3h-3"/></svg></button>
   <button data-w="tab" id="wTab" title="Yeni sekmede aç"><svg viewBox="0 0 16 16"><path d="M9.5 2.5h4v4M13.5 2.5L7.5 8.5M12 9.5v3.5H3V4h3.5"/></svg></button>
   <button data-w="fs" id="wFs" title="Tarayıcı tam ekranı (F)"><svg viewBox="0 0 16 16"><path id="fsIcon" d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg></button>
@@ -1509,7 +1510,7 @@ function autoPlace(created){if(!autoCl||!booted)return;const plan=[];
   if(!plan.length)return;const undo=applyPlan(plan);toast(plan.length>1?`${plan.length} yeni uygulama yıldızına yerleşti`:`${plan[0].a.name} → ${plan[0].name||plan[0].newName} (oto)`,undo)}
 /* ── Stars can be dragged anywhere; a click (no drag) still opens the küme menu ── */
 let starDrag=null;
-function startStarDrag(e,id){const sx=e.clientX,sy=e.clientY;let moved=false;hideMenu();hidePeek(true);
+function startStarDrag(e,id){const sx=e.clientX,sy=e.clientY;let moved=false;hideMenu();hidePeek(true);try{$('#stage').setPointerCapture(e.pointerId)}catch{}
   const s=id==='_w'?{x:WS.x,y:WS.y}:GX.sys.find(q=>q.g===id)||{x:0,y:0},ox=s2wx(sx)-s.x,oy=s2wy(sy)-s.y;
   const mv=ev=>{if(!moved&&Math.hypot(ev.clientX-sx,ev.clientY-sy)<5)return;if(!moved){moved=true;starDrag={id,x:s.x,y:s.y};document.body.classList.add('panning')}
     starDrag.x=s2wx(ev.clientX)-ox;starDrag.y=s2wy(ev.clientY)-oy;ptr.tAmp=0;wakeMesh()};
@@ -1854,6 +1855,7 @@ function startPan(e){
   if(touches.size>2)return;
   cam.go=null;cam.vx=cam.vy=0;cam.tz=cam.z;
   const P={id:e.pointerId,sx:e.clientX,sy:e.clientY,lx:e.clientX,ly:e.clientY,lt:performance.now(),moved:false,touch:e.pointerType!=='mouse'};
+  try{(e.currentTarget&&e.currentTarget.setPointerCapture?e.currentTarget:$('#stage')).setPointerCapture(e.pointerId)}catch{}
   if(P.touch){ptr.down=true;ptr.x=ptr.sx=e.clientX;ptr.y=ptr.sy=e.clientY;ptr.tAmp=1;wakeMesh()}
   const mv=ev=>{
     const tp=touches.get(ev.pointerId);if(tp){tp.x=ev.clientX;tp.y=ev.clientY}
@@ -1952,7 +1954,7 @@ function islandItems(){const out=[],r=STUDY.run;
   const dated=NOTES.reduce((a,p)=>a+(p?.blocks||[]).filter(b=>b.d===k&&!(b.t==='todo'&&b.c)).length,0);
   if(open+dated)out.push({k:'today',pri:2,ic:'<i class="ico">☑</i>',t:`Bugün ${open+dated} açık iş`,v:'',sub:'Notlar',act:'<button data-isl="today">Aç</button>'});
   const ev=(GCAL.ev||[]).find(e=>!e.all&&new Date(e.s.replace(' ','T'))>Date.now());if(ev){const mins=Math.round((new Date(ev.s)-Date.now())/6e4);if(mins<12*60)out.push({k:'event',pri:mins<30?6:2,ic:'<i class="ico">▦</i>',t:ev.t,v:ev.s.slice(11,16),sub:mins<60?mins+' dk sonra':'takvim',act:''})}
-  if(TABS.length)out.push({k:'apps',pri:1,ic:'<i class="ico">▣</i>',t:`${TABS.length} uygulama açık`,v:'',sub:'Alt+Q',act:'<button data-isl="sw">Geç</button>'});
+  if(TABS.length)out.push({k:'apps',pri:1,ic:'<i class="ico">▣</i>',t:`${TABS.length} uygulama açık`,v:'',sub:'Shift+Tab',act:'<button data-isl="sw">Geç</button>'});
   return out.sort((a,b)=>b.pri-a.pri)}
 let islOpen=false,islKey='';
 function paintFocusBar(){const b=$('#focusBar');if(!b)return;const it=islandItems();
@@ -2532,7 +2534,7 @@ function renderTabs(){const cur=curTab();
 function renderDock(){const d=$('#dock');
   d.innerHTML=`<span class="dk-l">Açık</span>`+mru().map(t=>{const m=miniIcon(t.app);
     return `<div class="dk${t.fr?'':' zz'}"><button class="dk-o" data-t="${esc(t.key)}" title="${esc(t.app.name)}"><span class="mini" style="${m.style}">${m.html}</span><span class="t">${esc(t.app.name)}</span></button><button class="dk-x" data-x="${esc(t.key)}" aria-label="${esc(t.app.name)} uygulamasını kapat" title="Kapat">${XI}</button></div>`}).join('')+
-    `<button class="dk-sw" data-sw aria-label="Uygulama değiştirici" title="Değiştirici · Alt+Q"><svg viewBox="0 0 16 16"><rect x="2.5" y="3.5" width="5" height="9" rx="1.5"/><rect x="9.5" y="3.5" width="4" height="9" rx="1.5"/></svg></button>`}
+    `<button class="dk-sw" data-sw aria-label="Uygulama değiştirici" title="Değiştirici · Shift+Tab ya da Alt+Q"><svg viewBox="0 0 16 16"><rect x="2.5" y="3.5" width="5" height="9" rx="1.5"/><rect x="9.5" y="3.5" width="4" height="9" rx="1.5"/></svg></button>`}
 function onTabClick(e){const x=e.target.closest('[data-x]');if(x){e.stopPropagation();closeTab(x.dataset.x);return}
   if(e.target.closest('[data-sw]')){switcher(false,0);return}
   const b=e.target.closest('[data-t]');if(b)switchTo(b.dataset.t)}
@@ -2551,14 +2553,17 @@ function switcher(alt,step){
     drawSwitcher();anim(SW.el,[{opacity:0},{opacity:1}],{duration:160,easing:EASE});anim(SW.el.firstChild,[{opacity:0,transform:'scale(.96)'},{opacity:1,transform:'none'}],{duration:320,easing:OUT})}
   else{SW.sel=(SW.sel+step+SW.list.length)%SW.list.length;drawSwitcher()}}
 function drawSwitcher(){if(!SW)return;const front=curTab();SW.list=SW.list.filter(it=>it.home||TABS.includes(it.t));SW.sel=Math.min(SW.sel,SW.list.length-1);
-  SW.el.innerHTML=`<div class="as"><div class="as-h">Açık uygulamalar <span>${FINE?'Alt basılıyken Q ile gez · bırakınca açılır':'Dokunarak geç'}</span></div><div class="as-g">`+SW.list.map((it,i)=>{
+  SW.el.innerHTML=`<div class="as"><div class="as-h">Açık uygulamalar <span>${FINE?(SW.shift?'Shift basılıyken Tab ile gez · bırakınca açılır':'Alt basılıyken Q ile gez · bırakınca açılır'):'Dokunarak geç'}</span></div><div class="as-g">`+SW.list.map((it,i)=>{
     if(it.home)return `<button class="as-c home${i===SW.sel?' sel':''}" data-i="${i}"><span class="as-ic"><svg viewBox="0 0 24 24"><path d="M4 11l8-6.5 8 6.5M6.5 9.5V19h11V9.5"/></svg></span><b>Ana ekran</b><small>Alt+H</small></button>`;
     const t=it.t,m=miniIcon(t.app),k=TABS.indexOf(t);
     return `<div class="as-w"><button class="as-c${i===SW.sel?' sel':''}${t===front&&!W.min?' cur':''}" data-i="${i}"><span class="as-ic mini" style="${m.style}">${m.html}</span><b>${esc(t.app.name)}</b><small>${t.fr?(k<9?'Alt+'+(k+1):'açık'):'uykuda · dokununca yüklenir'}</small></button><button class="as-x" data-x="${esc(t.key)}" aria-label="${esc(t.app.name)} uygulamasını kapat" title="Kapat">${XI}</button></div>`}).join('')+`</div></div>`}
 function switcherPick(){if(!SW)return;const it=SW.list[SW.sel];closeSwitcher();if(!it)return;if(it.home)goHome();else switchTo(it.t.key)}
 function closeSwitcher(){if(!SW)return;const el=SW.el;SW=null;anim(el,[{opacity:1},{opacity:0}],{duration:140,easing:EASE}).finished.then(()=>el.remove(),()=>el.remove())}
 // shared by the hub and every open app (same-origin frames forward their keys here)
+const isEditable=t=>!!t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName||''));
 function osKeys(e){
+  /* Shift+Tab: Alt+Tab gibi — Shift basılıyken Tab ile gez, Shift'i bırakınca açılır (yazı alanında normal Shift+Tab) */
+  if(e.key==='Tab'&&e.shiftKey&&!e.altKey&&!e.ctrlKey&&!e.metaKey&&!SW&&TABS.length&&!isEditable(e.target)&&!document.querySelector('.sheet-scrim,.pal-bg,.wp-bg')){e.preventDefault();switcher(true,1);if(SW){SW.shift=true;drawSwitcher()}return true}
   if(e.altKey&&!e.ctrlKey&&!e.metaKey){const c=e.code;
     if(c==='KeyQ'||c==='Backquote'){e.preventDefault();switcher(true,e.shiftKey?-1:1);return true}
     if(/^Digit[1-9]$/.test(c)){const t=TABS[+c.slice(5)-1];if(t){e.preventDefault();closeSwitcher();switchTo(t.key);return true}return false}
@@ -2566,10 +2571,10 @@ function osKeys(e){
     if(c==='KeyW'&&W.app&&!W.min){e.preventDefault();closeWin();return true}}
   if(SW){if(e.key==='Escape'){e.preventDefault();closeSwitcher();return true}
     if(e.key==='Enter'){e.preventDefault();switcherPick();return true}
-    if(e.key==='ArrowRight'||e.key==='ArrowLeft'||e.key==='Tab'){e.preventDefault();switcher(SW.alt,e.key==='ArrowLeft'||e.shiftKey?-1:1);return true}}
+    if(e.key==='ArrowRight'||e.key==='ArrowLeft'||e.key==='Tab'){e.preventDefault();switcher(SW.alt,e.key==='ArrowLeft'||(e.shiftKey&&!SW.shift)?-1:1);return true}}
   if(e.key==='Escape'&&e.shiftKey&&W.app&&!W.min){e.preventDefault();closeWin();return true}
   return false}
-function osKeyUp(e){if(SW?.alt&&(e.key==='Alt'||!e.altKey))switcherPick()}
+function osKeyUp(e){if(!SW?.alt)return;if(SW.shift){if(e.key==='Shift')switcherPick();return}if(e.key==='Alt'||!e.altKey)switcherPick()}
 addEventListener('keyup',osKeyUp,true);
 addEventListener('blur',()=>{if(SW?.alt)SW.alt=false});
 
@@ -2695,7 +2700,7 @@ function shortcuts(){
     <span>Ara / komut paleti</span><span>${K('⌘','K')}</span><span>Yeni taslak</span><span>${K('⌘','N')}</span>
     <span>Galaksiyi göster</span><span>${K('G')}</span><span>Tema değiştir</span><span>${K('⇧','⌘','L')}</span>
     <span>Tarayıcı tam ekranı</span><span>${K('F')}</span><span>Uygulamayı kapat</span><span>${K('⇧','Esc')}</span>
-    <span>Uygulamalar arası geç</span><span>${K('Alt','Q')}</span><span>N. uygulamaya git</span><span>${K('Alt','1–9')}</span>
+    <span>Uygulamalar arası geç</span><span>${K('⇧','Tab')} · ${K('Alt','Q')}</span><span>N. uygulamaya git</span><span>${K('Alt','1–9')}</span>
     <span>Ana ekrana dön</span><span>${K('Alt','H')}</span><span>Bu uygulamayı kapat</span><span>${K('Alt','W')}</span>
     <span>Bağlantı kur</span><span>${K('⇧')} + sürükle</span><span>Kısayollar</span><span>${K('?')}</span>
     <span>Boş alana çift tıkla</span><span>yeni taslak</span><span>HTML'i ekrana bırak</span><span>taslak ekle</span>

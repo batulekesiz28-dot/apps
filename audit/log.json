@@ -1084,5 +1084,34 @@
     "fix": "İz yayı artık hiç sarmıyor"
    }
   ]
+ },
+ {
+  "at": "2026-11-14T16:33:28",
+  "change": "Kaydırma takılması düzeltildi (imleç sürüklerken sahneye kilitli, iframe'ler olay yutmuyor); Shift+Tab ile Alt+Tab gibi uygulamalar arası geçiş",
+  "scores": {
+   "Hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Hub masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Hub",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Galaksiyi kaydırırken imleç bir iframe'in (önizleme, gömülü Google öğesi, açık uygulama) üstünden geçince kaydırma duruyordu",
+    "fix": "Sürüklerken imleç sahneye kilitleniyor, iframe'ler tıklamaya kapanıyor"
+   },
+   {
+    "app": "Hub",
+    "sev": "bilgi",
+    "status": "fixed",
+    "text": "Shift+Tab: Shift basılıyken Tab ile uygulamalar arasında gez, bırakınca açılır; yazı alanlarında normal çalışır"
+   }
+  ]
  }
 ]

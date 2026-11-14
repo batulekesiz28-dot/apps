@@ -1113,5 +1113,28 @@
     "text": "Shift+Tab: Shift basılıyken Tab ile uygulamalar arasında gez, bırakınca açılır; yazı alanlarında normal çalışır"
    }
   ]
+ },
+ {
+  "at": "2026-11-14T16:36:28",
+  "change": "Shift+Tab artık odağı sayfadan (Windows/tarayıcıya) kaçırmıyor",
+  "scores": {
+   "Hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Hub masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Hub",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Hiç uygulama açık değilken Shift+Tab odağı tarayıcıya/Windows'a geçiriyordu",
+    "fix": "Shift+Tab her zaman yakalanıyor; uygulama yoksa uyarı çıkıyor, odak sayfada kalıyor"
+   }
+  ]
  }
 ]

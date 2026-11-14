@@ -2563,7 +2563,7 @@ function closeSwitcher(){if(!SW)return;const el=SW.el;SW=null;anim(el,[{opacity:
 const isEditable=t=>!!t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName||''));
 function osKeys(e){
   /* Shift+Tab: Alt+Tab gibi — Shift basılıyken Tab ile gez, Shift'i bırakınca açılır (yazı alanında normal Shift+Tab) */
-  if(e.key==='Tab'&&e.shiftKey&&!e.altKey&&!e.ctrlKey&&!e.metaKey&&!SW&&TABS.length&&!isEditable(e.target)&&!document.querySelector('.sheet-scrim,.pal-bg,.wp-bg')){e.preventDefault();switcher(true,1);if(SW){SW.shift=true;drawSwitcher()}return true}
+  if(e.key==='Tab'&&e.shiftKey&&!e.altKey&&!e.ctrlKey&&!e.metaKey&&!SW&&!isEditable(e.target)&&!document.querySelector('.sheet-scrim,.pal-bg,.wp-bg')){e.preventDefault();e.stopPropagation();if(!TABS.length){if(!e.repeat)toast('Açık uygulama yok — bir uygulama açınca Shift+Tab ile aralarında gezersin');return true}switcher(true,1);if(SW){SW.shift=true;drawSwitcher()}return true}
   if(e.altKey&&!e.ctrlKey&&!e.metaKey){const c=e.code;
     if(c==='KeyQ'||c==='Backquote'){e.preventDefault();switcher(true,e.shiftKey?-1:1);return true}
     if(/^Digit[1-9]$/.test(c)){const t=TABS[+c.slice(5)-1];if(t){e.preventDefault();closeSwitcher();switchTo(t.key);return true}return false}
@@ -2576,6 +2576,7 @@ function osKeys(e){
   return false}
 function osKeyUp(e){if(!SW?.alt)return;if(SW.shift){if(e.key==='Shift')switcherPick();return}if(e.key==='Alt'||!e.altKey)switcherPick()}
 addEventListener('keyup',osKeyUp,true);
+addEventListener('keydown',e=>{if(e.key==='Tab'&&e.shiftKey&&!document.body.classList.contains('locked')&&osKeys(e))e.stopPropagation()},true);
 addEventListener('blur',()=>{if(SW?.alt)SW.alt=false});
 
 /* ── Touch: swipe the handle (or an app's screen edge) to change apps ── */

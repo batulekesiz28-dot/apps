@@ -1220,6 +1220,7 @@ $('#view').addEventListener('keydown',e=>{
   if(slash&&slashKey(e))return;
   const mod=e.metaKey||e.ctrlKey;
   if(mod&&e.key==='Enter'&&b.t==='todo'){e.preventDefault();toggleTodo(b);return}
+  if(mod&&e.key==='Enter'&&['p','bullet','num'].includes(b.t)){e.preventDefault();setType(b,'todo',caretOff(el));return}
   if(e.altKey&&e.shiftKey&&(e.key==='ArrowUp'||e.key==='ArrowDown')){e.preventDefault();moveBlock(b,e.key==='ArrowUp'?-1:1);focusBlock(b,caretOff(el),f);return}
   if(mod&&['b','i','u'].includes(e.key.toLowerCase())){e.preventDefault();document.execCommand({b:'bold',i:'italic',u:'underline'}[e.key.toLowerCase()]);syncEl(el);return}
   if(mod&&e.shiftKey&&e.key.toLowerCase()==='x'){e.preventDefault();document.execCommand('strikeThrough');syncEl(el);return}

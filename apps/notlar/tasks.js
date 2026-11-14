@@ -168,7 +168,7 @@ const Tasks=(()=>{
     if(s==='today'){const L=scoped('today'),late=L.filter(x=>TK.dayOf(x)&&TK.dayOf(x)<t&&x.status!=='done').sort(sorter),now=L.filter(x=>!late.includes(x)&&x.status!=='done').sort(sorter),done=L.filter(x=>x.status==='done');
       if(!L.length)return empty(s);
       return`${late.length?`${H('Gecikmiş','<button class="tk-lnk" data-tkall-today>Bugüne al</button>')}<div class="tk-list" data-drop-day="${t}">${late.map(x=>row(x)).join('')}</div>${H(E(fmtLong(t)))}`:''}
-        <div class="tk-list" data-drop-day="${t}">${now.map(x=>row(x,{hideDate:true})).join('')||'<div class="tk-none">Bugünlük hepsi tamam.</div>'}</div>${fold(done)}`}
+        <div class="tk-list" data-drop-day="${t}">${now.map(x=>row(x,{hideDate:true})).join('')||'<div class="tk-none">Bugünlük hepsi tamam.</div>'}</div>${done.length?`${H(`Tamamlandı<small>${done.length}/${done.length+now.length+late.length}</small>`)}<div class="tk-list tk-donel">${done.map(x=>row(x,{hideDate:true,drag:false})).join('')}</div>`:''}`}
     if(s==='upcoming'){const L=scoped('upcoming'),by={};for(const x of L){const d=TK.dayOf(x);(by[d]=by[d]||[]).push(x)}
       const nod=TK.list().filter(x=>!TK.dayOf(x)&&x.status!=='done').sort(sorter);if(!L.length&&!nod.length)return empty(s);
       return Object.keys(by).sort().map(d=>`${H(`${E(dl(d))}<small>${E(fmtWd(d))}</small>`)}<div class="tk-list" data-drop-day="${d}">${by[d].sort(sorter).map(x=>row(x,{hideDate:true})).join('')}</div>`).join('')
@@ -236,7 +236,7 @@ const Tasks=(()=>{
   /* ── tamamla: küçük, tatmin edici animasyon ── */
   function complete(t){const was=t.status==='done',rowEl=$(`.tk-row[data-tid="${CSS.escape(t.id)}"]`);const n=TK.setStatus(t,was?'todo':'done');if(open===t.id)open=n.id;
     if(!was&&rowEl&&!matchMedia('(prefers-reduced-motion: reduce)').matches&&document.documentElement.dataset.motion!=='off'){busy=true;rowEl.classList.add('tk-pop');const c=rowEl.querySelector('.tk-chk');c?.classList.add('on');
-      setTimeout(()=>{rowEl.classList.add('tk-out');setTimeout(()=>{busy=false;refresh()},260)},420)}else refresh();
+      setTimeout(()=>{busy=false;refresh()},520)}else refresh();
     if(!was&&t.series){const k=streak(TK.tasks.get(t.series));if(k.cur>=3)toast(`🔥 ${t.title}: ${k.cur} gün seri`)}}
   function refresh(){if(typeof view!=='undefined'&&view==='tasks')render();else if(typeof renderView==='function'&&['cal','stats','acts'].includes(view))renderView(true)}
 

@@ -143,3 +143,10 @@
 .tk-dp{width:min(400px,calc(100vw - 20px))}.tk-props{grid-template-columns:58px minmax(0,1fr)}.tk-dr input[type=date]{width:138px}.tk-dr input[type=time]{width:110px}.tk-dr .tk-lnk{padding:2px 5px}
 @media (max-width:760px){.tk-tabs button{flex:1 1 auto;padding:0 6px;font-size:12.5px}.tk-row>.tk-ib{display:none}.tk-dr input[type=date]{width:150px}}
 @media (max-width:760px){.tk-tabs{gap:0}.tk-tabs button{padding:0 3px;font-size:12px}.tk-props{grid-template-columns:1fr;gap:4px}.tk-props>label{margin-top:6px}.tk-prs{gap:2px}.tk-prs button{padding:0 8px}}
+/* işaret kutusu net görünsün: bitti / bitmedi ilk bakışta belli */
+.tk-row>.tk-chk{width:22px;height:22px;box-shadow:inset 0 0 0 2px var(--pc)}
+.tk-chk.p0{--pc:color-mix(in srgb,var(--ink) 40%,transparent)}.tk-chk.p1{--pc:color-mix(in srgb,var(--ink) 55%,transparent)}
+.tk-row:hover>.tk-chk:not(.on)::after{transform:translateY(-1px) rotate(-45deg) scale(1);opacity:.45}
+.tk-row.done>.tk-chk{background:#30A46C}.tk-row.done>.tk-chk::after{border-color:#fff}
+.tk-pop>.tk-chk{background:#30A46C!important;box-shadow:none}.tk-pop>.tk-chk::after{border-color:#fff!important;transform:translateY(-1px) rotate(-45deg) scale(1)!important;opacity:1!important}
+.tk-row.done .tk-t{color:var(--ink3)}

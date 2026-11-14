@@ -109,3 +109,107 @@
 @media (prefers-reduced-motion:reduce){.tm-ev,.tm-chk::after,.tm-tr i{transition:none}}
 @media (max-width:760px){.cal-h{flex-wrap:wrap;row-gap:8px}.cal-h h1{flex-basis:100%;font-size:28px}.cal-h .tm-mseg{margin-right:auto}}
 @media (max-width:480px){#topSrch,.top .modes a[data-mode=ws]{display:none!important}.tnav a{min-width:40px;padding:0 9px}}
+
+/* ══ Takvim · zarif düzen ══════════════════════════════════════════
+   Notion Calendar'ın kıl çizgileri, Apple Takvim'in nokta+başlık ay görünümü,
+   Fantastical/Amie'nin kenarlıksız yumuşak blokları. Daktilo yazı yok: Geist +
+   eşit genişlikte rakamlar. Bugün = koyu daire, "şimdi" = kırmızı çizgi. */
+.cal,.tm-page{--gl:color-mix(in srgb,var(--ink) 7%,transparent);font-variant-numeric:tabular-nums}
+/* başlık ve küçük başlıklar */
+.cal .cal-h{margin-bottom:22px}.cal .cal-h h1{font-size:38px;letter-spacing:-.025em}.cal .cal-h h1 em{font-size:.6em;margin-left:4px;color:var(--ink3)}
+.cal .cal-h .tb{border-radius:9px}
+.cal .sh,.tm-page .sh{margin:26px 0 8px;font:600 13px/1.2 var(--font);letter-spacing:-.005em;text-transform:none;color:var(--ink)}
+.cal .sh .rule,.tm-page .sh .rule{display:none}
+.cal .dp .sh:first-of-type{margin-top:22px}
+/* ── ay ── */
+.cal .dow{padding:0 0 10px;font:500 12px var(--font);letter-spacing:0;text-transform:none;color:var(--ink3)}
+.cal .dow span{padding-left:10px}
+.cal .grid{border:0}
+.cal .cd{min-height:116px;padding:8px 6px 8px;border:0;border-top:.5px solid var(--gl);gap:2px;isolation:isolate}
+.cal .cd:not(:nth-child(7n)){border-right:.5px solid var(--gl)}
+.cal .cd:hover{background:none}.cal .cd:hover::before{opacity:1}
+.cal .cd::before{content:"";position:absolute;inset:3px;border-radius:12px;background:color-mix(in srgb,var(--ink) 3%,transparent);opacity:0;transition:opacity .2s;z-index:-1}
+.cal .cd.wk{background:none}
+.cal .cd .dn{min-width:26px;height:26px;margin:0 0 4px 2px;padding:0 7px;border-radius:13px;font:500 13px var(--font);color:var(--ink)}
+.cal .cd.out .dn{color:var(--ink4)}.cal .cd.out .chips{opacity:.5}
+.cal .cd.today .dn{background:var(--ink);color:var(--bg);font-weight:600}
+.cal .cd.sel{background:none}
+.cal .cd.sel::after{inset:3px;border-radius:12px;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ink) 16%,transparent);background:color-mix(in srgb,var(--ink) 3.5%,transparent);z-index:-1}
+.cal .cd.over::before{opacity:1;background:var(--sel)}
+.cal .cd .chips{display:flex;flex-direction:column;gap:1px;min-width:0;width:100%;overflow:hidden}
+.cal .tm-mc,.cal .tk-chip,.cal .c2{max-width:100%;overflow:hidden;height:20px;padding:0 5px;border-radius:6px;background:none;box-shadow:none;font-size:12px;color:var(--ink);transition:background .15s}
+.cal .tm-mc:hover,.cal .tk-chip:hover,.cal .c2:hover{background:color-mix(in srgb,var(--c,var(--ink)) 10%,transparent);box-shadow:none}
+.cal .tm-mc i{width:6px;height:6px}.cal .tm-mc em{font-style:normal;color:var(--ink3);margin-right:1px}
+.cal .tm-mc.st-done span{opacity:1;color:var(--ink3)}
+.cal .c2{color:var(--ink2)}
+.cal .cd .more{font:500 11.5px var(--font);color:var(--ink3);padding-left:6px}
+/* ── gün / hafta ── */
+.cal .tm-g{border-radius:0;box-shadow:none;background:none;overflow:visible}
+.cal .tm-gh{border-bottom:.5px solid var(--gl);padding-bottom:6px}
+.cal .tm-dh{flex-direction:row;justify-content:center;align-items:center;gap:6px;padding:6px 0;border-radius:10px;color:var(--ink3)}
+.cal .tm-dh small{font:500 12.5px var(--font);letter-spacing:0;text-transform:none;color:var(--ink3)}
+.cal .tm-dh b{display:grid;place-items:center;min-width:28px;height:28px;border-radius:14px;font-size:15px;font-weight:600;color:var(--ink)}
+.cal .tm-dh:hover{background:color-mix(in srgb,var(--ink) 3.5%,transparent)}
+.cal .tm-dh.today b{width:auto;padding:0 6px;background:var(--ink);color:var(--bg)}
+.cal .tm-ad{border-bottom:.5px solid var(--gl)}
+.cal .tm-ad>span{font:500 11px var(--font);text-transform:none;color:var(--ink3);padding:8px 8px 0 0}
+.cal .tm-adc{border-left:.5px solid var(--gl)}
+.cal .tm-gs{scrollbar-width:none;-webkit-mask:linear-gradient(to bottom,transparent,#000 10px,#000 calc(100% - 18px),transparent)}
+.cal .tm-gs::-webkit-scrollbar{display:none}
+.cal .tm-gb{background-image:repeating-linear-gradient(to bottom,var(--gl) 0 .5px,transparent .5px 54px)}
+.cal .tm-hrs span{right:10px;font:500 11px var(--font);color:var(--ink3);letter-spacing:.01em}
+.cal .tm-col{border-left:.5px solid var(--gl)}
+.cal .tm-col:hover,.cal .tm-col.today{background:none}
+.cal .tm-ev{left:2px;right:3px;padding:5px 8px 5px 10px;border-radius:9px;background:color-mix(in srgb,var(--c) 15%,var(--bg));box-shadow:none;
+  color:color-mix(in srgb,var(--c) 55%,var(--ink))}
+.cal .tm-ev::before{content:"";position:absolute;left:3px;top:4px;bottom:4px;width:3px;border-radius:2px;background:var(--c)}
+.cal .tm-ev b{font-size:12.5px;font-weight:600;color:inherit;letter-spacing:-.005em}
+.cal .tm-ev small{color:color-mix(in srgb,var(--c) 40%,var(--ink2));font-size:12px}
+.cal .tm-ev.st-plan{background:color-mix(in srgb,var(--c) 9%,var(--bg));box-shadow:none}
+.cal .tm-ev.st-done{background:color-mix(in srgb,var(--c) 22%,var(--bg))}
+.cal .tm-ev:hover{box-shadow:0 8px 20px -12px color-mix(in srgb,var(--c) 70%,transparent)}
+.cal .tm-ev.drag{box-shadow:0 18px 36px -14px rgba(0,0,0,.4)}
+[data-theme=dark] .cal .tm-ev{color:color-mix(in srgb,var(--c) 35%,var(--ink))}
+[data-theme=dark] .cal .tm-ev small{color:color-mix(in srgb,var(--c) 30%,var(--ink2))}
+.cal .tm-now{height:1.5px}.cal .tm-now::before{left:-5px;top:-4px;width:9px;height:9px;box-shadow:0 0 0 2px var(--bg)}
+.cal .tm-chip{border-radius:6px;background:color-mix(in srgb,var(--c,var(--ink3)) 13%,transparent)}
+/* ── sağdaki gün paneli ── */
+.cal .dp h2{font-size:30px;letter-spacing:-.02em}
+.cal .dp .wd{display:block;padding:0;text-align:left;font:400 13px var(--font);letter-spacing:0;text-transform:none;color:var(--ink3);margin-top:4px}
+.cal .dp .tm-qa{background:none;box-shadow:inset 0 -.5px 0 var(--gl);border-radius:0;padding-left:2px;height:40px}
+.cal .dp .tm-qa:focus-within{background:none;box-shadow:inset 0 -1px 0 var(--ink)}
+.cal .dp .row{background:none;box-shadow:none;padding:8px 6px}.cal .dp .row:hover{background:color-mix(in srgb,var(--ink) 4%,transparent);box-shadow:none}
+.cal .dp .row small{font:400 12px var(--font)}
+.cal .dp .lst{margin:4px 0 6px;gap:0}
+.cal .dp .none{font-size:13px;padding:6px 2px}
+.cal .dp>.pill{background:none;padding:0 6px;margin:8px 0 0!important;color:var(--ink2)}.cal .dp>.pill:hover{background:color-mix(in srgb,var(--ink) 4%,transparent);color:var(--ink)}
+.cal .tchips{gap:2px 4px}.cal .tchips .pill{height:28px;background:none;box-shadow:inset 0 0 0 .5px var(--line2);border-radius:999px;font-size:12.5px;color:var(--ink2);padding:0 11px}
+.cal .tchips .pill:hover{background:color-mix(in srgb,var(--ink) 4%,transparent);color:var(--ink)}
+/* ── aktivite satırları (panel + Aktiviteler + İstatistikler) ── */
+.cal .tm-act,.tm-page .tm-act{min-height:48px;border-radius:10px}
+.tm-page .tm-act{border-bottom:.5px solid var(--gl);border-radius:0}.tm-page .tm-act:hover{border-radius:10px;border-color:transparent}
+.cal .tm-bar,.tm-page .tm-bar{width:3px;justify-self:center;align-self:center;height:26px}
+.cal .tm-act.st-plan .tm-bar,.tm-page .tm-act.st-plan .tm-bar{background:color-mix(in srgb,var(--c) 45%,transparent);box-shadow:none}
+.cal .tm-time,.tm-page .tm-time{font:500 13px var(--font);color:var(--ink2)}
+.cal .tm-dur,.tm-page .tm-dur{font:400 13px var(--font);color:var(--ink3)}
+.cal .tm-tt,.tm-page .tm-tt{font-weight:500}
+.cal .tm-st,.tm-page .tm-st{height:24px;padding:0 8px;box-shadow:none;background:none;font-weight:500;color:var(--ink3)}
+.cal .tm-st:hover,.tm-page .tm-st:hover{background:color-mix(in srgb,var(--ink) 5%,transparent);color:var(--ink)}
+.tm-page .tm-dg{padding:22px 4px 4px}.tm-page .tm-dg b{font-size:15px}
+.tm-page .tm-hb span:last-child{font:500 13px var(--font)}
+.tm-page .tm-cc{font:500 12px var(--font)}
+.tm-page .tm-kpis b{font-size:24px;font-weight:600;letter-spacing:-.03em;white-space:nowrap}
+@media (max-width:760px){
+  .cal .cal-h h1{font-size:30px}
+  .cal .cd{min-height:68px;padding:5px 2px;align-items:center}.cal .cd .dn{margin:0 0 3px;align-self:center;font-size:13px}
+  .cal .cd .chips{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:3px}
+  .cal .tm-mc,.cal .tk-chip,.cal .c2{width:6px;height:6px;padding:0;border-radius:50%;font-size:0;background:var(--c,var(--ink3))}
+  .cal .tk-chip{background:var(--p,var(--ink3))}.cal .tm-mc i,.cal .tm-mc span,.cal .tk-chip>*,.cal .c2>*{display:none}
+  .cal .dow span{padding-left:0;text-align:center}
+  .cal .tm-g{--hw:46px}.cal .tm-hrs span{right:6px;font-size:12px}
+  .cal .tm-dh{flex-direction:column;gap:2px}.cal .tm-dh small{font-size:12px}
+  .cal .tm-ev{padding:4px 3px 4px 8px}.cal .tm-ev::before{left:2px}
+  .cal .tm-ev b{white-space:normal;word-break:normal;overflow-wrap:normal;text-overflow:clip;font-size:12px;line-height:1.3;max-height:calc(3 * 1.3em)}
+  .cal .tm-g.wk .tm-ev small{display:none}
+}
+@media (prefers-reduced-motion:reduce){.cal .cd::before{transition:none}}

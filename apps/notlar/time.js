@@ -153,7 +153,7 @@ const Time=(()=>{
     $('#view').innerHTML=`<div class="wide cal tm-cal"><div class="tm-gwrap">
       <div class="cal-h"><h1>${title}</h1>${modeSeg()}<button class="tb" data-gnav="-1" title="Önceki">${I.l}</button><button class="tb" data-gnav="0">Bugün</button><button class="tb" data-gnav="1" title="Sonraki">${I.r}</button></div>
       ${qaHTML('Aktivite ekle — ör. “Spor 18:00-19:00 koşu” ya da “yarın 10-12 İş toplantı”',calMode==='day'?sd:'')}
-      <div class="tm-g" style="--n:${days.length}"><div class="tm-gh"><span></span>${days.map(d=>`<button class="tm-dh${d===t?' today':''}${d===sd?' sel':''}" data-gpick="${d}"><small>${DOW[(pd(d).getDay()+6)%7]}</small><b>${pd(d).getDate()}</b></button>`).join('')}</div>
+      <div class="tm-g${days.length>1?' wk':''}" style="--n:${days.length}"><div class="tm-gh"><span></span>${days.map(d=>`<button class="tm-dh${d===t?' today':''}${d===sd?' sel':''}" data-gpick="${d}"><small>${DOW[(pd(d).getDay()+6)%7]}</small><b>${pd(d).getDate()}</b></button>`).join('')}</div>
         <div class="tm-ad"><span>tüm gün</span>${days.map(d=>`<div class="tm-adc" data-gday-ad="${d}">${allday(d)}</div>`).join('')}</div>
         <div class="tm-gs" id="tmScroll"><div class="tm-gb" style="height:${1440*PX}px"><div class="tm-hrs">${[...Array(24)].map((_,h)=>`<span style="top:${h*60*PX}px">${String(h).padStart(2,'0')}:00</span>`).join('')}</div>${cols}</div></div></div></div>
       <aside class="dp" id="dp"></aside></div>`;
@@ -261,5 +261,5 @@ const Time=(()=>{
     TM.on(()=>{if(!busy&&['cal','acts','tasks','stats'].includes(cur()))rerender()})}
   function rerender(soft){if(typeof renderView==='function'&&['cal','acts','tasks','stats'].includes(cur()))renderView(!soft)}
   /* ay görünümü hücrelerine aktivite şeritleri */
-  function monthChips(d){const L=TM.onDay(d);if(!L.length)return'';return L.slice(0,3).map(a=>{const c=TM.cat(a.cat);return`<div class="tm-mc st-${a.status}" draggable="true" data-mact="${a.id}" data-act-open="${a.id}" style="--c:${c.color}" title="${E(a.title)}${a.start?' · '+a.start:''}"><i></i><span>${a.start?a.start+' ':''}${E(a.title)}</span></div>`}).join('')+(L.length>3?`<div class="more">+${L.length-3} aktivite</div>`:'')}
+  function monthChips(d){const L=TM.onDay(d);if(!L.length)return'';return L.slice(0,3).map(a=>{const c=TM.cat(a.cat);return`<div class="tm-mc st-${a.status}" draggable="true" data-mact="${a.id}" data-act-open="${a.id}" style="--c:${c.color}" title="${E(a.title)}${a.start?' · '+a.start:''}"><i></i><span>${a.start?`<em>${a.start}</em> `:''}${E(a.title)}</span></div>`}).join('')+(L.length>3?`<div class="more">+${L.length-3} aktivite</div>`:'')}
   return{get calMode(){return calMode},renderGrid,dayPanelExtra,monthChips,renderActs,renderTasks,renderStats,bind,newAct,quickAdd,parse,tasks,modeSeg}})();

@@ -1689,5 +1689,48 @@
     "fix": "Bitmiş görevde kenar halkası kaldırıldı"
    }
   ]
+ },
+ {
+  "at": "2026-11-14T20:20:56",
+  "change": "Takvim, Aktiviteler, İstatistikler yeniden giydirildi: daktilo yazı yerine Geist, kutusuz kıl çizgili ızgara, kenarlıksız yumuşak etkinlik blokları, bugün koyu daire, ayda nokta+başlık (telefonda renkli noktalar), sade gün paneli",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Telefonda hafta görünümünde saat etiketleri kesiliyordu",
+    "fix": "Saat sütunu genişletildi"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Telefonda ay hücrelerinde etkinlikler '1…' diye anlamsız kırpılıyordu",
+    "fix": "Telefonda Apple gibi renkli noktalar"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Ay görünümünde uzun başlıklar yan hücreye taşıyordu",
+    "fix": "Hücre içinde kırpılıyor"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "open",
+    "text": "Telefonda hafta görünümünde sütunlar dar; uzun başlıklar kısalıyor (gün görünümü tam gösteriyor)"
+   }
+  ]
  }
 ]

@@ -74,6 +74,13 @@
    "color": "violet",
    "desc": "ChatGPT, Gemini ve Claude yapay zekâlarının yönettiği üç ada ülkesi: sanal siber güvenlik strateji simülasyonu, canlı savaş haritası, oyun motoru ve puanlama",
    "ai": true
+  },
+  {
+   "slug": "istatistik",
+   "name": "İstatistik",
+   "icon": "chart",
+   "color": "blue",
+   "desc": "Notlar, Study Log çalışma süreleri ve Kütüphane'den gerçek verilerle istatistik merkezi: aktivite grafikleri, ısı haritası, dağılımlar"
   }
  ]
 }

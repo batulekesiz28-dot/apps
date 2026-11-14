@@ -9,7 +9,13 @@
   function font(t){if(!F[t]||done[t])return;done[t]=1;var l=document.createElement('link');l.rel='stylesheet';l.href='https://fonts.googleapis.com/css2?family='+F[t]+'&display=swap';document.head.appendChild(l)}
   function apply(){var t=rd('appshell:theme'),m=rd('appshell:motion')||'full';
     if(SK[t]){root.setAttribute('data-skin',t);root.setAttribute('data-theme',SK[t]);font(t)}else{root.removeAttribute('data-skin');var f=rd('notlar:theme');if(f)root.setAttribute('data-theme',f)}
-    root.setAttribute('data-motion',m)}
+    root.setAttribute('data-motion',m);look()}
+  /* kişisel görünüm (hub tema stüdyosu): vurgu rengi + yazı tipi */
+  var LF={geist:['Geist','Geist:wght@300..800'],inter:['Inter','Inter:wght@300..800'],serif:['Fraunces','Fraunces:opsz,wght@9..144,300..800'],round:['Nunito','Nunito:wght@300..800'],mono:['JetBrains Mono','JetBrains+Mono:wght@300..700']};
+  function look(){var l=rd('appshell:look')||{},st=document.getElementById('lookCss');if(!st){st=document.createElement('style');st.id='lookCss';document.head.appendChild(st)}
+    var f=LF[l.font],css='';if(/^#[0-9a-f]{6}$/i.test(l.accent||''))css+='html{--accent:'+l.accent+'!important;--acc:'+l.accent+'!important}';
+    if(f){if(!document.querySelector('link[data-look="'+l.font+'"]')){var k=document.createElement('link');k.rel='stylesheet';k.setAttribute('data-look',l.font);k.href='https://fonts.googleapis.com/css2?family='+f[1]+'&display=swap';document.head.appendChild(k)}
+      css+="html{--font:'"+f[0]+"',system-ui,sans-serif!important;--serif:'"+f[0]+"',Georgia,serif!important}body{font-family:var(--font)}"}st.textContent=css}
   apply();
-  addEventListener('storage',function(e){if(e.key==='appshell:theme'||e.key==='appshell:motion'||e.key==='notlar:theme')apply()});
+  addEventListener('storage',function(e){if(e.key==='appshell:theme'||e.key==='appshell:motion'||e.key==='notlar:theme'||e.key==='appshell:look')apply()});
 })();

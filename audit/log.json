@@ -1446,5 +1446,58 @@
     "text": "Gerçek modellerle tam savaş, bilgisayarda yerel sunucu açıkken denenmeli (buradan internete çıkılamıyor)"
    }
   ]
+ },
+ {
+  "at": "2026-11-14T21:47:22",
+  "change": "İstatistik merkezi (yeni), Ctrl+K içerik araması + yeni not/görev/proje + son kullanılanlar, ana ekran düzenleri, vurgu rengi/yazı tipi/görünüm profilleri",
+  "scores": {
+   "istatistik masaüstü": {
+    "before": 92,
+    "after": 100
+   },
+   "istatistik telefon": {
+    "before": 93,
+    "after": 100
+   },
+   "hub telefon": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "istatistik",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Isı haritasındaki günler ve satırlar çok küçük dokunma alanıydı",
+    "fix": "Günler görsel kare oldu, satırlar en az 28px"
+   },
+   {
+    "app": "istatistik",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Telefonda grafik yazıları küçülüyordu",
+    "fix": "Grafikler ekran genişliğine göre çiziliyor"
+   },
+   {
+    "app": "istatistik",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Giriş ekranı gizliyken tıklamaları engelliyordu",
+    "fix": "[hidden] kuralı"
+   },
+   {
+    "app": "denetci",
+    "sev": "warn",
+    "status": "open",
+    "text": "Denetçi'de 'uyarı/not' etiketlerinin kontrastı sınırda (önceden vardı)"
+   },
+   {
+    "app": "hub",
+    "sev": "info",
+    "status": "open",
+    "text": "Köşe yuvarlaklığı, yazı boyutu, yoğunluk ayarları eklenmedi: hub'da bu değerler sabit; güvenli şekilde değiştirmek ayrı bir iş"
+   }
+  ]
  }
 ]

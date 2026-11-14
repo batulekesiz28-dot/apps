@@ -1593,5 +1593,41 @@
     "fix": "Süre sütunu genişletildi"
    }
   ]
+ },
+ {
+  "at": "2026-11-14T22:33:27",
+  "change": "Görevler: Notion/Todoist/TickTick tarzı görev sistemi (tasks.js) — tekrarlayan görevler, kanban, takvim, projeler, istatistik",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Görev detayındaki başlık kutusu tek satıra sıkışıyordu",
+    "fix": "Başlık alanı sabit yükseklikten çıkarıldı"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Telefonda haftalık görev takvimi ve kanban sütunları taşıyordu",
+    "fix": "Sütunlar ekran genişliğine göre kaydırmalı (snap) yapıldı"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "open",
+    "text": "Notların içindeki eski yapılacak satırları ayrı bölümde kalıyor; görev kayıtlarına otomatik taşınmıyor"
+   }
+  ]
  }
 ]

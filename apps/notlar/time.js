@@ -145,7 +145,7 @@ const Time=(()=>{
   function weekStart(d){return addDays(d,-((pd(d).getDay()+6)%7))}
   function renderGrid(){const sd=selDayOr(),days=calMode==='day'?[sd]:[...Array(7)].map((_,i)=>addDays(weekStart(sd),i)),t=today();
     const title=calMode==='day'?`${fmtShort(sd)} <em>${E(fmtWd(sd))}</em>`:`${fmtShort(days[0])} – ${fmtShort(days[6])}`;
-    const tk=tasks();const allday=d=>{const ta=tk.filter(o=>o.date===d),un=TM.onDay(d).filter(a=>!a.start);return`${un.map(a=>`<button class="tm-chip" data-act-open="${a.id}" style="--c:${TM.cat(a.cat).color}">${E(TM.cat(a.cat).icon)} ${E(a.title)}</button>`).join('')}${ta.slice(0,4).map(o=>`<button class="tm-chip task${o.done?' done':''}" data-tdone="${o.p.id}:${o.b.id}" title="Görev — tıklayınca tamamla">${o.done?'☑':'☐'} ${E(o.text.slice(0,40))}</button>`).join('')}${ta.length>4?`<span class="tm-more">+${ta.length-4} görev</span>`:''}`};
+    const allday=d=>{const ta=Tasks.forDay(d),un=TM.onDay(d).filter(a=>!a.start);return`${un.map(a=>`<button class="tm-chip" data-act-open="${a.id}" style="--c:${TM.cat(a.cat).color}">${E(TM.cat(a.cat).icon)} ${E(a.title)}</button>`).join('')}${Tasks.monthChips(d)}`};
     let cols='';for(const d of days){const ev=TM.onDay(d).filter(a=>a.start);
       cols+=`<div class="tm-col${d===t?' today':''}${d===sd&&calMode==='week'?' sel':''}" data-gday="${d}">${ev.map(a=>{const s=TM.hm(a.start),du=Math.max(20,a.dur||60),c=TM.cat(a.cat);
         return`<div class="tm-ev st-${a.status}" data-ev="${a.id}" style="--c:${c.color};top:${s*PX}px;height:${du*PX-2}px" tabindex="0" title="${E(a.title)} · ${a.start}${a.end?'–'+a.end:''}"><b>${E(a.title)}</b><small>${a.start}${a.end?'–'+a.end:''} · ${E(c.name)}</small><i class="tm-rs" data-rs></i></div>`}).join('')}
@@ -177,7 +177,7 @@ const Time=(()=>{
   function dayPanelExtra(d){const L=TM.onDay(d),tk=tasks().filter(o=>o.date===d),tot=L.reduce((s,a)=>s+(a.status==='done'?a.dur:0),0);
     return`<div class="sh"><span>Aktiviteler${tot?` · ${fm(tot)} tamamlandı`:''}</span><span class="rule"></span></div>${qaHTML('Ekle — ör. 14:00-15:30 Eğitim SAT',d)}
       <div class="tm-dl">${L.length?L.map(a=>actRow(a)).join(''):'<div class="none">Bu gün için aktivite yok.</div>'}</div>
-      <div class="sh"><span>Görevler</span><span class="rule"></span></div><div class="tm-dl">${tk.length?tk.map(taskRow).join(''):'<div class="none">Bu güne tarihli görev yok.</div>'}</div>`}
+      <div class="sh"><span>Görevler</span><span class="rule"></span></div><div class="tm-dl tk-list" data-drop-day="${d}">${Tasks.dayList(d)}</div>${tk.length?`<div class="sh"><span>Notlardaki yapılacaklar</span><span class="rule"></span></div><div class="tm-dl">${tk.map(taskRow).join('')}</div>`:''}`}
 
   /* ═════ AKTİVİTELER ═════ */
   let F={st:'all',cat:'',q:''};
@@ -196,7 +196,7 @@ const Time=(()=>{
       :`<div class="tm-empty"><b>Henüz aktivite yok</b><p>Yukarıya yazıp Enter'a bas. Saat, süre, gün ve kategoriyi cümleden kendim anlarım; takvime, istatistiklere ve gün notuna otomatik bağlanır.</p></div>`}</div>`}
 
   /* ═════ GÖREVLER ═════ */
-  function renderTasks(){setCrumb(SV('<rect x="2.5" y="2.5" width="11" height="11" rx="3"/><path d="M5.5 8.2l1.8 1.8 3.4-3.6"/>'),'Görevler');const all=tasks(),t=today();
+  function renderTasks(){return Tasks.render();setCrumb(SV('<rect x="2.5" y="2.5" width="11" height="11" rx="3"/><path d="M5.5 8.2l1.8 1.8 3.4-3.6"/>'),'Görevler');const all=tasks(),t=today();
     const late=all.filter(o=>!o.done&&o.date&&o.date<t),now=all.filter(o=>!o.done&&o.date===t),soon=all.filter(o=>!o.done&&o.date>t).sort((a,b)=>a.date.localeCompare(b.date)),nod=all.filter(o=>!o.done&&!o.date),done=all.filter(o=>o.done).sort((a,b)=>b.p.updated-a.p.updated).slice(0,40);
     const sec=(h,L,cls='')=>L.length?`<div class="sh ${cls}"><span>${h} · ${L.length}</span><span class="rule"></span></div><div class="tm-dl">${L.map(taskRow).join('')}</div>`:'';
     $('#view').innerHTML=`<div class="wrap tm-page"><div class="tm-ph"><h1>Görevler</h1><span class="tm-mut">${all.filter(o=>!o.done).length} açık · ${all.filter(o=>o.done).length} tamamlandı</span></div>
@@ -208,7 +208,7 @@ const Time=(()=>{
   let SR=lsg('time:srange','week');
   function renderStats(){setCrumb(I.chart,'İstatistikler');const t=today(),b=SR==='week'?weekStart(t):SR==='month'?t.slice(0,8)+'01':addDays(t,-89),e=SR==='week'?addDays(b,6):SR==='month'?addDays(t.slice(0,8)+'01',new Date(pd(t).getFullYear(),pd(t).getMonth()+1,0).getDate()-1):t;
     const L=TM.between(b,e),done=L.filter(a=>a.status==='done'),plan=L.filter(a=>a.status!=='done'),mDone=done.reduce((s,a)=>s+a.dur,0),mPlan=L.reduce((s,a)=>s+a.dur,0);
-    const tk=tasks().filter(o=>o.date>=b&&o.date<=e),tkd=tk.filter(o=>o.done).length;
+    const tk=TK.list().filter(o=>TK.dayOf(o)>=b&&TK.dayOf(o)<=e),tkd=tk.filter(o=>o.status==='done').length;
     const byCat=TM.cats.map(c=>[c,done.filter(a=>a.cat===c.id).reduce((s,a)=>s+a.dur,0)]).filter(x=>x[1]).sort((a,b)=>b[1]-a[1]),cmax=byCat[0]?.[1]||1;
     const days=[];for(let d=b;d<=e&&days.length<92;d=addDays(d,1))days.push(d);
     const per=days.map(d=>{const o={d};for(const c of TM.cats)o[c.id]=done.filter(a=>a.date===d&&a.cat===c.id).reduce((s,a)=>s+a.dur,0);o.tot=TM.cats.reduce((s,c)=>s+o[c.id],0);return o});
@@ -226,6 +226,7 @@ const Time=(()=>{
         <div class="sh"><span>Kategorilere göre</span><span class="rule"></span></div><div class="tm-bars">${byCat.length?byCat.map(([c,v])=>`<button class="tm-hb" data-qcatf="${c.id}"><span>${E(c.icon)} ${E(c.name)}</span><span class="tm-tr"><i style="width:${100*v/cmax}%;background:${c.color}"></i></span><span>${fm(v)} · %${Math.round(100*v/Math.max(1,mDone))}</span></button>`).join(''):'<div class="none">Bu aralıkta tamamlanmış aktivite yok.</div>'}</div>
         ${plan.length?`<div class="sh"><span>Bekleyen planlar · ${plan.length}</span><span class="rule"></span></div><div class="tm-list">${plan.slice(0,8).map(a=>actRow(a,true)).join('')}</div>`:''}`
       :`<div class="tm-empty"><b>Bu aralıkta kayıt yok</b><p>Aktivite ekledikçe zaman kullanımın burada grafiklere dönüşür. Hiçbir sayı uydurulmaz.</p></div>`}
+      ${Tasks.statsHTML(b,e)}
       <p class="tm-mut" style="margin-top:22px">Notlar, Study Log ve Kütüphane'yi birlikte görmek için <a href="../istatistik/" data-fullstats>İstatistik merkezi →</a></p></div>`}
 
   /* ── olaylar (tek yerden) ── */

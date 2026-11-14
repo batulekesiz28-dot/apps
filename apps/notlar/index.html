@@ -442,6 +442,7 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
 <link rel="stylesheet" href="brain.css">
 <link rel="stylesheet" href="media.css">
 <link rel="stylesheet" href="time.css">
+<link rel="stylesheet" href="tasks.css">
 <style id="tnavCss">
 /* ── Üst gezinme (sol menü yerine) — ince cam şerit, kayan seçili vurgu ── */
 .app,.app[data-mode=lib],.app[data-mode=brain]{grid-template-columns:1fr}
@@ -524,6 +525,7 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
 <script src="media.js"></script>
 <script src="brain.js"></script>
 <script src="time.js"></script>
+<script src="tasks.js"></script>
 
 <script>
 'use strict';
@@ -862,7 +864,7 @@ function renderCal(dir,quiet){
   let cells='';
   for(let i=0;i<weeks*7;i++){const dd=new Date(start);dd.setDate(start.getDate()+i);const s=ymd(dd),its=(by.get(s)||[]).sort((a,b)=>a.created-b.created);
     const fdn=fix.get(s)?.blocks.length||0;
-    cells+=`<div class="cd${dd.getMonth()!==m?' out':''}${s===t?' today':''}${s===selDay?' sel':''}${i%7>4?' wk':''}" data-day="${s}"><span class="dn">${dd.getDate()}</span><div class="chips">${Time.monthChips(s)}${its.slice(0,3).map(p=>`<div class="c2" draggable="true" data-pid="${p.id}" title="${esc(titleOf(p))}">${iconOf(p)}<span>${esc(titleOf(p))}</span></div>`).join('')}${its.length>3?`<div class="more">+${its.length-3}</div>`:''}${fdn?`<div class="more fdn">📌 ${fdn} tarihli satır</div>`:''}</div></div>`}
+    cells+=`<div class="cd${dd.getMonth()!==m?' out':''}${s===t?' today':''}${s===selDay?' sel':''}${i%7>4?' wk':''}" data-day="${s}"><span class="dn">${dd.getDate()}</span><div class="chips">${Time.monthChips(s)}${Tasks.monthChips(s)}${its.slice(0,3).map(p=>`<div class="c2" draggable="true" data-pid="${p.id}" title="${esc(titleOf(p))}">${iconOf(p)}<span>${esc(titleOf(p))}</span></div>`).join('')}${its.length>3?`<div class="more">+${its.length-3}</div>`:''}${fdn?`<div class="more fdn">📌 ${fdn} tarihli satır</div>`:''}</div></div>`}
   const isCur=y===new Date().getFullYear()&&m===new Date().getMonth();
   $('#view').innerHTML=`<div class="wide cal"><div>
     <div class="cal-h"><h1>${MONTHS[m]} <em>${y}</em></h1>
@@ -1555,19 +1557,19 @@ $('#gBtn').onclick=async()=>{const p=new firebase.auth.GoogleAuthProvider();p.se
 $('#gOut').onclick=()=>firebase.auth().signOut();
 $('#me').onclick=e=>{const u=firebase.auth().currentUser;if(!u)return;const p=float($('#me'),`<div class="pop-h" style="text-transform:none;letter-spacing:0;font-family:var(--font);font-size:12px;line-height:1.4"><b style="display:block;color:var(--ink);font-weight:500">${esc(u.displayName||'Hesap')}</b>${esc(u.email)}</div><div class="sep"></div><button class="mi" data-out><span class="bi">${IC.out}</span><span class="tx">Çıkış yap</span></button>`,{w:240});
   p.addEventListener('click',ev=>{if(ev.target.closest('[data-out]')){hideFloat();flushAll();firebase.auth().signOut()}})};
-function start(){applyTheme();welcome();if(!started){started=true;Time.bind()}route()}
+function start(){applyTheme();welcome();if(!started){started=true;Time.bind();Tasks.bind()}route()}
 (async()=>{
   applyTheme();
-  if(!CLOUD){S=Local;KB.startLocal();TM.startLocal();Local.load().forEach(p=>{const n=norm(p);pages.set(n.id,n)});$('#saved').title='Bu tarayıcıda kayıtlı';start();return}
+  if(!CLOUD){S=Local;KB.startLocal();TM.startLocal();TK.startLocal();Local.load().forEach(p=>{const n=norm(p);pages.set(n.id,n)});$('#saved').title='Bu tarayıcıda kayıtlı';start();return}
   gate('loading');
   try{await loadFirebase()}catch{return gate('error','Firebase yüklenemedi. İnternet bağlantını kontrol et.')}
   if(!firebase.apps.length)firebase.initializeApp(FB);
   const fs=firebase.firestore();try{await fs.enablePersistence({synchronizeTabs:true})}catch{}
   firebase.auth().getRedirectResult().catch(e=>gate('error',authMsg(e)));
   firebase.auth().onAuthStateChanged(async u=>{
-    if(!u){Cloud.stop();KB.stop();TM.stop();pages.clear();P=null;$('#view').innerHTML='';$('#nav').innerHTML='';$('#me').hidden=true;closePal();hideFloat(true);return gate('signin')}
+    if(!u){Cloud.stop();KB.stop();TM.stop();TK.stop();pages.clear();P=null;$('#view').innerHTML='';$('#nav').innerHTML='';$('#me').hidden=true;closePal();hideFloat(true);return gate('signin')}
     if((u.email||'').toLowerCase()!==OWNER){Cloud.stop();return gate('denied',`<b>${esc(u.email)}</b> bu deftere erişemez.`)}
-    gate('loading','Notlar yükleniyor…');S=Cloud;pages.clear();await Cloud.start(fs);await KB.startCloud(fs);await TM.startCloud(fs);
+    gate('loading','Notlar yükleniyor…');S=Cloud;pages.clear();await Cloud.start(fs);await KB.startCloud(fs);await TM.startCloud(fs);await TK.startCloud(fs);
     const me=$('#me');me.hidden=false;me.innerHTML=u.photoURL?`<img src="${esc(u.photoURL)}" alt="" referrerpolicy="no-referrer">`:esc((u.displayName||u.email)[0].toUpperCase());
     start();await ungate();
   });

@@ -5,6 +5,7 @@ Uygulamalar `apps/<slug>/index.html`, liste `apps.json`.
 
 ## ⚠️ ÖNCE BUNU OKU — devralma kuralı
 Bu proje uzun bir çalışmanın ürünü ve **çalışıyor**. Sen onu devralıyorsun.
+- **Başka yapay zekâ da çalışıyor (ChatGPT/Codex, `AGENTS.md`):** işe başlamadan önce `git pull` yap; onların değişikliklerini bozma/geri alma.
 - **Asla sıfırdan yazma.** Yeni dosya/uygulama kurmadan önce var olanı oku (`git log --oneline -20`, ilgili dosya).
   İstenen şey büyük olsa bile mevcut koda **ekle / düzelt**; hiçbir dosyayı baştan yazma, yeniden adlandırma ya da silme.
 - Bir dosya çok büyük (hub `index.html` ~2500 satır): tamamını okuma; `grep -n` ile ilgili fonksiyonu bul, sadece o bölümü değiştir.

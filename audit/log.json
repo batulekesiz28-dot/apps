@@ -2208,5 +2208,55 @@
     "text": "Düşük: 'bugün' kırmızısı (#FF453A) koyu zeminde 4.0:1 — Apple sistem rengi, bilerek bırakıldı"
    }
   ]
+ },
+ {
+  "at": "2026-11-15T13:17:42",
+  "change": "Performans: hub galaksisi dokunulmadıkça yavaşlıyor (8 sn → 24, 30 sn → 15 kare/sn); Medya'da kayan içeriğin üstündeki şeritlerde bulanık cam kaldırıldı (opak); Notlar zemininde gereksiz 'fixed' kaldırıldı; Denetçi geçmişi son 12 kayıt + 'daha eski'",
+  "scores": {
+   "denetci masaüstü": {
+    "before": 99,
+    "after": 100
+   },
+   "notlar (bütün ekranlar)": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "hub",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Galaksi dokunulmasa da tam ekranı saniyede 30 kez boyuyordu (yavaş bilgisayarda işlemciyi dolduruyordu)",
+    "fix": "Boşta kademeli yavaşlama: boşta iş %77 azaldı"
+   },
+   {
+    "app": "notlar",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Medya'da 200 kartlık listede kaydırırken takılma (en kötü kare 50ms)",
+    "fix": "Kayan içeriğin üstünde bulanıklık yok: takılan kare 7→0, iş 1531→924ms"
+   },
+   {
+    "app": "notlar",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Zemin gradyanı 'fixed' olduğu için kaydırmada fazladan boyama",
+    "fix": "Kaldırıldı (sayfa zaten kaymıyor, görüntü aynı)"
+   },
+   {
+    "app": "denetci",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Geçmiş büyüdükçe sayfa ağırlaşıyordu; rozet renkleri sınırda kontrast",
+    "fix": "Son 12 kayıt + düğme; renkler bir ton koyu"
+   },
+   {
+    "app": "notlar",
+    "sev": "info",
+    "status": "open",
+    "text": "CSS katmanları üst üste yama: glass.css ve media.css sonundaki düzeltmeler asıl kurallarla birleştirilmeli (temizlik planı)"
+   }
+  ]
  }
 ]

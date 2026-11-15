@@ -13,7 +13,7 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#FFFFFF;--bg2:#FAFAF9;--card:#FFFFFF;--ink:#18181B;--ink2:#52525B;--ink3:#6E6E77;--ink4:#E4E4E7;--line:rgba(0,0,0,.06);--line2:rgba(0,0,0,.1);--hover:rgba(0,0,0,.04);
   --font:'Geist',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;--mono:'Geist Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
-  --out:cubic-bezier(.16,1,.3,1);--spring:cubic-bezier(.3,1.4,.5,1);--ok:#15803D;--warn:#B45309;--err:#DC2626;--info:#2563EB;color-scheme:light}
+  --out:cubic-bezier(.16,1,.3,1);--spring:cubic-bezier(.3,1.4,.5,1);--ok:#166534;--warn:#92400E;--err:#B91C1C;--info:#1D4ED8;color-scheme:light}
 [data-theme=dark]{--bg:#0E0E10;--bg2:#141416;--card:#18181B;--ink:#EDEDEF;--ink2:#A1A1AA;--ink3:#8B8B94;--ink4:#2A2A2F;--line:rgba(255,255,255,.06);--line2:rgba(255,255,255,.1);--hover:rgba(255,255,255,.05);--ok:#4ADE80;--warn:#FBBF24;--err:#F87171;--info:#60A5FA;color-scheme:dark}
 html,body{background:var(--bg)}
 body{font-family:var(--font);color:var(--ink);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
@@ -85,6 +85,7 @@ summary .c{font:500 12px var(--mono);color:var(--ink3)}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:11px 16px;border-radius:13px;font-size:13px;z-index:50;box-shadow:0 14px 34px -12px rgba(0,0,0,.4)}
 #lab{position:fixed;left:-20000px;top:0;border:0;background:#fff}
 @media (max-width:600px){main{padding:calc(16px + env(safe-area-inset-top)) 14px 60px}.cat{grid-template-columns:96px minmax(0,1fr) 34px}.h,.sev{font-size:11.5px}.seg button{height:38px}#copy{height:40px!important}}
+.more-log{display:block;margin:6px auto 0;min-height:36px;padding:0 16px;border-radius:999px;font:inherit;font-size:13px;color:var(--ink2);background:var(--hover,rgba(127,127,127,.12));border:0;cursor:pointer}.more-log:hover{color:var(--ink)}
 </style>
 <script src="../../shared/skin.js"></script>
 </head>
@@ -114,7 +115,7 @@ const CATS={a11y:'Erişilebilirlik',ux:'Kullanılabilirlik',look:'Estetik',desig
 const LVL_N={kritik:'kritik',yuksek:'yüksek',orta:'orta',dusuk:'düşük'};
 const SEV={error:'hata',warn:'uyarı',info:'not',fixed:'düzeltildi'};
 const col=v=>v>=90?'var(--ok)':v>=75?'var(--warn)':'var(--err)';
-let res=ls.get('denetci:last',null),dev='mobile',LOG=[];
+let res=ls.get('denetci:last',null),dev='mobile',LOG=[],logAll=false;
 const LOCAL=new URLSearchParams(location.search).has('local')?'?local':'';
 
 function ring(el,v){const C=2*Math.PI*30;el.innerHTML=`<svg viewBox="0 0 72 72"><circle class="a" cx="36" cy="36" r="30"/><circle class="b" cx="36" cy="36" r="30" stroke="${v==null?'var(--ink4)':col(v)}" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C*(1-(v||0)/100)).toFixed(1)}"/></svg><b class="num">${v==null?'—':v}</b>`}
@@ -159,9 +160,10 @@ $('#copy').onclick=async()=>{const it=openItems();if(!it.length)return toast('G�
 
 /* ── Change log written by Claude after each change ── */
 async function loadLog(){try{LOG=await(await fetch('../../audit/log.json',{cache:'no-cache'})).json()}catch{LOG=[]}
-  $('#log').innerHTML=LOG.length?LOG.slice().reverse().map(e=>`<article class="card entry"><div class="entry-h"><b>${esc(e.change)}</b><time>${esc(new Date(e.at).toLocaleString('tr-TR',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'}))}</time></div>
+  const rev=LOG.slice().reverse(),shown=logAll?rev:rev.slice(0,12);
+  $('#log').innerHTML=LOG.length?shown.map(e=>`<article class="card entry"><div class="entry-h"><b>${esc(e.change)}</b><time>${esc(new Date(e.at).toLocaleString('tr-TR',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'}))}</time></div>
     ${e.scores?`<div class="sc">${Object.entries(e.scores).map(([k,v])=>`<span>${esc(k)} ${v.before} → <b>${v.after}</b></span>`).join('')}</div>`:''}
-    ${(e.items||[]).map(it=>`<div class="it"><span class="sev ${it.status==='fixed'?'fixed':it.sev||'warn'}">${it.status==='fixed'?'düzeltildi':'açık'}</span><span>${it.app?`<b style="font-weight:500;color:var(--ink)">${esc(it.app)}</b> · `:''}${esc(it.text)}</span></div>`).join('')}</article>`).join('')
+    ${(e.items||[]).map(it=>`<div class="it"><span class="sev ${it.status==='fixed'?'fixed':it.sev||'warn'}">${it.status==='fixed'?'düzeltildi':'açık'}</span><span>${it.app?`<b style="font-weight:500;color:var(--ink)">${esc(it.app)}</b> · `:''}${esc(it.text)}</span></div>`).join('')}</article>`).join('')+(rev.length>shown.length?`<button class="more-log" onclick="logAll=true;loadLog()">Daha eski ${rev.length-shown.length} kaydı göster</button>`:'')
     :'<div class="empty">Henüz kayıt yok.</div>';paintOpen()}
 
 $('#dev').onclick=e=>{const b=e.target.closest('[data-d]');if(!b)return;dev=b.dataset.d;[...$('#dev').children].forEach(x=>x.classList.toggle('on',x===b));paint()};

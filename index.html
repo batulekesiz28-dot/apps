@@ -1807,7 +1807,7 @@ function frame(t){
   raf=0;if(paused)return;
   // pacing: ≤60fps even on 120Hz screens; 30fps once the hands are off; ~4fps when nothing at all moves
   const busy=t-lastInput<2500||linkDrag||cam.go||cam.pan||wDrag||starDrag||meshAwake||introT<1,still=!busy&&t-lastInput>8000&&!galaxyOnScreen();
-  const gap=still?240:(!busy||TIER>=2)?31:14;
+  const idle=t-lastInput,gap=still?240:busy?(TIER>=2?31:14):idle>30000?66:idle>8000?41:31;
   if(t-lastDraw<gap){raf=requestAnimationFrame(frame);return}
   if(busy&&lastDraw&&PERF.auto&&TIER<2&&!document.hidden)perfSample(t-lastDraw);
   lastDraw=t;const dt=Math.min(40,t-(last||t));last=t;const k=dt/16.667,time=t/1000;

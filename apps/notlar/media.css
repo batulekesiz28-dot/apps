@@ -541,3 +541,11 @@ button.ml-sc:hover{background:rgba(255,255,255,.08)}button.ml-sc .mvi{width:13px
 @media (max-width:1000px){.app.mc-on .top{transition:opacity .2s}.app.mc-on.scrolled .top{opacity:0;pointer-events:none}}
 
 .mc,.mx-bg{--acc-bg:var(--acc)}
+/* ══ Performans: bulanık cam sadece içeriğin üstünde yüzen küçük öğelerde ═════════════════
+   Kaydırılan içeriğin üstündeki tam genişlik şeritler ve onların içindeki düğmeler her karede yeniden
+   bulanıklaştırılıyordu (200 kartlık listede takılma). Şeritler neredeyse opak düz renk; içlerindeki
+   kapsüller zaten şeridin zemininde durduğu için bulanıklık gereksiz. Gezinme kapsülü, açılır pencereler aynı kalır. */
+.mc-nav::before,.app.scrolled .mc-pbar:not(.home){backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:#0B0B0D!important}
+.mc-pbar .mc-sub a,.mc-pbar .mc-tb .mc-s,.mc-pbar .mc-fsel select,.mc-pbar .mc-vw,.mc-pbar .mc-gear{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background-color:rgba(44,44,48,.9)}
+.mc-pbar .mc-sub a.on,.mc-pbar .mc-vw button.on{background-color:rgba(255,255,255,.17)}
+.mc-pbar .mc-sub a:hover,.mc-pbar .mc-fsel select:hover{background-color:rgba(60,60,66,.95)}

@@ -96,17 +96,43 @@ const Media=(()=>{
       ${v==='r'?`<span class="mc-n" aria-hidden="true">${n}</span>`:''}
       <div class="mc-art">${v==='w'||v==='w2'?wideArt(it):poster(it)}
         ${it.score?`<span class="mc-sc">${scoreBadge(it)}</span>`:''}${it.rating?`<span class="mc-mine" title="Puanım ${it.rating}/10" aria-label="Puanım ${it.rating}/10">${IC.star}${it.rating}</span>`:''}${f?`<span class="mc-fl" title="İncelemen gerekiyor">${IC.warn}</span>`:''}${it.fav?`<span class="mc-fv" title="Favori">${IC.heart}</span>`:''}${prog(it)}
-        <div class="mc-hov"></div></div>
+</div>
       <div class="mc-cap"><b>${E(it.title)}</b><small>${metaShort(it)||TN[it.type]}</small></div></article>`}
-  // karttaki hızlı durum düğmesi: listede değilse “listeye ekle”, listedeyse “izledim / bitirdim”
-  function quick(it){const g=it.type==='game',b=it.type==='book',S0=stOf(it);
-    if(!S0)return`<button class="mc-b pri" data-mq="todo" title="${g?'Oynamak istediklerime ekle':b?'Okuma listeme ekle':'İzleme listeme ekle'}" aria-label="${g?'İstek listesine ekle':b?'Okuma listesine ekle':'İzleme listesine ekle'}">${IC.plus}</button>`;
-    if(S0==='todo'||S0==='doing'||S0==='dropped')return`<button class="mc-b pri" data-mq="done" title="${g?'Bitirdim':b?'Okudum':'İzledim'}" aria-label="${g?'Bitirdim olarak işaretle':b?'Okundu olarak işaretle':'İzledim olarak işaretle'}">${IC.check}</button>`;
-    return`<button class="mc-b on" data-mq="todo" title="${E(stName(it))} — tekrar listeye al" aria-label="Listeye geri al">${IC.check}</button>`}
-
-  const hovHTML=it=>{const s=stName(it);return`<div class="mc-qa">${quick(it)}<button class="mc-b" data-mq="fav" aria-label="${it.fav?'Favorilerden çıkar':'Favorilere ekle'}" title="Favori" aria-pressed="${it.fav}">${IC.heart}</button><button class="mc-b mc-rb${it.rating?' on':''}" data-mq="rate" aria-label="${it.rating?`Puanım ${it.rating}/10 — değiştir`:'Puanla'}" title="${it.rating?`Puanım ${it.rating}/10`:'Puanla'}">${IC.star}${it.rating?`<b>${it.rating}</b>`:''}</button><button class="mc-b" data-mq="more" aria-label="Diğer işlemler" title="Diğer">${IC.more}</button></div>
-      <b>${E(it.title)}</b><span>${metaShort(it)}</span>${s?`<em class="mc-st">${E(s)}</em>`:''}`};
-  function fillHov(c){const h=c?.querySelector('.mc-hov');if(!h||h.childElementCount)return;const it=KB.items.get(c.dataset.mi);if(it)h.innerHTML=hovHTML(it)}
+  /* ═ Spot ışığı: kapağın üstünde kısa bir an durunca ekranın geri kalanı bulanıklaşır, kapak yaylanarak öne çıkar.
+     Puanlanmamışsa altta cam “★ Puanla” hapı: üstüne gelince açılır, imleci gezdirdikçe 1–10 akar, tıkla → kaydedilir. ═ */
+  const SPT={t:0,card:null,el:null,v:0,block:null};
+  const RW=['','Berbat','Kötü','Zayıf','Vasat','İdare eder','Fena değil','İyi','Çok iyi','Harika','Başyapıt'];
+  const fineHover=()=>matchMedia('(hover:hover) and (pointer:fine)').matches;
+  function spotOff(now){clearTimeout(SPT.t);SPT.t=0;if(SPT.card)SPT.block=SPT.card.dataset.mi;const el=SPT.el;SPT.el=null;SPT.card=null;SPT.v=0;if(!el)return;el.classList.remove('on');if(now||!motion())el.remove();else setTimeout(()=>el.remove(),260)}
+  const srHTML=()=>`<div class="sr" role="slider" tabindex="0" aria-label="Puanla (1–10)" aria-valuemin="1" aria-valuemax="10" aria-valuenow="0"><i class="sr-fill"></i><span class="sr-tk" aria-hidden="true">${'<i></i>'.repeat(10)}</span><span class="sr-l">${IC.star}<b>Puanla</b></span></div>`;
+  function spotOn(card){const it=KB.items.get(card.dataset.mi),art=card.querySelector('.mc-art');if(!it||!art||!card.isConnected)return;
+    spotOff(true);const r=art.getBoundingClientRect();if(!r.width||r.top<40||r.bottom>innerHeight-10)return;
+    const S=r.width>r.height?1.06:1.1,el=document.createElement('div');el.className='msp';
+    el.innerHTML=`<div class="msp-bg"></div><div class="msp-f" style="left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;--s:${S}"></div><div class="msp-cap"><b>${E(it.title)}</b><small>${E(metaShort(it)||TN[it.type])}${stName(it)?' · '+E(stName(it)):''}</small></div>`;
+    const f=el.querySelector('.msp-f'),cl=art.cloneNode(true);cl.className='msp-art';cl.style.borderRadius=getComputedStyle(art).borderRadius;f.appendChild(cl);
+    if(!it.rating)f.insertAdjacentHTML('beforeend',srHTML());
+    const cap=el.querySelector('.msp-cap'),below=r.bottom+r.height*(S-1)/2+12;cap.style.left=(r.left+r.width/2)+'px';
+    if(below+44<innerHeight)cap.style.top=below+'px';else{cap.style.top=(r.top-r.height*(S-1)/2-52)+'px'}
+    document.body.appendChild(el);SPT.el=el;SPT.card=card;requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('on')));
+    f.addEventListener('pointerleave',()=>{if(SPT.el===el)spotOff()});
+    f.addEventListener('wheel',e=>{spotOff(true);q('#scroll')?.scrollBy({top:e.deltaY,left:e.deltaX})},{passive:true});
+    f.addEventListener('contextmenu',e=>{e.preventDefault();spotOff(true);menu(it.id,card)});
+    f.addEventListener('click',e=>{if(e.target.closest('.sr'))return;spotOff(true);open(it.id)});
+    const sr=f.querySelector('.sr');if(sr)wireRate(sr,it)}
+  function wireRate(sr,it){const lab=sr.querySelector('.sr-l');
+    const show=v=>{SPT.v=v;sr.style.setProperty('--v',v);sr.setAttribute('aria-valuenow',v);
+      lab.innerHTML=v?`<b class="sr-n">${v}</b><small>${RW[v]}</small>`:`<small>Sağa sola gezdir</small>`;
+      if(v&&motion())lab.firstElementChild.animate([{transform:'scale(1.4)',opacity:.4},{transform:'scale(1)',opacity:1}],{duration:280,easing:'cubic-bezier(.2,.9,.3,1.3)'})};
+    const at=e=>{const b=sr.getBoundingClientRect();return Math.max(1,Math.min(10,Math.ceil((e.clientX-b.left)/b.width*10)))};
+    const commit=v=>{if(!v)return;it.rating=v;KB.saveItem(it);sr.classList.add('done');sr.classList.remove('open');lab.innerHTML=`${IC.star}<b>${v}</b>`;sr.setAttribute('aria-label','Puanım '+v+'/10');
+      if(motion())sr.animate([{transform:'translateX(-50%) scale(1)'},{transform:'translateX(-50%) scale(1.18)'},{transform:'translateX(-50%) scale(1)'}],{duration:420,easing:'cubic-bezier(.2,.9,.3,1.2)'});
+      patchCards([it.id]);setTimeout(()=>spotOff(),720)};
+    sr.addEventListener('pointerenter',()=>{if(sr.classList.contains('done'))return;sr.classList.add('open');show(0)});
+    sr.addEventListener('pointermove',e=>{if(!sr.classList.contains('open'))return;const v=at(e);if(v!==SPT.v)show(v)});
+    sr.addEventListener('pointerleave',()=>{if(sr.classList.contains('done'))return;sr.classList.remove('open');SPT.v=0;sr.style.setProperty('--v',0);lab.innerHTML=`${IC.star}<b>Puanla</b>`});
+    sr.addEventListener('click',e=>{e.stopPropagation();if(!sr.classList.contains('done'))commit(sr.classList.contains('open')?at(e):0)});
+    sr.addEventListener('keydown',e=>{if(sr.classList.contains('done'))return;let v=SPT.v||0;if(e.key==='ArrowRight'||e.key==='ArrowUp')v=Math.min(10,v+1);else if(e.key==='ArrowLeft'||e.key==='ArrowDown')v=Math.max(1,v-1);else if(e.key==='Enter'||e.key===' '){e.preventDefault();commit(v);return}else if(e.key==='Escape'){spotOff();return}else return;
+      e.preventDefault();sr.classList.add('open');show(v)})}
   // uzun ana sayfalar: ilk raflar hemen, diğerleri ekrana yaklaşınca çizilir (sayfa hafif kalır)
   const LZ=new Map();let lzN=0,io=null;
   function lazy(html){if(!html)return'';const k='z'+(++lzN);LZ.set(k,html);return`<div class="mc-lz" data-lz="${k}"></div>`}
@@ -249,7 +275,10 @@ const Media=(()=>{
 
   /* ── olaylar ── */
   function wire(root){
-    root.addEventListener('pointerover',e=>{const c=e.target.closest?.('[data-mi]');if(c)fillHov(c)});root.addEventListener('focusin',e=>{const c=e.target.closest?.('[data-mi]');if(c)fillHov(c)});
+    // spot ışığı: imleç bir kapakta ~0,3 sn durursa (geçip giderken tetiklenmez)
+    root.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse'||!fineHover())return;const c=e.target.closest?.('.mc-card[data-mi]');if(!c||c===SPT.card||c.dataset.mi===SPT.block)return;clearTimeout(SPT.t);
+      SPT.t=setTimeout(()=>{if(Date.now()>(SPT.quiet||0)&&c.matches(':hover')&&!document.body.classList.contains('mset-drag')&&!q('.mset,.mq,.mrp'))spotOn(c)},320)});
+    root.addEventListener('pointerout',e=>{const c=e.target.closest?.('.mc-card[data-mi]');if(c&&!c.contains(e.relatedTarget)){clearTimeout(SPT.t);if(c.dataset.mi===SPT.block)SPT.block=null}});
     root.addEventListener('click',e=>{const t=e.target;
       const rw=t.closest('[data-row]');if(rw){const r=rw.parentElement.querySelector('.mc-row');r.scrollBy({left:+rw.dataset.row*r.clientWidth*.86,behavior:motion()?'smooth':'auto'});return}
       const hd=t.closest('[data-hd]');if(hd){heroGo(+hd.dataset.hd);return}
@@ -589,5 +618,7 @@ const Media=(()=>{
       const it=KB.addItem({type:t,title,year:y,status:f.s.value,tags:[TN[t].toLocaleLowerCase('tr')]});if(y)HINT.set(hk(it),{en:title,y:+y});close();say(`“${title}” eklendi — posteri aranıyor`);queue();open(it.id)})}
 
   /* sayfa değişince geçici arayüz kalmasın (Notlar route() çağırır) */
-  function dismiss(){qa('.mset,.mrp,.mq,.ma-bg').forEach(e=>e.remove())}
+  function dismiss(){spotOff(true);qa('.mset,.mrp,.mq,.ma-bg').forEach(e=>e.remove())}
+  // kaydırma, pencere değişimi, Esc → spot ışığı kapanır
+  addEventListener('scroll',()=>{SPT.quiet=Date.now()+700;if(SPT.el)spotOff()},true);addEventListener('blur',()=>spotOff(true));addEventListener('resize',()=>spotOff(true));addEventListener('keydown',e=>{if(e.key==='Escape'&&SPT.el)spotOff()});
   return{render,refresh,detail,close,imgErr,queue,addSheet,rateHTML,dismiss,patchCards,isMedia:t=>MT.includes(t),get st(){return st},get R(){return R},_rank:rank,_cleanG:cleanG}})();

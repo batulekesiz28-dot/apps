@@ -2513,5 +2513,35 @@
     "fix": "Geniş kart için %85 yatay görsel şartı; yoksa hepsi tam dikey poster"
    }
   ]
+ },
+ {
+  "at": "2026-11-15T15:57:40",
+  "change": "Medya: kart üstüne gelince spot ışığı (geri kalan bulanık) ve kaydırarak puanlama; siyah seçenek paneli kaldırıldı",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "fixed",
+    "text": "Üstüne gelince alttan siyah panel ve düğmeler çıkıyordu",
+    "fix": "Spot ışığı + puanlanmamışsa kaydırarak puanlama hapı; işlemler sağ tık menüsünde"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "fixed",
+    "text": "Spot ışığı kaydırırken ya da puanladıktan hemen sonra tekrar açılabiliyordu",
+    "fix": "Kaydırmadan sonra kısa süre susturuldu; aynı kart imleç çıkana kadar açılmıyor"
+   }
+  ]
  }
 ]

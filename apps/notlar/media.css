@@ -188,7 +188,7 @@
 .mx-st button[role=radio]:hover{background:rgba(255,255,255,.14);color:var(--mink)}.mx-st button[role=radio].on{background:var(--acc);color:var(--acc-ink)}
 .mx-body{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:40px;padding:8px 36px 40px}
 .mx-d{font-size:15.5px;line-height:1.65;color:var(--mink2)}.mx-d.dim,.dim{color:var(--mink3)}
-.mx-s{margin-top:26px}.mx-s h3,.mx-side h3{margin-bottom:10px;font:700 12px var(--font);letter-spacing:.12em;text-transform:uppercase;color:var(--mink3)}
+.mx-s{margin-top:26px}.mx-s h3,.mx-side h3{margin-bottom:10px;font:600 13px var(--font);letter-spacing:-.005em;color:var(--mink2)}
 .mx-s textarea{width:100%;min-height:120px;padding:14px 16px;border:0;border-radius:12px;outline:0;resize:vertical;background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1px var(--mline);color:var(--mink);font:15px/1.6 var(--serif)}
 .mx-s textarea:focus{box-shadow:inset 0 0 0 1.5px var(--acc)}.mx-s textarea::placeholder{color:var(--mink3)}
 .mx-prog{display:flex;flex-wrap:wrap;align-items:center;gap:18px}
@@ -472,3 +472,20 @@ button.ml-sc:hover{background:rgba(255,255,255,.08)}button.ml-sc .mvi{width:13px
 .mx-rt{margin-top:16px}.mx-rt .rt{gap:10px}
 @media (max-width:760px){button.ml-sc{height:40px}.mrp{left:8px!important;right:8px;width:auto}}
 @media (prefers-reduced-motion:reduce){.mrp{animation:none}}
+
+/* ══ Denetim: tek tasarım dili, doğru kaydırma, akıcılık ═══════════════════
+   1) Bütün bölümler aynı yüzey/renk/köşe: bölüm başına tema yok, vurgu beyaz-mat, yazı ailesi sistem (SF). */
+:is(.mc,.mx-bg,.ma-bg,.mq),:is(.mc,.mx-bg,.ma-bg,.mq)[data-sec]{--mbg:#0A0A0C;--mbg2:#141418;--mink:#F5F5F7;--mink2:#C9C9CE;--mink3:#A1A1A8;--mline:rgba(255,255,255,.09);
+  --acc:#F5F5F7;--acc-ink:#0D0D0F;--acc-bg:#F5F5F7;--font:var(--sys)}
+:is(.mx-bg,.ma-bg,.mq),:is(.mx-bg,.ma-bg,.mq)[data-sec]{--r:10px}
+.mc-my,.mc-b.mc-rb.on{color:#F5C451}.mx-rate i .mvi+.mvi{color:#F5C451;fill:#F5C451}
+/* 2) Kaydırma: sadece ana gezinme yapışık; durum kapsülleri içerikle birlikte kayar.
+      En üstte saydam (vitrin arkada görünür), kaydırınca buzlu cam zemin — içerik yazıları arkadan okunmaz. */
+.mc-sub{position:relative;top:auto;z-index:1}
+.mc-nav::before{inset:0;background:rgba(12,12,14,.8);backdrop-filter:saturate(1.6) blur(22px);-webkit-backdrop-filter:saturate(1.6) blur(22px);
+  box-shadow:inset 0 -.5px 0 rgba(255,255,255,.08);opacity:0;transition:opacity .28s cubic-bezier(.2,.8,.2,1)}
+.app.scrolled .mc-nav::before{opacity:1}
+/* 3) Büyük listeler: ekran dışındaki kart/satırlar çizilmez (bellek + akıcılık) */
+.mc-grid>.mc-card{content-visibility:auto;contain-intrinsic-size:auto 280px}
+.ml>.ml-r{content-visibility:auto;contain-intrinsic-size:auto 72px}
+@media (prefers-reduced-motion:reduce){.mc-nav::before{transition:none}}

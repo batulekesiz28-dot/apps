@@ -222,4 +222,4 @@ const Brain=(()=>{
     if(document.querySelector('.ld-bg,.la-bg,.rd-bg,.lpick,.pal-bg'))return;
     if(e.key==='/'){e.preventDefault();q('[data-bq]')?.focus()}else if(e.key==='Escape'&&G.sel){select(null)}else if(e.key==='+'||e.key==='='){zoomAt(G.w/2,G.h/2,1.3)}else if(e.key==='-'){zoomAt(G.w/2,G.h/2,1/1.3)}
     else if(e.key==='0'){fit()}else if(e.key==='Enter'&&G.sel&&t===document.body){openNode(G.sel)}else if(e.key.toLowerCase()==='l'&&G.sel){q('[data-bloc]')?.click()}});
-  return{render,soft,select,get G(){return G}}})();
+  return{render,soft,select,stop,get G(){return G}}})();

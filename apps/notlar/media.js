@@ -220,7 +220,7 @@ const Media=(()=>{
   function render(parts,o={}){const p=parse(parts);const changed=p.sec!==st.sec||p.page!==st.page;st.base=parts||[];
     if(changed){st.kind='';st.genre='';st.min=0;st.hero=0}st.sec=p.sec;st.page=p.page;if(p.gq){st.genre=p.gq;st.page='all'}if(changed||!o.keepQ)st.qs='';
     const v=q('#view');let root=q('#view>.mc');if(!root){v.innerHTML='<div class="mc"></div>';root=q('#view>.mc');wire(root)}
-    root.dataset.sec=st.sec;applyLook(root);root.innerHTML=nav()+`<main class="mc-main">${body()}</main>`;
+    root.dataset.sec=st.sec;applyLook(root);root.innerHTML=nav()+`<main class="mc-main">${body()}</main>`;if(changed)enter(q('.mc-main',root));
     document.getElementById('app')?.classList.add('mc-on');
     if(typeof setCrumb==='function')setCrumb(IC.play,st.sec==='home'?'Medya':SEC[st.sec].n,'');
     if(changed&&!o.soft)q('#scroll').scrollTop=0;else if(changed)q('#scroll').scrollTop=0;
@@ -263,7 +263,9 @@ const Media=(()=>{
     sp('--lcols',[c.cover?cov:'','minmax(0,1fr)',...['st','rate','score','like','fav'].map(k=>c[k]?W[k]:'')].filter(Boolean).join(' '));
     sp('--lcols-m',[c.cover?cov:'','minmax(0,1fr)',c.rate?'auto':'',c.fav?'44px':''].filter(Boolean).join(' '))}
   function saveLook(){lss('mc:look',st.look)}
-  function setLook(k,v,redraw){st.look[k]=v;lss('mc:look',st.look);applyLook();if(redraw){swap();qa('.mc [data-lv]').forEach(b=>{const on=b.dataset.lv===V();b.classList.toggle('on',on);b.setAttribute('aria-checked',on)})}}
+  /* bölüm/görünüm değişiminde kısa giriş (transform+opacity, ~280ms) */
+  function enter(el){if(el&&motion())el.animate([{opacity:0,transform:'translateY(6px)'},{opacity:1,transform:'none'}],{duration:280,easing:'cubic-bezier(.16,1,.3,1)'})}
+  function setLook(k,v,redraw){st.look[k]=v;lss('mc:look',st.look);applyLook();if(redraw){swap();enter(q('.mc .mc-main'));qa('.mc [data-lv]').forEach(b=>{const on=b.dataset.lv===V();b.classList.toggle('on',on);b.setAttribute('aria-checked',on)})}}
   function setHTML(){const L=st.look,seg=(k,o)=>`<div class="mset-seg" role="radiogroup">${o.map(([v,n])=>`<button role="radio" data-lk="${k}" data-lval="${v}" aria-checked="${L[k]===v}" class="${L[k]===v?'on':''}">${n}</button>`).join('')}</div>`;
     const rng=(k,n,min,max,stp,u='%')=>`<label for="mset-${k}">${n} <output>${L[k]}${u}</output></label><input id="mset-${k}" type="range" min="${min}" max="${max}" step="${stp}" value="${L[k]}" data-lr="${k}" data-u="${u}">`;
     const tg=(attr,k,n,on)=>`<button class="mset-tg" role="switch" ${attr}="${k}" aria-checked="${!!on}"><span>${n}</span><i aria-hidden="true"></i></button>`;
@@ -312,7 +314,7 @@ const Media=(()=>{
     m.innerHTML=`<p>${E(it.title)}</p>${Object.entries(stMap(it)).map(([k,n])=>`<button role="menuitemradio" aria-checked="${it.status===k}" data-q="${k}" class="${it.status===k?'on':''}">${it.status===k?IC.check:'<i></i>'}${n}</button>`).join('')}
       <div class="sep"></div><button data-q="rate">${IC.star}${it.rating?`Puanım ${it.rating}/10 — değiştir`:'Puanla'}</button><button data-q="fav">${IC.heart}${it.fav?'Favorilerden çıkar':'Favorilere ekle'}</button><button data-q="open">${IC.r}Ayrıntılar</button><button data-q="rematch">${IC.sync}Posteri yeniden eşleştir</button><div class="sep"></div><button data-q="del" class="danger">${IC.trash}Sil</button>`;
     document.body.appendChild(m);const r=anchor.getBoundingClientRect();m.style.left=Math.max(8,Math.min(r.left,innerWidth-m.offsetWidth-8))+'px';m.style.top=Math.max(8,Math.min(r.bottom+6,innerHeight-m.offsetHeight-8))+'px';
-    q('button',m)?.focus();const off=e=>{if(!m.contains(e.target)){m.remove();removeEventListener('pointerdown',off,true)}};setTimeout(()=>addEventListener('pointerdown',off,true));
+    q('button',m)?.focus();const off=e=>{if(!m.isConnected||!m.contains(e.target)){m.remove();removeEventListener('pointerdown',off,true)}};setTimeout(()=>addEventListener('pointerdown',off,true));
     m.addEventListener('keydown',e=>{if(e.key==='Escape'){m.remove();anchor.focus?.()}const bs=qa('button',m),i=bs.indexOf(document.activeElement);if(e.key==='ArrowDown'){e.preventDefault();bs[(i+1)%bs.length].focus()}if(e.key==='ArrowUp'){e.preventDefault();bs[(i-1+bs.length)%bs.length].focus()}});
     m.addEventListener('click',e=>{const b=e.target.closest('[data-q]');if(!b)return;m.remove();const k=b.dataset.q;if(k==='rate')return ratePop(id,anchor);if(k==='fav')act(id,'fav');else if(k==='open')open(id);else if(k==='rematch')rematch(it);
       else if(k==='del'){const snap=KB.delItem(id);try{Library.toastUndo(`“${it.title}” silindi`,()=>KB.restoreItem(snap))}catch{say('Silindi')}}else{if(it.status===k){it.status='';KB.saveItem(it);say('Durum kaldırıldı')}else setStatus(it,k)}})}
@@ -341,7 +343,7 @@ const Media=(()=>{
     m.innerHTML=`<p>${E(it.title)}</p>${rateHTML(it)}`;document.body.appendChild(m);
     const r=(anchor.getBoundingClientRect?anchor:anchor).getBoundingClientRect();m.style.left=Math.max(8,Math.min(r.left,innerWidth-m.offsetWidth-8))+'px';m.style.top=Math.max(8,r.bottom+m.offsetHeight+6>innerHeight?r.top-m.offsetHeight-6:r.bottom+6)+'px';
     (q('.rt-n button.on',m)||q('.rt-n button',m))?.focus();
-    const off=e=>{if(!m.contains(e.target)){m.remove();removeEventListener('pointerdown',off,true)}};setTimeout(()=>addEventListener('pointerdown',off,true));
+    const off=e=>{if(!m.isConnected||!m.contains(e.target)){m.remove();removeEventListener('pointerdown',off,true)}};setTimeout(()=>addEventListener('pointerdown',off,true));
     m.addEventListener('keydown',e=>{if(e.key==='Escape'){m.remove();anchor.focus?.()}if(/^[0-9]$/.test(e.key)){const n=e.key==='0'?10:+e.key;q(`[data-rnum="${n}"]`,m)?.click()}})}
   function stars(it){const v=it.rating;return`<div class="mx-rate" role="slider" tabindex="0" aria-label="Puanım" aria-valuemin="0" aria-valuemax="10" aria-valuenow="${v}" aria-valuetext="${v?v+' / 10':'puan yok'}">${[1,2,3,4,5].map(n=>`<button tabindex="-1" data-rs="${n}" aria-label="${n*2} puan"><i style="--f:${Math.max(0,Math.min(1,(v-(n-1)*2)/2))*100}%">${IC.star}${IC.star}</i></button>`).join('')}<b>${v?v+'<small>/10</small>':'—'}</b></div>`}
   function detailHTML(it){const s=secOf(it.type),g=it.type==='game',f=flagOf(it),wide=!!it.backdrop;
@@ -533,4 +535,6 @@ const Media=(()=>{
       const dup=all().find(i=>i.type===t&&norm(i.title)===norm(title));if(dup){close();say('Bu zaten kütüphanende');return open(dup.id)}
       const it=KB.addItem({type:t,title,year:y,status:f.s.value,tags:[TN[t].toLocaleLowerCase('tr')]});if(y)HINT.set(hk(it),{en:title,y:+y});close();say(`“${title}” eklendi — posteri aranıyor`);queue();open(it.id)})}
 
-  return{render,refresh,detail,close,imgErr,queue,addSheet,rateHTML,isMedia:t=>MT.includes(t),get st(){return st},get R(){return R},_rank:rank,_cleanG:cleanG}})();
+  /* sayfa değişince geçici arayüz kalmasın (Notlar route() çağırır) */
+  function dismiss(){qa('.mset,.mrp,.mq,.ma-bg').forEach(e=>e.remove())}
+  return{render,refresh,detail,close,imgErr,queue,addSheet,rateHTML,dismiss,isMedia:t=>MT.includes(t),get st(){return st},get R(){return R},_rank:rank,_cleanG:cleanG}})();

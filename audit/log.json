@@ -1975,5 +1975,135 @@
     "fix": "Kart, liste, sağ tık ve detay başlığından puanlanabiliyor"
    }
   ]
+ },
+ {
+  "at": "2026-11-15T12:03:01",
+  "change": "Genel kabuk denetimi (Notlar: Takvim, Aktiviteler, Görevler, Notlar, Şablonlar, Zaman çizelgesi, İstatistikler, Medya, Belgeler, Beyin) — kalıntı paneller, kaydırma, sınıf çakışmaları, tutarlılık, animasyon ayarı, bellek",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   },
+   "istatistik masaüstü": {
+    "before": 99,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Sayfa değişince açık paneller kalıyordu (Medya ayarları, sağ tık menüsü, puan penceresi, aktivite düzenleyici, komut paleti)",
+    "fix": "Yönlendiricide tek kapatma noktası"
+   },
+   {
+    "app": "notlar",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Aktivite düzenleyici açıkken sayfa değişirse takvim canlı yenilenmeyi bırakıyordu",
+    "fix": "Kapatırken kilit de açılıyor"
+   },
+   {
+    "app": "notlar",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Medya'da kaydırınca durum kapsülleri içeriğin üstünde kalıyor, kayan yazılar üst çubuğun arkasından okunuyordu",
+    "fix": "Kapsüller içerikle kayıyor; gezinme kaydırınca buzlu cam"
+   },
+   {
+    "app": "notlar",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Şablonlar sayfası ekrandan taşıyordu (Library'nin .tg sınıfıyla çakışma)",
+    "fix": "Şablon ızgarası .tplg"
+   },
+   {
+    "app": "notlar",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Library'nin .chip/.lnk/.spin/.hint/.empty-s kuralları Notlar'ı da etkiliyordu",
+    "fix": "Library kaplarıyla sınırlandı"
+   },
+   {
+    "app": "notlar",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Belgeler'deki üst + düğmesi hiçbir şey yapmıyordu",
+    "fix": "Düğme bağlandı"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Görevlerden çıkıp dönünce eski görev ayrıntı paneli açık geliyordu",
+    "fix": "Bölüm değişince sıfırlanıyor"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Hub'daki 'animasyon kapalı' ayarı Workspace'te geçerli değildi",
+    "fix": "anim yardımcısı + CSS ayara uyuyor"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Medya bölümleri farklı renk/köşe temaları taşıyordu; Belgeler kahverengi/turuncuydu",
+    "fix": "Tek beyaz-mat dil"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Bölüm başlıkları üç yerde büyük harf/harf aralıklı, diğerlerinde normaldi",
+    "fix": "Tek biçim"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Aktivite penceresi animasyonsuz beliriyordu; Medya sekme/görünüm değişimi zıplıyordu",
+    "fix": "Kısa giriş animasyonu"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Beyin'den çıkınca boyut gözlemcisi ve veri aboneliği arkada kalıyordu",
+    "fix": "Çıkışta Brain.stop"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Görev istatistiği boşken mavi çizgiler gösteriyordu; sayaç rakamları farklı hizadaydı",
+    "fix": "Boş durum yazısı; rakamlar alt hizalı"
+   },
+   {
+    "app": "istatistik",
+    "sev": "bilgi",
+    "status": "fixed",
+    "text": "Kaynak notu satırı çok uzundu",
+    "fix": "72 karakter genişlik"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "open",
+    "text": "Hub'ın kendisi (galaksi, sekmeler, widget'lar) bu turda derin denetlenmedi; sadece otomatik denetimden geçti (100)"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "open",
+    "text": "Bulut (giriş yapılmış) modu yerelde test edilemiyor; yerel modda veri kalıcılığı doğrulandı"
+   }
+  ]
  }
 ]

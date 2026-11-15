@@ -141,6 +141,8 @@ const Library=(()=>{
   function draw(){const r=root(),inner=q('.lib-in',r),scY=q('#scroll').scrollTop;
     inner.innerHTML=rail()+`<div class="lmain">${st.sub==='home'?homeHTML():listHTML()}</div>`;setTimeout(autoCovers,1200);
     setCrumb(sv('read'),st.sub==='home'?'Kütüphane':listCtx().t.replace(/^#/,'#'),`<button class="tb" data-act="add" title="İçerik ekle (A)" aria-label="İçerik ekle">${sv('plus')}</button>`);
+    // üst çubuktaki düğme .lib kabının dışında: kendi tıklamasını burada bağla (her çizimde yeni öğe → birikme yok)
+    document.querySelector('#topAct [data-act=add]')?.addEventListener('click',()=>addSheet());
     return scY}
   function parse(parts){const[a='',b='']=parts;if(!a)return{sub:'home',arg:''};if(['all','fav','reading','recent'].includes(a))return{sub:a,arg:''};if(['type','tag','col','st'].includes(a))return{sub:a,arg:decodeURIComponent(b)};return{sub:'home',arg:''}}
   const isMediaRoute=p=>!p.length||p[0]==='m';
@@ -451,5 +453,6 @@ const Library=(()=>{
     toast(`${added.length} içerik eklendi — posterler eşleşiyor`);loadPack().then(()=>Media.queue())}
   document.addEventListener('click',e=>{if(e.target.closest('[data-imp]')){e.preventDefault();doImport()}else if(e.target.closest('[data-imp-no]')){try{localStorage.setItem('lib:imp-hide',JSON.stringify(pack?.updated||1))}catch{}draw()}});
 
-  function closeAll(){closeDetail(true);closeReader(true);q('.la-bg')?.remove();LA=null}
-  return{render,soft,closeAll,findCovers,doImport,impBanner,loadPack,toastUndo,open,launch,addSheet,addFiles,libCard,pagePanel,itemPicker,pagePicker,cover,get st(){return st}}})();
+  function closeAll(){closeDetail(true);closeReader(true);q('.la-bg')?.remove();LA=null;dismiss()}
+  function dismiss(){document.querySelectorAll('.lmenu,.lpick').forEach(e=>e.remove())}
+  return{render,soft,closeAll,dismiss,findCovers,doImport,impBanner,loadPack,toastUndo,open,launch,addSheet,addFiles,libCard,pagePanel,itemPicker,pagePicker,cover,get st(){return st}}})();

@@ -272,4 +272,5 @@ const Time=(()=>{
   function rerender(soft){if(typeof renderView==='function'&&['cal','acts','tasks','stats'].includes(cur()))renderView(!soft)}
   /* ay görünümü hücrelerine aktivite şeritleri */
   function monthChips(d){const L=TM.onDay(d);if(!L.length)return'';return L.slice(0,3).map(a=>{const c=TM.cat(a.cat);return`<div class="tm-mc st-${a.status}" draggable="true" data-mact="${a.id}" data-act-open="${a.id}" style="--c:${c.color}" title="${E(a.title)}${a.start?' · '+a.start:''}"><i></i><span>${a.start?`<em>${a.start}</em> `:''}${E(a.title)}</span></div>`}).join('')+(L.length>3?`<div class="more">+${L.length-3} aktivite</div>`:'')}
-  return{get calMode(){return calMode},renderGrid,dayPanelExtra,monthChips,miniCal,navGrp,qaHTML,renderActs,renderTasks,renderStats,bind,newAct,quickAdd,parse,tasks,modeSeg}})();
+  function dismiss(){const e=document.querySelector('.tm-ed-bg');if(e){e.remove();busy=false}}
+  return{dismiss,get calMode(){return calMode},renderGrid,dayPanelExtra,monthChips,miniCal,navGrp,qaHTML,renderActs,renderTasks,renderStats,bind,newAct,quickAdd,parse,tasks,modeSeg}})();

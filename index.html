@@ -1840,7 +1840,7 @@ function frame(t){
 }
 const wake=()=>{if(!raf&&!paused)raf=requestAnimationFrame(frame)};
 function onScr(wx,wy,wr){const x=w2sx(wx),y=w2sy(wy),r=wr*cam.z;return x+r>0&&x-r<M.W&&y+r>0&&y-r<M.H}
-// adaptive quality: if more than a third of recent active frames take >24ms, step down one tier (remembered per device)
+// adaptive quality: compare rendered frames with their target interval, including sustained visible animation
 function perfSample(dt,budget=24){if(performance.now()<6000||dt>250)return; // ignore start-up loading and tab stalls
   const w=PERF.win;w.push(dt/Math.max(24,budget*1.5));if(w.length<90)return;const slow=w.filter(v=>v>1).length;PERF.win=[];PERF.bad=slow>30?(PERF.bad||0)+1:0;
   if(PERF.bad>=2){PERF.bad=0;setTier(TIER+1);toast(TIER>=2?'Akıcılık için hafif moda geçtim':'Akıcılık için görüntü kalitesini biraz düşürdüm')}}

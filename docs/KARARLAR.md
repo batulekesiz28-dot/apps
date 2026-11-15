@@ -34,6 +34,8 @@ Son güncelleme: 2026-11-15
 | Alt sekmeler | Sayfa başlığının yanında, **solda** (`.mc-sub`). |
 | Görünüm | 4 görünüm (tv, nf, compact, list) + ayar paneli (kapak boyu, boşluk, yoğunluk, yazı, köşe…). Kullanıcı karar verir, varsayılan tv. |
 | Puan | Beğen/beğenme/boş + 1–10 + favori (`rateHTML`); sağ tık → Puan ver. |
+| Kart rozetleri | IMDb (genel) puanı **sağ üstte** (sarı “IMDb” yazısıyla), **benim puanım mavi, sol altta**, favori kalbi sağ altta, “incele” uyarısı sol üstte. Puan kartın altındaki yazıda tekrar edilmez. |
+| Yatay kart (tv) | Sadece dikey posteri olan yapımda poster **ortada**, arkası bulanık posterle dolu; içeride ad tekrar yazılmaz. |
 
 ## Takvim, Görevler
 | Alan | Geçerli karar |

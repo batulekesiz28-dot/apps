@@ -78,9 +78,10 @@ const Media=(()=>{
     return`<div class="fp fp-${it.type}" aria-hidden="true"><span class="fp-k">${TN[it.type]}${it.year?' · '+E(it.year):''}</span><b class="fp-t">${E(it.title)}</b>${g?`<span class="fp-g">${E(g)}</span>`:''}</div>`}
   const poster=(it,cls='')=>`<div class="mp ${cls}" style="--h:${hash(it.title)%360}">${fallback(it)}${IMG(it.cover,it.cover2)}</div>`;
   const wideArt=it=>{const w=it.wide||it.backdrop,h=hash(it.title)%360;if(w)return`<div class="mw" style="--h:${h}">${fallback(it)}${IMG(w,it.cover)}</div>`;
-    return`<div class="mw pb" style="--h:${h}">${fallback(it)}${it.cover?`<div class="mw-bl">${IMG(it.cover,it.cover2)}</div><div class="mw-p">${IMG(it.cover,it.cover2)}</div><div class="mw-t"><b>${E(it.title)}</b><span>${metaShort(it)}</span></div>`:''}</div>`};
+    return`<div class="mw pb" style="--h:${h}">${fallback(it)}${it.cover?`<div class="mw-bl">${IMG(it.cover,it.cover2)}</div><div class="mw-p">${IMG(it.cover,it.cover2)}</div>`:''}</div>`};
+  // kart rozeti: IMDb puanı sağ üstte (IMDb etiketiyle), diğer kaynaklar olduğu gibi
+  const scoreBadge=it=>{const m=/^IMDb\s*(.+)$/i.exec(it.score||'');return m?`<i>IMDb</i>${E(m[1])}`:scoreTxt(it)};
   const scoreTxt=it=>it.score?E(it.score.replace(/^IMDb\s*/,'★ ').replace(/^MC\s*/,'MC ')):'';
-  const myStars=it=>it.rating?`<span class="mc-my" title="Puanım ${it.rating}/10">${IC.star}${it.rating}</span>`:'';
   function metaShort(it){const a=[];if(it.type==='book'&&it.author)a.push(it.author);if(it.year)a.push(it.year);if(it.type==='game'&&it.platforms.length)a.push(it.platforms.slice(0,2).join(' · '));else if(it.genres.length)a.push(it.genres[0]);
     if(it.type==='series'&&it.season)a.push(`S${it.season}${it.ep?' B'+it.ep:''}`);return a.map(E).join(' · ')}
   function metaLong(it,noType){const a=noType?[]:[TN[it.type]];if(it.year)a.push(it.year);if(it.genres.length)a.push(it.genres.slice(0,3).join(', '));if(it.type==='game'&&it.platforms.length)a.push(it.platforms.slice(0,4).join(' · '));
@@ -92,9 +93,9 @@ const Media=(()=>{
     return`<article class="mc-card v-${v} t-${it.type}${it.status?' s-'+it.status:''}" data-mi="${it.id}" tabindex="0" aria-label="${E(it.title)}${s?', '+E(s):''}">
       ${v==='r'?`<span class="mc-n" aria-hidden="true">${n}</span>`:''}
       <div class="mc-art">${v==='w'||v==='w2'?wideArt(it):poster(it)}
-        ${it.score&&v!=='w'&&v!=='w2'?`<span class="mc-sc">${scoreTxt(it)}</span>`:''}${f?`<span class="mc-fl" title="İncelemen gerekiyor">${IC.warn}</span>`:''}${it.fav?`<span class="mc-fv" title="Favori">${IC.heart}</span>`:''}${prog(it)}
+        ${it.score?`<span class="mc-sc">${scoreBadge(it)}</span>`:''}${it.rating?`<span class="mc-mine" title="Puanım ${it.rating}/10" aria-label="Puanım ${it.rating}/10">${IC.star}${it.rating}</span>`:''}${f?`<span class="mc-fl" title="İncelemen gerekiyor">${IC.warn}</span>`:''}${it.fav?`<span class="mc-fv" title="Favori">${IC.heart}</span>`:''}${prog(it)}
         <div class="mc-hov"></div></div>
-      <div class="mc-cap"><b>${E(it.title)}</b><small>${metaShort(it)||TN[it.type]}${myStars(it)}</small></div></article>`}
+      <div class="mc-cap"><b>${E(it.title)}</b><small>${metaShort(it)||TN[it.type]}</small></div></article>`}
   // karttaki hızlı durum düğmesi: listede değilse “listeye ekle”, listedeyse “izledim / bitirdim”
   function quick(it){const g=it.type==='game',b=it.type==='book',S0=stOf(it);
     if(!S0)return`<button class="mc-b pri" data-mq="todo" title="${g?'Oynamak istediklerime ekle':b?'Okuma listeme ekle':'İzleme listeme ekle'}" aria-label="${g?'İstek listesine ekle':b?'Okuma listesine ekle':'İzleme listesine ekle'}">${IC.plus}</button>`;

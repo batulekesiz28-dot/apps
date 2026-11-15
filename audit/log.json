@@ -2324,5 +2324,35 @@
     "text": "Takvim hafta görünümünde bugünün rakamı kontrast sınırında (4.5:1'e yakın)"
    }
   ]
+ },
+ {
+  "at": "2026-11-15T15:09:51",
+  "change": "Medya kartları: dikey poster ortada, IMDb puanı sağ üstte, kendi puanım mavi sol altta",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Apple TV görünümünde dikey posterler sola yaslıydı, ad iki kez yazıyordu",
+    "fix": "Poster ortalandı, içteki tekrar kaldırıldı"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Apple TV görünümünde IMDb puanı hiç görünmüyordu",
+    "fix": "Her görünümde sağ üstte; kendi puanım mavi rozetle sol altta"
+   }
+  ]
  }
 ]

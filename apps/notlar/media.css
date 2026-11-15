@@ -93,10 +93,13 @@
 .fp-game .fp-t,.fp-anime .fp-t{font-family:var(--font);font-weight:700;letter-spacing:-.02em}
 .fp-anime{background:radial-gradient(90% 60% at 50% 0%,hsl(var(--h) 80% 55% / .55),transparent 70%),linear-gradient(180deg,hsl(var(--h) 55% 22%),hsl(calc(var(--h) + 60) 60% 8%))}
 .mw .fp{padding:6% 6%}.mw .fp-t{-webkit-line-clamp:2;font-size:clamp(18px,1.6vw,24px)}
-.mw.pb{background:var(--mbg2)}
-.mc-sc{position:absolute;z-index:2;left:7px;top:7px;padding:3px 7px;border-radius:6px;font:700 12px/1.2 var(--font);color:#fff;background:rgba(0,0,0,.72);backdrop-filter:blur(6px);font-variant-numeric:tabular-nums}
-.mc-fl{position:absolute;z-index:2;right:7px;top:7px;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:#F5C451;color:#1A1405}.mc-fl .mvi{width:14px;height:14px;stroke-width:2}
+.mw.pb{background:var(--mbg2)}.mw.pb:has(.mw-p):not(.noimg) .fp{visibility:hidden}
+.mc-sc{position:absolute;z-index:2;right:7px;top:7px;padding:3px 7px;border-radius:6px;font:700 12px/1.2 var(--font);color:#fff;background:rgba(0,0,0,.72);backdrop-filter:blur(6px);font-variant-numeric:tabular-nums}
+.mc-fl{position:absolute;z-index:2;left:7px;top:7px;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:#F5C451;color:#1A1405}.mc-fl .mvi{width:14px;height:14px;stroke-width:2}
 .mc-fv{position:absolute;z-index:2;right:7px;bottom:7px;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.6);color:var(--acc)}.mc-fv .mvi{width:14px;height:14px;fill:currentColor}
+.mc-sc i{font-style:normal;font-weight:800;color:#F5C518;margin-right:4px;letter-spacing:-.01em}
+.mc-mine{position:absolute;z-index:2;left:7px;bottom:7px;display:inline-flex;align-items:center;gap:3px;padding:3px 7px 3px 6px;border-radius:6px;font:700 12px/1.2 var(--font);color:#fff;background:#0A6CD6;font-variant-numeric:tabular-nums;box-shadow:0 2px 8px -2px rgba(0,0,0,.5)}.mc-mine .mvi{width:11px;height:11px;fill:currentColor;stroke:none}
+.s-doing .mc-mine{bottom:11px}
 .mc-pr{position:absolute;z-index:2;left:0;right:0;bottom:0;height:4px;background:rgba(255,255,255,.2)}.mc-pr i{display:block;height:100%;background:var(--acc)}
 .mc-hov{position:absolute;inset:0;z-index:3;display:none;flex-direction:column;justify-content:flex-end;gap:3px;padding:12px;border-radius:var(--r);background:linear-gradient(0deg,rgba(0,0,0,.94) 0%,rgba(0,0,0,.6) 45%,transparent 75%);opacity:0;transition:opacity .3s}
 .mc-hov b{font-size:14px;font-weight:600;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.mc-hov>span{font-size:12px;color:#D8D6D1}
@@ -111,7 +114,6 @@
   .mc-card:hover .mc-sc{opacity:0}}
 .mc-cap{padding:9px 2px 0}.mc-cap b{display:block;font-size:13.5px;font-weight:500;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mc-cap small{display:flex;align-items:center;gap:6px;margin-top:2px;font-size:12px;color:var(--mink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mc-my{display:inline-flex;align-items:center;gap:2px;margin-left:auto;color:var(--acc);font-weight:600}.mc-my .mvi{width:11px;height:11px;fill:currentColor}
 /* varyantlar */
 .mc-card.v-w,.mc-row.v-w .mc-card{width:clamp(250px,22vw,360px)}
 .mc-card.v-w2,.mc-row.v-w2 .mc-card{width:clamp(270px,24vw,380px)}
@@ -241,9 +243,8 @@
 @media (prefers-reduced-motion:reduce){.mc *,.mx-bg *{animation:none!important;transition-duration:.01ms!important}}
 [data-motion=off] .mc *,[data-motion=off] .mx-bg *{animation:none!important;transition-duration:.01ms!important}
 .mw-bl{position:absolute;inset:0}.mw-bl img{filter:blur(22px) brightness(.5) saturate(1.5);transform:scale(1.35)}
-.mw-p{position:absolute;left:5%;top:9%;bottom:9%;aspect-ratio:2/3;border-radius:5px;overflow:hidden;box-shadow:0 12px 30px -8px rgba(0,0,0,.8);background:var(--mbg2)}
-.mw-t{position:absolute;left:calc(5% + 30%);right:6%;bottom:12%;display:flex;flex-direction:column;gap:3px;color:#fff;pointer-events:none}.mw-t b{font:600 16px/1.2 var(--font);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.mw-t span{font-size:12px;color:#DDD}
-.mw.noimg .mw-bl,.mw.noimg .mw-p,.mw.noimg .mw-t{display:none}.mw.pb .fp{z-index:0}.mw.pb .mw-bl,.mw.pb .mw-p,.mw.pb .mw-t{z-index:1}
+.mw-p{position:absolute;left:50%;top:8%;bottom:8%;transform:translateX(-50%);aspect-ratio:2/3;border-radius:5px;overflow:hidden;box-shadow:0 12px 30px -8px rgba(0,0,0,.8);background:var(--mbg2)}
+.mw.noimg .mw-bl,.mw.noimg .mw-p{display:none}.mw.pb .fp{z-index:0}.mw.pb .mw-bl,.mw.pb .mw-p{z-index:1}
 .mc-sync[hidden]{display:none}
 @media (max-width:760px){.mc-nav{position:relative}.mc-sub{position:relative;top:0}}
 .mc-lz{height:330px}
@@ -441,7 +442,6 @@
 /* ══ Puanlama her yerden: kart üstü yıldız, liste hücresi, sağ tık, detay başlığı ══ */
 .mc-b.mc-rb{width:auto;min-width:34px;padding:0 9px;gap:4px;display:inline-flex;align-items:center;justify-content:center}
 .mc-b.mc-rb b{font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums}.mc-b.mc-rb.on{color:#F5C451}.mc-b.mc-rb.on .mvi{fill:currentColor}
-.mc-my .mvi{fill:currentColor}
 button.ml-sc{display:inline-flex;align-items:center;gap:4px;justify-self:start;height:32px;padding:0 10px;margin-left:-10px;border-radius:999px;color:var(--mink);transition:background .15s}
 button.ml-sc:hover{background:rgba(255,255,255,.08)}button.ml-sc .mvi{width:13px;height:13px;color:var(--mink3)}button.ml-sc i{font-size:12.5px}
 .mrp{position:fixed;z-index:600;width:min(340px,calc(100vw - 16px));padding:12px 14px 14px;border-radius:16px;color:#F5F5F7;font-family:var(--sys,-apple-system,system-ui,sans-serif);
@@ -457,7 +457,7 @@ button.ml-sc:hover{background:rgba(255,255,255,.08)}button.ml-sc .mvi{width:13px
 :is(.mc,.mx-bg,.ma-bg,.mq),:is(.mc,.mx-bg,.ma-bg,.mq)[data-sec]{--mbg:#0A0A0C;--mbg2:#141418;--mink:#F5F5F7;--mink2:#C9C9CE;--mink3:#A1A1A8;--mline:rgba(255,255,255,.09);
   --acc:#F5F5F7;--acc-ink:#0D0D0F;--acc-bg:#F5F5F7;--font:var(--sys)}
 :is(.mx-bg,.ma-bg,.mq),:is(.mx-bg,.ma-bg,.mq)[data-sec]{--r:10px}
-.mc-my,.mc-b.mc-rb.on{color:#F5C451}.mx-rate i .mvi+.mvi{color:#F5C451;fill:#F5C451}
+.mc-b.mc-rb.on{color:#F5C451}.mx-rate i .mvi+.mvi{color:#F5C451;fill:#F5C451}
 /* 2) Kaydırma: sadece ana gezinme yapışık; durum kapsülleri içerikle birlikte kayar.
       En üstte saydam (vitrin arkada görünür), kaydırınca buzlu cam zemin — içerik yazıları arkadan okunmaz. */
 .mc-sub{position:relative;top:auto;z-index:1}

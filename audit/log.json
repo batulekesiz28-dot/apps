@@ -2693,5 +2693,42 @@
     "fix": "Spot 2 sn durunca açılıyor, ayrıntılar anında"
    }
   ]
+ },
+ {
+  "at": "2026-11-15T21:04:12",
+  "change": "Medya fragman: iTunes resmî fragmanları, çıkıp kaybolma yok, boyut elle ayarlanıyor",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Çoğu filmde fragman bulunamıyordu",
+    "fix": "Önce Apple/iTunes resmî fragmanı (doğrudan video), sonra Jikan/TMDB/Wikidata"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Fragman alanı solda belirip kayboluyordu",
+    "fix": "Alan sadece video oynamaya başlayınca görünüyor"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "fixed",
+    "text": "Fragman boyutu ayarlanamıyordu",
+    "fix": "Köşeden sürükle (çift tık: varsayılan) + Görünüm panelinde genişlik ve aç/kapa"
+   }
+  ]
  }
 ]

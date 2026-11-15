@@ -610,8 +610,8 @@ html[data-motion=off] .msp-x{transition:none;transform:none}
 /* fragman: bilginin karşı tarafında 16:9; önce YouTube kapak karesi, video gelince yumuşak geçiş; tıkla → ses */
 .msp-yt{position:absolute;box-sizing:content-box;opacity:0;transform:scale(.96);transition:opacity .4s .05s,transform .6s .05s cubic-bezier(.2,.9,.22,1.1);pointer-events:none}
 .msp-yt.l{padding-right:34px}.msp-yt.r{padding-left:34px}
-.msp.det .msp-yt{opacity:1;transform:none;pointer-events:auto}
-.msp-yt.in{position:relative;width:100%;transform:none;opacity:1;margin-bottom:4px}
+.msp.det .msp-yt.ready{opacity:1;transform:none;pointer-events:auto}
+.msp-yt.in{position:relative;width:100%;transform:none;opacity:1;margin-bottom:4px;display:none}.msp-yt.in.ready{display:block}
 .msp-yv{position:relative;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000;cursor:pointer;box-shadow:0 30px 70px -24px rgba(0,0,0,.95),0 0 0 1px rgba(255,255,255,.14)}
 .msp-yth{position:absolute;inset:0;background:#000 center/cover no-repeat;transition:opacity .6s}
 .msp-yf{position:absolute;inset:-1px;width:calc(100% + 2px);height:calc(100% + 2px);border:0;opacity:0;transition:opacity .6s;pointer-events:none}
@@ -620,3 +620,10 @@ html[data-motion=off] .msp-x{transition:none;transform:none}
 .msp-ym .mvi{width:15px;height:15px}.msp-yv:hover .msp-ym{background:rgba(0,0,0,.75)}
 @media (prefers-reduced-motion:reduce){.msp-yt{transition:opacity .2s;transform:none}}
 html[data-motion=off] .msp-yt{transition:none;transform:none}
+/* fragman boyutu: dış alt köşeden sürükle (çift tık: varsayılan) */
+.msp-yr{position:absolute;bottom:-10px;z-index:3;width:26px;height:26px;cursor:nesw-resize;touch-action:none}
+.msp-yr.l{left:-10px}.msp-yr.r{right:-10px;cursor:nwse-resize}
+.msp-yr::after{content:"";position:absolute;inset:7px;border:solid rgba(255,255,255,.75);border-width:0 0 3px 3px;border-radius:0 0 0 5px;opacity:0;transition:opacity .2s}
+.msp-yr.r::after{border-width:0 3px 3px 0;border-radius:0 0 5px 0}
+.msp-yt:hover .msp-yr::after,.msp-yt.rs .msp-yr::after{opacity:1}
+.msp-yt.rs .msp-yf{pointer-events:none}.msp-yt.rs{transition:none}

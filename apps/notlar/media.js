@@ -101,24 +101,26 @@ const Media=(()=>{
   /* ═ Fragman (spot ışığında bilgi panelinin karşı tarafında, resmî YouTube oynatıcısı, youtube-nocookie).
      Kimlik sırası: önbellek mc:yt → anime: Jikan trailer → TMDB videos (anahtar varsa) → Wikidata P1651 (mid ya da IMDb/Steam ile bulunur).
      Kapağın üstüne gelir gelmez aranır (spot açılmadan önce), bulunan kimlik saklanır → ikinci seferde anında. Bulunamazsa 7 gün sonra yeniden denenir. ═ */
-  const YT=lsg('mc:yt',{}),ytP=new Map(),okYT=v=>/^[\w-]{11}$/.test(v||'');
+  const YT=lsg('mc:yt2',{}),ytP=new Map(),okYT=v=>/^[\w-]{11}$/.test(v||'');
   const hasTrailer=it=>['movie','series','anime','game'].includes(it?.type);
   // aday listesi (birden çok): bir video oynamazsa sıradaki denenir; bozuk olduğu anlaşılanlar mc:ytbad'de (bir daha denenmez)
   const YTB=lsg('mc:ytbad',{});const badYT=v=>{YTB[v]=Date.now();lss('mc:ytbad',YTB)};
-  function ytIds(it){if(!hasTrailer(it))return Promise.resolve([]);const c=YT[it.id],l=c?(c.l||(c.v?[c.v]:[])).filter(v=>!YTB[v]):null;
+  function ytIds(it){if(!hasTrailer(it))return Promise.resolve([]);const c=YT[it.id],l=c?(c.l||[]).filter(v=>!YTB[v]):null;
     if(c&&(l.length||Date.now()-c.at<7*864e5))return Promise.resolve(l);
     if(ytP.has(it.id))return ytP.get(it.id);
-    const p=(async()=>{const out=[],add=v=>{if(okYT(v)&&!out.includes(v)&&!YTB[v])out.push(v)};let done=true;
+    const p=(async()=>{const out=[],add=v=>{v=okYT(v)?'yt:'+v:v;if(/^(yt|mp):/.test(v||'')&&!out.includes(v)&&!YTB[v])out.push(v)};let done=true;
       const wdq=async q=>{const e=await getJSON(`https://www.wikidata.org/w/api.php?action=wbgetclaims&entity=${q}&property=P1651&format=json&origin=*`);const cl=(e?.claims?.P1651||[]).filter(x=>x.rank!=='deprecated');
         cl.sort((a,b)=>(b.rank==='preferred')-(a.rank==='preferred')).slice(0,6).forEach(x=>add(x?.mainsnak?.datavalue?.value))};
       const byProp=async(pr,val)=>{const j=await getJSON(`https://www.wikidata.org/w/api.php?action=query&list=search&srsearch=haswbstatement:${pr}=${encodeURIComponent(val)}&srlimit=1&format=json&origin=*`);return j?.query?.search?.[0]?.title||''};
-      try{if(it.type==='anime'&&it.mal){const d=await getJSON(`https://api.jikan.moe/v4/anime/${it.mal}`);add(d?.data?.trailer?.youtube_id)}
+      try{if(it.type==='movie'||it.type==='series'){const yr=parseInt(it.year)||0,k=it.type==='series'?'tv':'mv',en=(it.wiki&&!it.wiki.startsWith('tr:')?it.wiki:'').replace(/_/g,' ').replace(/\s*\([^)]*\)\s*$/,'');
+          let u=await itPrev(it.title,yr,k);if(!u&&en&&norm(en)!==norm(it.title))u=await itPrev(en,yr,k);if(u)add('mp:'+u)}
+        if(it.type==='anime'&&it.mal){const d=await getJSON(`https://api.jikan.moe/v4/anime/${it.mal}`);add(d?.data?.trailer?.youtube_id)}
         const key=tmdbKey();if(key&&it.imdb&&it.type!=='game'){const f=await getJSON(`https://api.themoviedb.org/3/find/${it.imdb}?api_key=${encodeURIComponent(key)}&external_source=imdb_id`);
           const m=(f?.movie_results||[])[0],t=(f?.tv_results||[])[0],id=(m||t)?.id;if(id){const vs=await getJSON(`https://api.themoviedb.org/3/${m?'movie':'tv'}/${id}/videos?api_key=${encodeURIComponent(key)}`);
             const V=(vs?.results||[]).filter(x=>x.site==='YouTube'),rk=x=>(x.type==='Trailer'?0:x.type==='Teaser'?2:4)+(x.official?0:1);V.sort((a,b)=>rk(a)-rk(b)).slice(0,5).forEach(x=>add(x.key))}}
         let q=/^Q\d+$/.test(it.mid||'')?it.mid:'';if(!q&&it.imdb)q=await byProp('P345',it.imdb);if(!q&&it.steam)q=await byProp('P1733',it.steam);if(q)await wdq(q)}
       catch(e){done=false}
-      ytP.delete(it.id);if(done||out.length){YT[it.id]={l:out,at:Date.now()};lss('mc:yt',YT)}return out})();
+      ytP.delete(it.id);if(done||out.length){YT[it.id]={l:out,at:Date.now()};lss('mc:yt2',YT)}return out})();
     ytP.set(it.id,p);return p}
   let ytWarm=false;function warmYT(){if(ytWarm)return;ytWarm=true;for(const h of['https://www.youtube-nocookie.com','https://i.ytimg.com','https://www.wikidata.org']){const l=document.createElement('link');l.rel='preconnect';l.href=h;l.crossOrigin='';document.head.appendChild(l)}}
   // silinmiş videonun kapak karesi 120×90 gri yer tutucudur → hiç denemeden ele
@@ -129,17 +131,21 @@ const Media=(()=>{
     const cleanup=()=>{removeEventListener('message',onMsg);clearInterval(tm)};
     const onMsg=e=>{if(!fr||e.source!==fr.contentWindow)return;let d;try{d=typeof e.data==='string'?JSON.parse(e.data):e.data}catch{return}if(!d)return;
       if(d.event==='onError'){badYT(ids[i]);next();return}
-      const ps=d.event==='onStateChange'?d.info:d.event==='infoDelivery'?d.info?.playerState:null;if(ps===1&&!box.classList.contains('ok')){clearInterval(tm);box.classList.add('ok')}};
+      const ps=d.event==='onStateChange'?d.info:d.event==='infoDelivery'?d.info?.playerState:null;if(ps===1&&!box.classList.contains('ok'))playing()};
     addEventListener('message',onMsg);
     const cmd=(f,a=[])=>{try{fr?.contentWindow?.postMessage(JSON.stringify({event:'command',func:f,args:a}),'*')}catch{}};
     async function next(){if(!alive)return;fr?.remove();fr=null;clearInterval(tm);box?.classList.remove('ok');
-      while(++i<ids.length){if(await thumbOK(ids[i]))break;badYT(ids[i])}if(!alive)return;
+      while(++i<ids.length){const c=ids[i];if(c.startsWith('mp:')||await thumbOK(c.slice(3)))break;badYT(c)}if(!alive)return;
       if(i>=ids.length){alive=false;cleanup();onFail?.();return}
-      const v=ids[i];if(!box){slot.innerHTML=`<div class="msp-yv"><i class="msp-yth"></i><button type="button" class="msp-ym" data-ym aria-label="${auto?'Sesi aç':'Fragmanı oynat'}" title="${auto?'Sesi aç':'Oynat'}">${auto?IC.vol0:IC.play}</button></div>`;box=slot.firstElementChild;
-        box.addEventListener('click',e=>{e.stopPropagation();if(!fr){load();return}muted=!muted;cmd(muted?'mute':'unMute');if(!muted)cmd('setVolume',[70]);
+      const c=ids[i],mp=c.startsWith('mp:'),v=c.slice(3);if(!box){slot.insertAdjacentHTML('afterbegin',`<div class="msp-yv"><i class="msp-yth"></i><button type="button" class="msp-ym" data-ym aria-label="${auto?'Sesi aç':'Fragmanı oynat'}" title="${auto?'Sesi aç':'Oynat'}">${auto?IC.vol0:IC.play}</button></div>`);box=slot.firstElementChild;
+        box.addEventListener('click',e=>{if(e.target.closest('.msp-yr'))return;e.stopPropagation();if(!fr){load();return}muted=!muted;if(fr.tagName==='VIDEO'){fr.muted=muted;if(!muted)fr.volume=.7}else{cmd(muted?'mute':'unMute');if(!muted)cmd('setVolume',[70])}
           const b=box.querySelector('[data-ym]');b.innerHTML=muted?IC.vol0:IC.vol1;b.setAttribute('aria-label',muted?'Sesi aç':'Sesi kapat');b.title=muted?'Sesi aç':'Sesi kapat'})}
-      box.querySelector('.msp-yth').style.backgroundImage=`url(https://i.ytimg.com/vi/${v}/hqdefault.jpg)`;if(auto)load()}
-    function load(){if(fr||!alive)return;const v=ids[i];fr=document.createElement('iframe');fr.className='msp-yf';fr.title='Fragman';fr.allow='autoplay; encrypted-media; picture-in-picture';fr.referrerPolicy='strict-origin-when-cross-origin';
+      box.querySelector('.msp-yth').style.backgroundImage=mp?'none':`url(https://i.ytimg.com/vi/${v}/hqdefault.jpg)`;if(!auto)slot.classList.add('ready');if(auto)load()}
+    const playing=()=>{clearInterval(tm);box.classList.add('ok');slot.classList.add('ready')};
+    function load(){if(fr||!alive)return;const c=ids[i],v=c.slice(3);
+      if(c.startsWith('mp:')){fr=document.createElement('video');fr.className='msp-yf';fr.muted=muted;fr.autoplay=true;fr.loop=true;fr.playsInline=true;fr.preload='auto';fr.src=v;
+        fr.addEventListener('playing',playing,{once:true});fr.addEventListener('error',()=>{badYT(c);next()},{once:true});box.insertBefore(fr,box.querySelector('[data-ym]'));fr.play?.().catch(()=>{});return}
+      fr=document.createElement('iframe');fr.className='msp-yf';fr.title='Fragman';fr.allow='autoplay; encrypted-media; picture-in-picture';fr.referrerPolicy='strict-origin-when-cross-origin';
       fr.src=`https://www.youtube-nocookie.com/embed/${v}?autoplay=1&mute=1&controls=0&rel=0&playsinline=1&modestbranding=1&iv_load_policy=3&disablekb=1&loop=1&playlist=${v}&enablejsapi=1&origin=${encodeURIComponent(location.origin)}&widget_referrer=${encodeURIComponent(location.href)}`;
       // IFrame API el sıkışması: oynatıcı olay göndermeye “listening” ile başlar
       fr.addEventListener('load',()=>{const hi=()=>{try{fr?.contentWindow?.postMessage(JSON.stringify({event:'listening',id:1,channel:'widget'}),'*')}catch{}};hi();clearInterval(tm);let n=0;tm=setInterval(()=>{if(++n>40||box.classList.contains('ok'))clearInterval(tm);else hi()},250)});
@@ -168,15 +174,24 @@ const Media=(()=>{
       inf.style.width=w+'px';inf.style.top=ft+'px';if(side==='r')inf.style.left=fr+'px';else inf.style.left=(fl-w)+'px';
       requestAnimationFrame(()=>{const h=inf.offsetHeight;if(ft+h>innerHeight-16)inf.style.top=Math.max(16,innerHeight-16-h)+'px'})
       // fragman: bilginin KARŞI tarafında; orada yer yoksa bilgi panelinin en üstünde
-      if(hasTrailer(it)){const osp=side==='r'?spL:spR,slot=document.createElement('div');
-        if(osp>=260){const tw=Math.min(520,osp-8),th=tw*9/16,cy=r.top+r.height/2;slot.className='msp-yt '+(side==='r'?'l':'r');slot.style.width=tw+'px';
-          slot.style.top=Math.max(16,Math.min(innerHeight-16-th,cy-th/2))+'px';slot.style.left=(side==='r'?fl-tw:fr)+'px';el.appendChild(slot)}
+      if(hasTrailer(it)&&!lsg('mc:ytoff',false)){const osp=side==='r'?spL:spR,slot=document.createElement('div');
+        if(osp>=260){const ys=side==='r'?'l':'r',edge=ys==='l'?fl:fr,cy=r.top+r.height/2,max=Math.min(960,osp-8);slot.className='msp-yt '+ys;el.appendChild(slot);
+          // genişlik: kullanıcının seçtiği (mc:ytw, köşeden sürükle ya da Görünüm paneli), yere sığacak kadar
+          const size=(w,keep)=>{w=Math.max(240,Math.min(max,w));const h=w*9/16;slot.style.width=w+'px';if(!keep)slot.style.top=Math.max(16,Math.min(innerHeight-16-h,cy-h/2))+'px';else slot.style.top=Math.max(16,Math.min(innerHeight-16-h,parseFloat(slot.style.top)))+'px';slot.style.left=(ys==='l'?edge-w-34:edge)+'px';return w};
+          size(lsg('mc:ytw',480));slot.insertAdjacentHTML('beforeend',`<span class="msp-yr ${ys}" title="Sürükle: fragman boyutu · çift tık: varsayılan" aria-hidden="true"></span>`);
+          const hd=slot.querySelector('.msp-yr');
+          hd.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();const x0=e.clientX,w0=slot.offsetWidth-34;let w=w0;try{hd.setPointerCapture(e.pointerId)}catch{}slot.classList.add('rs');SPT.rs=true;
+            const mv=ev=>{w=size(w0+(ys==='l'?x0-ev.clientX:ev.clientX-x0),true)},up=()=>{hd.removeEventListener('pointermove',mv);hd.removeEventListener('pointerup',up);hd.removeEventListener('pointercancel',up);slot.classList.remove('rs');lss('mc:ytw',Math.round(w));
+              // bıraktıktan sonra imleç spot dışındaysa kapan (sürüklerken kapanmaz)
+              setTimeout(()=>{SPT.rs=false;document.addEventListener('pointermove',ev=>{const t=ev.target;if(SPT.el===el&&!(el.querySelector('.msp-f')?.contains(t)||el.querySelector('.msp-in')?.contains(t)||slot.contains(t)))spotOff(false,true)},{once:true})},0)};
+            hd.addEventListener('pointermove',mv);hd.addEventListener('pointerup',up);hd.addEventListener('pointercancel',up)});
+          hd.addEventListener('dblclick',e=>{e.stopPropagation();lss('mc:ytw',480);size(480)});hd.addEventListener('click',e=>e.stopPropagation())}
         else{slot.className='msp-yt in';inf.prepend(slot)}
         const fail=()=>{if(SPT.el!==el)return;slot.remove();if(!inf.querySelector('[data-ytq]'))inf.querySelector('.msp-a')?.insertAdjacentHTML('beforeend',`<a data-ytq href="https://www.youtube.com/results?search_query=${encodeURIComponent(it.title+' '+(it.year||'')+' trailer')}" target="_blank" rel="noopener">Fragman${IC.r}</a>`)};
         ytIds(it).then(l=>{if(SPT.el!==el)return;if(l.length)ytMount(slot,l,fail);else fail()})}}
     document.body.appendChild(el);SPT.el=el;SPT.card=card;requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('on')));
     if(el.querySelector('.msp-in'))requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('det')));
-    const inf=el.querySelector('.msp-in'),yt=el.querySelector('.msp-yt:not(.in)'),leave=e=>{const t=e.relatedTarget;if(t&&(f.contains(t)||inf?.contains(t)||yt?.contains(t)))return;if(SPT.el===el)spotOff(false,true)};
+    const inf=el.querySelector('.msp-in'),yt=el.querySelector('.msp-yt:not(.in)'),leave=e=>{if(SPT.rs)return;const t=e.relatedTarget;if(t&&(f.contains(t)||inf?.contains(t)||yt?.contains(t)))return;if(SPT.el===el)spotOff(false,true)};
     if(yt){yt.addEventListener('pointerleave',leave);yt.addEventListener('wheel',e=>{spotOff(true);q('#scroll')?.scrollBy({top:e.deltaY,left:e.deltaX})},{passive:true})}
     f.addEventListener('pointerleave',leave);if(inf){inf.addEventListener('pointerleave',leave);inf.addEventListener('wheel',e=>{spotOff(true);q('#scroll')?.scrollBy({top:e.deltaY,left:e.deltaX})},{passive:true});
       inf.addEventListener('click',e=>{if(e.target.closest('[data-spo]')){spotOff(true);open(it.id)}else if(e.target.closest('a'))setTimeout(()=>spotOff(true),50)})}
@@ -408,6 +423,7 @@ const Media=(()=>{
       <h4>Kartlar</h4>${pvHTML()}<div class="mset-tgs">${tg('data-lt','title','Altında isim',L.title)}</div>${rng('cover','Kapak genişliği',60,160,5)}${rng('ar','Kapak yüksekliği',60,170,5)}${rng('radius','Köşe yuvarlaklığı',0,24,1,'px')}${rng('gap','Kart aralığı',40,220,10)}
       <label>Izgara yoğunluğu</label>${seg('dens',[['r','Rahat'],['n','Normal'],['s','Sıkı']])}
       <div class="mset-tgs">${tg('data-lt','meta','Yıl, tür, yazar',L.meta)}${tg('data-lt','badge','Genel puan rozeti',L.badge)}</div>
+      <h4>Fragman</h4><div class="mset-tgs">${tg('data-lyt','on','Üstüne gelince fragman',!lsg('mc:ytoff',false))}</div><label for="mset-ytw">Fragman genişliği <output>${lsg('mc:ytw',480)}px</output></label><input id="mset-ytw" type="range" min="240" max="960" step="20" value="${lsg('mc:ytw',480)}" data-ytw>
       <h4>Liste</h4>${rng('rowh','Satır yüksekliği',70,170,5)}
       <label>Sütunlar</label><div class="mset-tgs">${LC.map(([k,n])=>tg('data-lc',k,n,L.lc[k])).join('')}</div>
       <h4>Ana sayfa</h4><div class="mset-tgs">${tg('data-lt','hero','Büyük vitrin',L.hero)}</div>
@@ -431,7 +447,7 @@ const Media=(()=>{
     el.addEventListener('keydown',e=>{const h=e.target.closest('[data-pvh]');if(!h)return;const L=st.look,d=e.shiftKey?10:5,cl=(v,a,b)=>Math.max(a,Math.min(b,v));let cv=L.cover,ar=L.ar||100;
       if(e.key==='ArrowRight')cv+=d;else if(e.key==='ArrowLeft')cv-=d;else if(e.key==='ArrowDown')ar+=d;else if(e.key==='ArrowUp')ar-=d;else if(e.key==='Home'||e.key==='0'){cv=100;ar=100}else return;
       e.preventDefault();setSize(cl(cv,60,160),cl(ar,60,170));saveLook()});
-    el.addEventListener('input',e=>{const t=e.target;if(t.dataset.lr){t.previousElementSibling.querySelector('output').textContent=t.value+t.dataset.u;setLook(t.dataset.lr,+t.value);pvSync()}});
+    el.addEventListener('input',e=>{const t=e.target;if(t.matches('[data-ytw]')){t.previousElementSibling.querySelector('output').textContent=t.value+'px';lss('mc:ytw',+t.value);return}if(t.dataset.lr){t.previousElementSibling.querySelector('output').textContent=t.value+t.dataset.u;setLook(t.dataset.lr,+t.value);pvSync()}});
     el.addEventListener('pointerdown',e=>{const h=e.target.closest('[data-pvh]');if(!h)return;e.preventDefault();const f=h.parentElement,ax=h.dataset.pvh,{B,R}=pvBase(),x0=e.clientX,y0=e.clientY,w0=f.offsetWidth,h0=f.offsetHeight;
       const L=st.look,c0=L.cover,a0=L.ar||100,cl=(v,a,b)=>{v=Math.abs(v-100)<=7?100:Math.round(v/5)*5;return Math.max(a,Math.min(b,v))};let raf=0,last=null;
       try{h.setPointerCapture(e.pointerId)}catch(_){}f.classList.add('drag');el.classList.add('see');document.body.classList.add('mset-drag');
@@ -444,6 +460,7 @@ const Media=(()=>{
     el.addEventListener('click',e=>{const t=e.target,L=st.look;if(t.closest('[data-msx]'))return el.remove();
       if(t.closest('[data-msr]')){st.look={...JSON.parse(JSON.stringify(LOOK0)),tabsOff:st.look.tabsOff};saveLook();applyLook();refresh();redrawPanel();return}
       const b=t.closest('[data-lk]');if(b){setLook(b.dataset.lk,b.dataset.lval,b.dataset.lk==='view');if(b.dataset.lk==='view'){redrawPanel();return}qa(`[data-lk="${b.dataset.lk}"]`,el).forEach(x=>{const on=x===b;x.classList.toggle('on',on);x.setAttribute('aria-checked',on)});return}
+      const yo=t.closest('[data-lyt]');if(yo){const off=!lsg('mc:ytoff',false);lss('mc:ytoff',off);yo.setAttribute('aria-checked',!off);return}
       const tg=t.closest('[data-lt]');if(tg){const k=tg.dataset.lt;setLook(k,L[k]?0:1,k==='hero');tg.setAttribute('aria-checked',!!L[k]);pvSync();return}
       const lc=t.closest('[data-lc]');if(lc){const k=lc.dataset.lc;L.lc[k]=L.lc[k]?0:1;saveLook();applyLook();swap();lc.setAttribute('aria-checked',!!L.lc[k]);return}
       const shb=t.closest('[data-lsh]');if(shb){const k=shb.dataset.lsh;L.off=L.off.includes(k)?L.off.filter(x=>x!==k):[...L.off,k];saveLook();swap();redrawPanel(`[data-lsh="${k}"]`);return}
@@ -615,6 +632,13 @@ const Media=(()=>{
     'Nintendo Switch':'Switch','Nintendo Switch 2':'Switch 2','macOS':'Mac','Classic Mac OS':'Mac','Linux':'Linux','Android':'Android','iOS':'iOS','iPadOS':'iPad','Stadia':'Stadia','Wii U':'Wii U','PlayStation Vita':'PS Vita','Steam Deck':'Steam Deck','SteamOS':'Steam Deck'};
   const PFO=['PC','PS5','PS4','Xbox Series','Xbox One','Switch','Switch 2','Mac','Linux','PS3','Xbox 360','iOS','Android'];
   // JSONP (iTunes Search): CORS gerektirmez; sadece ad + yıl birebir tutarsa kabul edilir
+  // iTunes resmî fragman (previewUrl, .m4v): film → movie, dizi → tvSeason. Ad (ve yıl ±1) eşleşmeli.
+  function itPrev(term,year,kind){return new Promise(res=>{if(!term)return res('');const cb='__mcip'+Math.random().toString(36).slice(2);const s=document.createElement('script');let done=false;
+    const fin=v=>{if(done)return;done=true;window[cb]=()=>{};s.remove();res(v)};const nt=norm(term);
+    window[cb]=d=>{const L=(d?.results||[]).filter(x=>x.previewUrl);const nm=x=>norm(kind==='tv'?(x.collectionName||'').replace(/,?\s*(season|sezon)\s*\d+.*$/i,''):x.trackName||'');
+      const yr=x=>!year||Math.abs(parseInt(x.releaseDate)-year)<=1;const r=L.find(x=>nm(x)===nt&&yr(x))||L.find(x=>nm(x).startsWith(nt)&&yr(x)&&year);fin(r?.previewUrl||'')};
+    s.onerror=()=>fin('');setTimeout(()=>fin(''),7000);
+    s.src=`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&${kind==='tv'?'media=tvShow&entity=tvSeason':'media=movie&entity=movie'}&limit=15&callback=${cb}`;document.head.appendChild(s)})}
   function itunes(term,year){return new Promise(res=>{const cb='__mcit'+Math.random().toString(36).slice(2);const s=document.createElement('script');let done=false;
     const fin=v=>{if(done)return;done=true;window[cb]=()=>{};s.remove();res(v)};
     window[cb]=d=>{const r=(d?.results||[]).find(x=>norm(x.trackName)===norm(term)&&(!year||Math.abs(parseInt(x.releaseDate)-year)<=1));fin(r?.artworkUrl100?r.artworkUrl100.replace(/\/\d+x\d+bb\.(jpg|png)$/,'/600x900bb.jpg'):'')};

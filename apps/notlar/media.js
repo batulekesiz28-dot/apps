@@ -101,7 +101,7 @@ const Media=(()=>{
   /* ═ Fragman (spot ışığında bilgi panelinin karşı tarafında, resmî YouTube oynatıcısı, youtube-nocookie).
      Kimlik sırası: önbellek mc:yt → anime: Jikan trailer → TMDB videos (anahtar varsa) → Wikidata P1651 (mid ya da IMDb/Steam ile bulunur).
      Kapağın üstüne gelir gelmez aranır (spot açılmadan önce), bulunan kimlik saklanır → ikinci seferde anında. Bulunamazsa 7 gün sonra yeniden denenir. ═ */
-  const YT=lsg('mc:yt2',{}),ytP=new Map(),okYT=v=>/^[\w-]{11}$/.test(v||'');
+  const YT=lsg('mc:yt3',{}),ytP=new Map(),okYT=v=>/^[\w-]{11}$/.test(v||'');
   const hasTrailer=it=>['movie','series','anime','game'].includes(it?.type);
   // aday listesi (birden çok): bir video oynamazsa sıradaki denenir; bozuk olduğu anlaşılanlar mc:ytbad'de (bir daha denenmez)
   const YTB=lsg('mc:ytbad',{});const badYT=v=>{YTB[v]=Date.now();lss('mc:ytbad',YTB)};
@@ -113,21 +113,21 @@ const Media=(()=>{
         cl.sort((a,b)=>(b.rank==='preferred')-(a.rank==='preferred')).slice(0,6).forEach(x=>add(x?.mainsnak?.datavalue?.value))};
       const byProp=async(pr,val)=>{const j=await getJSON(`https://www.wikidata.org/w/api.php?action=query&list=search&srsearch=haswbstatement:${pr}=${encodeURIComponent(val)}&srlimit=1&format=json&origin=*`);return j?.query?.search?.[0]?.title||''};
       try{if(it.type==='movie'||it.type==='series'){const yr=parseInt(it.year)||0,k=it.type==='series'?'tv':'mv',en=(it.wiki&&!it.wiki.startsWith('tr:')?it.wiki:'').replace(/_/g,' ').replace(/\s*\([^)]*\)\s*$/,'');
-          let u=await itPrev(it.title,yr,k);if(!u&&en&&norm(en)!==norm(it.title))u=await itPrev(en,yr,k);if(u)add('mp:'+u)}
+          let u=await itPrev(it.title,yr,k,'tr');if(!u&&en&&norm(en)!==norm(it.title))u=await itPrev(en,yr,k,'us');if(!u)u=await itPrev(it.title,yr,k,'us');if(u)add('mp:'+u)}
         if(it.type==='anime'&&it.mal){const d=await getJSON(`https://api.jikan.moe/v4/anime/${it.mal}`);add(d?.data?.trailer?.youtube_id)}
         const key=tmdbKey();if(key&&it.imdb&&it.type!=='game'){const f=await getJSON(`https://api.themoviedb.org/3/find/${it.imdb}?api_key=${encodeURIComponent(key)}&external_source=imdb_id`);
           const m=(f?.movie_results||[])[0],t=(f?.tv_results||[])[0],id=(m||t)?.id;if(id){const vs=await getJSON(`https://api.themoviedb.org/3/${m?'movie':'tv'}/${id}/videos?api_key=${encodeURIComponent(key)}`);
             const V=(vs?.results||[]).filter(x=>x.site==='YouTube'),rk=x=>(x.type==='Trailer'?0:x.type==='Teaser'?2:4)+(x.official?0:1);V.sort((a,b)=>rk(a)-rk(b)).slice(0,5).forEach(x=>add(x.key))}}
         let q=/^Q\d+$/.test(it.mid||'')?it.mid:'';if(!q&&it.imdb)q=await byProp('P345',it.imdb);if(!q&&it.steam)q=await byProp('P1733',it.steam);if(q)await wdq(q)}
       catch(e){done=false}
-      ytP.delete(it.id);if(done||out.length){YT[it.id]={l:out,at:Date.now()};lss('mc:yt2',YT)}return out})();
+      ytP.delete(it.id);if(done||out.length){YT[it.id]={l:out,at:Date.now()};lss('mc:yt3',YT)}return out})();
     ytP.set(it.id,p);return p}
   let ytWarm=false;function warmYT(){if(ytWarm)return;ytWarm=true;for(const h of['https://www.youtube-nocookie.com','https://i.ytimg.com','https://www.wikidata.org']){const l=document.createElement('link');l.rel='preconnect';l.href=h;l.crossOrigin='';document.head.appendChild(l)}}
   // silinmiş videonun kapak karesi 120×90 gri yer tutucudur → hiç denemeden ele
   const thumbOK=v=>new Promise(res=>{const im=new Image();const t=setTimeout(()=>res(true),2500);im.onload=()=>{clearTimeout(t);res(im.naturalWidth>120)};im.onerror=()=>{clearTimeout(t);res(false)};im.src=`https://i.ytimg.com/vi/${v}/mqdefault.jpg`});
   // fragman alanı: kapak karesi hemen görünür; video GİZLİ yüklenir, oynamaya başlayınca (IFrame API olayı) belirir.
   // Hata (silinmiş / gömme kapalı / bölge) gelirse sıradaki aday denenir; hiçbiri olmazsa onFail → alan kalkar. Kullanıcı hata ekranı görmez.
-  function ytMount(slot,ids,onFail){const auto=motion();let i=-1,fr=null,muted=true,box=null,alive=true,tm=0;
+  function ytMount(slot,ids,onFail){const auto=true;let i=-1,fr=null,muted=true,box=null,alive=true,tm=0;
     const cleanup=()=>{removeEventListener('message',onMsg);clearInterval(tm)};
     const onMsg=e=>{if(!fr||e.source!==fr.contentWindow)return;let d;try{d=typeof e.data==='string'?JSON.parse(e.data):e.data}catch{return}if(!d)return;
       if(d.event==='onError'){badYT(ids[i]);next();return}
@@ -144,11 +144,11 @@ const Media=(()=>{
     const playing=()=>{clearInterval(tm);box.classList.add('ok');slot.classList.add('ready')};
     function load(){if(fr||!alive)return;const c=ids[i],v=c.slice(3);
       if(c.startsWith('mp:')){fr=document.createElement('video');fr.className='msp-yf';fr.muted=muted;fr.autoplay=true;fr.loop=true;fr.playsInline=true;fr.preload='auto';fr.src=v;
-        fr.addEventListener('playing',playing,{once:true});fr.addEventListener('error',()=>{badYT(c);next()},{once:true});box.insertBefore(fr,box.querySelector('[data-ym]'));fr.play?.().catch(()=>{});return}
+        fr.addEventListener('playing',playing,{once:true});fr.addEventListener('canplay',()=>setTimeout(()=>{if(fr&&!fr.paused)playing()},300),{once:true});fr.addEventListener('error',()=>{badYT(c);next()},{once:true});box.insertBefore(fr,box.querySelector('[data-ym]'));fr.play?.().catch(()=>{});return}
       fr=document.createElement('iframe');fr.className='msp-yf';fr.title='Fragman';fr.allow='autoplay; encrypted-media; picture-in-picture';fr.referrerPolicy='strict-origin-when-cross-origin';
       fr.src=`https://www.youtube-nocookie.com/embed/${v}?autoplay=1&mute=1&controls=0&rel=0&playsinline=1&modestbranding=1&iv_load_policy=3&disablekb=1&loop=1&playlist=${v}&enablejsapi=1&origin=${encodeURIComponent(location.origin)}&widget_referrer=${encodeURIComponent(location.href)}`;
       // IFrame API el sıkışması: oynatıcı olay göndermeye “listening” ile başlar
-      fr.addEventListener('load',()=>{const hi=()=>{try{fr?.contentWindow?.postMessage(JSON.stringify({event:'listening',id:1,channel:'widget'}),'*')}catch{}};hi();clearInterval(tm);let n=0;tm=setInterval(()=>{if(++n>40||box.classList.contains('ok'))clearInterval(tm);else hi()},250)});
+      fr.addEventListener('load',()=>{const me=fr;setTimeout(()=>{if(alive&&fr===me&&!box.classList.contains('ok'))playing()},1600);const hi=()=>{try{fr?.contentWindow?.postMessage(JSON.stringify({event:'listening',id:1,channel:'widget'}),'*')}catch{}};hi();clearInterval(tm);let n=0;tm=setInterval(()=>{if(++n>40||box.classList.contains('ok'))clearInterval(tm);else hi()},250)});
       box.insertBefore(fr,box.querySelector('[data-ym]'))}
     slot._stop=()=>{alive=false;cleanup()};next()}
   /* ═ Spot ışığı: kapağın üstünde kısa bir an durunca ekranın geri kalanı bulanıklaşır, kapak yaylanarak öne çıkar.
@@ -633,12 +633,12 @@ const Media=(()=>{
   const PFO=['PC','PS5','PS4','Xbox Series','Xbox One','Switch','Switch 2','Mac','Linux','PS3','Xbox 360','iOS','Android'];
   // JSONP (iTunes Search): CORS gerektirmez; sadece ad + yıl birebir tutarsa kabul edilir
   // iTunes resmî fragman (previewUrl, .m4v): film → movie, dizi → tvSeason. Ad (ve yıl ±1) eşleşmeli.
-  function itPrev(term,year,kind){return new Promise(res=>{if(!term)return res('');const cb='__mcip'+Math.random().toString(36).slice(2);const s=document.createElement('script');let done=false;
+  function itPrev(term,year,kind,cc='us'){return new Promise(res=>{if(!term)return res('');const cb='__mcip'+Math.random().toString(36).slice(2);const s=document.createElement('script');let done=false;
     const fin=v=>{if(done)return;done=true;window[cb]=()=>{};s.remove();res(v)};const nt=norm(term);
     window[cb]=d=>{const L=(d?.results||[]).filter(x=>x.previewUrl);const nm=x=>norm(kind==='tv'?(x.collectionName||'').replace(/,?\s*(season|sezon)\s*\d+.*$/i,''):x.trackName||'');
-      const yr=x=>!year||Math.abs(parseInt(x.releaseDate)-year)<=1;const r=L.find(x=>nm(x)===nt&&yr(x))||L.find(x=>nm(x).startsWith(nt)&&yr(x)&&year);fin(r?.previewUrl||'')};
+      const yr=x=>!year||Math.abs(parseInt(x.releaseDate)-year)<=1;const r=L.find(x=>nm(x)===nt&&yr(x))||L.find(x=>(nm(x).startsWith(nt)||nt.startsWith(nm(x)))&&nm(x).length>2&&yr(x)&&year)||(year?null:L.find(x=>nm(x).startsWith(nt)));fin(r?.previewUrl||'')};
     s.onerror=()=>fin('');setTimeout(()=>fin(''),7000);
-    s.src=`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&${kind==='tv'?'media=tvShow&entity=tvSeason':'media=movie&entity=movie'}&limit=15&callback=${cb}`;document.head.appendChild(s)})}
+    s.src=`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&${kind==='tv'?'media=tvShow&entity=tvSeason':'media=movie&entity=movie'}&country=${cc}&limit=15&callback=${cb}`;document.head.appendChild(s)})}
   function itunes(term,year){return new Promise(res=>{const cb='__mcit'+Math.random().toString(36).slice(2);const s=document.createElement('script');let done=false;
     const fin=v=>{if(done)return;done=true;window[cb]=()=>{};s.remove();res(v)};
     window[cb]=d=>{const r=(d?.results||[]).find(x=>norm(x.trackName)===norm(term)&&(!year||Math.abs(parseInt(x.releaseDate)-year)<=1));fin(r?.artworkUrl100?r.artworkUrl100.replace(/\/\d+x\d+bb\.(jpg|png)$/,'/600x900bb.jpg'):'')};

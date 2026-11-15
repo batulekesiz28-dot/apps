@@ -32,7 +32,7 @@ const Ders=(()=>{
     else{try{const d=JSON.parse(localStorage.getItem(LK)||'null')||{sessions:[]};d.set={...(d.set||{}),...p};localStorage.setItem(LK,JSON.stringify(d))}catch{}}
     emit()}
   const subjects=()=>Array.isArray(set?.subjects)?set.subjects:[];
-  const weekMin=id=>sess.reduce((a,s)=>a+(s.subj===id?+s.min||0:0),0)+(set?.run&&set.run.subj===id&&set.run.start?Math.max(0,(Date.now()-set.run.start)/60000):0);
+  const weekMin=id=>sess.reduce((a,s)=>a+(s.subj===id?+s.min||0:0),0)+(set?.run&&set.run.subj===id&&set.run.date>=weekStart()?((+set.run.acc||0)+(set.run.on?(Date.now()-set.run.at)/1000:0))/60:0);
 
   /* ── Notlar sayfaları ── */
   const rootOf=id=>[...pages.values()].find(p=>p.tpl==='ders:'+id);

@@ -45,6 +45,11 @@ Son güncelleme: 2026-11-15
 | Notlar sekmesi | Önce sade **bölüm seçimi**: Work · Ders notu · Library (satırlar, kart yok; klavye 1·2·3). |
 | Ders notu | Study Log'a bağlı: dersler, bu haftaki çalışma çubuğu, haftalık hedef (− / +30 dk), her dersin kendi defteri ve notları; yeni ders Study Log'a da eklenir. Süre Study Log sayacıyla tutulur. |
 
+## Hub widget'ları
+| Alan | Geçerli karar |
+|---|---|
+| Study Log widget'ı | Bugün/hedef halkası, çalışan sayaç (başlat/duraklat buradan; bitirme Study Log'da), bu haftaki dersler. **Ekranda tut**: Kapalı · Uygulamalarda · Her yerde → küçük, sürüklenebilir, büyütülebilir pencere; yeri cihazda hatırlanır. |
+
 ## Takvim, Görevler
 | Alan | Geçerli karar |
 |---|---|

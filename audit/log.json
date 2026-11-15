@@ -2603,5 +2603,35 @@
     "fix": "Silindi"
    }
   ]
+ },
+ {
+  "at": "2026-11-15T20:33:07",
+  "change": "Hub: Study Log widget'ı + ekranda tutulabilen pencere",
+  "scores": {
+   "hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "hub masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "hub",
+    "sev": "bilgi",
+    "status": "fixed",
+    "text": "Study Log'u görmek için uygulamayı açmak gerekiyordu",
+    "fix": "Widget: bugün/hedef, sayaç başlat/duraklat, dersler; istenirse uygulamaların üstünde de ekranda kalan sürüklenebilir pencere"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Ders notu ekranı duraklatılmış sayacın süresini yanlış sayıyordu",
+    "fix": "Study Log'un saydığı gibi (biriken + çalışan süre)"
+   }
+  ]
  }
 ]

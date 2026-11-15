@@ -2377,5 +2377,28 @@
     "fix": "Örnek kapak kenarından/köşesinden çekilebiliyor; kaydırıcılar da senkron"
    }
   ]
+ },
+ {
+  "at": "2026-11-15T15:17:49",
+  "change": "Netflix görünümünde kartların altında isim çıkıyor (Altında isim anahtarına bağlı)",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Netflix görünümünde 'Altında isim' açık olsa da isimler hiç çıkmıyordu (eski bir kural gizliyordu)",
+    "fix": "Kural silindi; anahtar her görünümde çalışıyor"
+   }
+  ]
  }
 ]

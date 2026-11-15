@@ -311,7 +311,6 @@
 /* Netflix: yoğun posterler, başlık yalnızca üzerine gelince */
 .mc[data-view=nf]{--card:calc(clamp(112px,9.5vw,156px) * var(--cz,1))}
 .mc[data-view=nf] .mc-row{gap:calc(8px * var(--gz,1))}
-.mc[data-view=nf] .mc-row.v-p .mc-cap,.mc[data-view=nf] .mc-grid .mc-cap{display:none}
 .mc[data-view=nf] .mc-grid{gap:calc(10px * var(--gz,1));grid-template-columns:repeat(auto-fill,minmax(calc(124px * var(--cz,1) * var(--dz,1)),1fr))}
 /* Kompakt: küçük kapaklar, çok içerik, en az metin */
 .mc[data-view=compact]{--card:calc(92px * var(--cz,1))}

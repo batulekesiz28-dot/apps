@@ -2633,5 +2633,35 @@
     "fix": "Study Log'un saydığı gibi (biriken + çalışan süre)"
    }
   ]
+ },
+ {
+  "at": "2026-11-15T20:43:37",
+  "change": "Medya spot ışığı: karşı tarafta fragman; ayrıntılar ~2,5 sn gecikmeyle",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "fixed",
+    "text": "Spot ışığında fragman yoktu; ayrıntılar hemen açılıyordu",
+    "fix": "Bilginin karşı tarafında resmî YouTube fragmanı (önceden aranır, saklanır); ayrıntılar ~2,5 sn sonra"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Kapaktan uzaklaşıp aynı kapağa dönünce spot ışığı açılmıyordu",
+    "fix": "Sadece puan/kaydırma/Esc sonrası kilitleniyor"
+   }
+  ]
  }
 ]

@@ -584,11 +584,13 @@ button.ml-sc:hover{background:rgba(255,255,255,.08)}button.ml-sc .mvi{width:13px
 html[data-motion=off] .msp-f,html[data-motion=off] .sr,html[data-motion=off] .sr-fill,html[data-motion=off] .msp-cap{transition:none}
 
 /* spot ışığı bilgi paneli: kutu yok, bulanık zeminde sade yazı; kapağın boş tarafına doğru akarak açılır */
-.msp-in{position:absolute;pointer-events:auto;box-sizing:border-box;display:flex;flex-direction:column;gap:10px;color:#fff;max-height:calc(100vh - 32px);overflow:hidden}
+.msp-in{position:absolute;box-sizing:border-box;display:flex;flex-direction:column;gap:10px;color:#fff;max-height:calc(100vh - 32px);overflow:hidden}
 .msp-in.r{padding:6px 8px 6px 34px}.msp-in.l{padding:6px 34px 6px 8px;text-align:right;align-items:flex-end}
 .msp-x{opacity:0;transform:translateX(var(--dx,-14px));transition:opacity .35s calc(.12s + var(--i) * .045s),transform .55s calc(.12s + var(--i) * .045s) cubic-bezier(.2,.9,.22,1.1)}
 .msp-in.l .msp-x{--dx:14px}
-.msp.on .msp-x{opacity:1;transform:none}
+.msp.det .msp-x{opacity:1;transform:none}
+.msp-in{pointer-events:none}.msp.det .msp-in{pointer-events:auto}
+.msp.det .msp-cap{opacity:0;transform:translate(-50%,6px)}
 .msp-k{font-size:11.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.62)}
 .msp-in h3{margin:0;font-size:clamp(22px,2.1vw,30px);font-weight:700;line-height:1.08;letter-spacing:-.022em;text-wrap:balance}
 .msp-m{margin:0;font-size:13.5px;color:rgba(255,255,255,.78)}
@@ -604,3 +606,17 @@ html[data-motion=off] .msp-f,html[data-motion=off] .sr,html[data-motion=off] .sr
 .msp-a>*:focus-visible{outline:2px solid #fff;outline-offset:2px}
 @media (prefers-reduced-motion:reduce){.msp-x{transition:opacity .2s;transform:none}}
 html[data-motion=off] .msp-x{transition:none;transform:none}
+
+/* fragman: bilginin karşı tarafında 16:9; önce YouTube kapak karesi, video gelince yumuşak geçiş; tıkla → ses */
+.msp-yt{position:absolute;box-sizing:content-box;opacity:0;transform:scale(.96);transition:opacity .4s .05s,transform .6s .05s cubic-bezier(.2,.9,.22,1.1);pointer-events:none}
+.msp-yt.l{padding-right:34px}.msp-yt.r{padding-left:34px}
+.msp.det .msp-yt{opacity:1;transform:none;pointer-events:auto}
+.msp-yt.in{position:relative;width:100%;transform:none;opacity:1;margin-bottom:4px}
+.msp-yv{position:relative;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000;cursor:pointer;box-shadow:0 30px 70px -24px rgba(0,0,0,.95),0 0 0 1px rgba(255,255,255,.14)}
+.msp-yth{position:absolute;inset:0;background:#000 center/cover no-repeat;transition:opacity .6s}
+.msp-yf{position:absolute;inset:-1px;width:calc(100% + 2px);height:calc(100% + 2px);border:0;opacity:0;transition:opacity .6s;pointer-events:none}
+.msp-yv.ok .msp-yf{opacity:1}.msp-yv.ok .msp-yth{opacity:0}
+.msp-ym{position:absolute;right:10px;bottom:10px;z-index:2;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;color:#fff;background:rgba(0,0,0,.55);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2)}
+.msp-ym .mvi{width:15px;height:15px}.msp-yv:hover .msp-ym{background:rgba(0,0,0,.75)}
+@media (prefers-reduced-motion:reduce){.msp-yt{transition:opacity .2s;transform:none}}
+html[data-motion=off] .msp-yt{transition:none;transform:none}

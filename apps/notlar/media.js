@@ -40,7 +40,7 @@ const Media=(()=>{
   const stName=it=>stMap(it)[stOf(it)]||'';
   const inPage=(it,k)=>k==='fav'?it.fav:k==='played'?['played','done'].includes(it.status):k==='all'?true:stOf(it)===k;
   const S=p=>`<svg class="mvi" viewBox="0 0 16 16" aria-hidden="true">${p}</svg>`;
-  const IC={play:S('<path d="M5 3.5v9l7.5-4.5z" fill="currentColor" stroke="none"/>'),plus:S('<path d="M8 3v10M3 8h10"/>'),check:S('<path d="M3.5 8.5l3 3 6-7"/>'),
+  const IC={vol0:S('<path d="M3 6.2h2.4L8.8 3.5v9L5.4 9.8H3z"/><path d="m11 6.3 3.2 3.4M14.2 6.3 11 9.7"/>'),vol1:S('<path d="M3 6.2h2.4L8.8 3.5v9L5.4 9.8H3z"/><path d="M11.2 5.6a3.4 3.4 0 0 1 0 4.8M12.9 3.9a5.8 5.8 0 0 1 0 8.2"/>'),play:S('<path d="M5 3.5v9l7.5-4.5z" fill="currentColor" stroke="none"/>'),plus:S('<path d="M8 3v10M3 8h10"/>'),check:S('<path d="M3.5 8.5l3 3 6-7"/>'),
     heart:S('<path d="M8 13.5S2.5 10.2 2.5 6.3A2.8 2.8 0 0 1 8 5a2.8 2.8 0 0 1 5.5 1.3C13.5 10.2 8 13.5 8 13.5z"/>'),more:S('<circle cx="3.5" cy="8" r="1.1" fill="currentColor" stroke="none"/><circle cx="8" cy="8" r="1.1" fill="currentColor" stroke="none"/><circle cx="12.5" cy="8" r="1.1" fill="currentColor" stroke="none"/>'),
     x:S('<path d="M4 4l8 8M12 4l-8 8"/>'),search:S('<circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/>'),l:S('<path d="M10 3.5L5.5 8l4.5 4.5"/>'),r:S('<path d="M6 3.5L10.5 8 6 12.5"/>'),
     clock:S('<circle cx="8" cy="8" r="5.5"/><path d="M8 5v3.2l2 1.3"/>'),edit:S('<path d="M10.5 2.5l3 3-8 8H2.5v-3z"/>'),trash:S('<path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.6 9h5.8l.6-9"/>'),
@@ -98,12 +98,42 @@ const Media=(()=>{
         ${it.score?`<span class="mc-sc">${scoreBadge(it)}</span>`:''}${it.rating?`<span class="mc-mine" title="Puanım ${it.rating}/10" aria-label="Puanım ${it.rating}/10">${IC.star}${it.rating}</span>`:''}${f?`<span class="mc-fl" title="İncelemen gerekiyor">${IC.warn}</span>`:''}${it.fav?`<span class="mc-fv" title="Favori">${IC.heart}</span>`:''}${prog(it)}
 </div>
       <div class="mc-cap"><b>${E(it.title)}</b><small>${metaShort(it)||TN[it.type]}</small></div></article>`}
+  /* ═ Fragman (spot ışığında bilgi panelinin karşı tarafında, resmî YouTube oynatıcısı, youtube-nocookie).
+     Kimlik sırası: önbellek mc:yt → anime: Jikan trailer → TMDB videos (anahtar varsa) → Wikidata P1651 (mid ya da IMDb/Steam ile bulunur).
+     Kapağın üstüne gelir gelmez aranır (spot açılmadan önce), bulunan kimlik saklanır → ikinci seferde anında. Bulunamazsa 7 gün sonra yeniden denenir. ═ */
+  const YT=lsg('mc:yt',{}),ytP=new Map(),okYT=v=>/^[\w-]{11}$/.test(v||'');
+  const hasTrailer=it=>['movie','series','anime','game'].includes(it?.type);
+  function ytId(it){if(!hasTrailer(it))return Promise.resolve('');const c=YT[it.id];if(c&&(c.v||Date.now()-c.at<7*864e5))return Promise.resolve(c.v||'');
+    if(ytP.has(it.id))return ytP.get(it.id);
+    const p=(async()=>{let v='',done=true;const wdq=async q=>{const e=await getJSON(`https://www.wikidata.org/w/api.php?action=wbgetclaims&entity=${q}&property=P1651&format=json&origin=*`);const cl=e?.claims?.P1651||[];return(cl.find(x=>x.rank==='preferred')||cl.find(x=>x.rank!=='deprecated'))?.mainsnak?.datavalue?.value||''};
+      const byProp=async(pr,val)=>{const j=await getJSON(`https://www.wikidata.org/w/api.php?action=query&list=search&srsearch=haswbstatement:${pr}=${encodeURIComponent(val)}&srlimit=1&format=json&origin=*`);return j?.query?.search?.[0]?.title||''};
+      try{if(it.type==='anime'&&it.mal){const d=await getJSON(`https://api.jikan.moe/v4/anime/${it.mal}`);v=d?.data?.trailer?.youtube_id||''}
+        const key=tmdbKey();if(!okYT(v)&&key&&it.imdb&&it.type!=='game'){const f=await getJSON(`https://api.themoviedb.org/3/find/${it.imdb}?api_key=${encodeURIComponent(key)}&external_source=imdb_id`);
+          const m=(f?.movie_results||[])[0],t=(f?.tv_results||[])[0],id=(m||t)?.id;if(id){const vs=await getJSON(`https://api.themoviedb.org/3/${m?'movie':'tv'}/${id}/videos?api_key=${encodeURIComponent(key)}`);
+            const L=(vs?.results||[]).filter(x=>x.site==='YouTube');v=(L.find(x=>x.type==='Trailer'&&x.official)||L.find(x=>x.type==='Trailer')||L.find(x=>x.type==='Teaser')||{}).key||''}}
+        if(!okYT(v)){let q=/^Q\d+$/.test(it.mid||'')?it.mid:'';if(!q&&it.imdb)q=await byProp('P345',it.imdb);if(!q&&it.steam)q=await byProp('P1733',it.steam);if(q)v=await wdq(q)}}
+      catch(e){done=false}
+      if(!okYT(v))v='';ytP.delete(it.id);if(done||v){YT[it.id]={v,at:Date.now()};lss('mc:yt',YT)}return v})();
+    ytP.set(it.id,p);return p}
+  let ytWarm=false;function warmYT(){if(ytWarm)return;ytWarm=true;for(const h of['https://www.youtube-nocookie.com','https://i.ytimg.com','https://www.wikidata.org']){const l=document.createElement('link');l.rel='preconnect';l.href=h;l.crossOrigin='';document.head.appendChild(l)}}
+  // fragman alanı: önce YouTube kapak karesi (anında), sonra sessiz otomatik oynayan video yumuşakça gelir; tıkla → ses aç/kapa
+  function ytMount(slot,v){const auto=motion();slot.innerHTML=`<div class="msp-yv"><i class="msp-yth" style="background-image:url(https://i.ytimg.com/vi/${v}/hqdefault.jpg)"></i>
+      <button type="button" class="msp-ym" data-ym aria-label="${auto?'Sesi aç':'Fragmanı oynat'}" title="${auto?'Sesi aç':'Oynat'}">${auto?IC.vol0:IC.play}</button></div>`;
+    const box=slot.firstElementChild;let fr=null,muted=true;
+    const load=()=>{if(fr)return;fr=document.createElement('iframe');fr.className='msp-yf';fr.title='Fragman';fr.allow='autoplay; encrypted-media; picture-in-picture';fr.referrerPolicy='strict-origin-when-cross-origin';
+      fr.src=`https://www.youtube-nocookie.com/embed/${v}?autoplay=1&mute=1&controls=0&rel=0&playsinline=1&modestbranding=1&iv_load_policy=3&disablekb=1&loop=1&playlist=${v}&enablejsapi=1&origin=${encodeURIComponent(location.origin)}`;
+      fr.addEventListener('load',()=>setTimeout(()=>box.classList.add('ok'),350));box.insertBefore(fr,box.querySelector('[data-ym]'))};
+    const cmd=f=>{try{fr?.contentWindow?.postMessage(JSON.stringify({event:'command',func:f,args:[]}),'*')}catch{}};
+    box.addEventListener('click',e=>{e.stopPropagation();if(!fr){load();return}muted=!muted;cmd(muted?'mute':'unMute');
+      const b=box.querySelector('[data-ym]');b.innerHTML=muted?IC.vol0:IC.vol1;b.setAttribute('aria-label',muted?'Sesi aç':'Sesi kapat');b.title=muted?'Sesi aç':'Sesi kapat'});
+    if(auto)load()}
   /* ═ Spot ışığı: kapağın üstünde kısa bir an durunca ekranın geri kalanı bulanıklaşır, kapak yaylanarak öne çıkar.
      Puanlanmamışsa altta cam “★ Puanla” hapı: üstüne gelince açılır, imleci gezdirdikçe 1–10 akar, tıkla → kaydedilir. ═ */
   const SPT={t:0,card:null,el:null,v:0,block:null};
   const RW=['','Berbat','Kötü','Zayıf','Vasat','İdare eder','Fena değil','İyi','Çok iyi','Harika','Başyapıt'];
   const fineHover=()=>matchMedia('(hover:hover) and (pointer:fine)').matches;
-  function spotOff(now){clearTimeout(SPT.t);SPT.t=0;if(SPT.card)SPT.block=SPT.card.dataset.mi;const el=SPT.el;SPT.el=null;SPT.card=null;SPT.v=0;if(!el)return;el.classList.remove('on');if(now||!motion())el.remove();else setTimeout(()=>el.remove(),260)}
+  // free: imleç uzaklaşarak kapattı → aynı karta dönünce yeniden açılabilir; diğer kapanışlarda (puan, kaydırma, Esc) imleç karttan çıkana kadar açılmaz
+  function spotOff(now,free){clearTimeout(SPT.t);clearTimeout(SPT.dt);SPT.t=0;if(SPT.card&&!free)SPT.block=SPT.card.dataset.mi;const el=SPT.el;SPT.el=null;SPT.card=null;SPT.v=0;if(!el)return;el.classList.remove('on');if(now||!motion())el.remove();else setTimeout(()=>el.remove(),260)}
   const srHTML=()=>`<div class="sr" role="slider" tabindex="0" aria-label="Puanla (1–10)" aria-valuemin="1" aria-valuemax="10" aria-valuenow="0"><i class="sr-fill"></i><span class="sr-tk" aria-hidden="true">${'<i></i>'.repeat(10)}</span><span class="sr-l">${IC.star}<b>Puanla</b></span></div>`;
   function spotOn(card){const it=KB.items.get(card.dataset.mi),art=card.querySelector('.mc-art');if(!it||!art||!card.isConnected)return;
     spotOff(true);const r=art.getBoundingClientRect();if(!r.width||r.top<40||r.bottom>innerHeight-10)return;
@@ -113,13 +143,22 @@ const Media=(()=>{
     if(!it.rating)f.insertAdjacentHTML('beforeend',srHTML());
     // bilgi paneli: kapağın hangi yanında yer çoksa oraya açılır; yer yoksa sadece altta ad
     const g=r.width*(S-1)/2,fl=r.left-g,fr=r.right+g,ft=Math.max(16,r.top-g),spR=innerWidth-fr-24,spL=fl-24,side=spR>=300||spR>=spL?'r':'l',sp=side==='r'?spR:spL;
-    const cap=el.querySelector('.msp-cap');
-    if(sp>=280){cap.remove();const w=Math.min(400,sp-8);el.insertAdjacentHTML('beforeend',infoHTML(it,side));const inf=el.querySelector('.msp-in');
+    // ayrıntılar (bilgi + fragman) kapak öne çıktıktan ~2,2 sn sonra açılır (.det); o sırada altta ad durur, fragman arkada yüklenir
+    const cap=el.querySelector('.msp-cap'),below=r.bottom+g+12;cap.style.left=(r.left+r.width/2)+'px';if(below+44<innerHeight)cap.style.top=below+'px';else cap.style.top=(r.top-g-52)+'px';
+    if(sp>=280){const w=Math.min(400,sp-8);el.insertAdjacentHTML('beforeend',infoHTML(it,side));const inf=el.querySelector('.msp-in');
       inf.style.width=w+'px';inf.style.top=ft+'px';if(side==='r')inf.style.left=fr+'px';else inf.style.left=(fl-w)+'px';
-      requestAnimationFrame(()=>{const h=inf.offsetHeight;if(ft+h>innerHeight-16)inf.style.top=Math.max(16,innerHeight-16-h)+'px'})}
-    else{const below=r.bottom+g+12;cap.style.left=(r.left+r.width/2)+'px';if(below+44<innerHeight)cap.style.top=below+'px';else cap.style.top=(r.top-g-52)+'px'}
+      requestAnimationFrame(()=>{const h=inf.offsetHeight;if(ft+h>innerHeight-16)inf.style.top=Math.max(16,innerHeight-16-h)+'px'})
+      // fragman: bilginin KARŞI tarafında; orada yer yoksa bilgi panelinin en üstünde
+      if(hasTrailer(it)){const osp=side==='r'?spL:spR,slot=document.createElement('div');
+        if(osp>=260){const tw=Math.min(520,osp-8),th=tw*9/16,cy=r.top+r.height/2;slot.className='msp-yt '+(side==='r'?'l':'r');slot.style.width=tw+'px';
+          slot.style.top=Math.max(16,Math.min(innerHeight-16-th,cy-th/2))+'px';slot.style.left=(side==='r'?fl-tw:fr)+'px';el.appendChild(slot)}
+        else{slot.className='msp-yt in';inf.prepend(slot)}
+        ytId(it).then(v=>{if(SPT.el!==el)return;if(v){ytMount(slot,v);return}slot.remove();
+          inf.querySelector('.msp-a')?.insertAdjacentHTML('beforeend',`<a href="https://www.youtube.com/results?search_query=${encodeURIComponent(it.title+' '+(it.year||'')+' trailer')}" target="_blank" rel="noopener">Fragman${IC.r}</a>`)})}}
     document.body.appendChild(el);SPT.el=el;SPT.card=card;requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('on')));
-    const inf=el.querySelector('.msp-in'),leave=e=>{const t=e.relatedTarget;if(t&&(f.contains(t)||inf?.contains(t)))return;if(SPT.el===el)spotOff()};
+    clearTimeout(SPT.dt);if(el.querySelector('.msp-in'))SPT.dt=setTimeout(()=>{if(SPT.el===el)el.classList.add('det')},2200);
+    const inf=el.querySelector('.msp-in'),yt=el.querySelector('.msp-yt:not(.in)'),leave=e=>{const t=e.relatedTarget;if(t&&(f.contains(t)||inf?.contains(t)||yt?.contains(t)))return;if(SPT.el===el)spotOff(false,true)};
+    if(yt){yt.addEventListener('pointerleave',leave);yt.addEventListener('wheel',e=>{spotOff(true);q('#scroll')?.scrollBy({top:e.deltaY,left:e.deltaX})},{passive:true})}
     f.addEventListener('pointerleave',leave);if(inf){inf.addEventListener('pointerleave',leave);inf.addEventListener('wheel',e=>{spotOff(true);q('#scroll')?.scrollBy({top:e.deltaY,left:e.deltaX})},{passive:true});
       inf.addEventListener('click',e=>{if(e.target.closest('[data-spo]')){spotOff(true);open(it.id)}else if(e.target.closest('a'))setTimeout(()=>spotOff(true),50)})}
     f.addEventListener('wheel',e=>{spotOff(true);q('#scroll')?.scrollBy({top:e.deltaY,left:e.deltaX})},{passive:true});
@@ -293,7 +332,7 @@ const Media=(()=>{
   /* ── olaylar ── */
   function wire(root){
     // spot ışığı: imleç bir kapakta ~0,3 sn durursa (geçip giderken tetiklenmez)
-    root.addEventListener('pointerover',e=>{if(!(e.pointerType==='pen'||(e.pointerType==='mouse'&&fineHover())))return;const c=e.target.closest?.('.mc-card[data-mi]');if(!c||c===SPT.card||c.dataset.mi===SPT.block)return;clearTimeout(SPT.t);SPT.over=c;
+    root.addEventListener('pointerover',e=>{if(!(e.pointerType==='pen'||(e.pointerType==='mouse'&&fineHover())))return;const c=e.target.closest?.('.mc-card[data-mi]');if(!c||c===SPT.card||c.dataset.mi===SPT.block)return;clearTimeout(SPT.t);SPT.over=c;{const it=KB.items.get(c.dataset.mi);if(hasTrailer(it)){warmYT();ytId(it)}}
       SPT.t=setTimeout(()=>{if(Date.now()>(SPT.quiet||0)&&SPT.over===c&&!document.body.classList.contains('mset-drag')&&!q('.mset,.mq,.mrp'))spotOn(c)},320)});
     root.addEventListener('pointerout',e=>{const c=e.target.closest?.('.mc-card[data-mi]');if(c&&!c.contains(e.relatedTarget)){clearTimeout(SPT.t);if(SPT.over===c)SPT.over=null;if(c.dataset.mi===SPT.block)SPT.block=null}});
     root.addEventListener('click',e=>{const t=e.target;
@@ -638,4 +677,4 @@ const Media=(()=>{
   function dismiss(){spotOff(true);qa('.mset,.mrp,.mq,.ma-bg').forEach(e=>e.remove())}
   // kaydırma, pencere değişimi, Esc → spot ışığı kapanır
   addEventListener('scroll',()=>{SPT.quiet=Date.now()+700;if(SPT.el)spotOff()},true);addEventListener('blur',()=>spotOff(true));addEventListener('resize',()=>spotOff(true));addEventListener('keydown',e=>{if(e.key==='Escape'&&SPT.el)spotOff()});
-  return{render,refresh,detail,close,imgErr,queue,addSheet,rateHTML,dismiss,patchCards,isMedia:t=>MT.includes(t),get st(){return st},get R(){return R},_rank:rank,_cleanG:cleanG}})();
+  return{render,refresh,detail,close,imgErr,queue,addSheet,rateHTML,dismiss,patchCards,isMedia:t=>MT.includes(t),get st(){return st},get R(){return R},_rank:rank,_cleanG:cleanG,_yt:ytId}})();

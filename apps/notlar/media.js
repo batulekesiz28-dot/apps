@@ -80,7 +80,7 @@ const Media=(()=>{
   const wideArt=it=>{const w=it.wide||it.backdrop,h=hash(it.title)%360;if(w)return`<div class="mw" style="--h:${h}">${fallback(it)}${IMG(w,it.cover)}</div>`;
     return`<div class="mw pb" style="--h:${h}">${fallback(it)}${it.cover?`<div class="mw-bl">${IMG(it.cover,it.cover2)}</div><div class="mw-p">${IMG(it.cover,it.cover2)}</div><div class="mw-t"><b>${E(it.title)}</b><span>${metaShort(it)}</span></div>`:''}</div>`};
   const scoreTxt=it=>it.score?E(it.score.replace(/^IMDb\s*/,'★ ').replace(/^MC\s*/,'MC ')):'';
-  const myStars=it=>it.rating?`<span class="mc-my" title="Puanım ${it.rating}/10">${IC.star}${(it.rating/2).toFixed(it.rating%2?1:0)}</span>`:'';
+  const myStars=it=>it.rating?`<span class="mc-my" title="Puanım ${it.rating}/10">${IC.star}${it.rating}</span>`:'';
   function metaShort(it){const a=[];if(it.type==='book'&&it.author)a.push(it.author);if(it.year)a.push(it.year);if(it.type==='game'&&it.platforms.length)a.push(it.platforms.slice(0,2).join(' · '));else if(it.genres.length)a.push(it.genres[0]);
     if(it.type==='series'&&it.season)a.push(`S${it.season}${it.ep?' B'+it.ep:''}`);return a.map(E).join(' · ')}
   function metaLong(it){const a=[TN[it.type]];if(it.year)a.push(it.year);if(it.genres.length)a.push(it.genres.slice(0,3).join(', '));if(it.type==='game'&&it.platforms.length)a.push(it.platforms.slice(0,4).join(' · '));
@@ -101,7 +101,7 @@ const Media=(()=>{
     if(S0==='todo'||S0==='doing'||S0==='dropped')return`<button class="mc-b pri" data-mq="done" title="${g?'Bitirdim':b?'Okudum':'İzledim'}" aria-label="${g?'Bitirdim olarak işaretle':b?'Okundu olarak işaretle':'İzledim olarak işaretle'}">${IC.check}</button>`;
     return`<button class="mc-b on" data-mq="todo" title="${E(stName(it))} — tekrar listeye al" aria-label="Listeye geri al">${IC.check}</button>`}
 
-  const hovHTML=it=>{const s=stName(it);return`<div class="mc-qa">${quick(it)}<button class="mc-b" data-mq="fav" aria-label="${it.fav?'Favorilerden çıkar':'Favorilere ekle'}" title="Favori" aria-pressed="${it.fav}">${IC.heart}</button><button class="mc-b" data-mq="more" aria-label="Diğer işlemler" title="Diğer">${IC.more}</button></div>
+  const hovHTML=it=>{const s=stName(it);return`<div class="mc-qa">${quick(it)}<button class="mc-b" data-mq="fav" aria-label="${it.fav?'Favorilerden çıkar':'Favorilere ekle'}" title="Favori" aria-pressed="${it.fav}">${IC.heart}</button><button class="mc-b mc-rb${it.rating?' on':''}" data-mq="rate" aria-label="${it.rating?`Puanım ${it.rating}/10 — değiştir`:'Puanla'}" title="${it.rating?`Puanım ${it.rating}/10`:'Puanla'}">${IC.star}${it.rating?`<b>${it.rating}</b>`:''}</button><button class="mc-b" data-mq="more" aria-label="Diğer işlemler" title="Diğer">${IC.more}</button></div>
       <b>${E(it.title)}</b><span>${metaShort(it)}</span>${s?`<em class="mc-st">${E(s)}</em>`:''}`};
   function fillHov(c){const h=c?.querySelector('.mc-hov');if(!h||h.childElementCount)return;const it=KB.items.get(c.dataset.mi);if(it)h.innerHTML=hovHTML(it)}
   // uzun ana sayfalar: ilk raflar hemen, diğerleri ekrana yaklaşınca çizilir (sayfa hafif kalır)
@@ -115,7 +115,7 @@ const Media=(()=>{
   const likeIc=it=>it.like>0?`<span class="ml-lk up" title="Beğendim">${IC.up}</span>`:it.like<0?`<span class="ml-lk down" title="Beğenmedim">${IC.down}</span>`:'<span class="ml-lk none" title="Değerlendirmedim">—</span>';
   function lrow(it){const s=stName(it),c=st.look.lc;return`<article class="ml-r t-${it.type}" data-mi="${it.id}" tabindex="0" aria-label="${E(it.title)}">${c.cover?poster(it,'ml-p'):''}
       <span class="ml-t"><b>${E(it.title)}</b>${st.look.meta?`<small>${E(TN[it.type])}${metaShort(it)?' · '+metaShort(it):''}</small>`:''}</span>
-      ${c.st?`<span class="ml-s">${s?E(s):'<i>—</i>'}</span>`:''}${c.rate?`<span class="ml-sc">${it.rating?`<b>${it.rating}</b><small>/10</small>`:'<i>—</i>'}</span>`:''}${c.score?`<span class="ml-gs">${it.score?scoreTxt(it):'<i>—</i>'}</span>`:''}${c.like?likeIc(it):''}
+      ${c.st?`<span class="ml-s">${s?E(s):'<i>—</i>'}</span>`:''}${c.rate?`<button class="ml-sc" data-mq="rate" title="Puanla" aria-label="${it.rating?`Puanım ${it.rating}/10 — değiştir`:'Puanla'}">${it.rating?`<b>${it.rating}</b><small>/10</small>`:`${IC.star}<i>Puanla</i>`}</button>`:''}${c.score?`<span class="ml-gs">${it.score?scoreTxt(it):'<i>—</i>'}</span>`:''}${c.like?likeIc(it):''}
       ${c.fav?`<button class="ml-f${it.fav?' on':''}" data-mq="fav" aria-pressed="${it.fav}" aria-label="${it.fav?'Favorilerden çıkar':'Favorilere ekle'}" title="Favori">${IC.heart}</button>`:''}</article>`}
   const listHTML=l=>{const c=st.look.lc;return`<div class="ml"><div class="ml-hd" aria-hidden="true">${c.cover?'<span></span>':''}<span>Ad</span>${c.st?'<span>Durum</span>':''}${c.rate?'<span>Puanım</span>':''}${c.score?'<span>Genel puan</span>':''}${c.like?'<span>Beğeni</span>':''}${c.fav?'<span></span>':''}</div>${l.map(lrow).join('')}</div>`};
   const gridHTML=(l,s)=>V()==='list'?listHTML(l):`<div class="mc-grid v-${V()==='tv'?'w':s==='games'?'g':'p'}">${l.map(it=>card(it,V()==='tv'?'w':'p')).join('')}</div>`;
@@ -243,7 +243,7 @@ const Media=(()=>{
       const mg=t.closest('[data-mg]');if(mg){st.genre=mg.dataset.mg;swap();return}
       const ad=t.closest('[data-madd]');if(ad){addSheet(ad.dataset.madd||'');return}
       const fx=t.closest('[data-mfix]');if(fx){fix(fx.dataset.id,fx.dataset.mfix);return}
-      const mq=t.closest('[data-mq]');if(mq){e.preventDefault();e.stopPropagation();const id=mq.dataset.id||mq.closest('[data-mi]')?.dataset.mi;if(mq.dataset.mq==='more')return menu(id,mq);act(id,mq.dataset.mq);return}
+      const mq=t.closest('[data-mq]');if(mq){e.preventDefault();e.stopPropagation();const id=mq.dataset.id||mq.closest('[data-mi]')?.dataset.mi;if(mq.dataset.mq==='more')return menu(id,mq);if(mq.dataset.mq==='rate')return ratePop(id,mq);act(id,mq.dataset.mq);return}
       const mo=t.closest('[data-mo]');if(mo){open(mo.dataset.mo);return}
       const c=t.closest('[data-mi]');if(c&&!t.closest('a')){open(c.dataset.mi)}});
     root.addEventListener('keydown',e=>{const c=e.target.closest?.('[data-mi]');if(c&&e.target===c&&(e.key==='Enter'||e.key===' ')){e.preventDefault();open(c.dataset.mi)}
@@ -310,11 +310,11 @@ const Media=(()=>{
     else if(k==='move'){const to=it.flagTo;if(!to)return;it.type=to;it.flag='';it.flagWhy='';it.flagTo='';it.match='';it.metaAt=0;it.cover='';it.cover2='';it.backdrop='';it.wide='';it.year='';it.genres=[];it.platforms=[];it.eps=0;it.season=0;it.ep=0;HINT.delete(hk(it));it.reviewed=false;if(it.status==='done'&&to==='game')it.status='done';KB.saveItem(it);say(`${TN[to]} olarak taşındı — posteri aranıyor`);queue()}}
   function menu(id,anchor){q('.mq')?.remove();const it=KB.items.get(id);if(!it)return;const m=document.createElement('div');m.className='mq';m.setAttribute('role','menu');
     m.innerHTML=`<p>${E(it.title)}</p>${Object.entries(stMap(it)).map(([k,n])=>`<button role="menuitemradio" aria-checked="${it.status===k}" data-q="${k}" class="${it.status===k?'on':''}">${it.status===k?IC.check:'<i></i>'}${n}</button>`).join('')}
-      <div class="sep"></div><button data-q="fav">${IC.heart}${it.fav?'Favorilerden çıkar':'Favorilere ekle'}</button><button data-q="open">${IC.r}Ayrıntılar</button><button data-q="rematch">${IC.sync}Posteri yeniden eşleştir</button><div class="sep"></div><button data-q="del" class="danger">${IC.trash}Sil</button>`;
+      <div class="sep"></div><button data-q="rate">${IC.star}${it.rating?`Puanım ${it.rating}/10 — değiştir`:'Puanla'}</button><button data-q="fav">${IC.heart}${it.fav?'Favorilerden çıkar':'Favorilere ekle'}</button><button data-q="open">${IC.r}Ayrıntılar</button><button data-q="rematch">${IC.sync}Posteri yeniden eşleştir</button><div class="sep"></div><button data-q="del" class="danger">${IC.trash}Sil</button>`;
     document.body.appendChild(m);const r=anchor.getBoundingClientRect();m.style.left=Math.max(8,Math.min(r.left,innerWidth-m.offsetWidth-8))+'px';m.style.top=Math.max(8,Math.min(r.bottom+6,innerHeight-m.offsetHeight-8))+'px';
     q('button',m)?.focus();const off=e=>{if(!m.contains(e.target)){m.remove();removeEventListener('pointerdown',off,true)}};setTimeout(()=>addEventListener('pointerdown',off,true));
     m.addEventListener('keydown',e=>{if(e.key==='Escape'){m.remove();anchor.focus?.()}const bs=qa('button',m),i=bs.indexOf(document.activeElement);if(e.key==='ArrowDown'){e.preventDefault();bs[(i+1)%bs.length].focus()}if(e.key==='ArrowUp'){e.preventDefault();bs[(i-1+bs.length)%bs.length].focus()}});
-    m.addEventListener('click',e=>{const b=e.target.closest('[data-q]');if(!b)return;m.remove();const k=b.dataset.q;if(k==='fav')act(id,'fav');else if(k==='open')open(id);else if(k==='rematch')rematch(it);
+    m.addEventListener('click',e=>{const b=e.target.closest('[data-q]');if(!b)return;m.remove();const k=b.dataset.q;if(k==='rate')return ratePop(id,anchor);if(k==='fav')act(id,'fav');else if(k==='open')open(id);else if(k==='rematch')rematch(it);
       else if(k==='del'){const snap=KB.delItem(id);try{Library.toastUndo(`“${it.title}” silindi`,()=>KB.restoreItem(snap))}catch{say('Silindi')}}else{if(it.status===k){it.status='';KB.saveItem(it);say('Durum kaldırıldı')}else setStatus(it,k)}})}
 
   /* ── detay ── */
@@ -336,6 +336,13 @@ const Media=(()=>{
     if(lk)it.like=+lk.dataset.rlike;if(nm){const n=+nm.dataset.rnum;it.rating=it.rating===n?0:n}if(fv)it.fav=!it.fav;
     KB.saveItem(it,true);box.outerHTML=rateHTML(it);q(`.rt[data-rid="${CSS.escape(it.id)}"] ${lk?`[data-rlike="${lk.dataset.rlike}"]`:nm?`[data-rnum="${nm.dataset.rnum}"]`:'[data-rfav]'}`)?.focus();
     clearTimeout(rateHTML.t);rateHTML.t=setTimeout(()=>KB.saveItem(it),400)},true);
+  /* hızlı puan penceresi: karttan, listeden, sağ tıktan */
+  function ratePop(id,anchor){q('.mrp')?.remove();q('.mq')?.remove();const it=KB.items.get(id);if(!it)return;const m=document.createElement('div');m.className='mrp';m.setAttribute('role','dialog');m.setAttribute('aria-label',`${it.title} — puanla`);
+    m.innerHTML=`<p>${E(it.title)}</p>${rateHTML(it)}`;document.body.appendChild(m);
+    const r=(anchor.getBoundingClientRect?anchor:anchor).getBoundingClientRect();m.style.left=Math.max(8,Math.min(r.left,innerWidth-m.offsetWidth-8))+'px';m.style.top=Math.max(8,r.bottom+m.offsetHeight+6>innerHeight?r.top-m.offsetHeight-6:r.bottom+6)+'px';
+    (q('.rt-n button.on',m)||q('.rt-n button',m))?.focus();
+    const off=e=>{if(!m.contains(e.target)){m.remove();removeEventListener('pointerdown',off,true)}};setTimeout(()=>addEventListener('pointerdown',off,true));
+    m.addEventListener('keydown',e=>{if(e.key==='Escape'){m.remove();anchor.focus?.()}if(/^[0-9]$/.test(e.key)){const n=e.key==='0'?10:+e.key;q(`[data-rnum="${n}"]`,m)?.click()}})}
   function stars(it){const v=it.rating;return`<div class="mx-rate" role="slider" tabindex="0" aria-label="Puanım" aria-valuemin="0" aria-valuemax="10" aria-valuenow="${v}" aria-valuetext="${v?v+' / 10':'puan yok'}">${[1,2,3,4,5].map(n=>`<button tabindex="-1" data-rs="${n}" aria-label="${n*2} puan"><i style="--f:${Math.max(0,Math.min(1,(v-(n-1)*2)/2))*100}%">${IC.star}${IC.star}</i></button>`).join('')}<b>${v?v+'<small>/10</small>':'—'}</b></div>`}
   function detailHTML(it){const s=secOf(it.type),g=it.type==='game',f=flagOf(it),wide=!!it.backdrop;
     const links=[it.wiki&&[`https://${it.wiki.startsWith('tr:')?'tr':'en'}.wikipedia.org/wiki/${it.wiki.replace(/^tr:/,'')}`,'Wikipedia'],it.imdb&&[`https://www.imdb.com/title/${it.imdb}/`,'IMDb'],it.mal&&[`https://myanimelist.net/anime/${it.mal}`,'MyAnimeList'],it.steam&&[`https://store.steampowered.com/app/${it.steam}/`,'Steam']].filter(Boolean);
@@ -345,7 +352,8 @@ const Media=(()=>{
         <div class="mx-head">${poster(it,'mx-p')}<div class="mx-ti"><a class="mx-k" href="#lib/m/${s}">${IC[it.type==='movie'?'film':it.type==='series'?'tv':it.type]}${TN[it.type]} · ${SEC[s].n}</a>
           <h1>${E(it.title)}</h1><p class="mx-m">${metaLong(it)}${it.score?`<span class="mh-sc">${scoreTxt(it)}</span>`:''}</p>
           <div class="mx-st" role="radiogroup" aria-label="${g?'Oynama':'İzlenme'} durumu">${Object.entries(stMap(it)).map(([k,n])=>`<button role="radio" aria-checked="${it.status===k}" class="${it.status===k?'on':''}" data-ds="${k}">${it.status===k?IC.check:''}${n}</button>`).join('')}
-            <button class="mb ic${it.fav?' on':''}" data-dfav aria-pressed="${it.fav}" aria-label="Favori" title="Favori">${IC.heart}</button></div></div></div></div>
+            <button class="mb ic${it.fav?' on':''}" data-dfav aria-pressed="${it.fav}" aria-label="Favori" title="Favori">${IC.heart}</button></div>
+          <div class="mx-rt">${rateHTML(it)}</div></div></div></div>
       <div class="mx-body"><div class="mx-main">
         ${f?flagBox(it):''}
         ${it.desc?`<p class="mx-d">${E(it.desc)}</p>`:`<p class="mx-d dim">${it.match?'Açıklama bulunamadı.':'Bilgiler aranıyor…'}</p>`}
@@ -360,7 +368,6 @@ const Media=(()=>{
           <div class="mx-fb"><button class="mb" data-eclose>Vazgeç</button><button class="mb pri" data-esave>Kaydet</button></div></div></section>
         <section class="mx-s mx-pick" hidden></section></div>
       <aside class="mx-side">
-        <section><h3>Değerlendirmem</h3>${rateHTML(it)}</section>
         <dl class="mx-dl">${it.year?`<dt>Yıl</dt><dd>${E(it.year)}</dd>`:''}${it.genres.length?`<dt>Tür</dt><dd>${it.genres.map(E).join(', ')}</dd>`:''}${g&&it.platforms.length?`<dt>Platform</dt><dd>${it.platforms.map(p=>`<span class="pf">${E(p)}</span>`).join('')}</dd>`:''}
           ${it.eps?`<dt>Bölüm</dt><dd>${it.eps}</dd>`:''}${it.score?`<dt>Genel puan</dt><dd>${E(it.score)}</dd>`:''}<dt>Eklenme</dt><dd>${new Date(it.added).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'})}</dd>
           <dt>Eşleşme</dt><dd>${matchTxt(it)}</dd></dl>

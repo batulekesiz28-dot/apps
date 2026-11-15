@@ -1945,5 +1945,35 @@
     "text": "Raf satırında anahtar ve sıralama okları yan yana (denetçi 'yapışık düğme' bilgisi veriyor); her biri 28px+ ve ayrı amaçlı, bilerek bırakıldı"
    }
   ]
+ },
+ {
+  "at": "2026-11-15T10:02:25",
+  "change": "Medya: puanlama her yerden — kart üstünde yıldız düğmesi, listede 'Puanla' hücresi, sağ tık menüsünde 'Puanla', detayda başlığın hemen altında; kartta 10'luk puan görünüyor; klavyeyle 1–9, 0=10",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Sağ üstteki görünüm düğmelerine basınca düğmeler kayboluyor, görünüm değişmiyordu",
+    "fix": "Gizleme sadece arama kutusu açıkken"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Puanlama sadece detayın alt köşesindeydi, bulunmuyordu",
+    "fix": "Kart, liste, sağ tık ve detay başlığından puanlanabiliyor"
+   }
+  ]
  }
 ]

@@ -405,7 +405,7 @@
 .mc-r .mc-s{width:40px;padding:0;justify-content:center;transition:width .3s cubic-bezier(.16,1,.3,1)}
 .mc-r .mc-s kbd{display:none}.mc-r .mc-s input{display:block;flex:0 0 0;width:0;min-width:0;padding:0;opacity:0}.mc-r .mc-s{cursor:text}
 .mc-r .mc-s:focus-within{width:200px;padding:0 14px;justify-content:flex-start}.mc-r .mc-s:focus-within input{flex:1 1 auto;opacity:1}
-.mc-r:focus-within .mc-vw{display:none}
+.mc-r:has(.mc-s:focus-within) .mc-vw{display:none}
 /* alt kapsüller: ortada; taşarsa kaydırılır (soldan kesilmez) */
 .mc-sub>a:first-child{margin-left:auto}.mc-sub>a:last-child{margin-right:auto}
 @media (max-width:1240px){.mc-r .mc-vw{display:none}}
@@ -458,3 +458,17 @@
 @media (prefers-reduced-motion:reduce){.mset-tg i,.mset-tg i::after{transition:none}}
 .mset header{position:sticky;top:-14px;z-index:2;margin:-14px -16px 0;padding:12px 16px 8px;background:rgba(32,32,36,.96);border-radius:18px 18px 0 0}
 .mset>*{flex-shrink:0}
+
+/* ══ Puanlama her yerden: kart üstü yıldız, liste hücresi, sağ tık, detay başlığı ══ */
+.mc-b.mc-rb{width:auto;min-width:34px;padding:0 9px;gap:4px;display:inline-flex;align-items:center;justify-content:center}
+.mc-b.mc-rb b{font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums}.mc-b.mc-rb.on{color:#F5C451}.mc-b.mc-rb.on .mvi{fill:currentColor}
+.mc-my .mvi{fill:currentColor}
+button.ml-sc{display:inline-flex;align-items:center;gap:4px;justify-self:start;height:32px;padding:0 10px;margin-left:-10px;border-radius:999px;color:var(--mink);transition:background .15s}
+button.ml-sc:hover{background:rgba(255,255,255,.08)}button.ml-sc .mvi{width:13px;height:13px;color:var(--mink3)}button.ml-sc i{font-size:12.5px}
+.mrp{position:fixed;z-index:600;width:min(340px,calc(100vw - 16px));padding:12px 14px 14px;border-radius:16px;color:#F5F5F7;font-family:var(--sys,-apple-system,system-ui,sans-serif);
+  background:rgba(30,30,34,.86);backdrop-filter:saturate(1.8) blur(26px);-webkit-backdrop-filter:saturate(1.8) blur(26px);box-shadow:inset 0 0 0 .5px rgba(255,255,255,.12),0 24px 60px -16px rgba(0,0,0,.75);animation:msetIn .2s cubic-bezier(.16,1,.3,1)}
+.mrp>p{margin:0 0 10px;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mrp .rt-n button:focus-visible,.mrp .rt-l button:focus-visible,.mrp .rt-f:focus-visible{outline:2px solid rgba(255,255,255,.8);outline-offset:1px}
+.mx-rt{margin-top:16px}.mx-rt .rt{gap:10px}
+@media (max-width:760px){button.ml-sc{height:40px}.mrp{left:8px!important;right:8px;width:auto}}
+@media (prefers-reduced-motion:reduce){.mrp{animation:none}}

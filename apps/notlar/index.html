@@ -438,12 +438,13 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
 @media (max-width:760px){.pgb{min-height:58px}.tw,.tw0{width:36px;height:40px}.ni.tr{padding-left:calc(2px + var(--dp,0)*14px)}.sub-add{height:44px}.crumb .cr{height:40px;max-width:120px}.pgn{display:none}.mv-q{height:40px}}
 </style>
 <script>/* mat cam tasarımı: bir kereliğine koyu temaya geç (sonra tema düğmesi serbest) */try{if(!localStorage.getItem('notlar:glass1')){localStorage.setItem('notlar:glass1','1');localStorage.setItem('notlar:theme','"dark"')}}catch(e){}</script>
-<script src="../../shared/skin.js?v=20261116j"></script>
-<link rel="stylesheet" href="library.css?v=20261116j">
-<link rel="stylesheet" href="brain.css?v=20261116j">
-<link rel="stylesheet" href="media.css?v=20261116j">
-<link rel="stylesheet" href="time.css?v=20261116j">
-<link rel="stylesheet" href="tasks.css?v=20261116j">
+<script src="../../shared/skin.js?v=20261116m"></script>
+<link rel="stylesheet" href="library.css?v=20261116m">
+<link rel="stylesheet" href="brain.css?v=20261116m">
+<link rel="stylesheet" href="media.css?v=20261116m">
+<link rel="stylesheet" href="time.css?v=20261116m">
+<link rel="stylesheet" href="tasks.css?v=20261116m">
+<link rel="stylesheet" href="ders.css?v=20261116m">
 <style id="tnavCss">
 /* ── Üst gezinme (sol menü yerine) — ince cam şerit, kayan seçili vurgu ── */
 .app,.app[data-mode=lib],.app[data-mode=brain]{grid-template-columns:1fr}
@@ -476,7 +477,7 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
 @media (max-width:420px){.tnav a,.tnav button,.top .modes a{padding:0 8px;min-width:38px}.tb.tsrch{margin-left:0}}
 @media (prefers-reduced-motion:reduce){.tnav .tk,.side{transition:none}}
 </style>
-<link rel="stylesheet" href="glass.css?v=20261116j">
+<link rel="stylesheet" href="glass.css?v=20261116m">
 </head>
 <body>
 <div class="app" id="app">
@@ -522,12 +523,13 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
   </div>
 </div>
 <div class="toasts" id="toasts"></div>
-<script src="kb.js?v=20261116j"></script>
-<script src="library.js?v=20261116j"></script>
-<script src="media.js?v=20261116j"></script>
-<script src="brain.js?v=20261116j"></script>
-<script src="time.js?v=20261116j"></script>
-<script src="tasks.js?v=20261116j"></script>
+<script src="kb.js?v=20261116m"></script>
+<script src="library.js?v=20261116m"></script>
+<script src="media.js?v=20261116m"></script>
+<script src="brain.js?v=20261116m"></script>
+<script src="time.js?v=20261116m"></script>
+<script src="tasks.js?v=20261116m"></script>
+<script src="ders.js?v=20261116m"></script>
 
 <script>
 'use strict';
@@ -728,10 +730,12 @@ function route(){
   else if(v==='cal'){view='cal';openId=null}
   else if(v==='acts'||v==='tasks'||v==='stats'){view=v;openId=null}
   else if(v==='tpl'){view='tpl';openId=null}
+  else if(v==='work'){view='home';openId=null}
+  else if(v==='ders'){view='ders';openId=null}
   else if(v==='lib'||v==='brain'){const parts=h.split('/').slice(1);
     if(view===v&&(v==='lib'?Library.soft(parts):Brain.soft(parts)))return;
     const was=view;view=v;openId=null;secParts=parts;setMode(v,was);return}
-  else{view='home';openId=null}
+  else{view='notes';openId=null}
   if(view!=='lib'&&view!=='brain')lastWs=location.hash||'#home';
   setMode('ws');renderSide();renderView();closeDrawer();
 }
@@ -810,7 +814,7 @@ function renderView(soft){
   if(view==='lib'||view==='brain'){if(!soft)(view==='lib'?Library:Brain).render(secParts);return}
   hideFloat();
   const v=$('#view'),sc=$('#scroll'),keep=soft?sc.scrollTop:0;
-  if(view==='page')renderPage();else if(view==='timeline')renderTimeline();else if(view==='cal')renderCal();else if(view==='acts')Time.renderActs();else if(view==='tasks')Time.renderTasks();else if(view==='stats')Time.renderStats();else if(view==='tpl')renderTpl();else renderHome();
+  if(view==='notes')Ders.hub();else if(view==='ders')Ders.render();else if(view==='page')renderPage();else if(view==='timeline')renderTimeline();else if(view==='cal')renderCal();else if(view==='acts')Time.renderActs();else if(view==='tasks')Time.renderTasks();else if(view==='stats')Time.renderStats();else if(view==='tpl')renderTpl();else renderHome();
   sc.scrollTop=keep;onScroll();
   $('#app').classList.toggle('nocrumb',!(view==='page'&&pages.get(openId)?.parent));
   if(!soft)anim(v,[{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'none'}],{duration:460,easing:OUT});
@@ -833,8 +837,8 @@ function setCrumb(ic,label,act=''){$('#crumb').innerHTML=label?`<span class="ic"
 /* Home */
 function greet(){const h=new Date().getHours();return h<6?'İyi geceler':h<12?'Günaydın':h<18?'İyi günler':'İyi akşamlar'}
 function renderHome(){
-  setCrumb('','');
-  const t=today(),all=sorted();
+  setCrumb('<svg class="li" viewBox="0 0 16 16"><rect x="2.5" y="5" width="11" height="8.5" rx="2"/><path d="M6 5V3.8c0-.5.4-.8.8-.8h2.4c.4 0 .8.3.8.8V5"/></svg>','Work');
+  const t=today(),all=sorted().filter(p=>!Ders.isDers(p));
   const daily=all.find(p=>p.tpl==='daily'&&p.date===t);
   const open=daily?daily.blocks.filter(b=>b.t==='todo'&&!b.c&&plain(b.h).trim()).length:0;
   const week=[];for(let i=0;i<7;i++){const d=addDays(t,i),its=all.filter(p=>p.date===d);if(its.length)week.push([d,its])}
@@ -1573,19 +1577,19 @@ $('#gBtn').onclick=async()=>{const p=new firebase.auth.GoogleAuthProvider();p.se
 $('#gOut').onclick=()=>firebase.auth().signOut();
 $('#me').onclick=e=>{const u=firebase.auth().currentUser;if(!u)return;const p=float($('#me'),`<div class="pop-h" style="text-transform:none;letter-spacing:0;font-family:var(--font);font-size:12px;line-height:1.4"><b style="display:block;color:var(--ink);font-weight:500">${esc(u.displayName||'Hesap')}</b>${esc(u.email)}</div><div class="sep"></div><button class="mi" data-out><span class="bi">${IC.out}</span><span class="tx">Çıkış yap</span></button>`,{w:240});
   p.addEventListener('click',ev=>{if(ev.target.closest('[data-out]')){hideFloat();flushAll();firebase.auth().signOut()}})};
-function start(){applyTheme();welcome();if(!started){started=true;Time.bind();Tasks.bind()}route()}
+function start(){applyTheme();welcome();if(!started){started=true;Time.bind();Tasks.bind();Ders.bind();Ders.on(()=>{if(curMode==='ws'&&(view==='ders'||view==='notes'))renderView(true)})}route()}
 (async()=>{
   applyTheme();
-  if(!CLOUD){S=Local;KB.startLocal();TM.startLocal();TK.startLocal();Local.load().forEach(p=>{const n=norm(p);pages.set(n.id,n)});$('#saved').title='Bu tarayıcıda kayıtlı';start();return}
+  if(!CLOUD){S=Local;KB.startLocal();TM.startLocal();TK.startLocal();Ders.startLocal();Local.load().forEach(p=>{const n=norm(p);pages.set(n.id,n)});$('#saved').title='Bu tarayıcıda kayıtlı';start();return}
   gate('loading');
   try{await loadFirebase()}catch{return gate('error','Firebase yüklenemedi. İnternet bağlantını kontrol et.')}
   if(!firebase.apps.length)firebase.initializeApp(FB);
   const fs=firebase.firestore();try{await fs.enablePersistence({synchronizeTabs:true})}catch{}
   firebase.auth().getRedirectResult().catch(e=>gate('error',authMsg(e)));
   firebase.auth().onAuthStateChanged(async u=>{
-    if(!u){Cloud.stop();KB.stop();TM.stop();TK.stop();pages.clear();P=null;$('#view').innerHTML='';$('#nav').innerHTML='';$('#me').hidden=true;closePal();hideFloat(true);return gate('signin')}
+    if(!u){Cloud.stop();KB.stop();TM.stop();TK.stop();Ders.stop();pages.clear();P=null;$('#view').innerHTML='';$('#nav').innerHTML='';$('#me').hidden=true;closePal();hideFloat(true);return gate('signin')}
     if((u.email||'').toLowerCase()!==OWNER){Cloud.stop();return gate('denied',`<b>${esc(u.email)}</b> bu deftere erişemez.`)}
-    gate('loading','Notlar yükleniyor…');S=Cloud;pages.clear();await Cloud.start(fs);await KB.startCloud(fs);await TM.startCloud(fs);await TK.startCloud(fs);
+    gate('loading','Notlar yükleniyor…');S=Cloud;pages.clear();await Cloud.start(fs);await KB.startCloud(fs);await TM.startCloud(fs);await TK.startCloud(fs);await Ders.startCloud(fs);
     const me=$('#me');me.hidden=false;me.innerHTML=u.photoURL?`<img src="${esc(u.photoURL)}" alt="" referrerpolicy="no-referrer">`:esc((u.displayName||u.email)[0].toUpperCase());
     start();await ungate();
   });

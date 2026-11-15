@@ -2566,5 +2566,42 @@
     "fix": "Boş tarafa açılan bilgi paneli; kalem üstüne gelme destekleniyor"
    }
   ]
+ },
+ {
+  "at": "2026-11-15T20:25:27",
+  "change": "Notlar bölümlere ayrıldı (Work · Ders notu · Library); Ders notu Study Log'a bağlı",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "fixed",
+    "text": "Notlar tek parçaydı; ders notları iş notlarına karışıyordu",
+    "fix": "Bölüm seçimi + Study Log'a bağlı Ders notu (hedef, haftalık süre, ders defterleri)"
+   },
+   {
+    "app": "notlar",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Bozulan bir yorum satırı Medya'da puan penceresinin ve liste puan düğmesinin stilini yok ediyordu (küçük dokunma alanı)",
+    "fix": "Yorum düzeltildi; temizlik betiği yorumları artık bozmuyor"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "fixed",
+    "text": "Test ekran görüntüleri yanlışlıkla repoya girmişti",
+    "fix": "Silindi"
+   }
+  ]
  }
 ]

@@ -110,6 +110,7 @@
 @media (hover:hover) and (pointer:fine){
   .mc-hov{display:flex}
   .mc-card:hover .mc-art,.mc-card:focus-visible .mc-art{transform:scale(1.07) translateY(-6px);box-shadow:0 26px 50px -18px rgba(0,0,0,.95),0 0 0 1px rgba(255,255,255,.12);z-index:4}
+  .mc-card.v-w:hover .mc-art,.mc-card.v-w:focus-visible .mc-art,.mc-card.v-w2:hover .mc-art{transform:scale(1.035) translateY(-3px)}
   .mc-card:hover .mc-hov,.mc-card:focus-within .mc-hov{opacity:1}
   .mc-card:hover .mc-sc{opacity:0}}
 .mc-cap{padding:9px 2px 0}.mc-cap b{display:block;font-size:13.5px;font-weight:500;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -300,24 +301,27 @@
 .mc-row{gap:calc(clamp(10px,1vw,16px) * var(--gz,1))}
 .mc-card.v-w,.mc-row.v-w .mc-card{width:calc(clamp(250px,22vw,360px) * var(--cz,1))}
 .mc-card.v-w2,.mc-row.v-w2 .mc-card{width:calc(clamp(270px,24vw,380px) * var(--cz,1))}
-.mc-grid{gap:calc(26px * var(--gz,1)) calc(16px * var(--gz,1));grid-template-columns:repeat(auto-fill,minmax(calc(150px * var(--cz,1) * var(--dz,1)),1fr))}
-.mc-grid.v-g{grid-template-columns:repeat(auto-fill,minmax(calc(158px * var(--cz,1) * var(--dz,1)),1fr))}
-.mc-grid.v-w{grid-template-columns:repeat(auto-fill,minmax(calc(280px * var(--cz,1) * var(--dz,1)),1fr))}
+/* ızgara sütunları SABİT genişlik: kart, ayarda seçilen boyda kalır (1fr ile büyüyüp kaçmaz); telefonda ekranı doldurur */
+.mc-grid{justify-content:center;gap:calc(26px * var(--gz,1)) calc(16px * var(--gz,1));grid-template-columns:repeat(auto-fill,calc(150px * var(--cz,1) * var(--dz,1)))}
+.mc-grid.v-g{grid-template-columns:repeat(auto-fill,calc(158px * var(--cz,1) * var(--dz,1)))}
+.mc-grid.v-w{grid-template-columns:repeat(auto-fill,calc(280px * var(--cz,1) * var(--dz,1)))}
 .fp-book{background:linear-gradient(165deg,hsl(var(--h) 30% 30%),hsl(calc(var(--h) + 30) 35% 12%))}
 /* Apple TV: büyük geniş kapaklar, görsel önde, sade beyaz yazı */
 .mc[data-view=tv] .mc-row.v-w .mc-card{width:calc(clamp(280px,26vw,420px) * var(--cz,1))}
+.mc[data-view=tv] .mc-grid.v-w{grid-template-columns:repeat(auto-fill,calc(clamp(280px,26vw,420px) * var(--cz,1) * var(--dz,1)))}
 .mc[data-view=tv] .mc-art{border-radius:12px}
 .mc[data-view=tv] .mc-cap{padding-top:10px}.mc[data-view=tv] .mc-cap small{color:rgba(255,255,255,.55)}
 /* Netflix: yoğun posterler, başlık yalnızca üzerine gelince */
 .mc[data-view=nf]{--card:calc(clamp(112px,9.5vw,156px) * var(--cz,1))}
 .mc[data-view=nf] .mc-row{gap:calc(8px * var(--gz,1))}
-.mc[data-view=nf] .mc-grid{gap:calc(10px * var(--gz,1));grid-template-columns:repeat(auto-fill,minmax(calc(124px * var(--cz,1) * var(--dz,1)),1fr))}
+.mc[data-view=nf] .mc-grid{gap:calc(10px * var(--gz,1));grid-template-columns:repeat(auto-fill,calc(124px * var(--cz,1) * var(--dz,1)))}
 /* Kompakt: küçük kapaklar, çok içerik, en az metin */
 .mc[data-view=compact]{--card:calc(92px * var(--cz,1))}
 .mc[data-view=compact] .mc-row{gap:calc(8px * var(--gz,1));padding-top:10px;padding-bottom:16px}
 .mc[data-view=compact] .mc-cap{padding-top:6px}.mc[data-view=compact] .mc-cap small,.mc[data-view=compact] .mc-sc,.mc[data-view=compact] .mc-fv{display:none}
 .mc[data-view=compact] .mc-cap b{font-size:12px}
-.mc[data-view=compact] .mc-grid{gap:calc(14px * var(--gz,1)) calc(8px * var(--gz,1));grid-template-columns:repeat(auto-fill,minmax(calc(92px * var(--cz,1) * var(--dz,1)),1fr))}
+.mc[data-view=compact] .mc-grid{gap:calc(14px * var(--gz,1)) calc(8px * var(--gz,1));grid-template-columns:repeat(auto-fill,calc(92px * var(--cz,1) * var(--dz,1)))}
+@media (max-width:600px){.mc .mc-grid,.mc .mc-grid.v-g{grid-template-columns:repeat(auto-fill,minmax(calc(104px * var(--cz,1) * var(--dz,1)),1fr))}.mc .mc-grid.v-w,.mc[data-view=tv] .mc-grid.v-w{grid-template-columns:repeat(auto-fill,minmax(min(100%,calc(280px * var(--cz,1))),1fr))}}
 .mc[data-view=compact] .mc-shelf h2{font-size:calc(16px * var(--fz,1))}
 /* Liste: kapak · ad · durum · puan · beğeni · favori */
 .ml{display:flex;flex-direction:column;padding:0 var(--px) 8px}
@@ -352,6 +356,14 @@
 .mset-pf:hover .mset-hx::after,.mset-pf:hover .mset-hy::after,.mset-pf.drag .mset-hx::after,.mset-pf.drag .mset-hy::after{background:#fff}
 .mset-pc{max-width:100%;font-size:13px;font-weight:500;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mset-hint{margin:0 0 4px;text-align:center;font-size:12px;color:rgba(255,255,255,.55)}
+.mset-sz{min-height:16px;font-size:12px;color:rgba(255,255,255,.6);font-variant-numeric:tabular-nums}
+.mset-hx:focus-visible,.mset-hy:focus-visible{outline:none}.mset-hx:focus-visible::after,.mset-hy:focus-visible::after{background:#fff;box-shadow:0 0 0 3px rgba(10,132,255,.6)}
+.mset-hx:hover::after,.mset-pf.drag .mset-hx::after{transform:scaleY(1.25)}.mset-hy:hover::after,.mset-pf.drag .mset-hy::after{transform:scaleX(1.25)}
+.mset-pf.drag>.mp,.mset-pf.drag>.mw{box-shadow:0 0 0 2px rgba(255,255,255,.85),0 14px 30px -14px rgba(0,0,0,.9)}
+/* çekerken panel saydamlaşır: arkadaki kartların değişimi görünür */
+.mset{transition:background-color .2s,box-shadow .2s}.mset>*{transition:opacity .2s}
+.mset.see{background:transparent!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.mset.see>:not(.mset-pv){opacity:0;pointer-events:none}.mset.see .mset-pc,.mset.see .mset-sz{text-shadow:0 1px 6px rgba(0,0,0,.9)}
 body.mset-drag{cursor:grabbing;user-select:none}
 .mset header{display:flex;align-items:center;justify-content:space-between}.mset header b{font-size:15px;font-weight:600}
 .mset-x{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;color:rgba(255,255,255,.6)}.mset-x:hover{background:rgba(255,255,255,.08);color:#fff}

@@ -2400,5 +2400,42 @@
     "fix": "Kural silindi; anahtar her görünümde çalışıyor"
    }
   ]
+ },
+ {
+  "at": "2026-11-15T15:23:06",
+  "change": "Medya: kartlar seçilen boyda kalıyor (ızgara taşmıyor/büyümüyor), sürükleyerek boyut ayarı iyileşti",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Apple TV ızgarasında kartlar satırı doldurmak için seçilen boydan çok büyüyordu (önizlemeyle uyuşmuyordu)",
+    "fix": "Sütunlar sabit genişlikte, ızgara ortalı"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "fixed",
+    "text": "Geniş kartlar üzerine gelince fazla büyüyüp yerinden kaçıyordu",
+    "fix": "Geniş kartlarda büyüme yarıya indi"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "fixed",
+    "text": "Boyut önizlemesi gerçek boyu göstermiyordu, klavyeyle ayarlanamıyordu",
+    "fix": "Gerçek px boyu, çekerken saydam panel, çift tıkla sıfırla, %100'e yapışma, ok tuşları"
+   }
+  ]
  }
 ]

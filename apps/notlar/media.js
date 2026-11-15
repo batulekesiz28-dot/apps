@@ -281,8 +281,13 @@ const Media=(()=>{
   const pvBase=()=>V()==='tv'?{B:150,R:215/460}:{B:96,R:3/2};
   function pvHTML(){const L=st.look,it=pvPick()||{id:'',type:'movie',title:'Örnek film',cover:''},wide=V()==='tv',{B}=pvBase();
     return`<div class="mset-pv"><div class="mset-pf" style="width:${B*L.cover/100}px;--ar:${(L.ar||100)/100};--r:${L.radius}px">${wide?wideArt(it):poster(it)}
-      <span class="mset-hx" data-pvh="x" title="Genişlik"></span><span class="mset-hy" data-pvh="y" title="Yükseklik"></span><span class="mset-hc" data-pvh="xy" title="İkisi birden"></span></div>
-      <div class="mset-pc"${L.title?'':' hidden'}>${E(it.title)}</div></div><p class="mset-hint">Kenarından ya da köşesinden çek — bütün kartlar böyle olur</p>`}
+      <span class="mset-hx" data-pvh="x" tabindex="0" role="slider" aria-label="Kapak genişliği" aria-valuemin="60" aria-valuemax="160" aria-valuenow="${L.cover}" title="Genişlik · çift tıkla: sıfırla"></span>
+      <span class="mset-hy" data-pvh="y" tabindex="0" role="slider" aria-label="Kapak yüksekliği" aria-valuemin="60" aria-valuemax="170" aria-valuenow="${L.ar||100}" title="Yükseklik · çift tıkla: sıfırla"></span>
+      <span class="mset-hc" data-pvh="xy" title="İkisi birden · çift tıkla: sıfırla" aria-hidden="true"></span></div>
+      <div class="mset-pc"${L.title?'':' hidden'}>${E(it.title)}</div><div class="mset-sz" aria-live="polite"></div></div>
+      <p class="mset-hint">Kenarından ya da köşesinden çek · çift tık sıfırlar</p>`}
+  // ekrandaki gerçek kartın boyu (px) — önizleme küçük ölçekli, bu sayı gerçeği söyler
+  const realSize=()=>{const a=q('#view>.mc .mc-main .mc-art, #view>.mc .mc-art');if(!a)return'';const r=a.getBoundingClientRect();return r.width?`${Math.round(r.width)} × ${Math.round(r.height)} px`:''};
   function setHTML(){const L=st.look,seg=(k,o)=>`<div class="mset-seg" role="radiogroup">${o.map(([v,n])=>`<button role="radio" data-lk="${k}" data-lval="${v}" aria-checked="${L[k]===v}" class="${L[k]===v?'on':''}">${n}</button>`).join('')}</div>`;
     const rng=(k,n,min,max,stp,u='%')=>`<label for="mset-${k}">${n} <output>${L[k]}${u}</output></label><input id="mset-${k}" type="range" min="${min}" max="${max}" step="${stp}" value="${L[k]}" data-lr="${k}" data-u="${u}">`;
     const tg=(attr,k,n,on)=>`<button class="mset-tg" role="switch" ${attr}="${k}" aria-checked="${!!on}"><span>${n}</span><i aria-hidden="true"></i></button>`;
@@ -306,16 +311,24 @@ const Media=(()=>{
     const redrawPanel=focusSel=>{const y=el.scrollTop;el.innerHTML=setHTML();el.scrollTop=y;if(focusSel)el.querySelector(focusSel)?.focus()};
     const pvSync=()=>{const L=st.look,f=el.querySelector('.mset-pf');if(f){f.style.width=pvBase().B*L.cover/100+'px';f.style.setProperty('--ar',(L.ar||100)/100);f.style.setProperty('--r',L.radius+'px')}
       const c=el.querySelector('.mset-pc');if(c)c.hidden=!L.title;
-      for(const k of ['cover','ar']){const r=el.querySelector('#mset-'+k);if(r&&+r.value!==L[k]){r.value=L[k];r.previousElementSibling.querySelector('output').textContent=L[k]+'%'}}};
+      for(const k of ['cover','ar']){const r=el.querySelector('#mset-'+k);if(r&&+r.value!==L[k]){r.value=L[k];r.previousElementSibling.querySelector('output').textContent=L[k]+'%'}}
+      el.querySelector('[data-pvh=x]')?.setAttribute('aria-valuenow',L.cover);el.querySelector('[data-pvh=y]')?.setAttribute('aria-valuenow',L.ar||100);
+      const z=el.querySelector('.mset-sz');if(z)z.textContent=realSize()};
+    const setSize=(cv,ar)=>{const L=st.look;if(cv===L.cover&&ar===(L.ar||100))return;L.cover=cv;L.ar=ar;applyLook();pvSync()};
+    requestAnimationFrame(pvSync);
+    el.addEventListener('dblclick',e=>{const h=e.target.closest('[data-pvh]');if(!h)return;const L=st.look,ax=h.dataset.pvh;setSize(ax==='y'?L.cover:100,ax==='x'?(L.ar||100):100);saveLook()});
+    el.addEventListener('keydown',e=>{const h=e.target.closest('[data-pvh]');if(!h)return;const L=st.look,d=e.shiftKey?10:5,cl=(v,a,b)=>Math.max(a,Math.min(b,v));let cv=L.cover,ar=L.ar||100;
+      if(e.key==='ArrowRight')cv+=d;else if(e.key==='ArrowLeft')cv-=d;else if(e.key==='ArrowDown')ar+=d;else if(e.key==='ArrowUp')ar-=d;else if(e.key==='Home'||e.key==='0'){cv=100;ar=100}else return;
+      e.preventDefault();setSize(cl(cv,60,160),cl(ar,60,170));saveLook()});
     el.addEventListener('input',e=>{const t=e.target;if(t.dataset.lr){t.previousElementSibling.querySelector('output').textContent=t.value+t.dataset.u;setLook(t.dataset.lr,+t.value);pvSync()}});
     el.addEventListener('pointerdown',e=>{const h=e.target.closest('[data-pvh]');if(!h)return;e.preventDefault();const f=h.parentElement,ax=h.dataset.pvh,{B,R}=pvBase(),x0=e.clientX,y0=e.clientY,w0=f.offsetWidth,h0=f.offsetHeight;
-      const L=st.look,c0=L.cover,a0=L.ar||100,cl=(v,a,b)=>Math.max(a,Math.min(b,Math.round(v/5)*5));let raf=0,last=null;
-      try{h.setPointerCapture(e.pointerId)}catch(_){}f.classList.add('drag');document.body.classList.add('mset-drag');
+      const L=st.look,c0=L.cover,a0=L.ar||100,cl=(v,a,b)=>{v=Math.abs(v-100)<=7?100:Math.round(v/5)*5;return Math.max(a,Math.min(b,v))};let raf=0,last=null;
+      try{h.setPointerCapture(e.pointerId)}catch(_){}f.classList.add('drag');el.classList.add('see');document.body.classList.add('mset-drag');
       const step=()=>{raf=0;const ev=last;const w=ax==='y'?w0:w0+(ev.clientX-x0),hh=ax==='x'?h0*w/w0:h0+(ev.clientY-y0);
         const cv=ax==='y'?c0:cl(w/B*100,60,160),ar=ax==='x'?a0:cl(hh/(Math.max(1,B*cv/100)*R)*100,60,170);
-        if(cv!==L.cover||ar!==L.ar){L.cover=cv;L.ar=ar;applyLook();pvSync()}};
+        setSize(cv,ar)};
       const mv=ev=>{last=ev;if(!raf)raf=requestAnimationFrame(step)};
-      const up=()=>{h.removeEventListener('pointermove',mv);h.removeEventListener('pointerup',up);h.removeEventListener('pointercancel',up);if(raf){cancelAnimationFrame(raf);raf=0;if(last)step()}f.classList.remove('drag');document.body.classList.remove('mset-drag');saveLook()};
+      const up=()=>{h.removeEventListener('pointermove',mv);h.removeEventListener('pointerup',up);h.removeEventListener('pointercancel',up);if(raf){cancelAnimationFrame(raf);raf=0;if(last)step()}f.classList.remove('drag');el.classList.remove('see');document.body.classList.remove('mset-drag');saveLook()};
       h.addEventListener('pointermove',mv);h.addEventListener('pointerup',up);h.addEventListener('pointercancel',up)});
     el.addEventListener('click',e=>{const t=e.target,L=st.look;if(t.closest('[data-msx]'))return el.remove();
       if(t.closest('[data-msr]')){st.look=JSON.parse(JSON.stringify(LOOK0));saveLook();applyLook();refresh();redrawPanel();return}

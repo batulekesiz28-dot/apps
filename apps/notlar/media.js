@@ -234,12 +234,19 @@ const Media=(()=>{
   /* ── kabuk ── */
   const VIEWS=[['tv','Apple TV',IC.vtv],['nf','Netflix',IC.vnf],['compact','Kompakt',IC.vcp],['list','Liste',IC.vls]];
   const viewSeg=()=>`<div class="mc-vw" role="radiogroup" aria-label="Görünüm">${VIEWS.map(([k,n,ic])=>`<button role="radio" data-lv="${k}" aria-checked="${V()===k}" class="${V()===k?'on':''}" title="${n} görünümü" aria-label="${n} görünümü">${ic}</button>`).join('')}</div>`;
+  const CHATGPT_VIEW_KEY='mc:chatgpt-preview';
+  function previewToggle(){const on=!!lsg(CHATGPT_VIEW_KEY,false),label=on?'Eski Medya görünümüne dön':'Yeni Medya tasarımını göster';
+    return `<button class="mc-ai-toggle" data-mc-preview type="button" aria-pressed="${on}" aria-label="${label}" title="${label}"><span class="mc-ai-mark" aria-hidden="true">GPT</span><span class="mc-ai-label">${on?'Eski görünüm':'Yeni tasarım'}</span></button>`}
+  function setPreview(on){on=!!on;lss(CHATGPT_VIEW_KEY,on);const root=q('#view>.mc');if(!root)return;
+    root.dataset.chatgpt=on?'on':'off';document.body.classList.toggle('media-chatgpt',on);
+    const b=q('[data-mc-preview]',root);if(b){const label=on?'Eski Medya görünümüne dön':'Yeni Medya tasarımını göster';
+      b.setAttribute('aria-pressed',String(on));b.setAttribute('aria-label',label);b.title=label;const s=q('.mc-ai-label',b);if(s)s.textContent=on?'Eski görünüm':'Yeni tasarım'}}
   function nav(){const tabs=[['home','Ana sayfa','#lib',IC.home],...ORDER.filter(k=>k===st.sec||!st.look.tabsOff.includes(k)).map(k=>[k,SEC[k].n,'#lib/m/'+k,IC[SEC[k].ic]])];
     const sub=st.sec!=='home'?SEC[st.sec].pages.map(([k,n])=>{const c=k==='home'?'':all().filter(i=>inSec(i,st.sec)&&inPage(i,k)).length;
         return`<a href="#lib/m/${st.sec}${k==='home'?'':'/'+k}" class="${st.page===k?'on':''}"${st.page===k?' aria-current="page"':''}>${n}${k==='home'?'':`<em>${c}</em>`}</a>`}).join('')+(()=>{const r=all().filter(i=>inSec(i,st.sec)&&flagOf(i)).length;return r?`<a href="#lib/m/${st.sec}/review" class="rev${st.page==='review'?' on':''}">${IC.warn}İnceleme<em>${r}</em></a>`:''})():'';
     return`<nav class="mc-nav" aria-label="Medya bölümleri"><a class="mc-brand" href="#lib" aria-label="Medya ana sayfa"><span>${IC.play}</span><b>Medya</b></a>
       <div class="mc-tabs">${tabs.map(([k,n,h,ic])=>`<a href="${h}" class="t-${k}${st.sec===k?' on':''}"${st.sec===k?' aria-current="page"':''}>${ic}<span>${n}</span></a>`).join('')}${st.look.tabsOff.includes('docs')?'':`<a href="#lib/docs" class="t-docs">${IC.link}<span>Belgeler</span></a>`}</div>
-      <div class="mc-r"><span class="mc-sync" aria-live="polite"${R.busy?'':' hidden'}>${IC.sync}<span>${R.busy?syncTxt():''}</span></span></div></nav>${bar(sub)}`}
+      <div class="mc-r"><span class="mc-sync" aria-live="polite"${R.busy?'':' hidden'}>${IC.sync}<span>${R.busy?syncTxt():''}</span></span></div></nav>${bar(sub)}${previewToggle()}`}
   /* sayfa kontrol alanı: solda başlık + durum sekmeleri, sağda araçlar (arama · filtre · görünüm · ayar).
      Kaydırınca saklanır (.sbar → Notlar'ın akıllı başlık denetleyicisi), yukarı kaydırınca geri gelir. */
   const countTxt=()=>{const n=st.count??0,s=st.sec;return`${n} ${s==='games'?'oyun':s==='books'?'kitap':s==='movies'?'film':s==='series'?'dizi':s==='anime'?'anime':'içerik'}`};
@@ -262,7 +269,7 @@ const Media=(()=>{
   function render(parts,o={}){const p=parse(parts);const changed=p.sec!==st.sec||p.page!==st.page;st.base=parts||[];
     if(changed){st.kind='';st.genre='';st.min=0;st.hero=0}if(p.sec!==st.sec)st.look=loadLook(p.sec);st.sec=p.sec;st.page=p.page;if(p.gq){st.genre=p.gq;st.page='all'}if(changed||!o.keepQ)st.qs='';
     const v=q('#view');let root=q('#view>.mc');if(!root){v.innerHTML='<div class="mc"></div>';root=q('#view>.mc');wire(root)}
-    root.dataset.sec=st.sec;applyLook(root);const b=body();root.innerHTML=nav()+`<main class="mc-main">${b}</main>`;root.classList.toggle('has-hero',!!q('.mh',root));if(changed)enter(q('.mc-main',root));
+    root.dataset.sec=st.sec;const preview=!!lsg(CHATGPT_VIEW_KEY,false);root.dataset.chatgpt=preview?'on':'off';document.body.classList.toggle('media-chatgpt',preview);applyLook(root);const b=body();root.innerHTML=nav()+`<main class="mc-main">${b}</main>`;root.classList.toggle('has-hero',!!q('.mh',root));if(changed)enter(q('.mc-main',root));
     document.getElementById('app')?.classList.add('mc-on');
     if(typeof setCrumb==='function')setCrumb(IC.play,st.sec==='home'?'Medya':SEC[st.sec].n,'');
     if(changed&&!o.soft)q('#scroll').scrollTop=0;else if(changed)q('#scroll').scrollTop=0;
@@ -280,6 +287,7 @@ const Media=(()=>{
       SPT.t=setTimeout(()=>{if(Date.now()>(SPT.quiet||0)&&c.matches(':hover')&&!document.body.classList.contains('mset-drag')&&!q('.mset,.mq,.mrp'))spotOn(c)},320)});
     root.addEventListener('pointerout',e=>{const c=e.target.closest?.('.mc-card[data-mi]');if(c&&!c.contains(e.relatedTarget)){clearTimeout(SPT.t);if(c.dataset.mi===SPT.block)SPT.block=null}});
     root.addEventListener('click',e=>{const t=e.target;
+      const pv=t.closest('[data-mc-preview]');if(pv){e.preventDefault();setPreview(pv.getAttribute('aria-pressed')!=='true');return}
       const rw=t.closest('[data-row]');if(rw){const r=rw.parentElement.querySelector('.mc-row');r.scrollBy({left:+rw.dataset.row*r.clientWidth*.86,behavior:motion()?'smooth':'auto'});return}
       const hd=t.closest('[data-hd]');if(hd){heroGo(+hd.dataset.hd);return}
       const mk=t.closest('[data-mk]');if(mk){st.kind=mk.dataset.mk;swap();return}
@@ -618,7 +626,7 @@ const Media=(()=>{
       const it=KB.addItem({type:t,title,year:y,status:f.s.value,tags:[TN[t].toLocaleLowerCase('tr')]});if(y)HINT.set(hk(it),{en:title,y:+y});close();say(`“${title}” eklendi — posteri aranıyor`);queue();open(it.id)})}
 
   /* sayfa değişince geçici arayüz kalmasın (Notlar route() çağırır) */
-  function dismiss(){spotOff(true);qa('.mset,.mrp,.mq,.ma-bg').forEach(e=>e.remove())}
+  function dismiss(){spotOff(true);document.body.classList.remove('media-chatgpt');qa('.mset,.mrp,.mq,.ma-bg').forEach(e=>e.remove())}
   // kaydırma, pencere değişimi, Esc → spot ışığı kapanır
   addEventListener('scroll',()=>{SPT.quiet=Date.now()+700;if(SPT.el)spotOff()},true);addEventListener('blur',()=>spotOff(true));addEventListener('resize',()=>spotOff(true));addEventListener('keydown',e=>{if(e.key==='Escape'&&SPT.el)spotOff()});
   return{render,refresh,detail,close,imgErr,queue,addSheet,rateHTML,dismiss,patchCards,isMedia:t=>MT.includes(t),get st(){return st},get R(){return R},_rank:rank,_cleanG:cleanG}})();

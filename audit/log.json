@@ -1810,5 +1810,55 @@
     "text": "Yan panelde etkinlik durumunu tek tıkla değiştirme kalktı; durum, etkinliğe tıklayınca açılan pencereden ve Aktiviteler sayfasından değişiyor"
    }
   ]
+ },
+ {
+  "at": "2026-11-15T09:34:15",
+  "change": "Medya: Filmler ve Diziler ayrıldı, Animeler/Oyunlar/Kitaplar ayrı bölümler (kitaplar Library ile aynı kayıt); diziler/animelerde Yarım Bıraktıklarım; Apple TV tarzı cam kapsül gezinme + sistem yazısı (SF Pro); 4 görünüm (Apple TV, Netflix, Kompakt, Liste); görünüm ayarları (kapak, aralık, yoğunluk, yazı, ikon); beğendim/beğenmedim + 10 üzerinden puan + favori (kitap detayında da)",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   },
+   "medya (5 görünüm) telefon": {
+    "before": null,
+    "after": 100
+   },
+   "medya (5 görünüm) masaüstü": {
+    "before": null,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Liste görünümünde küçük kapak yedeğinde 9px yazı vardı",
+    "fix": "Küçük kapakta yazı gizlendi"
+   },
+   {
+    "app": "notlar",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Ayar panelindeki sürgüler dokunmak için inceydi",
+    "fix": "Sürgü yüksekliği 28px (telefonda 40px)"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "open",
+    "text": "Telefonda görünüm değiştirme düğmeleri yer kaplamasın diye ayar (dişli) panelinde"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "open",
+    "text": "Kitaplar Belgeler (PDF/makale) sayfasında da görünmeye devam ediyor — aynı kayıt, kopya değil"
+   }
+  ]
  }
 ]

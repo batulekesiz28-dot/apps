@@ -21,16 +21,24 @@ const Media=(()=>{
   const norm=s=>String(s||'').toLocaleLowerCase('en').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/ı/g,'i').replace(/&/g,'and').replace(/[^a-z0-9]+/g,' ').replace(/^(the|a|an) /,'').trim();
   const say=(m,o)=>{try{toast(m,o)}catch{}};
 
-  const MT=['movie','series','anime','game'];
-  const TN={movie:'Film',series:'Dizi',anime:'Anime',game:'Oyun'};
+  const MT=['movie','series','anime','game'];          // poster eşleştirmesi yapılan türler
+  const AT=[...MT,'book'];                               // Medya'da gösterilen türler (kitaplar Library ile ortak kayıt)
+  const TN={movie:'Film',series:'Dizi',anime:'Anime',game:'Oyun',book:'Kitap'};
+  const SERIAL=[['home','Keşfet'],['done','İzlediklerim'],['todo','İzlemek İstediklerim'],['doing','İzliyorum'],['dropped','Yarım Bıraktıklarım'],['fav','Favorilerim']];
   const SEC={
-    tv:{n:'Film & Dizi',types:['movie','series'],pages:[['home','Keşfet'],['done','İzlediklerim'],['doing','Devam ettiklerim'],['todo','İzleme listem'],['fav','Favorilerim']]},
-    anime:{n:'Anime',types:['anime'],pages:[['home','Keşfet'],['done','İzlediklerim'],['doing','Devam ettiklerim'],['todo','İzleme listem'],['fav','Favorilerim']]},
-    games:{n:'Oyunlar',types:['game'],pages:[['home','Keşfet'],['played','Oynadıklarım'],['doing','Şu an oynadıklarım'],['todo','Oynamak istediklerim'],['done','Bitirdiklerim'],['fav','Favorilerim']]}};
-  const secOf=t=>t==='game'?'games':t==='anime'?'anime':'tv';
-  const ST={watch:{todo:'İzleme listem',doing:'İzliyorum',done:'İzledim'},game:{todo:'Oynamak istiyorum',doing:'Oynuyorum',played:'Oynadım',done:'Bitirdim'}};
-  const stMap=it=>it.type==='game'?ST.game:ST.watch;
-  const stName=it=>stMap(it)[it.status]||'';
+    movies:{n:'Filmler',ic:'film',types:['movie'],pages:[['home','Keşfet'],['done','İzlediklerim'],['todo','İzlemek İstediklerim'],['doing','İzliyorum'],['fav','Favorilerim']]},
+    series:{n:'Diziler',ic:'tv',types:['series'],pages:SERIAL},
+    anime:{n:'Animeler',ic:'anime',types:['anime'],pages:SERIAL},
+    books:{n:'Kitaplar',ic:'book',types:['book'],pages:[['home','Keşfet'],['done','Okundu'],['doing','Okunuyor'],['todo','Okunmak İsteniyor'],['fav','Favorilerim']]},
+    games:{n:'Oyunlar',ic:'game',types:['game'],pages:[['home','Keşfet'],['played','Oynadıklarım'],['doing','Şu an oynadıklarım'],['todo','Oynamak istediklerim'],['done','Bitirdiklerim'],['fav','Favorilerim']]}};
+  const ORDER=['movies','series','anime','games','books'];
+  const secOf=t=>t==='game'?'games':t==='anime'?'anime':t==='series'?'series':t==='book'?'books':'movies';
+  const ST={watch:{todo:'İzlemek istiyorum',doing:'İzliyorum',done:'İzledim'},serial:{todo:'İzlemek istiyorum',doing:'İzliyorum',dropped:'Yarım bıraktım',done:'İzledim'},book:{todo:'Okumak istiyorum',doing:'Okunuyor',done:'Okundu'},game:{todo:'Oynamak istiyorum',doing:'Oynuyorum',played:'Oynadım',done:'Bitirdim'}};
+  const stMap=it=>it.type==='game'?ST.game:it.type==='book'?ST.book:it.type==='series'||it.type==='anime'?ST.serial:ST.watch;
+  // kitapta durum elle seçilmemişse okuma ilerlemesinden çıkar (Library ile aynı kural)
+  const stOf=it=>it.type==='book'?(it.status||(it.progress>=.99?'done':it.progress>.01?'doing':'')):it.status;
+  const stName=it=>stMap(it)[stOf(it)]||'';
+  const inPage=(it,k)=>k==='fav'?it.fav:k==='played'?['played','done'].includes(it.status):k==='all'?true:stOf(it)===k;
   const S=p=>`<svg class="mvi" viewBox="0 0 16 16" aria-hidden="true">${p}</svg>`;
   const IC={play:S('<path d="M5 3.5v9l7.5-4.5z" fill="currentColor" stroke="none"/>'),plus:S('<path d="M8 3v10M3 8h10"/>'),check:S('<path d="M3.5 8.5l3 3 6-7"/>'),
     heart:S('<path d="M8 13.5S2.5 10.2 2.5 6.3A2.8 2.8 0 0 1 8 5a2.8 2.8 0 0 1 5.5 1.3C13.5 10.2 8 13.5 8 13.5z"/>'),more:S('<circle cx="3.5" cy="8" r="1.1" fill="currentColor" stroke="none"/><circle cx="8" cy="8" r="1.1" fill="currentColor" stroke="none"/><circle cx="12.5" cy="8" r="1.1" fill="currentColor" stroke="none"/>'),
@@ -40,10 +48,18 @@ const Media=(()=>{
     film:S('<rect x="2" y="3" width="12" height="10" rx="1.5"/><path d="M5 3v10M11 3v10M2 6h3M2 10h3M11 6h3M11 10h3"/>'),tv:S('<rect x="1.5" y="3.5" width="13" height="8.5" rx="1.5"/><path d="M5.5 14.5h5M6 1.5l2 2 2-2"/>'),
     star:S('<path d="M8 2l1.8 3.7 4 .6-2.9 2.8.7 4L8 11.2 4.4 13.1l.7-4L2.2 6.3l4-.6z"/>'),
     game:S('<path d="M4.5 5h7a3 3 0 0 1 3 3v1.5a2 2 0 0 1-3.6 1.2L10 9.5H6l-.9 1.2A2 2 0 0 1 1.5 9.5V8a3 3 0 0 1 3-3z"/><path d="M5 6.8v2M4 7.8h2"/>'),anime:S('<path d="M8 2l1.6 3.4 3.7.5-2.7 2.6.7 3.7L8 10.4l-3.3 1.8.7-3.7L2.7 5.9l3.7-.5z"/>'),
-    book:S('<path d="M3 2.5h6.5a2 2 0 0 1 2 2v9a1.5 1.5 0 0 0-1.5-1.5H3z"/><path d="M11.5 4.5h1.5v9.5h-3"/>'),home:S('<path d="M2.5 7.5L8 3l5.5 4.5M4 6.5V13h8V6.5"/>'),
+    book:S('<path d="M3 2.5h6.5a2 2 0 0 1 2 2v9a1.5 1.5 0 0 0-1.5-1.5H3z"/><path d="M11.5 4.5h1.5v9.5h-3"/>'),
+    up:S('<path d="M5.5 14V7.5L8.5 2c1 0 1.7.8 1.5 1.8L9.5 6.5h3.3a1.2 1.2 0 0 1 1.2 1.4l-1 5A1.3 1.3 0 0 1 11.7 14z"/><path d="M2 7.5h3.5V14H2z"/>'),
+    down:S('<path d="M10.5 2v6.5L7.5 14c-1 0-1.7-.8-1.5-1.8l.5-2.7H3.2A1.2 1.2 0 0 1 2 8.1l1-5A1.3 1.3 0 0 1 4.3 2z"/><path d="M14 8.5h-3.5V2H14z"/>'),
+    gear:S('<circle cx="8" cy="8" r="2"/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M3.4 12.6l1.4-1.4M11.2 4.8l1.4-1.4"/>'),
+    vtv:S('<rect x="1.5" y="3" width="13" height="6.5" rx="1.5"/><path d="M1.5 12.5h5M9.5 12.5h5"/>'),vnf:S('<rect x="1.5" y="2.5" width="3.5" height="5.5" rx=".8"/><rect x="6.25" y="2.5" width="3.5" height="5.5" rx=".8"/><rect x="11" y="2.5" width="3.5" height="5.5" rx=".8"/><path d="M1.5 11h13M1.5 13.5h13"/>'),
+    vcp:S('<rect x="1.5" y="1.5" width="3" height="4" rx=".6"/><rect x="6.5" y="1.5" width="3" height="4" rx=".6"/><rect x="11.5" y="1.5" width="3" height="4" rx=".6"/><rect x="1.5" y="8" width="3" height="4" rx=".6"/><rect x="6.5" y="8" width="3" height="4" rx=".6"/><rect x="11.5" y="8" width="3" height="4" rx=".6"/>'),
+    vls:S('<rect x="1.5" y="2.5" width="3" height="3" rx=".6"/><rect x="1.5" y="10.5" width="3" height="3" rx=".6"/><path d="M6.5 4h8M6.5 12h8"/>'),home:S('<path d="M2.5 7.5L8 3l5.5 4.5M4 6.5V13h8V6.5"/>'),
     minus:S('<path d="M3 8h10"/>'),sync:S('<path d="M13 8a5 5 0 0 1-9 3M3 8a5 5 0 0 1 9-3"/><path d="M12 2v3h-3M4 14v-3h3"/>')};
-  const st={sec:'home',page:'home',qs:'',genre:'',sort:lsg('mc:sort','added'),kind:'',min:0,hero:0,base:[]};
-  const all=()=>[...KB.items.values()].filter(i=>MT.includes(i.type));
+  const LOOK0={view:'tv',cover:100,icon:'m',font:'m',gap:100,dens:'n'};
+  const st={sec:'home',page:'home',qs:'',genre:'',sort:lsg('mc:sort','added'),kind:'',min:0,hero:0,base:[],look:{...LOOK0,...lsg('mc:look',{})}};
+  const V=()=>st.look.view;
+  const all=()=>[...KB.items.values()].filter(i=>AT.includes(i.type));
   const inSec=(it,s)=>SEC[s].types.includes(it.type);
   const flagOf=it=>it.reviewed?'':it.flag?it.flag:(it.match==='unsure'||it.match==='none')?'match':'';
 
@@ -58,7 +74,7 @@ const Media=(()=>{
     return`<div class="mw pb" style="--h:${h}">${fallback(it)}${it.cover?`<div class="mw-bl">${IMG(it.cover,it.cover2)}</div><div class="mw-p">${IMG(it.cover,it.cover2)}</div><div class="mw-t"><b>${E(it.title)}</b><span>${metaShort(it)}</span></div>`:''}</div>`};
   const scoreTxt=it=>it.score?E(it.score.replace(/^IMDb\s*/,'★ ').replace(/^MC\s*/,'MC ')):'';
   const myStars=it=>it.rating?`<span class="mc-my" title="Puanım ${it.rating}/10">${IC.star}${(it.rating/2).toFixed(it.rating%2?1:0)}</span>`:'';
-  function metaShort(it){const a=[];if(it.year)a.push(it.year);if(it.type==='game'&&it.platforms.length)a.push(it.platforms.slice(0,2).join(' · '));else if(it.genres.length)a.push(it.genres[0]);
+  function metaShort(it){const a=[];if(it.type==='book'&&it.author)a.push(it.author);if(it.year)a.push(it.year);if(it.type==='game'&&it.platforms.length)a.push(it.platforms.slice(0,2).join(' · '));else if(it.genres.length)a.push(it.genres[0]);
     if(it.type==='series'&&it.season)a.push(`S${it.season}${it.ep?' B'+it.ep:''}`);return a.map(E).join(' · ')}
   function metaLong(it){const a=[TN[it.type]];if(it.year)a.push(it.year);if(it.genres.length)a.push(it.genres.slice(0,3).join(', '));if(it.type==='game'&&it.platforms.length)a.push(it.platforms.slice(0,4).join(' · '));
     if(it.eps)a.push(it.eps+' bölüm');return a.map(E).join('<i>·</i>')}
@@ -73,9 +89,9 @@ const Media=(()=>{
         <div class="mc-hov"></div></div>
       <div class="mc-cap"><b>${E(it.title)}</b><small>${metaShort(it)||TN[it.type]}${myStars(it)}</small></div></article>`}
   // karttaki hızlı durum düğmesi: listede değilse “listeye ekle”, listedeyse “izledim / bitirdim”
-  function quick(it){const g=it.type==='game';
-    if(!it.status)return`<button class="mc-b pri" data-mq="todo" title="${g?'Oynamak istediklerime ekle':'İzleme listeme ekle'}" aria-label="${g?'İstek listesine ekle':'İzleme listesine ekle'}">${IC.plus}</button>`;
-    if(it.status==='todo'||it.status==='doing')return`<button class="mc-b pri" data-mq="${g?'done':'done'}" title="${g?'Bitirdim':'İzledim'}" aria-label="${g?'Bitirdim olarak işaretle':'İzledim olarak işaretle'}">${IC.check}</button>`;
+  function quick(it){const g=it.type==='game',b=it.type==='book',S0=stOf(it);
+    if(!S0)return`<button class="mc-b pri" data-mq="todo" title="${g?'Oynamak istediklerime ekle':b?'Okuma listeme ekle':'İzleme listeme ekle'}" aria-label="${g?'İstek listesine ekle':b?'Okuma listesine ekle':'İzleme listesine ekle'}">${IC.plus}</button>`;
+    if(S0==='todo'||S0==='doing'||S0==='dropped')return`<button class="mc-b pri" data-mq="done" title="${g?'Bitirdim':b?'Okudum':'İzledim'}" aria-label="${g?'Bitirdim olarak işaretle':b?'Okundu olarak işaretle':'İzledim olarak işaretle'}">${IC.check}</button>`;
     return`<button class="mc-b on" data-mq="todo" title="${E(stName(it))} — tekrar listeye al" aria-label="Listeye geri al">${IC.check}</button>`}
 
   const hovHTML=it=>{const s=stName(it);return`<div class="mc-qa">${quick(it)}<button class="mc-b" data-mq="fav" aria-label="${it.fav?'Favorilerden çıkar':'Favorilere ekle'}" title="Favori" aria-pressed="${it.fav}">${IC.heart}</button><button class="mc-b" data-mq="more" aria-label="Diğer işlemler" title="Diğer">${IC.more}</button></div>
@@ -87,7 +103,17 @@ const Media=(()=>{
   function lazyWatch(){io?.disconnect();if(!('IntersectionObserver'in window)){qa('.mc [data-lz]').forEach(fillLz);return}
     io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){io.unobserve(e.target);fillLz(e.target)}}),{root:q('#scroll'),rootMargin:'900px 0px'});qa('.mc [data-lz]').forEach(z=>io.observe(z))}
   function fillLz(z){const h=LZ.get(z.dataset.lz);LZ.delete(z.dataset.lz);if(h==null)return;z.outerHTML=h;arrows()}
-  function shelf(title,list,o={}){if(!list.length)return'';const v=o.v||'p';
+  /* görünüm: tv = Apple TV (geniş büyük kapaklar) · nf = Netflix (yoğun posterler) · compact (küçük, az metin) · list (satırlar) */
+  const vOf=v=>V()==='tv'?(v==='r'?'r':'w'):V()==='compact'?'p':v;
+  const likeIc=it=>it.like>0?`<span class="ml-lk up" title="Beğendim">${IC.up}</span>`:it.like<0?`<span class="ml-lk down" title="Beğenmedim">${IC.down}</span>`:'<span class="ml-lk none" title="Değerlendirmedim">—</span>';
+  function lrow(it){const s=stName(it);return`<article class="ml-r t-${it.type}" data-mi="${it.id}" tabindex="0" aria-label="${E(it.title)}">${poster(it,'ml-p')}
+      <span class="ml-t"><b>${E(it.title)}</b><small>${E(TN[it.type])}${metaShort(it)?' · '+metaShort(it):''}</small></span>
+      <span class="ml-s">${s?E(s):'<i>—</i>'}</span><span class="ml-sc">${it.rating?`<b>${it.rating}</b><small>/10</small>`:'<i>—</i>'}</span>${likeIc(it)}
+      <button class="ml-f${it.fav?' on':''}" data-mq="fav" aria-pressed="${it.fav}" aria-label="${it.fav?'Favorilerden çıkar':'Favorilere ekle'}" title="Favori">${IC.heart}</button></article>`}
+  const listHTML=l=>`<div class="ml"><div class="ml-hd" aria-hidden="true"><span></span><span>Ad</span><span>Durum</span><span>Puanım</span><span>Beğeni</span><span></span></div>${l.map(lrow).join('')}</div>`;
+  const gridHTML=(l,s)=>V()==='list'?listHTML(l):`<div class="mc-grid v-${V()==='tv'?'w':s==='games'?'g':'p'}">${l.map(it=>card(it,V()==='tv'?'w':'p')).join('')}</div>`;
+  function shelf(title,list,o={}){if(!list.length)return'';const v=vOf(o.v||'p');
+    if(V()==='list')return`<section class="mc-shelf ml-shelf"><header><h2>${E(title)}</h2>${o.href?`<a class="mc-all" href="${o.href}">Tümünü gör${IC.r}</a>`:''}</header>${listHTML(list.slice(0,6))}</section>`;
     return`<section class="mc-shelf${o.cls?' '+o.cls:''}"><header><h2>${E(title)}</h2>${o.sub?`<p>${E(o.sub)}</p>`:''}${o.href?`<a class="mc-all" href="${o.href}">Tümünü gör${IC.r}</a>`:''}</header>
       <div class="mc-rw"><button class="mc-arr l" data-row="-1" aria-label="Sola kaydır" tabindex="-1">${IC.l}</button><div class="mc-row v-${v}">${list.map((it,i)=>card(it,v,i+1)).join('')}</div><button class="mc-arr r" data-row="1" aria-label="Sağa kaydır" tabindex="-1">${IC.r}</button></div></section>`}
 
@@ -95,7 +121,7 @@ const Media=(()=>{
   function featured(list){const day=new Date().toDateString();const sc=it=>(it.status==='doing'?6:0)+(it.fav?3:0)+(it.backdrop?4:0)+(it.cover?2:-20)+(parseFloat(it.score)||0)/3+(hash(it.id+day)%100)/40;
     return list.filter(i=>i.cover||i.backdrop).sort((a,b)=>sc(b)-sc(a)).slice(0,5)}
   function kicker(it){return it.status==='doing'?(it.type==='game'?'Şu an oynuyorsun':'Kaldığın yerden devam et'):it.status==='todo'?(it.type==='game'?'Oynamak istediklerinden':'İzleme listenden'):it.fav?'Favorilerinden':it.status==='done'||it.status==='played'?(it.type==='game'?'Oynadıkların arasından':'İzlediklerinden'):'Kütüphanenden'}
-  function hero(list){if(!list.length)return'';
+  function hero(list){if(!list.length||V()==='compact'||V()==='list')return'';
     return`<section class="mh" aria-roledescription="carousel" aria-label="Öne çıkanlar"><div class="mh-sl">${list.map((it,i)=>{const wide=!!it.backdrop;
       return`<div class="mh-s${i===st.hero%list.length?' on':''}" data-i="${i}" aria-hidden="${i!==st.hero%list.length}">
         <div class="mh-bg ${wide?'wide':'post'}">${IMG(it.backdrop||it.cover,wide?it.cover:it.cover2,'',i===0)}</div><div class="mh-gr"></div>
@@ -114,75 +140,78 @@ const Media=(()=>{
   /* ── sayfalar ── */
   const byAdded=l=>l.slice().sort((a,b)=>b.added-a.added),byScore=l=>l.slice().sort((a,b)=>(b.rating||parseFloat(b.score.replace(/[^\d.]/g,''))/(b.type==='game'?10:1)||0)-(a.rating||parseFloat(a.score.replace(/[^\d.]/g,''))/(a.type==='game'?10:1)||0));
   const byTouch=l=>l.slice().sort((a,b)=>(b.opened||b.updated)-(a.opened||a.updated));
-  function homeHTML(){const l=all();if(!l.length)return emptyHome();const w=l.filter(i=>i.type!=='game'),g=l.filter(i=>i.type==='game');
-    const rev=l.filter(flagOf).length;
+  function homeHTML(){const l=all();if(!l.length)return emptyHome();const w=l.filter(i=>i.type!=='game'&&i.type!=='book');
+    const rev=l.filter(flagOf).length,of=t=>l.filter(i=>i.type===t);
     return hero(featured(l))+`<div class="mc-shelves">
       ${(Library.impBanner?.()||'').replace('class="imp"','class="imp mc-imp"')}
       ${rev?`<a class="mc-rev" href="#lib/m/${secOf(l.find(flagOf).type)}/review">${IC.warn}<span><b>${rev} kayıt incelemeni bekliyor</b><small>Türü ya da posteri kesin olmayanları işaretledim — rastgele bir kategoriye atmadım.</small></span>${IC.r}</a>`:''}
-      ${shelf('İzlemeye devam ettiklerin',byTouch(w.filter(i=>i.status==='doing')),{v:'w2',href:'#lib/m/tv/doing'})}
-      ${shelf('Son eklenenler',byAdded(l).slice(0,18),{})}
-      ${shelf('İzleme listenden öneriler',byScore(w.filter(i=>i.status==='todo')).slice(0,18),{sub:'Puanı en yüksekten başlayarak',href:'#lib/m/tv/todo'})}
-      ${lazy(shelf('Son oynadığın oyunlar',byTouch(g.filter(i=>['doing','played','done'].includes(i.status))).slice(0,12),{v:'w',cls:'games',href:'#lib/m/games/played'}))}
-      ${lazy(shelf('Oynamak istediklerin',byScore(g.filter(i=>i.status==='todo')),{cls:'games',href:'#lib/m/games/todo'}))}
+      ${shelf('Kaldığın yerden devam et',byTouch(w.filter(i=>i.status==='doing')),{v:'w2'})}
+      ${shelf('Filmler',byAdded(of('movie')).slice(0,20),{href:'#lib/m/movies'})}
+      ${shelf('Diziler',byAdded(of('series')).slice(0,20),{href:'#lib/m/series'})}
+      ${lazy(shelf('Animeler',byAdded(of('anime')).slice(0,20),{cls:'anime',href:'#lib/m/anime'}))}
+      ${lazy(shelf('Oyunlar',byTouch(of('game')).slice(0,16),{v:'w',cls:'games',href:'#lib/m/games'}))}
+      ${lazy(shelf('Kitaplar',byAdded(of('book')).slice(0,20),{cls:'books',href:'#lib/m/books'}))}
       ${lazy(shelf('Favorilerin',byTouch(l.filter(i=>i.fav)),{}))}
       ${lazy(shelf('En sevdiklerin',byScore(w.filter(i=>i.status==='done')).slice(0,10),{v:'r',sub:'İzlediklerin arasında en yüksek puanlılar'}))}
-      ${lazy(shelf('Anime arşivin',byScore(l.filter(i=>i.type==='anime')).slice(0,18),{cls:'anime',href:'#lib/m/anime'}))}
       ${lazy(docsShelf())}</div>`}
-  function docsShelf(){const d=[...KB.items.values()].filter(i=>!MT.includes(i.type));if(!d.length)return'';
-    return`<section class="mc-shelf docs"><header><h2>Kütüphane</h2><p>Kitaplar, PDF'ler, makaleler</p><a class="mc-all" href="#lib/docs">Kütüphaneye git${IC.r}</a></header><div class="mc-docs">${d.slice(0,8).map(it=>`<a class="mc-doc" href="#lib/i/${it.id}">${Library.cover(it,'mini')}<span><b>${E(it.title)}</b><small>${E((KB.TYPES[it.type]||KB.TYPES.file).n)}</small></span></a>`).join('')}</div></section>`}
+  function docsShelf(){const d=[...KB.items.values()].filter(i=>!AT.includes(i.type));if(!d.length)return'';
+    return`<section class="mc-shelf docs"><header><h2>Belgeler</h2><p>PDF'ler, makaleler, videolar</p><a class="mc-all" href="#lib/docs">Belgelere git${IC.r}</a></header><div class="mc-docs">${d.slice(0,8).map(it=>`<a class="mc-doc" href="#lib/i/${it.id}">${Library.cover(it,'mini')}<span><b>${E(it.title)}</b><small>${E((KB.TYPES[it.type]||KB.TYPES.file).n)}</small></span></a>`).join('')}</div></section>`}
   function emptyHome(){return`<section class="mc-empty"><div class="mc-e-art" aria-hidden="true">${['#E5484D','#B07CFF','#66C0F4','#F0A04B','#30A46C'].map((c,i)=>`<span style="--c:${c};--i:${i}"></span>`).join('')}</div>
       <h2>Kişisel sinema salonun, anime arşivin ve oyun kütüphanen</h2><p>İzlediğin filmleri, devam ettiğin dizileri ve oynadığın oyunları ekle — posterleri ve bilgileri otomatik bulunur.</p>
       <div class="mh-b"><button class="mb pri" data-madd>${IC.plus}İlk içeriği ekle</button></div>${(Library.impBanner?.()||'').replace('class="imp"','class="imp mc-imp"')}</section>`}
-  function secHome(s){const l=all().filter(i=>inSec(i,s)),c=SEC[s];if(!l.length)return secEmpty(s,'home');const g=s==='games';
-    const genres=topGenres(l).slice(0,4);
+  function secHome(s){const l=all().filter(i=>inSec(i,s));if(!l.length)return secEmpty(s,'home');const g=s==='games',b=s==='books',ser=s==='series'||s==='anime';
+    const genres=topGenres(l).slice(0,4),p=k=>l.filter(i=>stOf(i)===k);
     return hero(featured(l))+`<div class="mc-shelves">
-      ${shelf(g?'Şu an oynadıkların':'Devam ettiklerin',byTouch(l.filter(i=>i.status==='doing')),{v:g?'w':'w2',href:`#lib/m/${s}/doing`})}
-      ${shelf(g?'Oynamak istediklerin':'İzleme listen',byScore(l.filter(i=>i.status==='todo')),{href:`#lib/m/${s}/todo`})}
-      ${s==='tv'?shelf('Filmler',byAdded(l.filter(i=>i.type==='movie')).slice(0,20),{href:'#lib/m/tv/done'})+lazy(shelf('Diziler',byAdded(l.filter(i=>i.type==='series')).slice(0,20),{href:'#lib/m/tv/done'})):''}
-      ${lazy(shelf(g?'En yüksek puanlı oyunların':'En yüksek puanlılar',byScore(l.filter(i=>i.status==='done'||i.status==='played')).slice(0,10),{v:'r'}))}
-      ${g?lazy(shelf('Oynadıkların',byTouch(l.filter(i=>i.status==='played'||i.status==='done')).slice(0,24),{v:'w',href:'#lib/m/games/played'})):''}
+      ${shelf(g?'Şu an oynadıkların':b?'Okuduğun kitaplar':'Devam ettiklerin',byTouch(p('doing')),{v:g?'w':b?'p':'w2',href:`#lib/m/${s}/doing`})}
+      ${shelf(g?'Oynamak istediklerin':b?'Okumak istediklerin':'İzlemek istediklerin',byScore(p('todo')),{href:`#lib/m/${s}/todo`})}
+      ${shelf('Son eklenenler',byAdded(l).slice(0,20),{href:`#lib/m/${s}/all`})}
+      ${ser?lazy(shelf('Yarım bıraktıkların',byTouch(p('dropped')),{href:`#lib/m/${s}/dropped`})):''}
+      ${lazy(shelf(g?'En yüksek puanlı oyunların':b?'Okudukların':'En yüksek puanlılar',byScore(l.filter(i=>['done','played'].includes(stOf(i)))).slice(0,10),{v:b?'p':'r',href:`#lib/m/${s}/${g?'played':'done'}`}))}
       ${genres.map(gn=>lazy(shelf(gn,byScore(l.filter(i=>i.genres.includes(gn))).slice(0,18),{href:`#lib/m/${s}/all?g=${encodeURIComponent(gn)}`}))).join('')}
       ${lazy(shelf('Favorilerin',l.filter(i=>i.fav),{href:`#lib/m/${s}/fav`}))}</div>`}
   function topGenres(l){const m=new Map();l.forEach(i=>i.genres.forEach(g=>m.set(g,(m.get(g)||0)+1)));return[...m].filter(x=>x[1]>=3).sort((a,b)=>b[1]-a[1]).map(x=>x[0])}
-  function secEmpty(s,page){const g=s==='games',m={home:[g?'Oyun kütüphanen boş':'Henüz bir şey yok',g?'Oynadığın ya da oynamak istediğin oyunları ekle; Steam kapakları ve platform bilgisi otomatik gelir.':'Bir film ya da dizi ekle; posteri, yılı ve türü otomatik bulunur.'],
+  function secEmpty(s,page){const g=s==='games',b=s==='books',m={home:[g?'Oyun kütüphanen boş':b?'Henüz kitap yok':'Henüz bir şey yok',g?'Oynadığın ya da oynamak istediğin oyunları ekle; Steam kapakları ve platform bilgisi otomatik gelir.':b?'Bir kitap ekle; kapağı ve yazarı otomatik bulunur.':'Bir içerik ekle; posteri, yılı ve türü otomatik bulunur.'],dropped:['Yarım bıraktığın bir şey yok','Bir diziyi “Yarım bıraktım” yaparsan burada durur.'],
       done:['Henüz izlediğin bir şey yok','Bir içeriği “İzledim” olarak işaretlediğinde burada görünür.'],doing:[g?'Şu an oynadığın bir oyun yok':'Devam ettiğin bir şey yok',g?'Bir oyunu “Oynuyorum” yap, burada bekler.':'Bir diziyi “İzliyorum” yap; kaldığın sezon/bölümü de tutarım.'],
       todo:[g?'İstek listen boş':'İzleme listen boş','Kartlardaki + ile listene ekle.'],fav:['Favorin yok','Kartlardaki kalple favorilere ekleyebilirsin.'],played:['Henüz oynadığın oyun yok','Oynadığın oyunları ekle.'],review:['İncelenecek bir şey yok','Her kaydın türü ve posteri kesin görünüyor.'],all:['Sonuç yok','Filtreleri değiştir.']}[page]||['Burada bir şey yok',''];
-    return`<div class="mc-none"><span>${IC[g?'game':s==='anime'?'anime':'film']}</span><b>${m[0]}</b><p>${m[1]}</p><button class="mb pri" data-madd>${IC.plus}İçerik ekle</button></div>`}
+    return`<div class="mc-none"><span>${IC[SEC[s]?.ic||'film']}</span><b>${m[0]}</b><p>${m[1]}</p><button class="mb pri" data-madd>${IC.plus}İçerik ekle</button></div>`}
   function filt(l){let r=l;if(st.kind)r=r.filter(i=>i.type===st.kind);if(st.genre)r=r.filter(i=>i.genres.includes(st.genre));
     if(st.min)r=r.filter(i=>(i.rating||(parseFloat(i.score.replace(/[^\d.]/g,''))/(i.type==='game'?10:1))||0)>=st.min);
     const k=st.sort;r=r.slice();if(k==='title')r.sort((a,b)=>a.title.localeCompare(b.title,'tr'));else if(k==='year')r.sort((a,b)=>(+b.year||0)-(+a.year||0));else if(k==='score')r=byScore(r);else if(k==='rating')r.sort((a,b)=>b.rating-a.rating);else r=byAdded(r);return r}
-  function pageHTML(s,page){const base=all().filter(i=>inSec(i,s));const l=page==='all'?base:base.filter(it=>page==='fav'?it.fav:page==='played'?['played','done'].includes(it.status):page==='review'?!!flagOf(it):it.status===page);
+  function pageHTML(s,page){const base=all().filter(i=>inSec(i,s));const l=base.filter(it=>page==='review'?!!flagOf(it):inPage(it,page));
     const genres=topGenres(l.length>=6?l:base).slice(0,14),r=filt(l),t=(SEC[s].pages.find(p=>p[0]===page)||[0,page==='review'?'İnceleme':'Tümü'])[1];
-    const tools=page==='review'?'':`<div class="mc-tools">${s==='tv'?`<div class="mc-seg" role="group" aria-label="Tür">${[['','Hepsi'],['movie','Filmler'],['series','Diziler']].map(([k,n])=>`<button data-mk="${k}" class="${st.kind===k?'on':''}">${n}</button>`).join('')}</div>`:''}
+    const tools=page==='review'?'':`<div class="mc-tools">
         ${genres.length?`<div class="mc-gen" role="group" aria-label="Tür filtresi"><button data-mg="" class="${st.genre?'':'on'}">Tüm türler</button>${genres.map(g=>`<button data-mg="${E(g)}" class="${st.genre===g?'on':''}">${E(g)}</button>`).join('')}</div>`:''}
         <span class="grow"></span><label class="mc-sel">Puan<select data-mmin aria-label="En düşük puan">${[[0,'Hepsi'],[7,'7+'],[8,'8+'],[9,'9+']].map(([v,n])=>`<option value="${v}"${+st.min===v?' selected':''}>${n}</option>`).join('')}</select></label>
         <label class="mc-sel">Sırala<select data-msort aria-label="Sıralama">${[['added','Eklenme'],['title','Ad'],['year','Yıl'],['score','Genel puan'],['rating','Puanım']].map(([v,n])=>`<option value="${v}"${st.sort===v?' selected':''}>${n}</option>`).join('')}</select></label></div>`;
-    return`<div class="mc-page"><header class="mc-ph"><h1>${E(t)}</h1><p>${r.length} ${s==='games'?'oyun':'içerik'}${page==='review'?' · türü ya da posteri kesin olmayanlar':''}</p></header>${tools}
-      ${page==='review'&&l.length?`<div class="mc-revl">${l.map(reviewRow).join('')}</div>`:r.length?`<div class="mc-grid v-${s==='games'?'g':'p'}">${r.map(it=>card(it,'p')).join('')}</div>`:secEmpty(s,l.length?'all':page)}</div>`}
+    return`<div class="mc-page"><header class="mc-ph"><h1>${E(t)}</h1><p>${r.length} ${s==='games'?'oyun':s==='books'?'kitap':'içerik'}${page==='review'?' · türü ya da posteri kesin olmayanlar':''}</p></header>${tools}
+      ${page==='review'&&l.length?`<div class="mc-revl">${l.map(reviewRow).join('')}</div>`:r.length?gridHTML(r,s):secEmpty(s,l.length?'all':page)}</div>`}
   function reviewRow(it){return`<div class="mc-rr">${poster(it,'sm')}<div><b>${E(it.title)}</b><small>${E(TN[it.type])}${it.year?' · '+E(it.year):''} · ${it.flag==='type'?'Türü belirsiz':it.match==='none'?'Eşleşme bulunamadı':'Eşleşme kesin değil'}</small>
       <p>${E(it.flagWhy||(it.match==='none'?'Bu adla, bu türde güvenilir bir kayıt bulunamadı. Adı düzeltirsen ya da başka aday seçersen posteri gelir.':`“${it.wiki?decodeURIComponent(it.wiki).replace(/_/g,' '):it.title}” ile eşleştirdim ama adı ya da yılı birebir tutmuyor.`))}</p></div>
       <div class="mc-rb">${it.flag==='type'&&it.flagTo?`<button class="mb sm" data-mfix="move" data-id="${it.id}">${TN[it.flagTo]} yap</button>`:''}<button class="mb sm" data-mfix="ok" data-id="${it.id}">${IC.check}Doğru</button><button class="mb sm pri" data-mo="${it.id}">İncele</button></div></div>`}
   function searchHTML(){const qq=norm(st.qs),l=all().filter(i=>norm(i.title+' '+i.genres.join(' ')+' '+(i.wiki||'')).includes(qq));
     const g=s=>l.filter(i=>inSec(i,s));
-    return`<div class="mc-page"><header class="mc-ph"><h1>“${E(st.qs)}”</h1><p>${l.length} sonuç</p></header>${l.length?['tv','anime','games'].map(s=>g(s).length?`<h3 class="mc-h3">${SEC[s].n}</h3><div class="mc-grid v-${s==='games'?'g':'p'}">${g(s).map(it=>card(it)).join('')}</div>`:'').join(''):`<div class="mc-none"><span>${IC.search}</span><b>Bulunamadı</b><p>Başka bir ad dene ya da yeni içerik olarak ekle.</p><button class="mb pri" data-madd="${E(st.qs)}">${IC.plus}“${E(st.qs)}” ekle</button></div>`}</div>`}
+    return`<div class="mc-page"><header class="mc-ph"><h1>“${E(st.qs)}”</h1><p>${l.length} sonuç</p></header>${l.length?ORDER.map(s=>g(s).length?`<h3 class="mc-h3">${SEC[s].n}</h3>${gridHTML(g(s),s)}`:'').join(''):`<div class="mc-none"><span>${IC.search}</span><b>Bulunamadı</b><p>Başka bir ad dene ya da yeni içerik olarak ekle.</p><button class="mb pri" data-madd="${E(st.qs)}">${IC.plus}“${E(st.qs)}” ekle</button></div>`}</div>`}
 
   /* ── kabuk ── */
-  function nav(){const tabs=[['home','Ana sayfa','#lib',IC.home],['tv','Film & Dizi','#lib/m/tv',IC.film],['anime','Anime','#lib/m/anime',IC.anime],['games','Oyunlar','#lib/m/games',IC.game]];
-    const sub=st.sec!=='home'?SEC[st.sec].pages.map(([k,n])=>{const c=k==='home'?'':all().filter(i=>inSec(i,st.sec)&&(k==='fav'?i.fav:k==='played'?['played','done'].includes(i.status):i.status===k)).length;
+  const VIEWS=[['tv','Apple TV',IC.vtv],['nf','Netflix',IC.vnf],['compact','Kompakt',IC.vcp],['list','Liste',IC.vls]];
+  const viewSeg=()=>`<div class="mc-vw" role="radiogroup" aria-label="Görünüm">${VIEWS.map(([k,n,ic])=>`<button role="radio" data-lv="${k}" aria-checked="${V()===k}" class="${V()===k?'on':''}" title="${n} görünümü" aria-label="${n} görünümü">${ic}</button>`).join('')}</div>`;
+  function nav(){const tabs=[['home','Ana sayfa','#lib',IC.home],...ORDER.map(k=>[k,SEC[k].n,'#lib/m/'+k,IC[SEC[k].ic]])];
+    const sub=st.sec!=='home'?SEC[st.sec].pages.map(([k,n])=>{const c=k==='home'?'':all().filter(i=>inSec(i,st.sec)&&inPage(i,k)).length;
         return`<a href="#lib/m/${st.sec}${k==='home'?'':'/'+k}" class="${st.page===k?'on':''}"${st.page===k?' aria-current="page"':''}>${n}${k==='home'?'':`<em>${c}</em>`}</a>`}).join('')+(()=>{const r=all().filter(i=>inSec(i,st.sec)&&flagOf(i)).length;return r?`<a href="#lib/m/${st.sec}/review" class="rev${st.page==='review'?' on':''}">${IC.warn}İnceleme<em>${r}</em></a>`:''})():'';
     return`<nav class="mc-nav" aria-label="Medya bölümleri"><a class="mc-brand" href="#lib" aria-label="Medya ana sayfa"><span>${IC.play}</span><b>Medya</b></a>
-      <div class="mc-tabs">${tabs.map(([k,n,h,ic])=>`<a href="${h}" class="t-${k}${st.sec===k?' on':''}"${st.sec===k?' aria-current="page"':''}>${ic}<span>${n}</span></a>`).join('')}<a href="#lib/docs" class="t-docs">${IC.book}<span>Kütüphane</span></a></div>
-      <label class="mc-s">${IC.search}<input data-ms value="${E(st.qs)}" placeholder="Film, dizi, anime, oyun ara" aria-label="Medyada ara" autocomplete="off"><kbd>/</kbd></label>
+      <div class="mc-tabs">${tabs.map(([k,n,h,ic])=>`<a href="${h}" class="t-${k}${st.sec===k?' on':''}"${st.sec===k?' aria-current="page"':''}>${ic}<span>${n}</span></a>`).join('')}<a href="#lib/docs" class="t-docs">${IC.link}<span>Belgeler</span></a></div>
+      <label class="mc-s">${IC.search}<input data-ms value="${E(st.qs)}" placeholder="Ara" aria-label="Film, dizi, anime, oyun ve kitap ara" autocomplete="off"><kbd>/</kbd></label>
+      ${viewSeg()}<button class="mc-gear" data-mset aria-label="Görünüm ayarları" title="Görünüm ayarları" aria-haspopup="dialog">${IC.gear}</button>
       <span class="mc-sync" aria-live="polite"${R.busy?'':' hidden'}>${IC.sync}<span>${R.busy?syncTxt():''}</span></span>
       <button class="mb pri mc-addb" data-madd>${IC.plus}<span>Ekle</span></button></nav>${sub?`<div class="mc-sub" role="navigation" aria-label="${E(SEC[st.sec].n)} sayfaları">${sub}</div>`:''}`}
   const syncTxt=()=>`Posterler eşleşiyor ${R.done}/${R.total}`;
   function body(){if(st.qs)return searchHTML();if(st.sec==='home')return homeHTML();if(st.page==='home')return secHome(st.sec);return pageHTML(st.sec,st.page)}
-  function parse(parts){const p=parts||[];let sec='home',page='home',gq='';if(p[0]==='m'){sec=SEC[p[1]]?p[1]:'home';let pg=p[2]||'home';const i=pg.indexOf('?');if(i>=0){gq=decodeURIComponent((pg.slice(i+1).match(/g=([^&]*)/)||[])[1]||'');pg=pg.slice(0,i)}page=pg}
+  function parse(parts){const p=parts||[];let sec='home',page='home',gq='';if(p[0]==='m'){const k=p[1]==='tv'?'movies':p[1];sec=SEC[k]?k:'home';let pg=p[2]||'home';const i=pg.indexOf('?');if(i>=0){gq=decodeURIComponent((pg.slice(i+1).match(/g=([^&]*)/)||[])[1]||'');pg=pg.slice(0,i)}page=pg}
     return{sec,page,gq}}
   function render(parts,o={}){const p=parse(parts);const changed=p.sec!==st.sec||p.page!==st.page;st.base=parts||[];
     if(changed){st.kind='';st.genre='';st.min=0;st.hero=0}st.sec=p.sec;st.page=p.page;if(p.gq){st.genre=p.gq;st.page='all'}if(changed||!o.keepQ)st.qs='';
     const v=q('#view');let root=q('#view>.mc');if(!root){v.innerHTML='<div class="mc"></div>';root=q('#view>.mc');wire(root)}
-    root.dataset.sec=st.sec;root.innerHTML=nav()+`<main class="mc-main">${body()}</main>`;
+    root.dataset.sec=st.sec;applyLook(root);root.innerHTML=nav()+`<main class="mc-main">${body()}</main>`;
     document.getElementById('app')?.classList.add('mc-on');
     if(typeof setCrumb==='function')setCrumb(IC.play,st.sec==='home'?'Medya':SEC[st.sec].n,'');
     if(changed&&!o.soft)q('#scroll').scrollTop=0;else if(changed)q('#scroll').scrollTop=0;
@@ -200,6 +229,8 @@ const Media=(()=>{
       const rw=t.closest('[data-row]');if(rw){const r=rw.parentElement.querySelector('.mc-row');r.scrollBy({left:+rw.dataset.row*r.clientWidth*.86,behavior:motion()?'smooth':'auto'});return}
       const hd=t.closest('[data-hd]');if(hd){heroGo(+hd.dataset.hd);return}
       const mk=t.closest('[data-mk]');if(mk){st.kind=mk.dataset.mk;swap();return}
+      const lv=t.closest('[data-lv]');if(lv){setLook('view',lv.dataset.lv,true);q('.mset')&&qa('.mset [data-lk=view]').forEach(x=>{const on=x.dataset.lval===V();x.classList.toggle('on',on);x.setAttribute('aria-checked',on)});return}
+      const ms=t.closest('[data-mset]');if(ms){q('.mset')?q('.mset').remove():settings(ms);return}
       const mg=t.closest('[data-mg]');if(mg){st.genre=mg.dataset.mg;swap();return}
       const ad=t.closest('[data-madd]');if(ad){addSheet(ad.dataset.madd||'');return}
       const fx=t.closest('[data-mfix]');if(fx){fix(fx.dataset.id,fx.dataset.mfix);return}
@@ -215,6 +246,28 @@ const Media=(()=>{
     // dokunmatik: kartın üstünde uzun bas → hızlı menü
     let lp=0;root.addEventListener('touchstart',e=>{const c=e.target.closest('[data-mi]');if(!c)return;lp=setTimeout(()=>{lp=-1;menu(c.dataset.mi,c)},520)},{passive:true});
     root.addEventListener('touchend',e=>{if(lp===-1){e.preventDefault()}clearTimeout(lp);lp=0});root.addEventListener('touchmove',()=>{clearTimeout(lp)},{passive:true})}
+  /* görünüm ayarları: anında uygulanır, mc:look'a kaydedilir (içerik verisine dokunmaz) */
+  function applyLook(root=q('#view>.mc')){if(!root)return;const L=st.look,F={s:.92,m:1,l:1.1},IZ={s:'14px',m:'16px',l:'19px'},DZ={r:1.22,n:1,s:.8};
+    root.dataset.view=L.view;const sp=(k,v)=>root.style.setProperty(k,v);sp('--cz',L.cover/100);sp('--gz',L.gap/100);sp('--fz',F[L.font]||1);sp('--iz',IZ[L.icon]||'16px');sp('--dz',DZ[L.dens]||1)}
+  function setLook(k,v,redraw){st.look[k]=v;lss('mc:look',st.look);applyLook();if(redraw){swap();qa('.mc [data-lv]').forEach(b=>{const on=b.dataset.lv===V();b.classList.toggle('on',on);b.setAttribute('aria-checked',on)})}}
+  function settings(anchor){q('.mset')?.remove();const L=st.look,seg=(k,o)=>`<div class="mset-seg" role="radiogroup">${o.map(([v,n])=>`<button role="radio" data-lk="${k}" data-lval="${v}" aria-checked="${L[k]===v}" class="${L[k]===v?'on':''}">${n}</button>`).join('')}</div>`;
+    const el=document.createElement('div');el.className='mset';el.setAttribute('role','dialog');el.setAttribute('aria-label','Görünüm ayarları');
+    el.innerHTML=`<header><b>Görünüm</b><button class="mset-x" data-msx aria-label="Kapat">${IC.x}</button></header>
+      <label>Görünüm türü</label>${seg('view',VIEWS.map(([k,n])=>[k,n]))}
+      <label for="mset-c">Kapak boyutu <output>${L.cover}%</output></label><input id="mset-c" type="range" min="70" max="150" step="5" value="${L.cover}" data-lr="cover">
+      <label for="mset-g">Kart aralığı <output>${L.gap}%</output></label><input id="mset-g" type="range" min="40" max="200" step="10" value="${L.gap}" data-lr="gap">
+      <label>Izgara yoğunluğu</label>${seg('dens',[['r','Rahat'],['n','Normal'],['s','Sıkı']])}
+      <label>Yazı boyutu</label>${seg('font',[['s','Küçük'],['m','Orta'],['l','Büyük']])}
+      <label>İkon boyutu</label>${seg('icon',[['s','Küçük'],['m','Orta'],['l','Büyük']])}
+      <button class="mset-r" data-msr>Varsayılana dön</button>`;
+    q('#view>.mc').appendChild(el);const r=anchor.getBoundingClientRect();el.style.top=Math.round(r.bottom+8)+'px';el.style.right=Math.max(8,Math.round(innerWidth-r.right))+'px';
+    el.addEventListener('input',e=>{const t=e.target;if(t.dataset.lr){t.previousElementSibling.querySelector('output').textContent=t.value+'%';setLook(t.dataset.lr,+t.value)}});
+    el.addEventListener('click',e=>{const t=e.target;if(t.closest('[data-msx]'))return el.remove();
+      if(t.closest('[data-msr]')){st.look={...LOOK0};lss('mc:look',st.look);applyLook();swap();el.remove();settings(anchor);return}
+      const b=t.closest('[data-lk]');if(b){setLook(b.dataset.lk,b.dataset.lval,b.dataset.lk==='view');qa(`[data-lk="${b.dataset.lk}"]`,el).forEach(x=>{const on=x===b;x.classList.toggle('on',on);x.setAttribute('aria-checked',on)})}});
+    setTimeout(()=>el.querySelector('button.on,input')?.focus(),0)}
+  addEventListener('pointerdown',e=>{const m=q('.mset');if(m&&!m.contains(e.target)&&!e.target.closest('[data-mset]'))m.remove()});
+  addEventListener('keydown',e=>{if(e.key==='Escape'&&q('.mset')){q('.mset').remove();q('[data-mset]')?.focus()}});
   function swap(){const m=q('.mc .mc-main');if(!m)return;const y=q('#scroll').scrollTop;m.innerHTML=body();q('#scroll').scrollTop=y;arrows();lazyWatch()}
   addEventListener('keydown',e=>{if(!q('#view>.mc')||e.metaKey||e.ctrlKey||e.altKey)return;if(e.target.closest?.('input,textarea,select,[contenteditable]'))return;if(q('.mx-bg,.ma-bg,.mq,.pal-bg'))return;
     if(e.key==='/'){e.preventDefault();q('.mc [data-ms]')?.focus()}else if(e.key==='a'||e.key==='A'){e.preventDefault();addSheet()}});
@@ -245,6 +298,15 @@ const Media=(()=>{
     const sc=q('.mx',bg).scrollTop;bg.dataset.sec=secOf(it.type);bg.innerHTML=detailHTML(it);q('.mx',bg).scrollTop=sc}
   function close(instant){const bg=q('.mx-bg');dId=null;if(!bg)return;if(instant||!motion())return bg.remove();bg.style.pointerEvents='none';bg.animate([{opacity:1},{opacity:0}],{duration:170}).finished.then(()=>bg.remove(),()=>bg.remove())}
   const back=()=>{if(location.hash.startsWith('#lib/i/')&&history.length>1)history.back();else go('#lib'+(st.base.length?'/'+st.base.join('/'):''))};
+  function rateHTML(it){const v=it.rating,L=[[1,'Beğendim',IC.up],[-1,'Beğenmedim',IC.down],[0,'Değerlendirmedim','']];
+    return`<div class="rt" data-rid="${E(it.id)}"><div class="rt-l" role="radiogroup" aria-label="Değerlendirme">${L.map(([k,n,ic])=>`<button role="radio" data-rlike="${k}" aria-checked="${(it.like||0)===k}" class="${(it.like||0)===k?'on':''}">${ic}${n}</button>`).join('')}</div>
+      <div class="rt-n" role="radiogroup" aria-label="Puanım (10 üzerinden)">${[1,2,3,4,5,6,7,8,9,10].map(n=>`<button role="radio" data-rnum="${n}" aria-checked="${v===n}" class="${n<=v?'in':''}${v===n?' on':''}" aria-label="${n} puan">${n}</button>`).join('')}<b>${v?v+'<small>/10</small>':'<small>Puan vermedin</small>'}</b></div>
+      <button class="rt-f${it.fav?' on':''}" data-rfav aria-pressed="${it.fav}">${IC.heart}${it.fav?'Favorilerimde':'Favorilere ekle'}</button></div>`}
+  document.addEventListener('click',e=>{const box=e.target.closest?.('.rt[data-rid]');if(!box)return;const it=KB.items.get(box.dataset.rid);if(!it)return;
+    const lk=e.target.closest('[data-rlike]'),nm=e.target.closest('[data-rnum]'),fv=e.target.closest('[data-rfav]');if(!lk&&!nm&&!fv)return;e.preventDefault();e.stopPropagation();
+    if(lk)it.like=+lk.dataset.rlike;if(nm){const n=+nm.dataset.rnum;it.rating=it.rating===n?0:n}if(fv)it.fav=!it.fav;
+    KB.saveItem(it,true);box.outerHTML=rateHTML(it);q(`.rt[data-rid="${CSS.escape(it.id)}"] ${lk?`[data-rlike="${lk.dataset.rlike}"]`:nm?`[data-rnum="${nm.dataset.rnum}"]`:'[data-rfav]'}`)?.focus();
+    clearTimeout(rateHTML.t);rateHTML.t=setTimeout(()=>KB.saveItem(it),400)},true);
   function stars(it){const v=it.rating;return`<div class="mx-rate" role="slider" tabindex="0" aria-label="Puanım" aria-valuemin="0" aria-valuemax="10" aria-valuenow="${v}" aria-valuetext="${v?v+' / 10':'puan yok'}">${[1,2,3,4,5].map(n=>`<button tabindex="-1" data-rs="${n}" aria-label="${n*2} puan"><i style="--f:${Math.max(0,Math.min(1,(v-(n-1)*2)/2))*100}%">${IC.star}${IC.star}</i></button>`).join('')}<b>${v?v+'<small>/10</small>':'—'}</b></div>`}
   function detailHTML(it){const s=secOf(it.type),g=it.type==='game',f=flagOf(it),wide=!!it.backdrop;
     const links=[it.wiki&&[`https://${it.wiki.startsWith('tr:')?'tr':'en'}.wikipedia.org/wiki/${it.wiki.replace(/^tr:/,'')}`,'Wikipedia'],it.imdb&&[`https://www.imdb.com/title/${it.imdb}/`,'IMDb'],it.mal&&[`https://myanimelist.net/anime/${it.mal}`,'MyAnimeList'],it.steam&&[`https://store.steampowered.com/app/${it.steam}/`,'Steam']].filter(Boolean);
@@ -269,7 +331,7 @@ const Media=(()=>{
           <div class="mx-fb"><button class="mb" data-eclose>Vazgeç</button><button class="mb pri" data-esave>Kaydet</button></div></div></section>
         <section class="mx-s mx-pick" hidden></section></div>
       <aside class="mx-side">
-        <section><h3>Puanım</h3>${stars(it)}</section>
+        <section><h3>Değerlendirmem</h3>${rateHTML(it)}</section>
         <dl class="mx-dl">${it.year?`<dt>Yıl</dt><dd>${E(it.year)}</dd>`:''}${it.genres.length?`<dt>Tür</dt><dd>${it.genres.map(E).join(', ')}</dd>`:''}${g&&it.platforms.length?`<dt>Platform</dt><dd>${it.platforms.map(p=>`<span class="pf">${E(p)}</span>`).join('')}</dd>`:''}
           ${it.eps?`<dt>Bölüm</dt><dd>${it.eps}</dd>`:''}${it.score?`<dt>Genel puan</dt><dd>${E(it.score)}</dd>`:''}<dt>Eklenme</dt><dd>${new Date(it.added).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'})}</dd>
           <dt>Eşleşme</dt><dd>${matchTxt(it)}</dd></dl>
@@ -418,7 +480,7 @@ const Media=(()=>{
     catch(e){say(e instanceof NetErr?'İnternete ulaşılamadı':'Yüklenemedi')}detailRefresh()}
 
   /* ── ekleme ── */
-  function addSheet(pre=''){q('.ma-bg')?.remove();const ty=st.sec==='games'?'game':st.sec==='anime'?'anime':'movie';const bg=document.createElement('div');bg.className='ma-bg';bg.dataset.sec=st.sec;
+  function addSheet(pre=''){q('.ma-bg')?.remove();if(st.sec==='books'){Library.addSheet(pre);return}const ty=st.sec==='games'?'game':st.sec==='anime'?'anime':st.sec==='series'?'series':'movie';const bg=document.createElement('div');bg.className='ma-bg';bg.dataset.sec=st.sec;
     bg.innerHTML=`<form class="ma" role="dialog" aria-modal="true" aria-label="Medya ekle"><header><h2>Ekle</h2><button type="button" class="mb ic" data-ax aria-label="Kapat">${IC.x}</button></header>
       <div class="mc-seg big" role="radiogroup" aria-label="Tür">${MT.map(t=>`<button type="button" role="radio" data-at="${t}" aria-checked="${t===ty}" class="${t===ty?'on':''}">${IC[t==='movie'?'film':t==='series'?'tv':t]}${TN[t]}</button>`).join('')}</div>
       <label class="ma-f">Ad<input name="t" required value="${E(pre)}" placeholder="Örn. Interstellar, Frieren, Elden Ring" autocomplete="off"></label>
@@ -435,4 +497,4 @@ const Media=(()=>{
       const dup=all().find(i=>i.type===t&&norm(i.title)===norm(title));if(dup){close();say('Bu zaten kütüphanende');return open(dup.id)}
       const it=KB.addItem({type:t,title,year:y,status:f.s.value,tags:[TN[t].toLocaleLowerCase('tr')]});if(y)HINT.set(hk(it),{en:title,y:+y});close();say(`“${title}” eklendi — posteri aranıyor`);queue();open(it.id)})}
 
-  return{render,refresh,detail,close,imgErr,queue,addSheet,isMedia:t=>MT.includes(t),get st(){return st},get R(){return R},_rank:rank,_cleanG:cleanG}})();
+  return{render,refresh,detail,close,imgErr,queue,addSheet,rateHTML,isMedia:t=>MT.includes(t),get st(){return st},get R(){return R},_rank:rank,_cleanG:cleanG}})();

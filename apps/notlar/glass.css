@@ -156,3 +156,7 @@ html[data-theme=dark] .cal .dp>.tm-qa:focus-within{background:var(--field-hi);bo
 html[data-theme=dark] .cal .dp .tk-qday{background:none;box-shadow:none}
 html[data-theme=dark] .cal .dp .tk-qday:focus-within{background:none;box-shadow:inset 0 -1px 0 var(--line2)}
 html[data-theme=dark] .cal .dp .tk-row:hover,html[data-theme=dark] .cal .dp .tk-row.sel{background:none}
+
+/* ── 13. Üst gezinme yazısı: Apple TV gibi sistem yazısı (SF Pro), ince ve hafif ── */
+.tnav a,.tnav button,.top .modes a{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Inter,system-ui,sans-serif;font-weight:400;letter-spacing:-.01em}
+.tnav .on,.top .modes a.on{font-weight:500}

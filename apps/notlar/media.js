@@ -498,11 +498,16 @@ const Media=(()=>{
     const o=r.o;Object.assign(it,{mid:o.mid,imdb:o.imdb,steam:o.steam,mal:o.mal,wiki:o.wiki,cover:o.cover,cover2:o.cover2,backdrop:o.backdrop,wide:o.wide,match:r.conf,metaAt:Date.now()});
     if(o.year)it.year=o.year;if(o.genres.length)it.genres=o.genres;if(o.platforms.length&&(!it.platforms.length||fresh))it.platforms=o.platforms;if(o.eps)it.eps=o.eps;if(o.desc&&(fresh||!it.desc))it.desc=o.desc;
     it.url=o.wiki?`https://${o.wiki.startsWith('tr:')?'tr':'en'}.wikipedia.org/wiki/${o.wiki.replace(/^tr:/,'')}`:it.url}
-  async function queue(){if(R.busy||R.off)return;const l=all().filter(needs);if(!l.length)return;R.busy=true;R.total=l.length;R.done=0;R.stats={ok:0,un:0,no:0};pill();let i=0,stop=false,lastEmit=Date.now();
+  /* afiş bulunan kartları yerinde güncelle (bütün sayfayı yeniden çizmek yüzlerce kartı ve resmi sıfırdan kuruyordu) */
+  function patchCards(ids){for(const id of ids){const it=KB.items.get(id);if(!it)continue;
+      for(const el of qa(`#view>.mc [data-mi="${CSS.escape(id)}"]`)){if(el.classList.contains('ml-r')){el.outerHTML=lrow(it);continue}
+        const v=(el.className.match(/\bv-(\w+)/)||[])[1]||'p',n=+(el.querySelector('.mc-n')?.textContent||0);el.outerHTML=card(it,v,n)}
+      if(dId===id)detailRefresh()}}
+  async function queue(){if(R.busy||R.off)return;const l=all().filter(needs);if(!l.length)return;R.busy=true;R.total=l.length;R.done=0;R.stats={ok:0,un:0,no:0};pill();let i=0,stop=false,lastEmit=Date.now();const changed=new Set();
     const work=async()=>{while(i<l.length&&!stop){const it=l[i++];if(!KB.items.has(it.id)||!needs(it)){R.done++;continue}
-      try{const r=await resolve(it);const cur=KB.items.get(it.id);if(cur&&needs(cur)){applyRes(cur,r);KB.saveItem(cur,true);R.stats[r.none?'no':r.conf==='ok'?'ok':'un']++}}
+      try{const r=await resolve(it);const cur=KB.items.get(it.id);if(cur&&needs(cur)){applyRes(cur,r);KB.saveItem(cur,true);changed.add(cur.id);R.stats[r.none?'no':r.conf==='ok'?'ok':'un']++}}
       catch(e){if(e instanceof NetErr){stop=true;R.off=true;setTimeout(()=>{R.off=false},60000)}else console.warn('eşleştirme',it.title,e)}
-      R.done++;pill();if(Date.now()-lastEmit>2500){lastEmit=Date.now();KB.emit('items')}}};
+      R.done++;pill();if(Date.now()-lastEmit>2500&&changed.size){lastEmit=Date.now();patchCards([...changed]);changed.clear()}}};
     await Promise.all([work(),work(),work()]);R.busy=false;pill();KB.emit('items');
     if(stop)say('İnternete ulaşılamadı — posterler bağlantı gelince eşleşecek');
     else if(R.total>2)say(`Posterler eşleşti: ${R.stats.ok} kesin${R.stats.un?` · ${R.stats.un} kontrol bekliyor`:''}${R.stats.no?` · ${R.stats.no} bulunamadı`:''}`)}
@@ -544,4 +549,4 @@ const Media=(()=>{
 
   /* sayfa değişince geçici arayüz kalmasın (Notlar route() çağırır) */
   function dismiss(){qa('.mset,.mrp,.mq,.ma-bg').forEach(e=>e.remove())}
-  return{render,refresh,detail,close,imgErr,queue,addSheet,rateHTML,dismiss,isMedia:t=>MT.includes(t),get st(){return st},get R(){return R},_rank:rank,_cleanG:cleanG}})();
+  return{render,refresh,detail,close,imgErr,queue,addSheet,rateHTML,dismiss,patchCards,isMedia:t=>MT.includes(t),get st(){return st},get R(){return R},_rank:rank,_cleanG:cleanG}})();

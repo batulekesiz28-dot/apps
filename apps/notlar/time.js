@@ -31,7 +31,7 @@ const TM=(()=>{
     if(!cats.length)cats=DEF.map(normCat);ready=true;emit('all')}
   function startCloud(fs){mode='cloud';const doc=fs.collection('hub').doc('time');ref={doc,acts:doc.collection('acts')};
     return new Promise(res=>{let left=2;const done=()=>{if(--left===0&&!ready){ready=true;res();emit('all')}};
-      let f1=true;unsubs.push(ref.acts.onSnapshot(s=>{s.docChanges().forEach(ch=>{if(ch.doc.metadata.hasPendingWrites&&!f1)return;if(ch.type==='removed')acts.delete(ch.doc.id);else acts.set(ch.doc.id,norm({...ch.doc.data(),id:ch.doc.id}))});if(f1){f1=false;done()}else emitSoon('acts')},e=>{say('Aktivite senkron hatası: '+(e.code||e.message));if(f1){f1=false;done()}}));
+      let f1=true;unsubs.push(ref.acts.onSnapshot(s=>{let ch1=false;s.docChanges().forEach(ch=>{if(ch.doc.metadata.hasPendingWrites&&!f1)return;if(ch.type==='removed'){if(acts.delete(ch.doc.id))ch1=true;return}const d=ch.doc.data(),cur=acts.get(ch.doc.id);if(!f1&&cur&&(+cur.updated||0)>=(+d.updated||0))return;acts.set(ch.doc.id,norm({...d,id:ch.doc.id}));ch1=true});if(f1){f1=false;done()}else if(ch1)emitSoon('acts')},e=>{say('Aktivite senkron hatası: '+(e.code||e.message));if(f1){f1=false;done()}}));
       let f2=true;unsubs.push(ref.doc.onSnapshot(s=>{if(s.metadata.hasPendingWrites&&!f2)return;const d=s.data()||{};cats=Array.isArray(d.cats)&&d.cats.length?d.cats.map(normCat):DEF.map(normCat);if(f2){f2=false;done()}else emitSoon('cats')},()=>{cats=DEF.map(normCat);if(f2){f2=false;done()}}));
       setTimeout(()=>{if(!ready){ready=true;res();emit('all')}},8000)})}
   function stop(){unsubs.forEach(u=>{try{u()}catch{}});unsubs=[];acts.clear();cats=[];ready=false}

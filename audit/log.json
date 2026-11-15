@@ -2258,5 +2258,35 @@
     "text": "CSS katmanları üst üste yama: glass.css ve media.css sonundaki düzeltmeler asıl kurallarla birleştirilmeli (temizlik planı)"
    }
   ]
+ },
+ {
+  "at": "2026-11-15T14:40:27",
+  "change": "Kasma düzeltmesi: bulut kaydı geri yankısı ve poster eşleştirme artık bütün ekranı yeniden çizmiyor",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Her kayıttan sonra buluttan dönen aynı veri Medya/Takvim/Görevler'i baştan çiziyordu",
+    "fix": "Değişmeyen ya da eski kopya yok sayılıyor; sadece gerçek değişiklikte yenileniyor"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Poster eşleştirme 2,5 sn'de bir bütün Medya sayfasını yeniden çiziyordu (kaydırma takılıyordu)",
+    "fix": "Sadece kapağı gelen kartlar yerinde güncelleniyor"
+   }
+  ]
  }
 ]

@@ -66,8 +66,10 @@ const KB=(()=>{
     ready=true;emit('all')}
   function startCloud(fs){mode='cloud';const doc=fs.collection('hub').doc('kb');ref={doc,items:doc.collection('items'),cols:doc.collection('cols')};
     return new Promise(res=>{let left=3;const done=()=>{if(--left===0){ready=true;res();emit('all')}};const fail=e=>{say('Kütüphane senkron hatası: '+(e.code||e.message));done()};
-      const watch=(coll,map,norm,tag)=>{let first=true;unsubs.push(coll.onSnapshot(s=>{s.docChanges().forEach(ch=>{if(ch.doc.metadata.hasPendingWrites&&!first)return;
-          if(ch.type==='removed')map.delete(ch.doc.id);else map.set(ch.doc.id,norm({...ch.doc.data(),id:ch.doc.id}))});if(first){first=false;done()}else emitSoon(tag)},e=>{if(first){first=false;fail(e)}}))};
+      // buluttan gelen değişiklik: kendi yazmamızın onayı (aynı 'updated') ya da eski kopya ise yok say — her onay bütün ekranı yeniden çizdiriyordu
+      const watch=(coll,map,norm,tag)=>{let first=true;unsubs.push(coll.onSnapshot(s=>{let changed=false;s.docChanges().forEach(ch=>{if(ch.doc.metadata.hasPendingWrites&&!first)return;
+          if(ch.type==='removed'){if(map.delete(ch.doc.id))changed=true;return}const d=ch.doc.data(),cur=map.get(ch.doc.id);if(!first&&cur&&(+cur.updated||0)>=(+d.updated||0))return;
+          map.set(ch.doc.id,norm({...d,id:ch.doc.id}));changed=true});if(first){first=false;done()}else if(changed)emitSoon(tag)},e=>{if(first){first=false;fail(e)}}))};
       watch(ref.items,items,normItem,'items');watch(ref.cols,cols,normCol,'cols');
       let first=true;unsubs.push(ref.doc.onSnapshot(s=>{if(s.metadata.hasPendingWrites&&!first)return;const d=s.data()||{};links=Array.isArray(d.links)?d.links:[];topics=d.topics||{};ptags=d.ptags||{};
         if(first){first=false;done()}else emitSoon('links')},e=>{if(first){first=false;fail(e)}}));

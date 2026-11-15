@@ -364,7 +364,7 @@
 .mset.see{background:transparent!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 .mset.see>:not(.mset-pv){opacity:0;pointer-events:none}.mset.see .mset-pc,.mset.see .mset-sz{text-shadow:0 1px 6px rgba(0,0,0,.9)}
 body.mset-drag{cursor:grabbing;user-select:none}
-.mset header{display:flex;align-items:center;justify-content:space-between}.mset header b{font-size:15px;font-weight:600}
+.mset header{display:flex;align-items:center;justify-content:space-between}.mset header b{font-size:15px;font-weight:600}.mset-sc{font-weight:400;color:rgba(255,255,255,.55)}
 .mset-x{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;color:rgba(255,255,255,.6)}.mset-x:hover{background:rgba(255,255,255,.08);color:#fff}
 .mset label{display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:rgba(235,235,245,.62)}
 .mset output{color:#fff;font-variant-numeric:tabular-nums}

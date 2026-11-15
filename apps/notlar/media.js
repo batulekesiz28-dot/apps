@@ -61,9 +61,11 @@ const Media=(()=>{
   const LC=[['cover','Kapak'],['st','Durum'],['rate','Puanım'],['score','Genel puan'],['like','Beğeni'],['fav','Favori']];
   const LOOK0={view:'tv',cover:100,icon:'m',font:'m',gap:100,dens:'n',radius:8,ar:100,title:1,meta:1,badge:1,hero:1,rowh:100,
     lc:{cover:1,st:1,rate:1,score:0,like:1,fav:1},shelves:Object.keys(SH),off:[],tabsOff:[]};
-  function loadLook(){const s=lsg('mc:look',{})||{},L={...LOOK0,...s,lc:{...LOOK0.lc,...(s.lc||{})}};
+  /* görünüm her bölüm için AYRI (ana sayfa, filmler, diziler, animeler, oyunlar, kitaplar): mc:look:<bölüm>.
+     İlk açılışta ortak eski ayar (mc:look) kopyalanır; üstteki kategori sekmeleri (tabsOff) ortak kalır. */
+  function loadLook(sec='home'){const g=lsg('mc:look',{})||{},s=lsg('mc:look:'+sec,null)||g,L={...LOOK0,...s,lc:{...LOOK0.lc,...(s.lc||{})}};
     L.shelves=[...(Array.isArray(s.shelves)?s.shelves.filter(k=>SH[k]):[]),...Object.keys(SH)].filter((k,i,a)=>a.indexOf(k)===i);
-    L.off=(Array.isArray(s.off)?s.off:[]).filter(k=>SH[k]);L.tabsOff=Array.isArray(s.tabsOff)?s.tabsOff:[];return L}
+    L.off=(Array.isArray(s.off)?s.off:[]).filter(k=>SH[k]);L.tabsOff=Array.isArray(g.tabsOff)?g.tabsOff:[];return L}
   const st={sec:'home',page:'home',qs:'',genre:'',sort:lsg('mc:sort','added'),kind:'',min:0,hero:0,base:[],look:loadLook()};
   const V=()=>st.look.view;
   const all=()=>[...KB.items.values()].filter(i=>AT.includes(i.type));
@@ -231,7 +233,7 @@ const Media=(()=>{
   function parse(parts){const p=parts||[];let sec='home',page='home',gq='';if(p[0]==='m'){const k=p[1]==='tv'?'movies':p[1];sec=SEC[k]?k:'home';let pg=p[2]||'home';const i=pg.indexOf('?');if(i>=0){gq=decodeURIComponent((pg.slice(i+1).match(/g=([^&]*)/)||[])[1]||'');pg=pg.slice(0,i)}page=pg}
     return{sec,page,gq}}
   function render(parts,o={}){const p=parse(parts);const changed=p.sec!==st.sec||p.page!==st.page;st.base=parts||[];
-    if(changed){st.kind='';st.genre='';st.min=0;st.hero=0}st.sec=p.sec;st.page=p.page;if(p.gq){st.genre=p.gq;st.page='all'}if(changed||!o.keepQ)st.qs='';
+    if(changed){st.kind='';st.genre='';st.min=0;st.hero=0}if(p.sec!==st.sec)st.look=loadLook(p.sec);st.sec=p.sec;st.page=p.page;if(p.gq){st.genre=p.gq;st.page='all'}if(changed||!o.keepQ)st.qs='';
     const v=q('#view');let root=q('#view>.mc');if(!root){v.innerHTML='<div class="mc"></div>';root=q('#view>.mc');wire(root)}
     root.dataset.sec=st.sec;applyLook(root);const b=body();root.innerHTML=nav()+`<main class="mc-main">${b}</main>`;root.classList.toggle('has-hero',!!q('.mh',root));if(changed)enter(q('.mc-main',root));
     document.getElementById('app')?.classList.add('mc-on');
@@ -275,13 +277,13 @@ const Media=(()=>{
     const c=L.lc,W={st:'160px',rate:'76px',score:'84px',like:'56px',fav:'40px'},cov='calc(42px * var(--cz,1) * var(--rh,1))';
     sp('--lcols',[c.cover?cov:'','minmax(0,1fr)',...['st','rate','score','like','fav'].map(k=>c[k]?W[k]:'')].filter(Boolean).join(' '));
     sp('--lcols-m',[c.cover?cov:'','minmax(0,1fr)',c.rate?'auto':'',c.fav?'44px':''].filter(Boolean).join(' '))}
-  function saveLook(){lss('mc:look',st.look)}
+  function saveLook(){lss('mc:look:'+st.sec,st.look);const g=lsg('mc:look',{})||{};g.tabsOff=st.look.tabsOff;lss('mc:look',g)}
   /* bölüm/görünüm değişiminde kısa giriş (transform+opacity, ~280ms) */
   function enter(el){if(el&&motion())el.animate([{opacity:0,transform:'translateY(6px)'},{opacity:1,transform:'none'}],{duration:280,easing:'cubic-bezier(.16,1,.3,1)'})}
-  function setLook(k,v,redraw){st.look[k]=v;lss('mc:look',st.look);applyLook();if(redraw){swap();enter(q('.mc .mc-main'));qa('.mc [data-lv]').forEach(b=>{const on=b.dataset.lv===V();b.classList.toggle('on',on);b.setAttribute('aria-checked',on)})}}
+  function setLook(k,v,redraw){st.look[k]=v;saveLook();applyLook();if(redraw){swap();enter(q('.mc .mc-main'));qa('.mc [data-lv]').forEach(b=>{const on=b.dataset.lv===V();b.classList.toggle('on',on);b.setAttribute('aria-checked',on)})}}
   /* boyut önizlemesi: kütüphaneden rastgele bir kapak; kenarından/köşesinden çekilerek bütün kartlar boyutlanır */
   let pvIt=null;
-  const pvPick=()=>{if(pvIt&&KB.items.has(pvIt.id))return pvIt;const l=[...KB.items.values()].filter(i=>AT.includes(i.type)&&(i.cover||i.backdrop||i.wide));pvIt=l.length?l[Math.random()*l.length|0]:null;return pvIt};
+  const pvPick=()=>{const inSec=i=>st.sec==='home'||secOf(i.type)===st.sec;if(pvIt&&KB.items.has(pvIt.id)&&inSec(pvIt))return pvIt;const l=[...KB.items.values()].filter(i=>AT.includes(i.type)&&inSec(i)&&(i.cover||i.backdrop||i.wide));pvIt=l.length?l[Math.random()*l.length|0]:null;return pvIt};
   const pvBase=()=>V()==='tv'&&hasWide(pvPick()||{})?{B:150,R:215/460}:{B:96,R:3/2};
   function pvHTML(){const L=st.look,it=pvPick()||{id:'',type:'movie',title:'Örnek film',cover:''},wide=V()==='tv'&&hasWide(it),{B}=pvBase();
     return`<div class="mset-pv"><div class="mset-pf" style="width:${B*L.cover/100}px;--ar:${(L.ar||100)/100};--r:${L.radius}px">${wide?wideArt(it):poster(it)}
@@ -296,7 +298,7 @@ const Media=(()=>{
     const rng=(k,n,min,max,stp,u='%')=>`<label for="mset-${k}">${n} <output>${L[k]}${u}</output></label><input id="mset-${k}" type="range" min="${min}" max="${max}" step="${stp}" value="${L[k]}" data-lr="${k}" data-u="${u}">`;
     const tg=(attr,k,n,on)=>`<button class="mset-tg" role="switch" ${attr}="${k}" aria-checked="${!!on}"><span>${n}</span><i aria-hidden="true"></i></button>`;
     const sh=L.shelves;
-    return`<header><b>Görünüm</b><button class="mset-x" data-msx aria-label="Kapat">${IC.x}</button></header>
+    return`<header><b>Görünüm <span class="mset-sc">· ${st.sec==='home'?'Ana sayfa':E(SEC[st.sec].n)}</span></b><button class="mset-x" data-msx aria-label="Kapat">${IC.x}</button></header>
       <h4>Görünüm türü</h4>${seg('view',VIEWS.map(([k,n])=>[k,n]))}
       <h4>Kartlar</h4>${pvHTML()}<div class="mset-tgs">${tg('data-lt','title','Altında isim',L.title)}</div>${rng('cover','Kapak genişliği',60,160,5)}${rng('ar','Kapak yüksekliği',60,170,5)}${rng('radius','Köşe yuvarlaklığı',0,24,1,'px')}${rng('gap','Kart aralığı',40,220,10)}
       <label>Izgara yoğunluğu</label>${seg('dens',[['r','Rahat'],['n','Normal'],['s','Sıkı']])}
@@ -309,7 +311,7 @@ const Media=(()=>{
       <h4>Üstteki kategoriler</h4><div class="mset-tgs">${[...ORDER,'docs'].map(k=>{const n=k==='docs'?'Belgeler':SEC[k].n;return tg('data-ltab',k,n,!L.tabsOff.includes(k)).replace('role="switch"',`role="switch" aria-label="${n} sekmesi"`)}).join('')}</div>
       <h4>Yazı ve ikonlar</h4><label>Yazı boyutu</label>${seg('font',[['s','Küçük'],['m','Orta'],['l','Büyük']])}
       <label>İkon boyutu</label>${seg('icon',[['s','Küçük'],['m','Orta'],['l','Büyük']])}
-      <button class="mset-r" data-msr>Hepsini varsayılana döndür</button>`}
+      <button class="mset-r" data-msr>Bu bölümü varsayılana döndür</button>`}
   function settings(anchor){q('.mset')?.remove();const el=document.createElement('div');el.className='mset';el.setAttribute('role','dialog');el.setAttribute('aria-label','Görünüm ayarları');
     el.innerHTML=setHTML();document.body.appendChild(el);const place=()=>{const r=(q('[data-mset]')||anchor).getBoundingClientRect();el.style.top=Math.round(r.bottom+8)+'px';el.style.right=Math.max(8,Math.round(innerWidth-r.right))+'px'};place();
     const redrawPanel=focusSel=>{const y=el.scrollTop;el.innerHTML=setHTML();el.scrollTop=y;if(focusSel)el.querySelector(focusSel)?.focus()};
@@ -335,7 +337,7 @@ const Media=(()=>{
       const up=()=>{h.removeEventListener('pointermove',mv);h.removeEventListener('pointerup',up);h.removeEventListener('pointercancel',up);if(raf){cancelAnimationFrame(raf);raf=0;if(last)step()}f.classList.remove('drag');el.classList.remove('see');document.body.classList.remove('mset-drag');saveLook()};
       h.addEventListener('pointermove',mv);h.addEventListener('pointerup',up);h.addEventListener('pointercancel',up)});
     el.addEventListener('click',e=>{const t=e.target,L=st.look;if(t.closest('[data-msx]'))return el.remove();
-      if(t.closest('[data-msr]')){st.look=JSON.parse(JSON.stringify(LOOK0));saveLook();applyLook();refresh();redrawPanel();return}
+      if(t.closest('[data-msr]')){st.look={...JSON.parse(JSON.stringify(LOOK0)),tabsOff:st.look.tabsOff};saveLook();applyLook();refresh();redrawPanel();return}
       const b=t.closest('[data-lk]');if(b){setLook(b.dataset.lk,b.dataset.lval,b.dataset.lk==='view');if(b.dataset.lk==='view'){redrawPanel();return}qa(`[data-lk="${b.dataset.lk}"]`,el).forEach(x=>{const on=x===b;x.classList.toggle('on',on);x.setAttribute('aria-checked',on)});return}
       const tg=t.closest('[data-lt]');if(tg){const k=tg.dataset.lt;setLook(k,L[k]?0:1,k==='hero');tg.setAttribute('aria-checked',!!L[k]);pvSync();return}
       const lc=t.closest('[data-lc]');if(lc){const k=lc.dataset.lc;L.lc[k]=L.lc[k]?0:1;saveLook();applyLook();swap();lc.setAttribute('aria-checked',!!L.lc[k]);return}

@@ -2467,5 +2467,28 @@
     "fix": "Sınıf adı değişti, görsel tam genişlik"
    }
   ]
+ },
+ {
+  "at": "2026-11-15T15:44:48",
+  "change": "Medya: her bölümün görünüm ayarı ayrı (filmlerdeki değişiklik oyunları etkilemiyor)",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Görünüm ayarı tek ve ortaktı: Filmler'de değiştirince Oyunlar da değişiyordu",
+    "fix": "Her bölüm kendi ayarını saklıyor; eski ayar her bölüme başlangıç olarak kopyalandı"
+   }
+  ]
  }
 ]

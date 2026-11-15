@@ -16,12 +16,12 @@
 .tk-row:hover{background:var(--hover)}.tk-row.sel{background:color-mix(in srgb,var(--accent) 8%,transparent)}.tk-row:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
 .tk-row.virt{opacity:.62}.tk-row.dragging{opacity:.35}.tk-row.tk-ins{box-shadow:inset 0 2px 0 var(--accent)}
 .tk-grip{position:absolute;left:-18px;top:12px;color:var(--ink4);opacity:0;cursor:grab;transition:opacity .15s}.tk-row:hover .tk-grip{opacity:1}
-.tk-chk{position:relative;flex-shrink:0;width:20px;height:20px;margin-top:0;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--pc,var(--ink4));background:none;transition:background .2s,box-shadow .2s,transform .3s var(--spring)}
+.tk-chk{position:relative;flex-shrink:0;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--pc,var(--ink4));background:none;transition:background .2s,box-shadow .2s,transform .3s var(--spring)}
 .tk-chk.p0{--pc:color-mix(in srgb,var(--ink) 28%,transparent)}.tk-chk.p1{--pc:color-mix(in srgb,var(--ink) 42%,transparent)}.tk-chk.p2{--pc:#F76B15}.tk-chk.p3{--pc:#E5484D}
 .tk-chk::after{content:"";position:absolute;inset:0;margin:auto;width:8px;height:4.5px;border-left:1.8px solid var(--pc);border-bottom:1.8px solid var(--pc);transform:translateY(-1px) rotate(-45deg) scale(0);transition:transform .2s var(--spring)}
 .tk-chk:hover::after{transform:translateY(-1px) rotate(-45deg) scale(1);opacity:.6}
 .tk-chk.on{background:var(--pc);box-shadow:none}.tk-chk.p0.on,.tk-chk.p1.on{background:var(--accent)}.tk-chk.p0.on::after,.tk-chk.p1.on::after{border-color:#fff}.tk-chk.on::after{border-color:#fff;transform:translateY(-1px) rotate(-45deg) scale(1);opacity:1}
-.tk-chk.big{width:22px;height:22px}.tk-chk.sm{width:16px;height:16px;border-radius:5px}.tk-chk.xs{width:13px;height:13px;margin:0}.tk-chk.xs::after{width:6px;height:3px}
+.tk-chk.big{--vis:22px}.tk-chk.sm{--vis:16px;border-radius:5px}.tk-chk.xs{--vis:13px}.tk-chk.xs::after{width:6px;height:3px}
 .tk-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}.tk-t{font-size:14px;line-height:1.4;color:var(--ink);overflow-wrap:anywhere}
 .tk-row.done .tk-t{color:var(--ink3);text-decoration:line-through;text-decoration-color:var(--ink4)}
 .tk-m{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;font-size:12px;color:var(--ink3)}.tk-m:empty{display:none}.tk-m svg.i{width:12px;height:12px}
@@ -91,7 +91,7 @@
 .tk-dp-f{display:flex;align-items:center;gap:8px;padding-top:10px;border-top:.5px solid var(--line)}
 @media (max-width:1100px){.tk-wk{grid-template-columns:repeat(8,170px)}.tk-board{grid-template-columns:repeat(4,220px)}}
 @media (max-width:760px){.tk-wrap{padding:3vh 0 30vh}.tk-head h1{font-size:28px}.tk-scopes{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.tk-scopes button{flex-shrink:0;min-height:40px}
-  .tk-ib{opacity:1;width:40px;height:40px}.tk-chk{width:22px;height:22px}.tk-chk.xs{width:14px;height:14px}.tk-row{min-height:48px}.tk-dp{top:auto;left:6px;right:6px;bottom:6px;width:auto;max-height:82vh}
+  .tk-ib{opacity:1;width:40px;height:40px}.tk-row>.tk-chk{--vis:22px}.tk-chk.xs{--vis:14px}.tk-row{min-height:48px}.tk-dp{top:auto;left:6px;right:6px;bottom:6px;width:auto;max-height:82vh}
   .tk-props{grid-template-columns:80px minmax(0,1fr)}.tk-wds button,.tk-dadd,.tk-lnk{min-height:40px}.tk-dp input,.tk-dp select{height:40px}.tk-sk{grid-template-columns:repeat(30,4px)}.tk-sk i{width:4px}.tk-rp .tk-m span{white-space:normal}
   .tk-spark small{font-size:12px}.tk-pact input[type=color],.tk-pe{height:40px}}
 @media (prefers-reduced-motion:reduce){.tk-dp,.tk-pop .tk-chk{animation:none}.tk-row{transition:none}}
@@ -144,9 +144,20 @@
 @media (max-width:760px){.tk-tabs button{flex:1 1 auto;padding:0 6px;font-size:12.5px}.tk-row>.tk-ib{display:none}.tk-dr input[type=date]{width:150px}}
 @media (max-width:760px){.tk-tabs{gap:0}.tk-tabs button{padding:0 3px;font-size:12px}.tk-props{grid-template-columns:1fr;gap:4px}.tk-props>label{margin-top:6px}.tk-prs{gap:2px}.tk-prs button{padding:0 8px}}
 /* işaret kutusu net görünsün: bitti / bitmedi ilk bakışta belli */
-.tk-row>.tk-chk{width:22px;height:22px;box-shadow:inset 0 0 0 2px var(--pc)}
+.tk-row>.tk-chk{--vis:22px;--ring:2px}
 .tk-chk.p0{--pc:color-mix(in srgb,var(--ink) 40%,transparent)}.tk-chk.p1{--pc:color-mix(in srgb,var(--ink) 55%,transparent)}
 .tk-row:hover>.tk-chk:not(.on)::after{transform:translateY(-1px) rotate(-45deg) scale(1);opacity:.45}
 .tk-row.done>.tk-chk{background:#30A46C;box-shadow:none}.tk-row.done>.tk-chk::after{border-color:#fff}
 .tk-pop>.tk-chk{background:#30A46C!important;box-shadow:none}.tk-pop>.tk-chk::after{border-color:#fff!important;transform:translateY(-1px) rotate(-45deg) scale(1)!important;opacity:1!important}
 .tk-row.done .tk-t{color:var(--ink3)}
+
+/* ── işaret dairesi: görünen boy (--vis) ile dokunma alanı (--hit) ayrı ─────────────
+   Düğme dokunma alanı boyunda (masaüstü 24px, telefon 40px; WCAG 2.5.8); daire içine çizilir:
+   halka = içeri kaydırılmış outline, dolgu = içerik kutusuna kırpılmış zemin. Yerleşim değişmez (negatif kenar boşluğu). */
+.tk-chk{--vis:20px;--hit:max(24px,var(--vis));--ring:1.5px;width:var(--hit);height:var(--hit);margin:calc((var(--vis) - var(--hit)) / 2)!important;
+  padding:calc((var(--hit) - var(--vis)) / 2);background-clip:content-box!important;box-shadow:none!important;
+  outline:var(--ring) solid var(--pc,var(--ink4));outline-offset:calc((var(--vis) - var(--hit)) / 2 - var(--ring));transition:background-color .2s,outline-color .2s,transform .3s var(--spring)}
+.tk-chk.on,.tk-row.done>.tk-chk,.tk-pop>.tk-chk{outline-color:transparent}
+.tk-chk:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.tk-pill button{min-width:24px;justify-content:center}
+@media (max-width:760px){.tk-chk{--hit:40px}.tk-chk.xs{--hit:24px}.tk-pill button{min-width:40px}.tk-dp .tk-dt{min-height:40px}.tk-dp .tk-lnk.danger{min-height:40px;padding:0 10px}}

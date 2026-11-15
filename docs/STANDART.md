@@ -306,3 +306,27 @@ Referans Apple'ın sadeliği (kopya değil). Amaç daha çok özellik göstermek
 - YAPMA: gereksiz dashboard, her şeyi karta koymak, büyük renkli kutular, her özellik için ayrı panel, onlarca ayar, süs animasyonu, mevcut tasarımı baştan değiştirmek, çalışanı bozmak, istenmemiş özellik icat etmek.
 - Yeni özellik için yeni ana menü açma; üstteki küçük, yuvarlak, hafif opak şeridi koru, var olan bölümlerin içine yerleştir.
 - Her değişiklikten önce sor: “Bu gerçekten kullanımı kolaylaştırıyor mu?” Hayırsa ekleme.
+
+## Estetik denetçi — kıdemli tasarımcı gözü (2026-11)
+“Çalışıyor mu, taşıyor mu, hata veriyor mu” yetmez. Her ekranda şu sorular sorulur; teknik olarak doğru ama yanlış yerde/ölçüde olan her şey **hatadır**.
+
+**Sorular:** Bu öğe gerçekten burada mı olmalı? Butonun konumu mantıklı mı? Başlık gereğinden fazla yer kaplıyor mu? Simetriyi bozuyor mu, sağ-sol boşluk dengeli mi? İkon diğerleriyle aynı ölçekte mi? Bu renk burada gerekli mi? Bu bölüm diğer ekranlardan farklı bir dil mi konuşuyor? Kaldırılması ya da taşınması arayüzü iyileştirir mi?
+
+**Önem düzeyleri (Denetçi `design` kategorisi, `lvl` alanı):**
+- **Kritik** — işlevi bozan ya da ciddi görsel sorun (üst üste binme, erişilemeyen kontrol, dokunulamayacak kadar küçük hedef)
+- **Yüksek** — hizalama, simetri, hiyerarşi ya da akışı bozan (başlığa yapışık araç, iki kez yazan başlık, gereksiz ikinci üst şerit)
+- **Orta** — tutarsızlık, gereksiz alan/renk, aynı iş için iki kontrol
+- **Düşük** — küçük görsel iyileştirme (ikon ölçeği, başlık boyu)
+
+**Yerleşim kalıpları (bütün ekranlarda aynı):**
+- Sayfa kontrol alanı: **solda** başlık (+ toplam sayı), altında durum sekmeleri; **sağda**, başlıkla aynı satırda araç grubu (arama · filtreler · görünüm · ayar · ekle). Araçlar asla başlığın yanına “boşluk buldukları yere” konmaz.
+- Aynı satırdaki kontroller aynı yükseklikte (Medya araçları 36px; telefonda 40px) ve aynı malzemede.
+- Sekme adı = sayfa başlığı kabul edilir (Apple kalıbı); ama yol satırı başlığı tekrarlamaz — sadece iç içe sayfada görünür.
+- Bir iş için tek kontrol (ör. favori ya kalp ya “Favorilere ekle”, ikisi birden değil).
+- Renk sadece anlam taşıyorsa: vurgu beyaz-mat; kategori rengi küçük göstergede; “bugün/şimdi” kırmızı; puan yıldızı altın.
+- Dekoratif tekrar (yedek kapak üzerindeki başlık) `aria-hidden`.
+- Dokunma hedefi görünen boydan ayrı tutulabilir (görev dairesi: `--vis` 20–22px görünür, `--hit` 24/40px dokunulur).
+
+**Akıllı başlık:** uzun listelerde sayfa kontrol alanı (`.sbar`) aşağı kaydırınca saklanır (28px eşik), yukarı doğru tek küçük hareketle geri gelir (4px), en üstte ve odak içindeyken hep görünür; sadece transform/opacity, `prefers-reduced-motion` ve `data-motion=off`'a uyar.
+
+**Nasıl denetlenir:** `python3 audit/run.py` (açılış ekranları) + `node audit/screens.js` (Notlar'ın her ekranı, görünümleri ve panelleri; telefon + masaüstü). Bulguları önem sırasıyla düzelt, ilgili ekranı yeniden tara, düzeltmenin başka yeri bozmadığını kontrol et.

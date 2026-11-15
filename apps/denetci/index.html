@@ -110,7 +110,8 @@ summary .c{font:500 12px var(--mono);color:var(--ink3)}
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const ls={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
-const CATS={a11y:'Erişilebilirlik',ux:'Kullanılabilirlik',look:'Estetik',perf:'Hız'};
+const CATS={a11y:'Erişilebilirlik',ux:'Kullanılabilirlik',look:'Estetik',design:'Tasarım kararları',perf:'Hız'};
+const LVL_N={kritik:'kritik',yuksek:'yüksek',orta:'orta',dusuk:'düşük'};
 const SEV={error:'hata',warn:'uyarı',info:'not',fixed:'düzeltildi'};
 const col=v=>v>=90?'var(--ok)':v>=75?'var(--warn)':'var(--err)';
 let res=ls.get('denetci:last',null),dev='mobile',LOG=[];
@@ -140,7 +141,7 @@ function paint(){
     const f=r.findings||[];
     return`<section class="card app" style="animation-delay:${i*60}ms"><div class="app-h"><b>${esc(a.name)}</b><span class="score num" style="color:${col(s.total)}">${s.total??'—'}</span></div>
       <div class="cats">${Object.entries(CATS).map(([c,l])=>`<div class="cat"><span>${l}</span><span class="bar"><i style="width:${s[c]??0}%;background:${col(s[c])}"></i></span><span class="num">${s[c]??'—'}</span></div>`).join('')}</div>
-      <div class="fl">${r.error?`<div class="empty">Açılamadı: ${esc(r.error)}</div>`:f.length?f.map(x=>`<details><summary><span class="sev ${x.sev}">${SEV[x.sev]}</span><span class="t">${esc(x.title)}</span><span class="c">${x.count>1?'×'+x.count:''}</span></summary>
+      <div class="fl">${r.error?`<div class="empty">Açılamadı: ${esc(r.error)}</div>`:f.length?f.map(x=>`<details><summary><span class="sev ${x.sev}">${x.lvl?LVL_N[x.lvl]:SEV[x.sev]}</span><span class="t">${esc(x.title)}</span><span class="c">${x.count>1?'×'+x.count:''}</span></summary>
         <div class="fd"><div>${esc(x.detail)}</div><div class="fix">${esc(x.fix)}</div>${x.samples?.length?`<code>${x.samples.map(esc).join(' · ')}</code>`:''}</div></details>`).join(''):'<div class="clean">✓ Sorun bulunamadı</div>'}</div></section>`}).join('');
   const tv=n?Math.round(sum/n):null;ring($('#tot'),tv);$('#totT').textContent=`${dev==='mobile'?'telefon':'bilgisayar'} · ${new Date(res.at).toLocaleString('tr-TR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}`;
   paintOpen()}
@@ -149,10 +150,10 @@ function openItems(){const items=[];
   for(const e of LOG)for(const it of e.items||[])if(it.status==='open'&&!items.some(x=>x.title===it.text))items.push({app:it.app,dev:'',sev:it.sev||'warn',title:it.text,fix:it.fix||'',samples:[]});
   return items}
 function paintOpen(){const it=openItems(),el=$('#open');
-  el.innerHTML=it.length?it.map(x=>`<details><summary><span class="sev ${x.sev}">${SEV[x.sev]}</span><span class="t">${esc(x.app)} · ${esc(x.title)}</span><span class="c">${x.dev==='mobile'?'telefon':x.dev==='desktop'?'bilgisayar':''}</span></summary><div class="fd">${x.detail?`<div>${esc(x.detail)}</div>`:''}${x.fix?`<div class="fix">${esc(x.fix)}</div>`:''}${x.samples?.length?`<code>${x.samples.map(esc).join(' · ')}</code>`:''}</div></details>`).join('')
+  el.innerHTML=it.length?it.map(x=>`<details><summary><span class="sev ${x.sev}">${x.lvl?LVL_N[x.lvl]:SEV[x.sev]}</span><span class="t">${esc(x.app)} · ${esc(x.title)}</span><span class="c">${x.dev==='mobile'?'telefon':x.dev==='desktop'?'bilgisayar':''}</span></summary><div class="fd">${x.detail?`<div>${esc(x.detail)}</div>`:''}${x.fix?`<div class="fix">${esc(x.fix)}</div>`:''}${x.samples?.length?`<code>${x.samples.map(esc).join(' · ')}</code>`:''}</div></details>`).join('')
     :'<div class="clean">✓ Açık konu yok</div>'}
 $('#copy').onclick=async()=>{const it=openItems();if(!it.length)return toast('Gönderilecek açık konu yok');
-  const txt='Denetçi şu sorunları buldu, düzelt ve günlüğe yaz:\n'+it.map(x=>`- [${SEV[x.sev]}] ${x.app}${x.dev?` (${x.dev==='mobile'?'telefon':'bilgisayar'})`:''}: ${x.title}${x.samples?.length?' — '+x.samples.slice(0,2).join(', '):''}`).join('\n');
+  const txt='Denetçi şu sorunları buldu, düzelt ve günlüğe yaz:\n'+it.map(x=>`- [${x.lvl?LVL_N[x.lvl]:SEV[x.sev]}] ${x.app}${x.dev?` (${x.dev==='mobile'?'telefon':'bilgisayar'})`:''}: ${x.title}${x.samples?.length?' — '+x.samples.slice(0,2).join(', '):''}`).join('\n');
   try{await navigator.clipboard.writeText(txt)}catch{const t=document.createElement('textarea');t.value=txt;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove()}
   toast('Kopyalandı — sohbete yapıştır')};
 

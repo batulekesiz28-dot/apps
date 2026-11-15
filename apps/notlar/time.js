@@ -195,9 +195,8 @@ const Time=(()=>{
     const group=list=>{let h='',last='';for(const a of list){if(a.date!==last){last=a.date;const sum=list.filter(x=>x.date===a.date).reduce((s,x)=>s+x.dur,0);h+=`<div class="tm-dg"><b>${E(dayLabel(a.date))}</b><span>${E(fmtWd(a.date))}${sum?' · '+fm(sum):''}</span></div>`}h+=actRow(a)}return h};
     $('#view').innerHTML=`<div class="wrap tm-page"><div class="tm-ph"><h1>Aktiviteler</h1><button class="tm-btn pri" data-newact>${I.plus}Ayrıntılı ekle</button></div>
       ${qaHTML('Ne yaptın ya da ne yapacaksın? ör. “Oyun 21:00-22:30 bitti”, “cuma 9-11 İş rapor”','')}
-      <div class="tm-qcats">${TM.cats.map(c=>`<button class="tm-qc" data-qcat="${c.id}" style="--c:${c.color}" title="${E(c.name)} olarak ekle"><i>${E(c.icon)}</i>${E(c.name)}</button>`).join('')}<button class="tm-qc ghost" data-catm>${I.edit}Düzenle</button></div>
-      <div class="tm-filt"><div class="tm-mseg">${[['all','Hepsi'],['plan','Planlandı'],['doing','Devam'],['done','Tamamlandı']].map(([k,l])=>`<button data-fst="${k}" class="${F.st===k?'on':''}">${l}</button>`).join('')}</div>
-        <select class="tm-sel" data-fcat aria-label="Kategori filtresi"><option value="">Tüm kategoriler</option>${TM.cats.map(c=>`<option value="${c.id}"${F.cat===c.id?' selected':''}>${E(c.icon)} ${E(c.name)}</option>`).join('')}</select>
+      <div class="tm-filt sbar ws-sbar"><div class="tm-mseg">${[['all','Hepsi'],['plan','Planlandı'],['doing','Devam'],['done','Tamamlandı']].map(([k,l])=>`<button data-fst="${k}" class="${F.st===k?'on':''}">${l}</button>`).join('')}</div>
+        <select class="tm-sel" data-fcat aria-label="Kategori filtresi"><option value="">Tüm kategoriler</option>${TM.cats.map(c=>`<option value="${c.id}"${F.cat===c.id?' selected':''}>${E(c.icon)} ${E(c.name)}</option>`).join('')}<option value="__edit">Kategorileri düzenle…</option></select>
         <input class="tm-srch" data-fq value="${E(F.q)}" placeholder="Ara…" aria-label="Aktivitelerde ara"></div>
       ${all.length?`${up.length?`<div class="sh"><span>Yaklaşan ve planlanan</span><span class="rule"></span></div><div class="tm-list">${group(up)}</div>`:''}
         <div class="sh"><span>Geçmiş</span><span class="rule"></span></div><div class="tm-list">${past.length?group(past):'<div class="none">Filtreye uyan geçmiş aktivite yok.</div>'}</div>`
@@ -261,7 +260,7 @@ const Time=(()=>{
       const fl=t.closest('[data-fullstats]');if(fl){e.preventDefault();try{if(window.parent!==window&&parent.HUB?.open){parent.HUB.open('p:istatistik');return}}catch{}location.href='../istatistik/'+(location.search.includes('local')?'?local':'');return}
       if(cur()==='cal'&&calMode!=='month'&&t.closest('.tm-col'))slotClick(e)});
     v.addEventListener('keydown',e=>{const st=e.target.closest?.('[data-act-st]');if(st&&(e.key==='Enter'||e.key===' ')){e.preventDefault();st.click()}const ev=e.target.closest?.('.tm-ev');if(ev&&e.key==='Enter')open(ev.dataset.ev)});
-    v.addEventListener('change',e=>{if(e.target.matches('[data-fcat]')){F.cat=e.target.value;rerender()}});
+    v.addEventListener('change',e=>{if(e.target.matches('[data-fcat]')){if(e.target.value==='__edit'){e.target.value=F.cat;catManager(rerender);return}F.cat=e.target.value;rerender()}});
     v.addEventListener('input',e=>{if(e.target.matches('[data-fq]')){F.q=e.target.value.toLocaleLowerCase('tr');clearTimeout(bind.t);bind.t=setTimeout(()=>{const pos=e.target.selectionStart;rerender();const n=$('[data-fq]');if(n){n.focus();n.setSelectionRange(pos,pos)}},200)}});
     v.addEventListener('pointerdown',e=>{if(e.target.closest('.tm-ev'))gridDrag(e)});
     /* ay görünümünde aktivite sürükle → başka güne */

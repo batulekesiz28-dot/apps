@@ -269,7 +269,7 @@
 .ag-ev.st-done .ag-nm{color:var(--ink2)}
 .cal .dp .tk-list{margin:0}
 .cal .dp .tk-row{min-height:36px;padding:7px 0;gap:10px;align-items:center}.cal .dp .tk-row::after{display:none}.cal .dp .tk-row .tk-grip{display:none}
-.cal .dp .tk-row>.tk-chk{width:18px;height:18px}.cal .dp .tk-t{font-size:13.5px}.cal .dp .tk-none{padding:3px 0 6px;font-size:12.5px}
+.cal .dp .tk-row>.tk-chk{--vis:18px}.cal .dp .tk-t{font-size:13.5px}.cal .dp .tk-none{padding:3px 0 6px;font-size:12.5px}
 .cal .dp .tk-qday{height:34px;margin:0;padding:0 0 0 1px;border-radius:0;background:none;box-shadow:none}
 .cal .dp .tk-qday:focus-within{background:none;box-shadow:inset 0 -1px 0 var(--line2)}
 .cal .dp .tk-qday input{font-size:13px}

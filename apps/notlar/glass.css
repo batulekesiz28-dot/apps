@@ -110,7 +110,7 @@ html[data-theme=dark] .tk-row:hover{background:rgba(255,255,255,.035)}
 html[data-theme=dark] .tk-row.sel{background:rgba(255,255,255,.06)}
 html[data-theme=dark] .tk-row::after{background:var(--line)}
 html[data-theme=dark] .tk-row>.tk-chk,html[data-theme=dark] .tk-chk{--pc:rgba(255,255,255,.42)}
-html[data-theme=dark] .tk-row>.tk-chk{width:20px;height:20px;box-shadow:inset 0 0 0 1.5px var(--pc)}
+html[data-theme=dark] .tk-row>.tk-chk{--vis:20px;--ring:1.5px}
 html[data-theme=dark] .tk-row:hover>.tk-chk:not(.on){--pc:rgba(255,255,255,.7)}
 html[data-theme=dark] .tk-chk.on,html[data-theme=dark] .tk-row.done>.tk-chk,html[data-theme=dark] .tk-pop>.tk-chk{background:rgba(255,255,255,.88)!important;box-shadow:none!important}
 html[data-theme=dark] .tk-chk.on::after,html[data-theme=dark] .tk-row.done>.tk-chk::after,html[data-theme=dark] .tk-pop>.tk-chk::after{border-color:#0C0C0E!important}
@@ -174,3 +174,43 @@ html[data-theme=dark] #topAct .tb:hover{color:var(--ink);background:var(--glass-
 /* ── 16. Belgeler (eski Kütüphane) Medya ile aynı yüzeylerde: sıcak kahverengi/turuncu yerine nötr koyu + beyaz-mat vurgu ── */
 html[data-theme=dark]:not([data-skin]){--lib-bg:#0A0A0C;--lib-bg2:#141418;--lib-ink:#F5F5F7;--lib-ink2:#C9C9CE;--lib-ink3:#A1A1A8;--lib-line:rgba(255,255,255,.09);
   --lib-card:#18181C;--lib-acc:#F5F5F7;--lib-acc-ink:#0D0D0F}
+
+/* ── 17. Akıllı başlık (Workspace'teki uzun listeler: Görevler, Aktiviteler) — denetleyici index.html smartBar ── */
+#scroll{container-type:inline-size}
+#view .ws-sbar{position:sticky;top:0;z-index:20;margin-inline:calc(50% - 50cqw);padding-inline:calc(50cqw - 50%)!important;
+  background:color-mix(in srgb,var(--bg) 84%,transparent);backdrop-filter:saturate(1.5) blur(20px);-webkit-backdrop-filter:saturate(1.5) blur(20px);box-shadow:inset 0 -.5px 0 var(--line);
+  transition:transform .34s cubic-bezier(.2,.8,.2,1),opacity .22s ease}
+.app.bar-hide #view .ws-sbar{transform:translateY(-100%);opacity:0;pointer-events:none}
+.tk-head.ws-sbar{padding:10px 0 12px;margin-top:-10px}.tm-filt.ws-sbar{padding:10px 0;margin-top:-10px}
+@media (prefers-reduced-motion:reduce){#view .ws-sbar{transition:none}}
+
+/* ── 18. Estetik denetim düzeltmeleri ── */
+/* yol satırı yalnızca iç içe sayfada; diğer ekranlarda başlığı tekrar ediyordu */
+.app.nocrumb .crumbbar{display:none}
+.app.nocrumb .view>.wrap,.app.nocrumb .view>.tk-wrap{padding-top:28px}
+/* akıllı başlık şeridi dururken zeminsiz; sadece içerik altından geçerken buzlu cam */
+.app:not(.scrolled) #view .ws-sbar{background:none;backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none}
+/* grup etiketi (Yaklaşan / Geçmiş) gün başlığından baskın olmasın */
+.tm-page .sh{font-size:12.5px;font-weight:500;color:var(--ink3);margin-top:28px}
+/* telefonda hızlı eylemler dev kartlar değil, kompakt satırlar */
+@media (max-width:760px){.quick{gap:8px;margin:24px 0 32px}.quick .qa{flex-direction:row;align-items:center;gap:14px;padding:12px 14px;min-height:60px}.quick .qa .e{font-size:20px}}
+/* soluk (önceki/sonraki ay) günler okunur kalsın — tıklanabilir oldukları için kontrast şart; ayrım yazı ağırlığıyla */
+.tmc-d.out,.cal .cd.out .dn{color:var(--ink3)!important;font-weight:400}
+.tmc-d:not(.out){font-weight:500}
+/* Şablonlar başlığı diğer sayfa başlıklarıyla aynı ölçekte */
+.ttl h1{font-family:var(--font);font-weight:600;letter-spacing:-.022em;font-size:26px}
+.tb.tai,.tb.tsrch,.tb.sbt{flex-shrink:0}
+@media (max-width:760px){
+  .ttl h1{font-size:22px}
+  .cal .tm-ad>span{font-size:12px}
+  .cal .dp .tk-qday{height:40px}
+  .tm-page .tm-st,.cal .tm-st{height:36px;min-width:36px}
+}
+/* takvim çipi daireyi (dokunma alanı) kırpmasın; başlık metni kendi içinde kırpılıyor */
+.cal .tk-chip{overflow:visible}
+/* küçük metin bağlantıları en az 28px dokunma yüksekliği */
+.tk-dr .tk-lnk,.tk-dp .tk-lnk{min-height:28px;display:inline-flex;align-items:center}
+@media (max-width:760px){.tk-dr .tk-lnk,.tk-dp .tk-lnk{min-height:40px}.tm-ed .tm-ed-t{min-height:40px}.tm-page a[data-fullstats]{display:inline-flex;align-items:center;min-height:40px}}
+/* ay/hafta ızgarasında görev = durum göstergesi (tamamlama gün panelinde ve listede) */
+.tk-ci{flex-shrink:0;width:10px;height:10px;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--ink3)}.tk-ci.on{background:var(--ink3);box-shadow:none}
+@media (max-width:760px){.tk-dp .tk-lnk.danger{min-width:48px;justify-content:center}}

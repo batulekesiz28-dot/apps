@@ -438,12 +438,12 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
 @media (max-width:760px){.pgb{min-height:58px}.tw,.tw0{width:36px;height:40px}.ni.tr{padding-left:calc(2px + var(--dp,0)*14px)}.sub-add{height:44px}.crumb .cr{height:40px;max-width:120px}.pgn{display:none}.mv-q{height:40px}}
 </style>
 <script>/* mat cam tasarımı: bir kereliğine koyu temaya geç (sonra tema düğmesi serbest) */try{if(!localStorage.getItem('notlar:glass1')){localStorage.setItem('notlar:glass1','1');localStorage.setItem('notlar:theme','"dark"')}}catch(e){}</script>
-<script src="../../shared/skin.js?v=20261115h"></script>
-<link rel="stylesheet" href="library.css?v=20261115h">
-<link rel="stylesheet" href="brain.css?v=20261115h">
-<link rel="stylesheet" href="media.css?v=20261115h">
-<link rel="stylesheet" href="time.css?v=20261115h">
-<link rel="stylesheet" href="tasks.css?v=20261115h">
+<script src="../../shared/skin.js?v=20261115q"></script>
+<link rel="stylesheet" href="library.css?v=20261115q">
+<link rel="stylesheet" href="brain.css?v=20261115q">
+<link rel="stylesheet" href="media.css?v=20261115q">
+<link rel="stylesheet" href="time.css?v=20261115q">
+<link rel="stylesheet" href="tasks.css?v=20261115q">
 <style id="tnavCss">
 /* ── Üst gezinme (sol menü yerine) — ince cam şerit, kayan seçili vurgu ── */
 .app,.app[data-mode=lib],.app[data-mode=brain]{grid-template-columns:1fr}
@@ -476,7 +476,7 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
 @media (max-width:420px){.tnav a,.tnav button,.top .modes a{padding:0 8px;min-width:38px}.tb.tsrch{margin-left:0}}
 @media (prefers-reduced-motion:reduce){.tnav .tk,.side{transition:none}}
 </style>
-<link rel="stylesheet" href="glass.css?v=20261115h">
+<link rel="stylesheet" href="glass.css?v=20261115q">
 </head>
 <body>
 <div class="app" id="app">
@@ -522,12 +522,12 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
   </div>
 </div>
 <div class="toasts" id="toasts"></div>
-<script src="kb.js?v=20261115h"></script>
-<script src="library.js?v=20261115h"></script>
-<script src="media.js?v=20261115h"></script>
-<script src="brain.js?v=20261115h"></script>
-<script src="time.js?v=20261115h"></script>
-<script src="tasks.js?v=20261115h"></script>
+<script src="kb.js?v=20261115q"></script>
+<script src="library.js?v=20261115q"></script>
+<script src="media.js?v=20261115q"></script>
+<script src="brain.js?v=20261115q"></script>
+<script src="time.js?v=20261115q"></script>
+<script src="tasks.js?v=20261115q"></script>
 
 <script>
 'use strict';
@@ -812,10 +812,21 @@ function renderView(soft){
   const v=$('#view'),sc=$('#scroll'),keep=soft?sc.scrollTop:0;
   if(view==='page')renderPage();else if(view==='timeline')renderTimeline();else if(view==='cal')renderCal();else if(view==='acts')Time.renderActs();else if(view==='tasks')Time.renderTasks();else if(view==='stats')Time.renderStats();else if(view==='tpl')renderTpl();else renderHome();
   sc.scrollTop=keep;onScroll();
+  $('#app').classList.toggle('nocrumb',!(view==='page'&&pages.get(openId)?.parent));
   if(!soft)anim(v,[{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'none'}],{duration:460,easing:OUT});
 }
 const sc=$('#scroll');
-let scrolledOn=false;function onScroll(){const on=sc.scrollTop>4;$('#top').style.setProperty('--topline',on?1:0);if(on!==scrolledOn){scrolledOn=on;$('#app').classList.toggle('scrolled',on)}}
+let scrolledOn=false;function onScroll(){const on=sc.scrollTop>4;$('#top').style.setProperty('--topline',on?1:0);if(on!==scrolledOn){scrolledOn=on;$('#app').classList.toggle('scrolled',on)}smartBar()}
+/* Akıllı başlık: sayfanın .sbar alanı aşağı kaydırınca saklanır, yukarı doğru küçük bir hareketle geri gelir.
+   Eşikler: aşağı 28px (titremeyi önler), yukarı 4px (tek tekerlek hareketi yeter); yön değişince sayaç sıfırlanır;
+   en üstte (ilk 80px) ve içinde odak varken (arama yazarken, seçim kutusu açıkken) her zaman görünür. Sadece transform/opacity. */
+const SB={y:0,acc:0,hid:false};
+function smartBar(){const y=sc.scrollTop,d=y-SB.y;SB.y=y;const bar=$('#view .sbar');
+  const set=h=>{if(h===SB.hid)return;SB.hid=h;$('#app').classList.toggle('bar-hide',h)};
+  if(!bar||y<80||bar.contains(document.activeElement)){SB.acc=0;return set(false)}
+  if(!d)return;if((d>0)!==(SB.acc>0))SB.acc=0;SB.acc+=d;
+  if(SB.acc>28)set(true);else if(SB.acc<-4)set(false)}
+document.addEventListener('focusin',e=>{if(SB.hid&&e.target.closest?.('#view .sbar'))smartBar()});
 sc.addEventListener('scroll',()=>{onScroll();hideFloat(true)},{passive:true});
 function setCrumb(ic,label,act=''){$('#crumb').innerHTML=label?`<span class="ic">${ic}</span><span>${esc(label)}</span>`:'';$('#topAct').innerHTML=act}
 

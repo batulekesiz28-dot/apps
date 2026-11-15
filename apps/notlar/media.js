@@ -75,7 +75,7 @@ const Media=(()=>{
   const IMG=(src,alt,cls='',eager)=>src?`<img class="${cls}" src="${E(src)}"${alt&&alt!==src?` data-alt="${E(alt)}"`:''} alt="" ${eager?'fetchpriority="high"':'loading="lazy"'} decoding="async" referrerpolicy="no-referrer" onload="this.classList.add('ok')" onerror="Media.imgErr(this)">`:'';
   // görsel yoksa: içeriğin adıyla tasarlanmış, türüne göre değişen tipografik kapak (rastgele görsel değil)
   function fallback(it){const g=(it.genres||[])[0]||'';
-    return`<div class="fp fp-${it.type}"><span class="fp-k">${TN[it.type]}${it.year?' · '+E(it.year):''}</span><b class="fp-t">${E(it.title)}</b>${g?`<span class="fp-g">${E(g)}</span>`:''}</div>`}
+    return`<div class="fp fp-${it.type}" aria-hidden="true"><span class="fp-k">${TN[it.type]}${it.year?' · '+E(it.year):''}</span><b class="fp-t">${E(it.title)}</b>${g?`<span class="fp-g">${E(g)}</span>`:''}</div>`}
   const poster=(it,cls='')=>`<div class="mp ${cls}" style="--h:${hash(it.title)%360}">${fallback(it)}${IMG(it.cover,it.cover2)}</div>`;
   const wideArt=it=>{const w=it.wide||it.backdrop,h=hash(it.title)%360;if(w)return`<div class="mw" style="--h:${h}">${fallback(it)}${IMG(w,it.cover)}</div>`;
     return`<div class="mw pb" style="--h:${h}">${fallback(it)}${it.cover?`<div class="mw-bl">${IMG(it.cover,it.cover2)}</div><div class="mw-p">${IMG(it.cover,it.cover2)}</div><div class="mw-t"><b>${E(it.title)}</b><span>${metaShort(it)}</span></div>`:''}</div>`};
@@ -83,7 +83,7 @@ const Media=(()=>{
   const myStars=it=>it.rating?`<span class="mc-my" title="Puanım ${it.rating}/10">${IC.star}${it.rating}</span>`:'';
   function metaShort(it){const a=[];if(it.type==='book'&&it.author)a.push(it.author);if(it.year)a.push(it.year);if(it.type==='game'&&it.platforms.length)a.push(it.platforms.slice(0,2).join(' · '));else if(it.genres.length)a.push(it.genres[0]);
     if(it.type==='series'&&it.season)a.push(`S${it.season}${it.ep?' B'+it.ep:''}`);return a.map(E).join(' · ')}
-  function metaLong(it){const a=[TN[it.type]];if(it.year)a.push(it.year);if(it.genres.length)a.push(it.genres.slice(0,3).join(', '));if(it.type==='game'&&it.platforms.length)a.push(it.platforms.slice(0,4).join(' · '));
+  function metaLong(it,noType){const a=noType?[]:[TN[it.type]];if(it.year)a.push(it.year);if(it.genres.length)a.push(it.genres.slice(0,3).join(', '));if(it.type==='game'&&it.platforms.length)a.push(it.platforms.slice(0,4).join(' · '));
     if(it.eps)a.push(it.eps+' bölüm');return a.map(E).join('<i>·</i>')}
   const prog=it=>it.status==='doing'&&it.eps&&it.ep?`<span class="mc-pr"><i style="width:${Math.min(100,Math.round(it.ep/it.eps*100))}%"></i></span>`:'';
 
@@ -187,19 +187,15 @@ const Media=(()=>{
     if(st.min)r=r.filter(i=>(i.rating||(parseFloat(i.score.replace(/[^\d.]/g,''))/(i.type==='game'?10:1))||0)>=st.min);
     const k=st.sort;r=r.slice();if(k==='title')r.sort((a,b)=>a.title.localeCompare(b.title,'tr'));else if(k==='year')r.sort((a,b)=>(+b.year||0)-(+a.year||0));else if(k==='score')r=byScore(r);else if(k==='rating')r.sort((a,b)=>b.rating-a.rating);else r=byAdded(r);return r}
   function pageHTML(s,page){const base=all().filter(i=>inSec(i,s));const l=base.filter(it=>page==='review'?!!flagOf(it):inPage(it,page));
-    const genres=topGenres(l.length>=6?l:base).slice(0,14),r=filt(l),t=(SEC[s].pages.find(p=>p[0]===page)||[0,page==='review'?'İnceleme':'Tümü'])[1];
-    const tools=page==='review'?'':`<div class="mc-tools">
-        ${genres.length?`<div class="mc-gen" role="group" aria-label="Tür filtresi"><button data-mg="" class="${st.genre?'':'on'}">Tüm türler</button>${genres.map(g=>`<button data-mg="${E(g)}" class="${st.genre===g?'on':''}">${E(g)}</button>`).join('')}</div>`:''}
-        <span class="grow"></span><label class="mc-sel">Puan<select data-mmin aria-label="En düşük puan">${[[0,'Hepsi'],[7,'7+'],[8,'8+'],[9,'9+']].map(([v,n])=>`<option value="${v}"${+st.min===v?' selected':''}>${n}</option>`).join('')}</select></label>
-        <label class="mc-sel">Sırala<select data-msort aria-label="Sıralama">${[['added','Eklenme'],['title','Ad'],['year','Yıl'],['score','Genel puan'],['rating','Puanım']].map(([v,n])=>`<option value="${v}"${st.sort===v?' selected':''}>${n}</option>`).join('')}</select></label></div>`;
-    return`<div class="mc-page"><header class="mc-ph"><h1>${E(t)}</h1><p>${r.length} ${s==='games'?'oyun':s==='books'?'kitap':'içerik'}${page==='review'?' · türü ya da posteri kesin olmayanlar':''}</p></header>${tools}
+    const r=filt(l);st.count=page==='review'?l.length:r.length;
+    return`<div class="mc-page">${page==='review'?'<p class="mc-note">Türü ya da posteri kesin olmayanlar — onayla ya da doğru kaydı seç.</p>':''}
       ${page==='review'&&l.length?`<div class="mc-revl">${l.map(reviewRow).join('')}</div>`:r.length?gridHTML(r,s):secEmpty(s,l.length?'all':page)}</div>`}
   function reviewRow(it){return`<div class="mc-rr">${poster(it,'sm')}<div><b>${E(it.title)}</b><small>${E(TN[it.type])}${it.year?' · '+E(it.year):''} · ${it.flag==='type'?'Türü belirsiz':it.match==='none'?'Eşleşme bulunamadı':'Eşleşme kesin değil'}</small>
       <p>${E(it.flagWhy||(it.match==='none'?'Bu adla, bu türde güvenilir bir kayıt bulunamadı. Adı düzeltirsen ya da başka aday seçersen posteri gelir.':`“${it.wiki?decodeURIComponent(it.wiki).replace(/_/g,' '):it.title}” ile eşleştirdim ama adı ya da yılı birebir tutmuyor.`))}</p></div>
       <div class="mc-rb">${it.flag==='type'&&it.flagTo?`<button class="mb sm" data-mfix="move" data-id="${it.id}">${TN[it.flagTo]} yap</button>`:''}<button class="mb sm" data-mfix="ok" data-id="${it.id}">${IC.check}Doğru</button><button class="mb sm pri" data-mo="${it.id}">İncele</button></div></div>`}
   function searchHTML(){const qq=norm(st.qs),l=all().filter(i=>norm(i.title+' '+i.genres.join(' ')+' '+(i.wiki||'')).includes(qq));
     const g=s=>l.filter(i=>inSec(i,s));
-    return`<div class="mc-page"><header class="mc-ph"><h1>“${E(st.qs)}”</h1><p>${l.length} sonuç</p></header>${l.length?ORDER.map(s=>g(s).length?`<h3 class="mc-h3">${SEC[s].n}</h3>${gridHTML(g(s),s)}`:'').join(''):`<div class="mc-none"><span>${IC.search}</span><b>Bulunamadı</b><p>Başka bir ad dene ya da yeni içerik olarak ekle.</p><button class="mb pri" data-madd="${E(st.qs)}">${IC.plus}“${E(st.qs)}” ekle</button></div>`}</div>`}
+    return`<div class="mc-page"><p class="mc-note">“${E(st.qs)}” için ${l.length} sonuç</p>${l.length?ORDER.map(s=>g(s).length?`<h3 class="mc-h3">${SEC[s].n}</h3>${gridHTML(g(s),s)}`:'').join(''):`<div class="mc-none"><span>${IC.search}</span><b>Bulunamadı</b><p>Başka bir ad dene ya da yeni içerik olarak ekle.</p><button class="mb pri" data-madd="${E(st.qs)}">${IC.plus}“${E(st.qs)}” ekle</button></div>`}</div>`}
 
   /* ── kabuk ── */
   const VIEWS=[['tv','Apple TV',IC.vtv],['nf','Netflix',IC.vnf],['compact','Kompakt',IC.vcp],['list','Liste',IC.vls]];
@@ -209,10 +205,22 @@ const Media=(()=>{
         return`<a href="#lib/m/${st.sec}${k==='home'?'':'/'+k}" class="${st.page===k?'on':''}"${st.page===k?' aria-current="page"':''}>${n}${k==='home'?'':`<em>${c}</em>`}</a>`}).join('')+(()=>{const r=all().filter(i=>inSec(i,st.sec)&&flagOf(i)).length;return r?`<a href="#lib/m/${st.sec}/review" class="rev${st.page==='review'?' on':''}">${IC.warn}İnceleme<em>${r}</em></a>`:''})():'';
     return`<nav class="mc-nav" aria-label="Medya bölümleri"><a class="mc-brand" href="#lib" aria-label="Medya ana sayfa"><span>${IC.play}</span><b>Medya</b></a>
       <div class="mc-tabs">${tabs.map(([k,n,h,ic])=>`<a href="${h}" class="t-${k}${st.sec===k?' on':''}"${st.sec===k?' aria-current="page"':''}>${ic}<span>${n}</span></a>`).join('')}${st.look.tabsOff.includes('docs')?'':`<a href="#lib/docs" class="t-docs">${IC.link}<span>Belgeler</span></a>`}</div>
-      <div class="mc-r"><label class="mc-s">${IC.search}<input data-ms value="${E(st.qs)}" placeholder="Ara" aria-label="Film, dizi, anime, oyun ve kitap ara" autocomplete="off"><kbd>/</kbd></label>
-      ${viewSeg()}<button class="mc-gear" data-mset aria-label="Görünüm ayarları" title="Görünüm ayarları" aria-haspopup="dialog">${IC.gear}</button>
-      <span class="mc-sync" aria-live="polite"${R.busy?'':' hidden'}>${IC.sync}<span>${R.busy?syncTxt():''}</span></span>
-      <button class="mb pri mc-addb" data-madd>${IC.plus}<span>Ekle</span></button></div></nav>${sub?`<div class="mc-sub" role="navigation" aria-label="${E(SEC[st.sec].n)} sayfaları">${sub}</div>`:''}`}
+      <div class="mc-r"><span class="mc-sync" aria-live="polite"${R.busy?'':' hidden'}>${IC.sync}<span>${R.busy?syncTxt():''}</span></span></div></nav>${bar(sub)}`}
+  /* sayfa kontrol alanı: solda başlık + durum sekmeleri, sağda araçlar (arama · filtre · görünüm · ayar).
+     Kaydırınca saklanır (.sbar → Notlar'ın akıllı başlık denetleyicisi), yukarı kaydırınca geri gelir. */
+  const countTxt=()=>{const n=st.count??0,s=st.sec;return`${n} ${s==='games'?'oyun':s==='books'?'kitap':s==='movies'?'film':s==='series'?'dizi':s==='anime'?'anime':'içerik'}`};
+  function bar(sub){const home=st.sec==='home',list=!home&&st.page!=='home'&&st.page!=='review';
+    const sel=(attr,label,opts,cur)=>`<label class="mc-fsel"><span class="vh">${label}</span><select ${attr} aria-label="${label}">${opts.map(([v,n])=>`<option value="${E(v)}"${String(cur)===String(v)?' selected':''}>${E(n)}</option>`).join('')}</select></label>`;
+    let filters='';if(list){const base=all().filter(i=>inSec(i,st.sec)),g=topGenres(base).slice(0,20);
+      filters=(g.length?sel('data-mgs','Tür',[['','Tüm türler'],...g.map(x=>[x,x])],st.genre):'')+sel('data-mmin','En düşük puan',[[0,'Tüm puanlar'],[7,'7 ve üstü'],[8,'8 ve üstü'],[9,'9 ve üstü']],+st.min)
+        +sel('data-msort','Sıralama',[['added','Eklenme sırası'],['title','Ada göre'],['year','Yıla göre'],['score','Genel puana göre'],['rating','Puanıma göre']],st.sort)}
+    const tools=`<div class="mc-tb"><label class="mc-s" title="Ara (/)">${IC.search}<input data-ms value="${E(st.qs)}" placeholder="Ara" aria-label="Film, dizi, anime, oyun ve kitap ara" autocomplete="off"></label>
+      ${filters}${viewSeg()}<button class="mc-gear" data-mset aria-label="Görünüm ayarları" title="Görünüm ayarları" aria-haspopup="dialog">${IC.gear}</button>
+      <button class="mc-add" data-madd title="Ekle (A)" aria-label="İçerik ekle">${IC.plus}<span>Ekle</span></button></div>`;
+    if(home)return`<div class="mc-pbar sbar home">${tools}</div>`;
+    const n=all().filter(i=>inSec(i,st.sec)).length;
+    return`<div class="mc-pbar sbar"><div class="mc-pt"><h1>${E(SEC[st.sec].n)}</h1><span class="mc-pb-n">${n} ${countTxt().split(' ').slice(1).join(' ')}</span></div>${tools}
+      ${sub?`<nav class="mc-sub" aria-label="${E(SEC[st.sec].n)} sayfaları">${sub}</nav>`:''}</div>`}
   const syncTxt=()=>`Posterler eşleşiyor ${R.done}/${R.total}`;
   function body(){if(st.qs)return searchHTML();if(st.sec==='home')return homeHTML();if(st.page==='home')return secHome(st.sec);return pageHTML(st.sec,st.page)}
   function parse(parts){const p=parts||[];let sec='home',page='home',gq='';if(p[0]==='m'){const k=p[1]==='tv'?'movies':p[1];sec=SEC[k]?k:'home';let pg=p[2]||'home';const i=pg.indexOf('?');if(i>=0){gq=decodeURIComponent((pg.slice(i+1).match(/g=([^&]*)/)||[])[1]||'');pg=pg.slice(0,i)}page=pg}
@@ -220,13 +228,13 @@ const Media=(()=>{
   function render(parts,o={}){const p=parse(parts);const changed=p.sec!==st.sec||p.page!==st.page;st.base=parts||[];
     if(changed){st.kind='';st.genre='';st.min=0;st.hero=0}st.sec=p.sec;st.page=p.page;if(p.gq){st.genre=p.gq;st.page='all'}if(changed||!o.keepQ)st.qs='';
     const v=q('#view');let root=q('#view>.mc');if(!root){v.innerHTML='<div class="mc"></div>';root=q('#view>.mc');wire(root)}
-    root.dataset.sec=st.sec;applyLook(root);root.innerHTML=nav()+`<main class="mc-main">${body()}</main>`;if(changed)enter(q('.mc-main',root));
+    root.dataset.sec=st.sec;applyLook(root);const b=body();root.innerHTML=nav()+`<main class="mc-main">${b}</main>`;root.classList.toggle('has-hero',!!q('.mh',root));if(changed)enter(q('.mc-main',root));
     document.getElementById('app')?.classList.add('mc-on');
     if(typeof setCrumb==='function')setCrumb(IC.play,st.sec==='home'?'Medya':SEC[st.sec].n,'');
     if(changed&&!o.soft)q('#scroll').scrollTop=0;else if(changed)q('#scroll').scrollTop=0;
     heroStart();arrows();lazyWatch();Library.loadPack?.().then(migrate);queue()}
   function refresh(){const root=q('#view>.mc');if(!root)return;const sc=q('#scroll'),y=sc.scrollTop,rows=qa('.mc-row',root).map(r=>r.scrollLeft),f=document.activeElement,inS=f&&f.matches('[data-ms]');
-    if(inS){const m=q('.mc-main',root);m.innerHTML=body()}else root.innerHTML=nav()+`<main class="mc-main">${body()}</main>`;
+    if(inS){const m=q('.mc-main',root);m.innerHTML=body()}else{const b=body();root.innerHTML=nav()+`<main class="mc-main">${b}</main>`;root.classList.toggle('has-hero',!!q('.mh',root))}
     lazyWatch();qa('.mc-row',root).forEach((r,i)=>r.scrollLeft=rows[i]||0);sc.scrollTop=y;heroStart();arrows();if(q('.mx-bg'))detailRefresh()}
   function arrows(){qa('.mc .mc-row').forEach(r=>{const w=r.closest('.mc-rw');const upd=()=>{w.classList.toggle('al',r.scrollLeft>8);w.classList.toggle('ar',r.scrollLeft+r.clientWidth<r.scrollWidth-8)};upd();r.onscroll=upd})}
   let rT=0;KB.on(()=>{if(!q('#view>.mc'))return;clearTimeout(rT);rT=setTimeout(()=>{const f=document.activeElement;if(f&&f.closest?.('.mx textarea,.mx input,.mx [contenteditable],.mq'))return detailRefresh(true);refresh()},140)});
@@ -250,7 +258,7 @@ const Media=(()=>{
       if(c&&e.target===c&&(e.key==='ArrowRight'||e.key==='ArrowLeft')){const sib=e.key==='ArrowRight'?c.nextElementSibling:c.previousElementSibling;if(sib?.matches('[data-mi]')){e.preventDefault();sib.focus();sib.scrollIntoView({block:'nearest',inline:'nearest',behavior:motion()?'smooth':'auto'})}}
       if(e.target.matches('[data-ms]')){if(e.key==='Escape'){e.target.value='';st.qs='';refresh();e.target.blur()}if(e.key==='Enter'){const f=q('.mc-main [data-mi]');if(f)open(f.dataset.mi)}}});
     root.addEventListener('input',e=>{if(e.target.matches('[data-ms]')){clearTimeout(root.sT);root.sT=setTimeout(()=>{st.qs=e.target.value.trim();q('.mc-main',root).innerHTML=body();arrows();heroStart();lazyWatch()},140)}});
-    root.addEventListener('change',e=>{if(e.target.matches('[data-msort]')){st.sort=e.target.value;lss('mc:sort',st.sort);swap()}if(e.target.matches('[data-mmin]')){st.min=+e.target.value;swap()}});
+    root.addEventListener('change',e=>{if(e.target.matches('[data-mgs]')){st.genre=e.target.value;swap()}if(e.target.matches('[data-msort]')){st.sort=e.target.value;lss('mc:sort',st.sort);swap()}if(e.target.matches('[data-mmin]')){st.min=+e.target.value;swap()}});
     root.addEventListener('contextmenu',e=>{const c=e.target.closest('[data-mi]');if(!c)return;e.preventDefault();menu(c.dataset.mi,{getBoundingClientRect:()=>({left:e.clientX,right:e.clientX,top:e.clientY,bottom:e.clientY})})});
     // dokunmatik: kartın üstünde uzun bas → hızlı menü
     let lp=0;root.addEventListener('touchstart',e=>{const c=e.target.closest('[data-mi]');if(!c)return;lp=setTimeout(()=>{lp=-1;menu(c.dataset.mi,c)},520)},{passive:true});
@@ -278,9 +286,9 @@ const Media=(()=>{
       <h4>Liste</h4>${rng('rowh','Satır yüksekliği',70,170,5)}
       <label>Sütunlar</label><div class="mset-tgs">${LC.map(([k,n])=>tg('data-lc',k,n,L.lc[k])).join('')}</div>
       <h4>Ana sayfa</h4><div class="mset-tgs">${tg('data-lt','hero','Büyük vitrin',L.hero)}</div>
-      <label>Raflar — aç/kapat, sırala</label><div class="mset-shs">${sh.map((k,n)=>`<div class="mset-sh${L.off.includes(k)?' off':''}">${tg('data-lsh',k,SH[k],!L.off.includes(k))}
+      <label>Raflar — aç/kapat, sırala</label><div class="mset-shs">${sh.map((k,n)=>`<div class="mset-sh${L.off.includes(k)?' off':''}">${tg('data-lsh',k,SH[k],!L.off.includes(k)).replace('role="switch"',`role="switch" aria-label="${SH[k]} rafı"`)}
         <button data-lmv="${k}:-1" aria-label="${SH[k]} yukarı" ${n?'':'disabled'}>${IC.l}</button><button data-lmv="${k}:1" aria-label="${SH[k]} aşağı" ${n<sh.length-1?'':'disabled'}>${IC.r}</button></div>`).join('')}</div>
-      <h4>Üstteki kategoriler</h4><div class="mset-tgs">${[...ORDER,'docs'].map(k=>tg('data-ltab',k,k==='docs'?'Belgeler':SEC[k].n,!L.tabsOff.includes(k))).join('')}</div>
+      <h4>Üstteki kategoriler</h4><div class="mset-tgs">${[...ORDER,'docs'].map(k=>{const n=k==='docs'?'Belgeler':SEC[k].n;return tg('data-ltab',k,n,!L.tabsOff.includes(k)).replace('role="switch"',`role="switch" aria-label="${n} sekmesi"`)}).join('')}</div>
       <h4>Yazı ve ikonlar</h4><label>Yazı boyutu</label>${seg('font',[['s','Küçük'],['m','Orta'],['l','Büyük']])}
       <label>İkon boyutu</label>${seg('icon',[['s','Küçük'],['m','Orta'],['l','Büyük']])}
       <button class="mset-r" data-msr>Hepsini varsayılana döndür</button>`}
@@ -351,10 +359,9 @@ const Media=(()=>{
     return`<article class="mx" role="dialog" aria-modal="true" aria-label="${E(it.title)}">
       <div class="mx-hero"><div class="mx-bd ${wide?'wide':'post'}">${IMG(it.backdrop||it.cover,wide?it.cover:it.cover2,'',true)}</div><div class="mx-sh"></div>
         <button class="mx-x" data-mx aria-label="Kapat (Esc)" title="Kapat">${IC.x}</button>
-        <div class="mx-head">${poster(it,'mx-p')}<div class="mx-ti"><a class="mx-k" href="#lib/m/${s}">${IC[it.type==='movie'?'film':it.type==='series'?'tv':it.type]}${TN[it.type]} · ${SEC[s].n}</a>
-          <h1>${E(it.title)}</h1><p class="mx-m">${metaLong(it)}${it.score?`<span class="mh-sc">${scoreTxt(it)}</span>`:''}</p>
-          <div class="mx-st" role="radiogroup" aria-label="${g?'Oynama':'İzlenme'} durumu">${Object.entries(stMap(it)).map(([k,n])=>`<button role="radio" aria-checked="${it.status===k}" class="${it.status===k?'on':''}" data-ds="${k}">${it.status===k?IC.check:''}${n}</button>`).join('')}
-            <button class="mb ic${it.fav?' on':''}" data-dfav aria-pressed="${it.fav}" aria-label="Favori" title="Favori">${IC.heart}</button></div>
+        <div class="mx-head">${poster(it,'mx-p')}<div class="mx-ti"><a class="mx-k" href="#lib/m/${s}">${IC[SEC[s].ic]}${SEC[s].n}</a>
+          <h1>${E(it.title)}</h1><p class="mx-m">${metaLong(it,true)}${it.score?`<span class="mh-sc">${scoreTxt(it)}</span>`:''}</p>
+          <div class="mx-st" role="radiogroup" aria-label="${g?'Oynama':'İzlenme'} durumu">${Object.entries(stMap(it)).map(([k,n])=>`<button role="radio" aria-checked="${it.status===k}" class="${it.status===k?'on':''}" data-ds="${k}">${it.status===k?IC.check:''}${n}</button>`).join('')}</div>
           <div class="mx-rt">${rateHTML(it)}</div></div></div></div>
       <div class="mx-body"><div class="mx-main">
         ${f?flagBox(it):''}

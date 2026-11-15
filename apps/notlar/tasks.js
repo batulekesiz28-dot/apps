@@ -159,7 +159,7 @@ const Tasks=(()=>{
   /* ═════ ANA GÖRÜNÜM ═════ */
   function render(){setCrumb(SV('<rect x="2.5" y="2.5" width="11" height="11" rx="3"/><path d="M5.5 8.2l1.8 1.8 3.4-3.6"/>'),'Görevler');const c=COUNTS();if(!qd)qdReset();
     const tabs=[['today','Bugün',c.today],['upcoming','Yaklaşan'],['rep','Tekrarlanan'],['done','Tamamlananlar']];
-    $('#view').innerHTML=`<div class="tk-wrap"><div class="tk-head"><h1>Görevler</h1><div class="tm-mseg tk-tabs" role="tablist" aria-label="Görevler">${tabs.map(([k,l,n])=>`<button data-tkscope="${k}" class="${st.scope===k?'on':''}" role="tab" aria-selected="${st.scope===k}">${l}${n?`<em>${n}</em>`:''}</button>`).join('')}</div></div>
+    $('#view').innerHTML=`<div class="tk-wrap"><div class="tk-head sbar ws-sbar"><h1>Görevler</h1><div class="tm-mseg tk-tabs" role="tablist" aria-label="Görevler">${tabs.map(([k,l,n])=>`<button data-tkscope="${k}" class="${st.scope===k?'on':''}" role="tab" aria-selected="${st.scope===k}">${l}${n?`<em>${n}</em>`:''}</button>`).join('')}</div></div>
       <form class="tk-qa" data-tkadd><span class="tk-qa-i">${I.plus}</span><input name="q" autocomplete="off" aria-label="Yeni görev" placeholder="Yeni görev"><div class="tk-pills">${pillsHTML()}</div><button class="tk-go" type="submit" aria-label="Ekle">${I.up}</button></form>
       ${body()}</div>${open?detailHTML():''}`;
     if(open)bindDetail()}
@@ -289,7 +289,7 @@ const Tasks=(()=>{
 
   /* ── takvim entegrasyonu ── */
   const forDay=d=>{const L=TK.list().filter(x=>TK.dayOf(x)===d);return d>T()?[...L,...TK.virtuals(d,d)]:L};
-  const chip=x=>`<div class="tk-chip${x.status==='done'?' done':''}" draggable="true" data-tid="${E(x.id)}" style="--p:${PRIO[x.prio][1]}" title="${E(x.title)}"><button class="tk-chk xs p${x.prio}${x.status==='done'?' on':''}" data-tchk aria-label="Tamamla"></button><span>${E(x.title)}</span></div>`;
+  const chip=x=>`<div class="tk-chip${x.status==='done'?' done':''}" draggable="true" data-tid="${E(x.id)}" style="--p:${PRIO[x.prio][1]}" title="${E(x.title)}"><i class="tk-ci${x.status==='done'?' on':''}" aria-hidden="true"></i><span>${E(x.title)}</span></div>`;
   function monthChips(d){const L=forDay(d);return L.slice(0,3).map(chip).join('')+(L.length>3?`<div class="more">+${L.length-3} görev</div>`:'')}
   function dayList(d){const L=forDay(d).sort(sorter);return`${L.map(x=>row(x,{hideDate:true})).join('')||'<div class="none">Bu güne görev yok.</div>'}<form class="tm-qa tk-qday" data-tkqday="${d}"><span class="tm-qa-i">${I.plus}</span><input name="q" placeholder="Görev ekle…" aria-label="Bu güne görev ekle"></form>`}
   /* ── istatistik ── */

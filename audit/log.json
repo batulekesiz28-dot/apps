@@ -2105,5 +2105,108 @@
     "text": "Bulut (giriş yapılmış) modu yerelde test edilemiyor; yerel modda veri kalıcılığı doğrulandı"
    }
   ]
+ },
+ {
+  "at": "2026-11-15T12:33:46",
+  "change": "Akıllı başlık (Medya, Görevler, Aktiviteler: aşağı kaydırınca saklanır, yukarı küçük hareketle gelir) + Medya sayfa kontrol alanı (solda başlık/sekmeler, sağda arama·filtre·görünüm·ayar·ekle) + Denetçi'ye 'Tasarım kararları' kategorisi (kritik/yüksek/orta/düşük) ve bütün ekranları tarayan audit/screens.js; bulunan tasarım sorunları düzeltildi",
+  "scores": {
+   "notlar (bütün ekranlar) telefon": {
+    "before": null,
+    "after": 100
+   },
+   "notlar (bütün ekranlar) masaüstü": {
+    "before": null,
+    "after": 100
+   },
+   "arena telefon": {
+    "before": 99,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Kritik: Medya ana sayfasında vitrin yokken araçlar 'İçe aktar' düğmelerinin üstüne biniyordu",
+    "fix": "Vitrin yoksa araçlar kendi satırında"
+   },
+   {
+    "app": "notlar",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Kritik: görev daireleri ve 'Saat ekle' dokunma sınırının altındaydı (sadece ana sayfa tarandığı için gözden kaçmıştı)",
+    "fix": "Görünen boy ayrı, dokunma alanı 24/40px"
+   },
+   {
+    "app": "notlar",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Kritik: takvimde soluk günler okunmuyordu",
+    "fix": "ink3 + ağırlık farkı"
+   },
+   {
+    "app": "notlar",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Yüksek: arama başlığın yanına yapışık duruyordu",
+    "fix": "Sağdaki araç grubuna taşındı"
+   },
+   {
+    "app": "notlar",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Yüksek: Medya'da üç ayrı üst şerit vardı",
+    "fix": "Tek üst çubuk"
+   },
+   {
+    "app": "notlar",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Yüksek: Görevler/Aktiviteler/İstatistikler/kök sayfa başlığı yol satırında tekrar ediyordu",
+    "fix": "Yol satırı sadece iç içe sayfada"
+   },
+   {
+    "app": "notlar",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Yüksek: Oyunlar hâlâ Steam mavisi, Animeler mor zemin/kalın başlık taşıyordu",
+    "fix": "12 bölüme özel kural kaldırıldı"
+   },
+   {
+    "app": "notlar",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Yüksek: telefonda Apple TV kartları ekranın yarısındaydı; geri gelen başlıkla köşe düğmeleri çakışıyordu",
+    "fix": "Izgarada tam genişlik; kaydırınca köşe düğmeleri çekiliyor"
+   },
+   {
+    "app": "notlar",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Orta: iki büyüteç; 'Filmler 14 film' yanıltıcı sayı; Medya detayında iki favori düğmesi ve üç kez 'Film'; Aktiviteler'de üç ekleme yolu; akıllı şerit dururken bant görünüyordu",
+    "fix": "Hepsi sadeleştirildi"
+   },
+   {
+    "app": "notlar",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Düşük: Şablonlar başlığı diğerlerinden büyüktü; grup etiketleri gün başlığından baskındı; telefonda hızlı eylem kartları devdi",
+    "fix": "Tek ölçek; kompakt satırlar"
+   },
+   {
+    "app": "arena",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Orta: telefonda harita araçları başlangıç kartının arkasından taşıyordu",
+    "fix": "Kart açıkken gizli"
+   },
+   {
+    "app": "notlar",
+    "sev": "info",
+    "status": "open",
+    "text": "Düşük: 'bugün' kırmızısı (#FF453A) koyu zeminde 4.0:1 — Apple sistem rengi, bilerek bırakıldı"
+   }
+  ]
  }
 ]

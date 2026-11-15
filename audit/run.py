@@ -30,6 +30,6 @@ async def main():
         print(f"\n== {v['name']}  masaüstü {v['desktop']['score']['total']}  telefon {v['mobile']['score']['total']}")
         for k in ('desktop','mobile'):
             for f in v[k]['findings']:
-                print(f"  [{k[0]}] {f['sev']:5} {f['cat']:4} {f['title']} ×{f['count']}  {'; '.join(f['samples'][:3])}")
+                print(f"  [{k[0]}] {f.get('lvl') or f['sev']:6} {f['cat']:6} {f['title']} ×{f['count']}  {'; '.join(f['samples'][:3])}")
     json.dump(out,open('/tmp/audit_last.json','w'),ensure_ascii=False)
 asyncio.run(main())

@@ -6,7 +6,9 @@
    ════════════════════════════════════════════════════════════ */
 (function(){
 'use strict';
-const CATS={a11y:'Erişilebilirlik',ux:'Kullanılabilirlik',look:'Estetik',perf:'Hız'};
+const CATS={a11y:'Erişilebilirlik',ux:'Kullanılabilirlik',look:'Estetik',design:'Tasarım kararları',perf:'Hız'};
+/* tasarım kararı bulgularının önem düzeyi → puan ağırlığı */
+const LVL={kritik:'error',yuksek:'warn',orta:'info',dusuk:'info'};
 const W={error:14,warn:6,info:2};
 
 function parseColor(c){const sr=String(c).match(/color\(srgb\s+([^)]+)\)/);if(sr){const p=sr[1].split(/[\s\/]+/).filter(Boolean).map(Number);return{r:p[0]*255,g:p[1]*255,b:p[2]*255,a:p.length>3?p[3]:1}}const m=String(c).match(/rgba?\(([^)]+)\)/);if(!m)return null;const p=m[1].split(/[\s,\/]+/).filter(Boolean).map(Number);return{r:p[0],g:p[1],b:p[2],a:p.length>3?p[3]:1}}
@@ -91,6 +93,46 @@ function run(doc,opt={}){
   const crowd=vis.filter(e=>e.matches('button,.btn,.chip')&&!segLike(e.parentElement)).filter(e=>{const r=e.getBoundingClientRect(),n=e.nextElementSibling;if(!n||!visible(n,win))return false;const q=n.getBoundingClientRect();return Math.abs(q.top-r.top)<4&&q.left-r.right>=0&&q.left-r.right<3});
   if(crowd.length>2)add('look','info','spacing','Birbirine yapışık düğmeler','Aralarında 3px’ten az boşluk olan düğmeler var.','Düğme grupları arasında en az 6–8px gap bırak.',crowd);
 
+  /* ── Tasarım kararları: kıdemli bir Apple/Google tasarımcısının soracağı sorular ──
+     Her bulgu bir karar önerir (fix) ve önem düzeyi taşır: kritik · yüksek · orta · düşük. */
+  const addD=(lvl,id,title,detail,fix,els)=>{add('design',LVL[lvl],id,title,detail,fix,els);out[out.length-1].lvl=lvl};
+  const R=e=>e.getBoundingClientRect(),bgOn=e=>{const cs=getComputedStyle(e);return(parseColor(cs.backgroundColor)?.a>.04)||cs.boxShadow!=='none'||parseFloat(cs.borderTopWidth)>0||cs.backgroundImage!=='none'};
+  const txt=e=>(e.textContent||'').replace(/\s+/g,' ').trim().toLocaleLowerCase('tr');
+  const heads=vis.filter(e=>/^H[1-3]$/.test(e.tagName)&&txt(e));
+  const ctrls=vis.filter(e=>e.matches('button,[role=button],select,a.btn,input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=hidden])'));
+  // 1) Başlığa yapışık araç: başlık metninin hemen sağında (≤32px) duran, başlığın parçası olmayan kontrol
+  const glued=[];for(const h of heads){const rg=doc.createRange();rg.selectNodeContents(h);const tr=rg.getBoundingClientRect();if(!tr.width)continue;
+    for(const c of ctrls){if(h.contains(c))continue;const r=R(c);if(!r.width)continue;const mid=r.top+r.height/2;
+      if(mid>tr.top-4&&mid<tr.bottom+4&&r.left-tr.right>=0&&r.left-tr.right<=32&&r.width<160)glued.push(c)}}
+  if(glued.length)addD('yuksek','glued','Düğme başlığın parçası gibi duruyor','Başlığın hemen yanındaki araç, başlığa ait bir şeymiş gibi okunuyor; görsel hiyerarşiyi bozuyor.','Aracı sayfanın sağ üstündeki araç grubuna taşı (sol: başlık · sağ: arama, filtre, görünüm).',glued);
+  // 2) Aynı başlık iki kez: başlığın hemen üstünde (≤120px) aynı metin
+  const dupH=[];for(const h of heads){const t=txt(h),hr=R(h);for(const e of textEls){if(e===h||h.contains(e)||e.contains(h)||e.closest('nav,[role=navigation],[role=tablist],[aria-hidden=true]'))continue;const r=R(e);if(r.bottom<=hr.top+2&&hr.top-r.bottom<120&&txt(e)===t)dupH.push(e)}}
+  if(dupH.length)addD('yuksek','duptitle','Aynı başlık iki kez','Başlığın hemen üstünde aynı ad tekrar ediyor (ör. yol satırı + başlık). Göz iki kez aynı şeyi okuyor.','Üstteki tekrarı kaldır; yol satırını sadece iç içe sayfalarda göster.',dupH);
+  // 3) Aynı satırdaki kontrollerin yüksekliği farklı (araç gruplarında tutarlılık)
+  const rows=new Map();for(const c of ctrls){if(!bgOn(c))continue;const p=c.parentElement;if(!p)continue;const cs=getComputedStyle(p);if(!/flex/.test(cs.display)||/column/.test(cs.flexDirection))continue;(rows.get(p)||rows.set(p,[]).get(p)).push(c)}
+  const uneven=[];for(const [p,l] of rows){if(l.length<3)continue;const hs=l.map(c=>Math.round(R(c).height)),mx=Math.max(...hs),mn=Math.min(...hs);if(mx-mn>6)uneven.push(p)}
+  if(uneven.length)addD('orta','rowheight','Aynı sıradaki düğmelerin boyu farklı','Yan yana duran kontroller farklı yüksekliklerde; satır dalgalı görünüyor.','Bir araç satırındaki bütün kontrolleri aynı yüksekliğe (ör. 36px) getir.',uneven);
+  // 4) Aynı gruptaki ikonlar farklı boyutta
+  const iconMix=[];for(const [p,l] of rows){const sz=l.map(c=>c.querySelector('svg')).filter(Boolean).map(s=>Math.round(R(s).width)).filter(w=>w>0);if(sz.length>=3&&Math.max(...sz)-Math.min(...sz)>3)iconMix.push(p)}
+  if(iconMix.length)addD('dusuk','iconsize','İkonlar aynı ölçekte değil','Aynı araç grubundaki ikonlar farklı boyutlarda.','Gruptaki ikonları tek ölçüye (ör. 16px) indir.',iconMix);
+  // 5) Neredeyse hizalı: sol kenarları 1–4px farkla kaçan başlıklar ve bölüm başları (ortak çizgiye oturmuyor)
+  const edges=heads.map(h=>({e:h,x:Math.round(R(h).left)})).filter(o=>o.x>0),near=[];
+  const layer=e=>e.closest('[aria-modal=true],[role=dialog]');
+  for(let i=0;i<edges.length;i++)for(let j=i+1;j<edges.length;j++){if(layer(edges[i].e)!==layer(edges[j].e))continue;const d=Math.abs(edges[i].x-edges[j].x);if(d>=1&&d<=4)near.push(edges[j].e)}
+  if(near.length)addD('orta','nearalign','Neredeyse hizalı başlıklar','Bazı başlıkların sol kenarı birkaç piksel kaymış; ortak hizaya oturmuyor.','Başlıkları aynı kenar boşluğuna bağla (aynı padding değişkeni).',near);
+  // 6) Aynı işi yapan iki kontrol yan yana (ör. iki ayrı “Favori”)
+  const nm=c=>(c.getAttribute('aria-label')||c.getAttribute('title')||txt(c)).toLocaleLowerCase('tr').replace(/\s+/g,' ').trim(),twin=[];
+  // ortak atanın altında iki kontrolü taşıyan dallar aynı türdense (liste satırı, aynı tip grup) bu tekrar eden yapıdır, ikiz değil
+  const repeated=(a,b)=>{let l=a.parentElement;while(l&&!l.contains(b))l=l.parentElement;if(!l||R(l).width>640)return true;const up=(x)=>{while(x.parentElement!==l)x=x.parentElement;return x};const ca=up(a),cb=up(b);return ca!==cb&&ca.tagName===cb.tagName&&ca.className===cb.className};
+  for(let i=0;i<ctrls.length;i++){const a=nm(ctrls[i]);if(!a||a.length<4)continue;const ra=R(ctrls[i]);for(let j=i+1;j<ctrls.length;j++){if(nm(ctrls[j])!==a)continue;const rb=R(ctrls[j]);if(Math.hypot(ra.left-rb.left,ra.top-rb.top)<260&&!repeated(ctrls[i],ctrls[j])){twin.push(ctrls[j]);break}}}
+  if(twin.length)addD('orta','twin','Aynı iş için iki kontrol','Yakın duran iki düğme aynı işi yapıyor; hangisine basılacağı belirsiz.','Birini kaldır; işi tek, doğru yerdeki kontrole bırak.',twin);
+  // 7) Gereksiz renk: arayüz kontrollerinde 3'ten fazla farklı doygun renk (içerik görselleri hariç)
+  const hues=new Set(),loud=[];for(const c of ctrls){const k=parseColor(getComputedStyle(c).backgroundColor);if(!k||k.a<.5)continue;const mx=Math.max(k.r,k.g,k.b),mn=Math.min(k.r,k.g,k.b);if(mx-mn<60)continue;const h=Math.round(Math.atan2(Math.sqrt(3)*(k.g-k.b),2*k.r-k.g-k.b)*180/Math.PI/30);if(!hues.has(h)){hues.add(h);loud.push(c)}}
+  if(hues.size>3)addD('orta','loud','Kontrollerde gereğinden fazla renk',`${hues.size} farklı renkli düğme var; vurgu rengi anlamını yitiriyor.`,'Kontrolleri nötr (beyaz/gri) tut; rengi sadece anlam taşıyan tek vurguya bırak.',loud);
+  // 8) Başlık gereğinden büyük (vitrin/hero dışında)
+  const huge=heads.filter(h=>h.tagName==='H1'&&!h.closest('.mh,.hero,[class*=hero]')&&parseFloat(getComputedStyle(h).fontSize)>(mobile?32:42));
+  if(huge.length)addD('dusuk','bigtitle','Başlık gereğinden büyük','Sayfa başlığı içerikten fazla dikkat çekiyor ve dikey alan harcıyor.',`Sayfa başlığını ${mobile?'22–28':'24–32'}px aralığına indir.`,huge);
+
   /* ── Hız ── */
   const n=doc.getElementsByTagName('*').length;
   if(n>3000)add('perf','error','dom','Çok büyük sayfa',`${n} öğe; kaydırma ve açılış yavaşlar.`,'Görünmeyen listeleri sanallaştır, gereksiz sarmalayıcıları kaldır.');else if(n>1500)add('perf','warn','dom','Büyük sayfa',`${n} öğe.`,'Öğe sayısını azaltmayı düşün.');
@@ -101,9 +143,9 @@ function run(doc,opt={}){
 
   /* ── Puan ── */
   const score={};for(const c of Object.keys(CATS)){let s=100;for(const f of out)if(f.cat===c)s-=W[f.sev]+(f.sev==='error'?Math.min(10,f.count-1):0);score[c]=Math.max(0,Math.round(s))}
-  score.total=Math.round((score.a11y*.35+score.ux*.3+score.look*.2+score.perf*.15));
+  score.total=Math.round((score.a11y*.3+score.ux*.25+score.look*.15+score.design*.15+score.perf*.15));
   return{at:Date.now(),mobile,url:doc.location.pathname,findings:out.sort((a,b)=>W[b.sev]-W[a.sev]),score,stats:{nodes:n,fonts:[...fam],sizes:sizes.size,colors:cols.size,ms:Math.round(performance.now()-t0)}}
 }
-const api={run,CATS};
+const api={run,CATS,LVL};
 if(typeof window!=='undefined')window.Audit=api;
 })();

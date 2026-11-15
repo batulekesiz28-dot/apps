@@ -200,10 +200,10 @@ const Media=(()=>{
         return`<a href="#lib/m/${st.sec}${k==='home'?'':'/'+k}" class="${st.page===k?'on':''}"${st.page===k?' aria-current="page"':''}>${n}${k==='home'?'':`<em>${c}</em>`}</a>`}).join('')+(()=>{const r=all().filter(i=>inSec(i,st.sec)&&flagOf(i)).length;return r?`<a href="#lib/m/${st.sec}/review" class="rev${st.page==='review'?' on':''}">${IC.warn}İnceleme<em>${r}</em></a>`:''})():'';
     return`<nav class="mc-nav" aria-label="Medya bölümleri"><a class="mc-brand" href="#lib" aria-label="Medya ana sayfa"><span>${IC.play}</span><b>Medya</b></a>
       <div class="mc-tabs">${tabs.map(([k,n,h,ic])=>`<a href="${h}" class="t-${k}${st.sec===k?' on':''}"${st.sec===k?' aria-current="page"':''}>${ic}<span>${n}</span></a>`).join('')}<a href="#lib/docs" class="t-docs">${IC.link}<span>Belgeler</span></a></div>
-      <label class="mc-s">${IC.search}<input data-ms value="${E(st.qs)}" placeholder="Ara" aria-label="Film, dizi, anime, oyun ve kitap ara" autocomplete="off"><kbd>/</kbd></label>
+      <div class="mc-r"><label class="mc-s">${IC.search}<input data-ms value="${E(st.qs)}" placeholder="Ara" aria-label="Film, dizi, anime, oyun ve kitap ara" autocomplete="off"><kbd>/</kbd></label>
       ${viewSeg()}<button class="mc-gear" data-mset aria-label="Görünüm ayarları" title="Görünüm ayarları" aria-haspopup="dialog">${IC.gear}</button>
       <span class="mc-sync" aria-live="polite"${R.busy?'':' hidden'}>${IC.sync}<span>${R.busy?syncTxt():''}</span></span>
-      <button class="mb pri mc-addb" data-madd>${IC.plus}<span>Ekle</span></button></nav>${sub?`<div class="mc-sub" role="navigation" aria-label="${E(SEC[st.sec].n)} sayfaları">${sub}</div>`:''}`}
+      <button class="mb pri mc-addb" data-madd>${IC.plus}<span>Ekle</span></button></div></nav>${sub?`<div class="mc-sub" role="navigation" aria-label="${E(SEC[st.sec].n)} sayfaları">${sub}</div>`:''}`}
   const syncTxt=()=>`Posterler eşleşiyor ${R.done}/${R.total}`;
   function body(){if(st.qs)return searchHTML();if(st.sec==='home')return homeHTML();if(st.page==='home')return secHome(st.sec);return pageHTML(st.sec,st.page)}
   function parse(parts){const p=parts||[];let sec='home',page='home',gq='';if(p[0]==='m'){const k=p[1]==='tv'?'movies':p[1];sec=SEC[k]?k:'home';let pg=p[2]||'home';const i=pg.indexOf('?');if(i>=0){gq=decodeURIComponent((pg.slice(i+1).match(/g=([^&]*)/)||[])[1]||'');pg=pg.slice(0,i)}page=pg}

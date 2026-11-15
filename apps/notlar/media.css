@@ -134,16 +134,9 @@
 
 /* ── liste sayfaları ── */
 .mc-page{padding:18px var(--px) 80px}
-.mc-ph{display:flex;align-items:baseline;gap:14px;margin:10px 0 18px}.mc-ph h1{font:500 clamp(30px,3.4vw,44px)/1.1 var(--serif);letter-spacing:-.02em}.mc-ph p{font-size:14px;color:var(--mink3)}
-.mc-tools{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:22px}
 .mc-seg{display:flex;padding:3px;border-radius:12px;background:rgba(255,255,255,.07)}
 .mc-seg button{display:flex;align-items:center;gap:7px;height:34px;padding:0 14px;border-radius:9px;font-size:13.5px;font-weight:500;color:var(--mink2);transition:background .2s,color .2s}.mc-seg button.on{background:var(--mink);color:var(--mbg)}
 .mc-seg.big{width:100%}.mc-seg.big button{flex:1;justify-content:center;height:42px}
-.mc-gen{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;max-width:100%}
-.mc-gen button{flex-shrink:0;height:34px;padding:0 13px;border-radius:999px;font-size:13px;color:var(--mink2);box-shadow:inset 0 0 0 1px var(--mline);transition:background .2s,color .2s}
-.mc-gen button:hover{color:var(--mink)}.mc-gen button.on{background:var(--acc);color:var(--acc-ink);box-shadow:none;font-weight:600}
-.mc-sel{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mink3)}
-.mc-sel select{height:36px;padding:0 10px;border:0;border-radius:10px;background:rgba(255,255,255,.08);color:var(--mink);font:inherit;font-size:13.5px}.mc-sel option{background:#1A1A1E}
 .mc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:26px 16px}
 .mc-grid .mc-card{width:auto}.mc-grid.v-g{grid-template-columns:repeat(auto-fill,minmax(158px,1fr))}
 .mc-h3{margin:26px 0 14px;font:600 18px var(--font)}
@@ -232,15 +225,15 @@
   .mc-nav{flex-wrap:wrap;height:auto;padding-top:10px;padding-bottom:6px;gap:8px}
   .mc-brand b{display:none}.mc-tabs{order:3;width:100%;justify-content:space-between;overflow-x:auto;scrollbar-width:none}
   .mc-tabs a{width:auto;flex:1;padding:0 8px;height:44px}.mc-tabs a span{display:inline;font-size:13px}.mc-tabs a .mvi{display:none}.mc-tabs a.t-docs::before{display:none}.mc-tabs a.t-docs{margin-left:0;padding-left:8px}
-  .mc-s{width:auto;flex:1}.mc-s kbd{display:none}.mc-addb span{display:none}.mc-addb{width:44px;padding:0}.mc-sync span{display:none}
+  .mc-s{width:auto;flex:1}.mc-s kbd{display:none}.mc-sync span{display:none}
   .mc-sub{top:0;position:relative}
   .mh{height:min(78vh,620px);margin-top:0}.mh-c{bottom:58px}.mh h2{font-size:clamp(32px,9vw,44px)}.mh-d{-webkit-line-clamp:2;font-size:14.5px}
   .mh-post{right:50%;top:18px;width:44%;transform:translateX(50%) rotate(0)!important;animation:none!important}.mh-s:has(.mh-post) .mh-c{bottom:58px}.mh-s:has(.mh-post) .mh-d{display:none}
   .mh-dots{left:0;right:0;bottom:12px;justify-content:center}
   .mc-card.v-w,.mc-row.v-w .mc-card{width:240px}.mc-card.v-w2,.mc-row.v-w2 .mc-card{width:250px}.mc-card.v-r{width:170px}.mc-n{font-size:100px}
   .mc-grid,.mc-grid.v-g{grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:18px 10px}
-  .mc-cap b{font-size:12.5px}.mc-tools{gap:8px}.mc-tools .grow{display:none}.mc-gen{order:5;width:100%}
-  .mc-seg button,.mc-gen button,.mc-sub a,.mc-sel select{min-height:40px}.mc-all{min-height:40px}.mb.sm{height:40px}
+  .mc-cap b{font-size:12.5px}
+  .mc-seg button,.mc-sub a{min-height:40px}.mc-all{min-height:40px}.mb.sm{height:40px}
   .mc-rr{grid-template-columns:56px 1fr}.mc-rr .mp.sm{width:56px}.mc-rb{grid-column:1/-1;flex-direction:row;flex-wrap:wrap}
   .mx-bg{padding:0}.mx{border-radius:0;min-height:100%}.mx-hero{min-height:0;padding-top:70px}.mx-head{flex-direction:column;align-items:flex-start;gap:16px;padding:0 18px 20px}.mx-p{width:132px}
   .mx-body{grid-template-columns:1fr;gap:10px;padding:4px 18px 40px}.mx-form{grid-template-columns:1fr 1fr}.mx-form label:nth-child(3){grid-column:1/-1}
@@ -254,7 +247,7 @@
 .mc-sync[hidden]{display:none}
 @media (max-width:760px){.mc-nav{position:relative}.mc-sub{position:relative;top:0}}
 .mc-lz{height:330px}
-.mx-st button[role=radio].on,.mc-gen button.on,.mc-st{background:var(--acc-bg)}
+.mx-st button[role=radio].on,.mc-st{background:var(--acc-bg)}
 .mh-m i,.mx-m i{opacity:1;color:var(--mink3)}
 .mc-imp .btn{height:40px}.mc-imp b{color:var(--mink)}.mc-imp .imp-ic{color:var(--acc)}
 .fp-k{font-size:12px;letter-spacing:.1em}
@@ -271,8 +264,7 @@
 .mc,.mx-bg,.ma-bg,.mq,.mset,.rt{--sys:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",Inter,system-ui,sans-serif;
   --gl:rgba(38,38,42,.5);--gl-fx:saturate(1.8) blur(24px);--gl-ln:inset 0 0 0 .5px rgba(255,255,255,.12);--gl-on:rgba(255,255,255,.17)}
 .mc{font-family:var(--sys);--card:calc(clamp(128px,11vw,180px) * var(--cz,1))}
-.mc .mc-shelf h2,.mc .mc-ph h1,.mc[data-sec] .mc-ph h1,.mc .mc-h3,.mc .mc-brand b{font-family:var(--sys)}
-.mc .mc-ph h1{font-weight:600;letter-spacing:-.025em;font-size:calc(clamp(26px,2.8vw,36px) * var(--fz,1))}
+.mc .mc-shelf h2,.mc .mc-h3,.mc .mc-brand b{font-family:var(--sys)}
 .mc .mc-shelf h2{font-weight:600;font-size:calc(19px * var(--fz,1));letter-spacing:-.012em}
 .mc .mc-cap b{font-size:max(12px,calc(13.5px * var(--fz,1)));font-weight:500}
 .mc .mc-cap small{font-size:max(12px,calc(12px * var(--fz,1)))}
@@ -296,7 +288,6 @@
 .mc-vw button:hover{color:#fff}.mc-vw button.on{background:var(--gl-on);color:#fff}
 .mc-gear{display:grid;place-items:center;width:40px;height:40px;flex-shrink:0;border-radius:50%;background:var(--gl);backdrop-filter:var(--gl-fx);-webkit-backdrop-filter:var(--gl-fx);box-shadow:var(--gl-ln);color:rgba(255,255,255,.75);transition:background .2s,color .2s}
 .mc-gear:hover,.mc-gear[aria-expanded=true]{background:var(--gl-on);color:#fff}
-.mc-nav .mc-addb{height:40px;padding:0 16px;border-radius:999px;font:500 13.5px var(--sys);background:rgba(255,255,255,.92);color:#111}
 .mc-tabs a:focus-visible,.mc-vw button:focus-visible,.mc-gear:focus-visible,.mc-sub a:focus-visible{outline:2px solid rgba(255,255,255,.8);outline-offset:2px}
 /* alt sayfalar: aynı malzemede küçük kapsüller */
 .mc-sub{background:none;backdrop-filter:none;-webkit-backdrop-filter:none;padding:2px var(--px) 12px;gap:6px}

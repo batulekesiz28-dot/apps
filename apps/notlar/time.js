@@ -126,10 +126,6 @@ const Time=(()=>{
       const d=b.d||(isDaily(p)?p.date:'')||datesOf(b)[0]||'';out.push({p,b,text,date:d,done:!!b.c})}return out}
   function setDone(o,v){o.b.c=v;touch(o.p);if(typeof P!=='undefined'&&P&&P.id===o.p.id&&typeof replaceNode==='function')replaceNode(o.b)}
   function postpone(o,d){if(isDaily(o.p)&&!o.b.d)moveToDay(o.p,o.b,d);else setBlockDate(o.p,o.b,d)}
-  function addTask(q){let text=String(q||'').trim();if(!text)return;let d=today();const w=text.split(/\s+/);
-    for(let n=3;n>=1;n--)for(let i=0;i+n<=w.length;i++){const x=parseTR(w.slice(i,i+n).join(' '));if(x){d=x;w.splice(i,n);n=0;break}}text=w.join(' ')||text;
-    let dst=dailyOf(d);if(!dst)dst=newPage({tpl:'daily',date:d});FRESH.delete(dst.id);let at=dst.blocks.length;while(at>0&&!plain(dst.blocks[at-1].h).trim()&&dst.blocks[at-1].t!=='divider')at--;
-    const empty=dst.blocks.findIndex(b=>b.t==='todo'&&!plain(b.h).trim());if(empty>=0)dst.blocks[empty].h=E(text);else dst.blocks.splice(at,0,B('todo',E(text)));touch(dst);toast(`Görev eklendi · ${dayLabel(d)}`)}
   const taskRow=o=>`<div class="tm-task${o.done?' done':''}"><button class="tm-chk${o.done?' on':''}" data-tdone="${o.p.id}:${o.b.id}" aria-label="${o.done?'Geri al':'Tamamla'}" aria-pressed="${o.done}"></button><span class="tm-tt">${E(o.text)}</span>
       <span class="tm-meta">${o.date?`<span class="tm-date${o.date<today()&&!o.done?' late':''}">${E(dayLabel(o.date))}</span>`:''}<a class="tm-src" href="#p/${o.p.id}" title="Sayfayı aç">${E(titleOf(o.p))}</a></span>
       ${o.done?'':`<button class="tm-ib" data-tlater="${o.p.id}:${o.b.id}" title="Yarına ertele" aria-label="Yarına ertele">${I.later}</button>`}</div>`;
@@ -203,13 +199,7 @@ const Time=(()=>{
       :`<div class="tm-empty"><b>Henüz aktivite yok</b><p>Yukarıya yazıp Enter'a bas. Saat, süre, gün ve kategoriyi cümleden kendim anlarım; takvime, istatistiklere ve gün notuna otomatik bağlanır.</p></div>`}</div>`}
 
   /* ═════ GÖREVLER ═════ */
-  function renderTasks(){return Tasks.render();setCrumb(SV('<rect x="2.5" y="2.5" width="11" height="11" rx="3"/><path d="M5.5 8.2l1.8 1.8 3.4-3.6"/>'),'Görevler');const all=tasks(),t=today();
-    const late=all.filter(o=>!o.done&&o.date&&o.date<t),now=all.filter(o=>!o.done&&o.date===t),soon=all.filter(o=>!o.done&&o.date>t).sort((a,b)=>a.date.localeCompare(b.date)),nod=all.filter(o=>!o.done&&!o.date),done=all.filter(o=>o.done).sort((a,b)=>b.p.updated-a.p.updated).slice(0,40);
-    const sec=(h,L,cls='')=>L.length?`<div class="sh ${cls}"><span>${h} · ${L.length}</span><span class="rule"></span></div><div class="tm-dl">${L.map(taskRow).join('')}</div>`:'';
-    $('#view').innerHTML=`<div class="wrap tm-page"><div class="tm-ph"><h1>Görevler</h1><span class="tm-mut">${all.filter(o=>!o.done).length} açık · ${all.filter(o=>o.done).length} tamamlandı</span></div>
-      <form class="tm-qa" data-qtask><span class="tm-qa-i">${I.plus}</span><input name="q" placeholder="Görev ekle — ör. “fizik ödevi yarın”, “faturayı öde cuma”" autocomplete="off" aria-label="Görev ekle"><button class="tm-qa-b" type="submit">Ekle</button></form>
-      <p class="tm-mut" style="margin:-4px 0 18px">Görevler Notlar'daki yapılacak satırlarıdır: eklediğin görev o günün notuna yazılır ve takvimde görünür. Yeniden girmen gerekmez.</p>
-      ${all.length?sec('Ertelenen / gecikmiş',late,'late')+sec('Bugün',now)+sec('Yaklaşan',soon)+sec('Tarihsiz',nod)+sec('Tamamlanan',done):`<div class="tm-empty"><b>Görev yok</b><p>Yukarıya yaz ya da herhangi bir sayfada “yapılacak” satırı ekle.</p></div>`}</div>`}
+  function renderTasks(){return Tasks.render()}
 
   /* ═════ İSTATİSTİKLER (aktivite ve görevler) ═════ */
   let SR=lsg('time:srange','week');
@@ -239,7 +229,7 @@ const Time=(()=>{
   /* ── olaylar (tek yerden) ── */
   function bind(){const v=$('#view');
     v.addEventListener('submit',e=>{const f=e.target;if(f.matches('.tm-qa[data-qa]')){e.preventDefault();const q=f.q.value.trim();if(!q)return;const a=quickAdd(q,{date:f.dataset.qa||undefined,cat:f.dataset.cat});if(a){f.q.value='';if(cur()==='cal'){selDay=a.date}}rerender();setTimeout(()=>$('.tm-qa[data-qa] input')?.focus(),20);return}
-      if(f.matches('[data-qtask]')){e.preventDefault();addTask(f.q.value);f.q.value='';rerender();setTimeout(()=>$('[data-qtask] input')?.focus(),20)}},true);
+      },true);
     v.addEventListener('click',e=>{const t=e.target;
       const st=t.closest('[data-act-st]');if(st){e.preventDefault();e.stopPropagation();const a=TM.acts.get(st.dataset.actSt);if(a){a.status=a.status==='plan'?'doing':a.status==='doing'?'done':'plan';TM.save(a)}return}
       const ao=t.closest('[data-act-open]');if(ao){e.preventDefault();e.stopPropagation();open(ao.dataset.actOpen);return}

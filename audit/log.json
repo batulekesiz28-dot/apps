@@ -2288,5 +2288,41 @@
     "fix": "Sadece kapağı gelen kartlar yerinde güncelleniyor"
    }
   ]
+ },
+ {
+  "at": "2026-11-15T14:52:25",
+  "change": "Temizlik 1: kullanılmayan stiller ve eski Görevler ekranı kodu silindi, karar listesi açıldı",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "fixed",
+    "text": "Kaldırılmış kanban/proje/hafta görünümlerinin ve eski hızlı eklemenin stilleri (~7 KB) duruyordu",
+    "fix": "Silindi; 28 ekranın önce/sonra görüntüsü karşılaştırıldı, stil kaynaklı fark yok"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "fixed",
+    "text": "time.js'te hiç çalışmayan eski Görevler ekranı kodu vardı",
+    "fix": "Silindi"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "open",
+    "text": "Takvim hafta görünümünde bugünün rakamı kontrast sınırında (4.5:1'e yakın)"
+   }
+  ]
  }
 ]

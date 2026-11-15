@@ -23,7 +23,7 @@
 .tm-ad{border-bottom:.5px solid var(--line);min-height:30px}.tm-ad>span{font:500 10px var(--mono);color:var(--ink3);text-transform:uppercase;padding:8px 6px 0;text-align:right}
 .tm-adc{display:flex;flex-direction:column;gap:3px;padding:4px;border-left:.5px solid var(--line);min-width:0}
 .tm-chip{display:block;max-width:100%;padding:2px 7px;border-radius:6px;font-size:12px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:color-mix(in srgb,var(--c,var(--ink3)) 16%,transparent);color:var(--ink)}
-.tm-chip.task{background:var(--hover);color:var(--ink2)}.tm-chip.task.done{text-decoration:line-through;opacity:.6}.tm-more{font-size:12px;color:var(--ink3);padding:0 6px}
+.tm-chip.task{background:var(--hover);color:var(--ink2)}.tm-chip.task.done{text-decoration:line-through;opacity:.6}
 .tm-gs{height:min(62vh,640px);overflow-y:auto;scrollbar-width:thin;overscroll-behavior:contain}
 .tm-gb{position:relative;display:grid;grid-template-columns:var(--hw) repeat(var(--n),minmax(0,1fr));background-image:repeating-linear-gradient(to bottom,var(--line) 0 .5px,transparent .5px 54px);background-position:0 0}
 .tm-hrs{position:relative}.tm-hrs span{position:absolute;right:8px;transform:translateY(-50%);font:500 10.5px var(--mono);color:var(--ink3)}.tm-hrs span:first-child{display:none}
@@ -47,9 +47,6 @@
 .tm-btn{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 13px;border-radius:9px;font-size:13px;font-weight:500;color:var(--ink);background:var(--hover);transition:background .2s,transform .2s}
 .tm-btn:hover{background:var(--hover2)}.tm-btn.pri{background:var(--ink);color:var(--bg)}.tm-btn.pri:hover{opacity:.9}.tm-btn.ghost{background:none;color:var(--ink2)}.tm-btn.ghost:hover{background:var(--hover);color:var(--ink)}
 .tm-ib{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:8px;color:var(--ink3);flex-shrink:0}.tm-ib:hover{background:var(--hover);color:var(--ink)}
-.tm-qcats{display:flex;flex-wrap:wrap;gap:6px;margin:-4px 0 18px}
-.tm-qc{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px 0 8px;border-radius:999px;font-size:12.5px;color:var(--ink2);box-shadow:inset 0 0 0 .5px var(--line2);transition:background .2s,color .2s}
-.tm-qc i{font-style:normal}.tm-qc:hover{color:var(--ink);background:color-mix(in srgb,var(--c) 14%,transparent)}.tm-qc.ghost{box-shadow:none;color:var(--ink3)}
 .tm-filt{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:22px}
 .tm-sel,.tm-srch{height:34px;padding:0 10px;border:0;border-radius:9px;background:color-mix(in srgb,var(--ink) 4%,transparent);box-shadow:inset 0 0 0 .5px var(--line2);font:inherit;font-size:13px;color:var(--ink);outline:0}
 .tm-srch{flex:1;min-width:140px}.tm-sel option{background:var(--card)}
@@ -104,7 +101,7 @@
 .tm-ci input[type=color]{padding:3px;width:36px}.tm-ce{text-align:center}.tm-cc{font:500 12px var(--mono);color:var(--ink3)}
 @media (max-width:1000px){.tm-cal{grid-template-columns:1fr}.tm-kpis{grid-template-columns:repeat(3,1fr)}}
 @media (max-width:760px){.tm-g{--hw:40px}.tm-act{grid-template-columns:4px 64px minmax(0,1fr) auto;gap:8px}.tm-act .tm-catl,.tm-act .tm-dur{display:none}.tm-hb{grid-template-columns:96px 1fr 92px}
-  .tm-row{grid-template-columns:1fr 1fr}.tm-mseg button,.tm-btn,.tm-qc,.tm-cat,.tm-sel,.tm-srch,.tm-seg button{min-height:40px}.tm-ib{width:40px;height:40px}.tm-chk{width:22px;height:22px}.tm-qa{height:48px}.tm-qa-b{height:40px}
+  .tm-row{grid-template-columns:1fr 1fr}.tm-mseg button,.tm-btn,.tm-cat,.tm-sel,.tm-srch,.tm-seg button{min-height:40px}.tm-ib{width:40px;height:40px}.tm-chk{width:22px;height:22px}.tm-qa{height:48px}.tm-qa-b{height:40px}
   .tm-dh small,.tm-ad>span,.tm-hrs span{font-size:12px}.tm-kpis{grid-template-columns:repeat(2,1fr)}.tm-ph h1{font-size:28px}.tm-st{min-height:32px}.tm-mc{height:22px}}
 @media (prefers-reduced-motion:reduce){.tm-ev,.tm-chk::after,.tm-tr i{transition:none}}
 @media (max-width:760px){.cal-h{flex-wrap:wrap;row-gap:8px}.cal-h h1{flex-basis:100%;font-size:28px}.cal-h .tm-mseg{margin-right:auto}}

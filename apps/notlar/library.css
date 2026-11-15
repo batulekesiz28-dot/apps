@@ -126,7 +126,6 @@
 .col:hover{transform:translateY(-3px);box-shadow:0 0 0 1px var(--lib-line),var(--lib-sh2)}
 .col-m{position:relative;height:150px;display:flex;align-items:flex-end;justify-content:center;gap:10px;padding:18px 18px 0;background:linear-gradient(160deg,color-mix(in srgb,var(--c) 34%,var(--lib-bg2)),color-mix(in srgb,var(--c) 12%,var(--lib-bg2)));overflow:hidden}
 .col-m .cv{width:78px;flex-shrink:0;margin-bottom:-14px;transition:transform .5s var(--out)}.col-m .cv-l{width:130px}.col-m .cv-s{width:96px}
-.col-m.n3 .cv:nth-child(1){transform:rotate(-7deg) translateY(10px)}.col-m.n3 .cv:nth-child(3){transform:rotate(7deg) translateY(10px)}
 .col:hover .col-m .cv:nth-child(1){transform:rotate(-10deg) translate(-6px,4px)}.col:hover .col-m .cv:nth-child(3){transform:rotate(10deg) translate(6px,4px)}
 .col-e{align-self:center;display:grid;place-items:center;width:64px;height:64px;border-radius:18px;font-size:30px;background:color-mix(in srgb,var(--c) 30%,transparent);color:var(--c)}.col-e .li{width:28px;height:28px}
 .col-b{padding:16px 18px 18px}.col-b b{display:block;font:500 19px/1.2 var(--serif)}.col-b small{display:block;margin-top:4px;font-size:12.5px;color:var(--lib-ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}

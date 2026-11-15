@@ -13,6 +13,9 @@ Bu proje uzun bir çalışmanın ürünü ve **çalışıyor**. Sen onu devralı
 - Kullanıcıyla Türkçe, kısa ve samimi konuş. Teknik ayrıntı yerine “ne değişti, nereden görürsün” anlat. Bitince “Ctrl+Shift+R ile yenile” de.
 - Değişikliği yerelde gerçekten dene (Playwright/Chrome ile ekran görüntüsü al), sonra Denetçi kuralını uygula.
 
+## Kararlar — `docs/KARARLAR.md`
+Geçerli tasarım kararlarının tek listesi. Yeni istek bir kararla çelişirse bunu söyle, kararı orada güncelle, eski kararın kodunu SİL (üstüne yama ekleme).
+
 ## Kalite standardı (kullanıcının ana talimatı) — `docs/STANDART.md`
 Her işte bu dosyadaki standarda uy. Özet:
 - Yeni bir şeye başlamadan önce o alanın 3–5 lider ürününü gerçekten araştır; neyin neden iyi olduğunu kısaca söyle. Kopyalama, en iyilerini birleştirip özgün yap.

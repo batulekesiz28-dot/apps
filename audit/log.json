@@ -2543,5 +2543,28 @@
     "fix": "Kaydırmadan sonra kısa süre susturuldu; aynı kart imleç çıkana kadar açılmıyor"
    }
   ]
+ },
+ {
+  "at": "2026-11-15T20:10:44",
+  "change": "Medya spot ışığı: yana açılan bilgi paneli (yasal izleme bağlantılarıyla), kalemle üstüne gelince de çalışıyor",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "fixed",
+    "text": "Spot ışığında yapım hakkında bilgi yoktu; tablette kalemle çalışmıyordu",
+    "fix": "Boş tarafa açılan bilgi paneli; kalem üstüne gelme destekleniyor"
+   }
+  ]
  }
 ]

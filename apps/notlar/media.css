@@ -583,3 +583,24 @@ button.ml-sc:hover{background:rgba(255,255,255,.08)}button.ml-sc .mvi{width:13px
 @media (prefers-reduced-motion:reduce){.msp-f,.sr,.sr-fill,.msp-cap{transition:none}}
 html[data-motion=off] .msp-f,html[data-motion=off] .sr,html[data-motion=off] .sr-fill,html[data-motion=off] .msp-cap{transition:none}
 
+/* spot ışığı bilgi paneli: kutu yok, bulanık zeminde sade yazı; kapağın boş tarafına doğru akarak açılır */
+.msp-in{position:absolute;pointer-events:auto;box-sizing:border-box;display:flex;flex-direction:column;gap:10px;color:#fff;max-height:calc(100vh - 32px);overflow:hidden}
+.msp-in.r{padding:6px 8px 6px 34px}.msp-in.l{padding:6px 34px 6px 8px;text-align:right;align-items:flex-end}
+.msp-x{opacity:0;transform:translateX(var(--dx,-14px));transition:opacity .35s calc(.12s + var(--i) * .045s),transform .55s calc(.12s + var(--i) * .045s) cubic-bezier(.2,.9,.22,1.1)}
+.msp-in.l .msp-x{--dx:14px}
+.msp.on .msp-x{opacity:1;transform:none}
+.msp-k{font-size:11.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.62)}
+.msp-in h3{margin:0;font-size:clamp(22px,2.1vw,30px);font-weight:700;line-height:1.08;letter-spacing:-.022em;text-wrap:balance}
+.msp-m{margin:0;font-size:13.5px;color:rgba(255,255,255,.78)}
+.msp-b{margin:0;display:flex;flex-wrap:wrap;gap:6px;align-items:center}.msp-in.l .msp-b{justify-content:flex-end}
+.msp-b .mc-sc,.msp-b .mc-mine{position:static}
+.msp-st{padding:3px 9px;border-radius:6px;font-size:12px;font-weight:600;background:rgba(255,255,255,.14)}
+.msp-d{margin:0;font-size:14px;line-height:1.5;color:rgba(255,255,255,.86);display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden}
+.msp-a{margin:4px 0 0;display:flex;flex-wrap:wrap;gap:8px;align-items:center}.msp-in.l .msp-a{justify-content:flex-end}
+.msp-a>*{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 13px;border-radius:999px;font-size:13px;font-weight:600;color:#fff;text-decoration:none;background:rgba(255,255,255,.12);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);transition:background .2s,transform .2s}
+.msp-a>*:hover{background:rgba(255,255,255,.22)}.msp-a>*:active{transform:scale(.96)}
+.msp-a .msp-go{background:#fff;color:#000;box-shadow:none}.msp-a .msp-go:hover{background:#e8e8ea}
+.msp-a .mvi{width:13px;height:13px}.msp-a a .mvi{width:11px;height:11px;opacity:.7}
+.msp-a>*:focus-visible{outline:2px solid #fff;outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.msp-x{transition:opacity .2s;transform:none}}
+html[data-motion=off] .msp-x{transition:none;transform:none}

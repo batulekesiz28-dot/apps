@@ -111,14 +111,31 @@ const Media=(()=>{
     el.innerHTML=`<div class="msp-bg"></div><div class="msp-f" style="left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;--s:${S}"></div><div class="msp-cap"><b>${E(it.title)}</b><small>${E(metaShort(it)||TN[it.type])}${stName(it)?' · '+E(stName(it)):''}</small></div>`;
     const f=el.querySelector('.msp-f'),cl=art.cloneNode(true);cl.className='msp-art';cl.style.borderRadius=getComputedStyle(art).borderRadius;f.appendChild(cl);
     if(!it.rating)f.insertAdjacentHTML('beforeend',srHTML());
-    const cap=el.querySelector('.msp-cap'),below=r.bottom+r.height*(S-1)/2+12;cap.style.left=(r.left+r.width/2)+'px';
-    if(below+44<innerHeight)cap.style.top=below+'px';else{cap.style.top=(r.top-r.height*(S-1)/2-52)+'px'}
+    // bilgi paneli: kapağın hangi yanında yer çoksa oraya açılır; yer yoksa sadece altta ad
+    const g=r.width*(S-1)/2,fl=r.left-g,fr=r.right+g,ft=Math.max(16,r.top-g),spR=innerWidth-fr-24,spL=fl-24,side=spR>=300||spR>=spL?'r':'l',sp=side==='r'?spR:spL;
+    const cap=el.querySelector('.msp-cap');
+    if(sp>=280){cap.remove();const w=Math.min(400,sp-8);el.insertAdjacentHTML('beforeend',infoHTML(it,side));const inf=el.querySelector('.msp-in');
+      inf.style.width=w+'px';inf.style.top=ft+'px';if(side==='r')inf.style.left=fr+'px';else inf.style.left=(fl-w)+'px';
+      requestAnimationFrame(()=>{const h=inf.offsetHeight;if(ft+h>innerHeight-16)inf.style.top=Math.max(16,innerHeight-16-h)+'px'})}
+    else{const below=r.bottom+g+12;cap.style.left=(r.left+r.width/2)+'px';if(below+44<innerHeight)cap.style.top=below+'px';else cap.style.top=(r.top-g-52)+'px'}
     document.body.appendChild(el);SPT.el=el;SPT.card=card;requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('on')));
-    f.addEventListener('pointerleave',()=>{if(SPT.el===el)spotOff()});
+    const inf=el.querySelector('.msp-in'),leave=e=>{const t=e.relatedTarget;if(t&&(f.contains(t)||inf?.contains(t)))return;if(SPT.el===el)spotOff()};
+    f.addEventListener('pointerleave',leave);if(inf){inf.addEventListener('pointerleave',leave);inf.addEventListener('wheel',e=>{spotOff(true);q('#scroll')?.scrollBy({top:e.deltaY,left:e.deltaX})},{passive:true});
+      inf.addEventListener('click',e=>{if(e.target.closest('[data-spo]')){spotOff(true);open(it.id)}else if(e.target.closest('a'))setTimeout(()=>spotOff(true),50)})}
     f.addEventListener('wheel',e=>{spotOff(true);q('#scroll')?.scrollBy({top:e.deltaY,left:e.deltaX})},{passive:true});
     f.addEventListener('contextmenu',e=>{e.preventDefault();spotOff(true);menu(it.id,card)});
     f.addEventListener('click',e=>{if(e.target.closest('.sr'))return;spotOff(true);open(it.id)});
     const sr=f.querySelector('.sr');if(sr)wireRate(sr,it)}
+  // spot ışığındaki bilgi: tür·yıl, ad, türler, puanlar, durum, özet ve bağlantılar (yasal: nerede izlenir / mağaza)
+  function infoHTML(it,side){const v=['movie','series','anime'].includes(it.type),g=it.type==='game',st=stName(it),m=[];
+    if(it.genres.length)m.push(it.genres.slice(0,3).join(', '));if(it.eps&&it.type!=='movie')m.push(it.eps+' bölüm');if(g&&it.platforms.length)m.push(it.platforms.slice(0,3).join(', '));if(it.dur)m.push(it.dur);
+    const L=[];if(v)L.push([`https://www.justwatch.com/tr/arama?q=${encodeURIComponent(it.title)}`,'Nerede izlenir']);if(g&&it.steam)L.push([`https://store.steampowered.com/app/${it.steam}/`,'Steam']);
+    if(it.imdb)L.push([`https://www.imdb.com/title/${it.imdb}/`,'IMDb']);if(it.mal)L.push([`https://myanimelist.net/anime/${it.mal}`,'MyAnimeList']);
+    let i=0;const x=h=>h?`<div class="msp-x" style="--i:${i++}">${h}</div>`:'';
+    return`<div class="msp-in ${side==='r'?'r':'l'}">${x(`<span class="msp-k">${E(TN[it.type])}${it.year?' · '+E(it.year):''}</span>`)}${x(`<h3>${E(it.title)}</h3>`)}${x(m.length?`<p class="msp-m">${E(m.join(' · '))}</p>`:'')}
+      ${x((it.score||it.rating||st)?`<p class="msp-b">${it.score?`<span class="mc-sc">${scoreBadge(it)}</span>`:''}${it.rating?`<span class="mc-mine">${IC.star}${it.rating}</span>`:''}${st?`<span class="msp-st">${E(st)}</span>`:''}</p>`:'')}
+      ${x(it.desc?`<p class="msp-d">${E(it.desc)}</p>`:'')}
+      ${x(`<p class="msp-a"><button type="button" class="msp-go" data-spo>${IC.play}Ayrıntılar</button>${L.map(([h,n])=>`<a href="${h}" target="_blank" rel="noopener">${E(n)}${IC.r}</a>`).join('')}</p>`)}</div>`}
   function wireRate(sr,it){const lab=sr.querySelector('.sr-l');
     const show=v=>{SPT.v=v;sr.style.setProperty('--v',v);sr.setAttribute('aria-valuenow',v);
       lab.innerHTML=v?`<b class="sr-n">${v}</b><small>${RW[v]}</small>`:`<small>Sağa sola gezdir</small>`;
@@ -276,9 +293,9 @@ const Media=(()=>{
   /* ── olaylar ── */
   function wire(root){
     // spot ışığı: imleç bir kapakta ~0,3 sn durursa (geçip giderken tetiklenmez)
-    root.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse'||!fineHover())return;const c=e.target.closest?.('.mc-card[data-mi]');if(!c||c===SPT.card||c.dataset.mi===SPT.block)return;clearTimeout(SPT.t);
-      SPT.t=setTimeout(()=>{if(Date.now()>(SPT.quiet||0)&&c.matches(':hover')&&!document.body.classList.contains('mset-drag')&&!q('.mset,.mq,.mrp'))spotOn(c)},320)});
-    root.addEventListener('pointerout',e=>{const c=e.target.closest?.('.mc-card[data-mi]');if(c&&!c.contains(e.relatedTarget)){clearTimeout(SPT.t);if(c.dataset.mi===SPT.block)SPT.block=null}});
+    root.addEventListener('pointerover',e=>{if(!(e.pointerType==='pen'||(e.pointerType==='mouse'&&fineHover())))return;const c=e.target.closest?.('.mc-card[data-mi]');if(!c||c===SPT.card||c.dataset.mi===SPT.block)return;clearTimeout(SPT.t);SPT.over=c;
+      SPT.t=setTimeout(()=>{if(Date.now()>(SPT.quiet||0)&&SPT.over===c&&!document.body.classList.contains('mset-drag')&&!q('.mset,.mq,.mrp'))spotOn(c)},320)});
+    root.addEventListener('pointerout',e=>{const c=e.target.closest?.('.mc-card[data-mi]');if(c&&!c.contains(e.relatedTarget)){clearTimeout(SPT.t);if(SPT.over===c)SPT.over=null;if(c.dataset.mi===SPT.block)SPT.block=null}});
     root.addEventListener('click',e=>{const t=e.target;
       const rw=t.closest('[data-row]');if(rw){const r=rw.parentElement.querySelector('.mc-row');r.scrollBy({left:+rw.dataset.row*r.clientWidth*.86,behavior:motion()?'smooth':'auto'});return}
       const hd=t.closest('[data-hd]');if(hd){heroGo(+hd.dataset.hd);return}

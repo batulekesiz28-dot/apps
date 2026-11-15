@@ -78,7 +78,7 @@ const Media=(()=>{
     return`<div class="fp fp-${it.type}" aria-hidden="true"><span class="fp-k">${TN[it.type]}${it.year?' · '+E(it.year):''}</span><b class="fp-t">${E(it.title)}</b>${g?`<span class="fp-g">${E(g)}</span>`:''}</div>`}
   const poster=(it,cls='')=>`<div class="mp ${cls}" style="--h:${hash(it.title)%360}">${fallback(it)}${IMG(it.cover,it.cover2)}</div>`;
   const wideArt=it=>{const w=it.wide||it.backdrop,h=hash(it.title)%360;if(w)return`<div class="mw" style="--h:${h}">${fallback(it)}${IMG(w,it.cover)}</div>`;
-    return`<div class="mw pb" style="--h:${h}">${fallback(it)}${it.cover?`<div class="mw-bl">${IMG(it.cover,it.cover2)}</div><div class="mw-p">${IMG(it.cover,it.cover2)}</div>`:''}</div>`};
+    return`<div class="mw pc" style="--h:${h}">${fallback(it)}${it.cover?IMG(it.cover,it.cover2):''}</div>`};
   // kart rozeti: IMDb puanı sağ üstte (IMDb etiketiyle), diğer kaynaklar olduğu gibi
   const scoreBadge=it=>{const m=/^IMDb\s*(.+)$/i.exec(it.score||'');return m?`<i>IMDb</i>${E(m[1])}`:scoreTxt(it)};
   const scoreTxt=it=>it.score?E(it.score.replace(/^IMDb\s*/,'★ ').replace(/^MC\s*/,'MC ')):'';
@@ -112,27 +112,31 @@ const Media=(()=>{
     io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){io.unobserve(e.target);fillLz(e.target)}}),{root:q('#scroll'),rootMargin:'900px 0px'});qa('.mc [data-lz]').forEach(z=>io.observe(z))}
   function fillLz(z){const h=LZ.get(z.dataset.lz);LZ.delete(z.dataset.lz);if(h==null)return;z.outerHTML=h;arrows()}
   /* görünüm: tv = Apple TV (geniş büyük kapaklar) · nf = Netflix (yoğun posterler) · compact (küçük, az metin) · list (satırlar) */
-  const vOf=v=>V()==='tv'?(v==='r'?'r':'w'):V()==='compact'?'p':v;
+  // Apple TV: kart şeklini kapaklar belirler — yatay görseli olanların çoğunluğu varsa geniş kart, yoksa büyük dikey poster (küçültülmüş/bulanık poster yok)
+  const hasWide=it=>!!(it.wide||it.backdrop);
+  const wideOK=l=>{const a=l.filter(i=>i.cover||hasWide(i));return!a.length||a.filter(hasWide).length*2>=a.length};
+  const vOf=(v,l=[])=>V()==='tv'?(v==='r'?'r':wideOK(l)?'w':'p'):V()==='compact'?'p':v;
   const likeIc=it=>it.like>0?`<span class="ml-lk up" title="Beğendim">${IC.up}</span>`:it.like<0?`<span class="ml-lk down" title="Beğenmedim">${IC.down}</span>`:'<span class="ml-lk none" title="Değerlendirmedim">—</span>';
   function lrow(it){const s=stName(it),c=st.look.lc;return`<article class="ml-r t-${it.type}" data-mi="${it.id}" tabindex="0" aria-label="${E(it.title)}">${c.cover?poster(it,'ml-p'):''}
       <span class="ml-t"><b>${E(it.title)}</b>${st.look.meta?`<small>${E(TN[it.type])}${metaShort(it)?' · '+metaShort(it):''}</small>`:''}</span>
       ${c.st?`<span class="ml-s">${s?E(s):'<i>—</i>'}</span>`:''}${c.rate?`<button class="ml-sc" data-mq="rate" title="Puanla" aria-label="${it.rating?`Puanım ${it.rating}/10 — değiştir`:'Puanla'}">${it.rating?`<b>${it.rating}</b><small>/10</small>`:`${IC.star}<i>Puanla</i>`}</button>`:''}${c.score?`<span class="ml-gs">${it.score?scoreTxt(it):'<i>—</i>'}</span>`:''}${c.like?likeIc(it):''}
       ${c.fav?`<button class="ml-f${it.fav?' on':''}" data-mq="fav" aria-pressed="${it.fav}" aria-label="${it.fav?'Favorilerden çıkar':'Favorilere ekle'}" title="Favori">${IC.heart}</button>`:''}</article>`}
   const listHTML=l=>{const c=st.look.lc;return`<div class="ml"><div class="ml-hd" aria-hidden="true">${c.cover?'<span></span>':''}<span>Ad</span>${c.st?'<span>Durum</span>':''}${c.rate?'<span>Puanım</span>':''}${c.score?'<span>Genel puan</span>':''}${c.like?'<span>Beğeni</span>':''}${c.fav?'<span></span>':''}</div>${l.map(lrow).join('')}</div>`};
-  const gridHTML=(l,s)=>V()==='list'?listHTML(l):`<div class="mc-grid v-${V()==='tv'?'w':s==='games'?'g':'p'}">${l.map(it=>card(it,V()==='tv'?'w':'p')).join('')}</div>`;
-  function shelf(title,list,o={}){if(!list.length)return'';const v=vOf(o.v||'p');
+  const gridHTML=(l,s)=>V()==='list'?listHTML(l):(()=>{const tw=V()==='tv'&&wideOK(l);return`<div class="mc-grid v-${tw?'w':s==='games'?'g':'p'}">${l.map(it=>card(it,tw?'w':'p')).join('')}</div>`})();
+  function shelf(title,list,o={}){if(!list.length)return'';const v=vOf(o.v||'p',list);
     if(V()==='list')return`<section class="mc-shelf ml-shelf"><header><h2>${E(title)}</h2>${o.href?`<a class="mc-all" href="${o.href}">Tümünü gör${IC.r}</a>`:''}</header>${listHTML(list.slice(0,6))}</section>`;
     return`<section class="mc-shelf${o.cls?' '+o.cls:''}"><header><h2>${E(title)}</h2>${o.sub?`<p>${E(o.sub)}</p>`:''}${o.href?`<a class="mc-all" href="${o.href}">Tümünü gör${IC.r}</a>`:''}</header>
       <div class="mc-rw"><button class="mc-arr l" data-row="-1" aria-label="Sola kaydır" tabindex="-1">${IC.l}</button><div class="mc-row v-${v}">${list.map((it,i)=>card(it,v,i+1)).join('')}</div><button class="mc-arr r" data-row="1" aria-label="Sağa kaydır" tabindex="-1">${IC.r}</button></div></section>`}
 
   /* ── öne çıkan alan ── */
   function featured(list){const day=new Date().toDateString();const sc=it=>(it.status==='doing'?6:0)+(it.fav?3:0)+(it.backdrop?4:0)+(it.cover?2:-20)+(parseFloat(it.score)||0)/3+(hash(it.id+day)%100)/40;
-    return list.filter(i=>i.cover||i.backdrop).sort((a,b)=>sc(b)-sc(a)).slice(0,5)}
+    // vitrine sadece yatay arka planı olanlar: dikey posteri büyütüp bulanıklaştırmak yok
+    return list.filter(i=>i.backdrop).sort((a,b)=>sc(b)-sc(a)).slice(0,5)}
   function kicker(it){return it.status==='doing'?(it.type==='game'?'Şu an oynuyorsun':'Kaldığın yerden devam et'):it.status==='todo'?(it.type==='game'?'Oynamak istediklerinden':'İzleme listenden'):it.fav?'Favorilerinden':it.status==='done'||it.status==='played'?(it.type==='game'?'Oynadıkların arasından':'İzlediklerinden'):'Kütüphanenden'}
   function hero(list){if(!list.length||!st.look.hero||V()==='compact'||V()==='list')return'';
     return`<section class="mh" aria-roledescription="carousel" aria-label="Öne çıkanlar"><div class="mh-sl">${list.map((it,i)=>{const wide=!!it.backdrop;
       return`<div class="mh-s${i===st.hero%list.length?' on':''}" data-i="${i}" aria-hidden="${i!==st.hero%list.length}">
-        <div class="mh-bg ${wide?'wide':'post'}">${IMG(it.backdrop||it.cover,wide?it.cover:it.cover2,'',i===0)}</div><div class="mh-gr"></div>
+        <div class="mh-bg">${IMG(it.backdrop||it.cover,wide?it.cover:it.cover2,'',i===0)}</div><div class="mh-gr"></div>
         <div class="mh-c"><span class="mh-k">${E(kicker(it))}</span><h2>${E(it.title)}</h2><p class="mh-m">${metaLong(it)}${it.score?`<span class="mh-sc">${scoreTxt(it)}</span>`:''}</p>
           ${it.desc?`<p class="mh-d">${E(it.desc.slice(0,240))}</p>`:''}
           <div class="mh-b"><button class="mb pri" data-mo="${it.id}">${IC.play}Ayrıntılar</button>${heroBtn(it)}<button class="mb ic${it.fav?' on':''}" data-mq="fav" data-id="${it.id}" aria-label="Favori" aria-pressed="${it.fav}" title="Favori">${IC.heart}</button></div></div>
@@ -278,8 +282,8 @@ const Media=(()=>{
   /* boyut önizlemesi: kütüphaneden rastgele bir kapak; kenarından/köşesinden çekilerek bütün kartlar boyutlanır */
   let pvIt=null;
   const pvPick=()=>{if(pvIt&&KB.items.has(pvIt.id))return pvIt;const l=[...KB.items.values()].filter(i=>AT.includes(i.type)&&(i.cover||i.backdrop||i.wide));pvIt=l.length?l[Math.random()*l.length|0]:null;return pvIt};
-  const pvBase=()=>V()==='tv'?{B:150,R:215/460}:{B:96,R:3/2};
-  function pvHTML(){const L=st.look,it=pvPick()||{id:'',type:'movie',title:'Örnek film',cover:''},wide=V()==='tv',{B}=pvBase();
+  const pvBase=()=>V()==='tv'&&hasWide(pvPick()||{})?{B:150,R:215/460}:{B:96,R:3/2};
+  function pvHTML(){const L=st.look,it=pvPick()||{id:'',type:'movie',title:'Örnek film',cover:''},wide=V()==='tv'&&hasWide(it),{B}=pvBase();
     return`<div class="mset-pv"><div class="mset-pf" style="width:${B*L.cover/100}px;--ar:${(L.ar||100)/100};--r:${L.radius}px">${wide?wideArt(it):poster(it)}
       <span class="mset-hx" data-pvh="x" tabindex="0" role="slider" aria-label="Kapak genişliği" aria-valuemin="60" aria-valuemax="160" aria-valuenow="${L.cover}" title="Genişlik · çift tıkla: sıfırla"></span>
       <span class="mset-hy" data-pvh="y" tabindex="0" role="slider" aria-label="Kapak yüksekliği" aria-valuemin="60" aria-valuemax="170" aria-valuenow="${L.ar||100}" title="Yükseklik · çift tıkla: sıfırla"></span>
@@ -391,7 +395,7 @@ const Media=(()=>{
   function detailHTML(it){const s=secOf(it.type),g=it.type==='game',f=flagOf(it),wide=!!it.backdrop;
     const links=[it.wiki&&[`https://${it.wiki.startsWith('tr:')?'tr':'en'}.wikipedia.org/wiki/${it.wiki.replace(/^tr:/,'')}`,'Wikipedia'],it.imdb&&[`https://www.imdb.com/title/${it.imdb}/`,'IMDb'],it.mal&&[`https://myanimelist.net/anime/${it.mal}`,'MyAnimeList'],it.steam&&[`https://store.steampowered.com/app/${it.steam}/`,'Steam']].filter(Boolean);
     return`<article class="mx" role="dialog" aria-modal="true" aria-label="${E(it.title)}">
-      <div class="mx-hero"><div class="mx-bd ${wide?'wide':'post'}">${IMG(it.backdrop||it.cover,wide?it.cover:it.cover2,'',true)}</div><div class="mx-sh"></div>
+      <div class="mx-hero"><div class="mx-bd ${wide?'land':'post'}">${IMG(it.backdrop||it.cover,wide?it.cover:it.cover2,'',true)}</div><div class="mx-sh"></div>
         <button class="mx-x" data-mx aria-label="Kapat (Esc)" title="Kapat">${IC.x}</button>
         <div class="mx-head">${poster(it,'mx-p')}<div class="mx-ti"><a class="mx-k" href="#lib/m/${s}">${IC[SEC[s].ic]}${SEC[s].n}</a>
           <h1>${E(it.title)}</h1><p class="mx-m">${metaLong(it,true)}${it.score?`<span class="mh-sc">${scoreTxt(it)}</span>`:''}</p>

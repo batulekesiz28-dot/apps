@@ -46,7 +46,6 @@
 .mh-bg{position:absolute;inset:0;z-index:-2;overflow:hidden;background:var(--mbg2)}
 .mh-bg img{width:100%;height:100%;object-fit:cover;object-position:center 25%;opacity:0;transition:opacity .6s}.mh-bg img.ok{opacity:1}
 .mh-s.on .mh-bg img{animation:kb 18s ease-out both}@keyframes kb{from{transform:scale(1.08)}to{transform:scale(1)}}
-.mh-bg.post img{filter:blur(48px) saturate(1.5) brightness(.6);transform:scale(1.3)!important;animation:none!important}
 .mh-gr{position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,var(--mbg) 0%,color-mix(in srgb,var(--mbg) 75%,transparent) 30%,transparent 65%),linear-gradient(0deg,var(--mbg) 0%,transparent 40%),linear-gradient(180deg,color-mix(in srgb,var(--mbg) 70%,transparent),transparent 26%)}
 .mh-c{position:absolute;left:var(--px);bottom:clamp(56px,9vh,100px);width:min(620px,calc(100% - 2*var(--px)))}
 .mh-k{display:inline-block;margin-bottom:12px;font:700 12px/1 var(--font);letter-spacing:.14em;text-transform:uppercase;color:var(--acc)}
@@ -93,7 +92,7 @@
 .fp-game .fp-t,.fp-anime .fp-t{font-family:var(--font);font-weight:700;letter-spacing:-.02em}
 .fp-anime{background:radial-gradient(90% 60% at 50% 0%,hsl(var(--h) 80% 55% / .55),transparent 70%),linear-gradient(180deg,hsl(var(--h) 55% 22%),hsl(calc(var(--h) + 60) 60% 8%))}
 .mw .fp{padding:6% 6%}.mw .fp-t{-webkit-line-clamp:2;font-size:clamp(18px,1.6vw,24px)}
-.mw.pb{background:var(--mbg2)}.mw.pb:has(.mw-p):not(.noimg) .fp{visibility:hidden}
+.mw.pc img{object-position:center 22%}
 .mc-sc{position:absolute;z-index:2;right:7px;top:7px;padding:3px 7px;border-radius:6px;font:700 12px/1.2 var(--font);color:#fff;background:rgba(0,0,0,.72);backdrop-filter:blur(6px);font-variant-numeric:tabular-nums}
 .mc-fl{position:absolute;z-index:2;left:7px;top:7px;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:#F5C451;color:#1A1405}.mc-fl .mvi{width:14px;height:14px;stroke-width:2}
 .mc-fv{position:absolute;z-index:2;right:7px;bottom:7px;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.6);color:var(--acc)}.mc-fv .mvi{width:14px;height:14px;fill:currentColor}
@@ -243,9 +242,6 @@
   .mx-links a{height:40px}.mx-cand{min-height:56px}.mq button{min-height:44px}.ma-r{grid-template-columns:1fr}.mc-sc{font-size:12px}}
 @media (prefers-reduced-motion:reduce){.mc *,.mx-bg *{animation:none!important;transition-duration:.01ms!important}}
 [data-motion=off] .mc *,[data-motion=off] .mx-bg *{animation:none!important;transition-duration:.01ms!important}
-.mw-bl{position:absolute;inset:0}.mw-bl img{filter:blur(22px) brightness(.5) saturate(1.5);transform:scale(1.35)}
-.mw-p{position:absolute;left:50%;top:8%;bottom:8%;transform:translateX(-50%);aspect-ratio:2/3;border-radius:5px;overflow:hidden;box-shadow:0 12px 30px -8px rgba(0,0,0,.8);background:var(--mbg2)}
-.mw.noimg .mw-bl,.mw.noimg .mw-p{display:none}.mw.pb .fp{z-index:0}.mw.pb .mw-bl,.mw.pb .mw-p{z-index:1}
 .mc-sync[hidden]{display:none}
 @media (max-width:760px){.mc-nav{position:relative}.mc-sub{position:relative;top:0}}
 .mc-lz{height:330px}
@@ -310,6 +306,9 @@
 .mc[data-view=tv] .mc-row.v-w .mc-card{width:calc(clamp(280px,26vw,420px) * var(--cz,1))}
 .mc[data-view=tv] .mc-grid.v-w{grid-template-columns:repeat(auto-fill,calc(clamp(280px,26vw,420px) * var(--cz,1) * var(--dz,1)))}
 .mc[data-view=tv] .mc-art{border-radius:12px}
+/* Apple TV dikey poster rafları/ızgarası: büyük posterler */
+.mc[data-view=tv]{--card:calc(clamp(150px,13vw,220px) * var(--cz,1))}
+.mc[data-view=tv] .mc-grid.v-p,.mc[data-view=tv] .mc-grid.v-g{grid-template-columns:repeat(auto-fill,calc(clamp(150px,13vw,220px) * var(--cz,1) * var(--dz,1)))}
 .mc[data-view=tv] .mc-cap{padding-top:10px}.mc[data-view=tv] .mc-cap small{color:rgba(255,255,255,.55)}
 /* Netflix: yoğun posterler, başlık yalnızca üzerine gelince */
 .mc[data-view=nf]{--card:calc(clamp(112px,9.5vw,156px) * var(--cz,1))}
@@ -321,7 +320,7 @@
 .mc[data-view=compact] .mc-cap{padding-top:6px}.mc[data-view=compact] .mc-cap small,.mc[data-view=compact] .mc-sc,.mc[data-view=compact] .mc-fv{display:none}
 .mc[data-view=compact] .mc-cap b{font-size:12px}
 .mc[data-view=compact] .mc-grid{gap:calc(14px * var(--gz,1)) calc(8px * var(--gz,1));grid-template-columns:repeat(auto-fill,calc(92px * var(--cz,1) * var(--dz,1)))}
-@media (max-width:600px){.mc .mc-grid,.mc .mc-grid.v-g{grid-template-columns:repeat(auto-fill,minmax(calc(104px * var(--cz,1) * var(--dz,1)),1fr))}.mc .mc-grid.v-w,.mc[data-view=tv] .mc-grid.v-w{grid-template-columns:repeat(auto-fill,minmax(min(100%,calc(280px * var(--cz,1))),1fr))}}
+@media (max-width:600px){.mc .mc-grid,.mc .mc-grid.v-g,.mc[data-view=tv] .mc-grid.v-p,.mc[data-view=tv] .mc-grid.v-g{grid-template-columns:repeat(auto-fill,minmax(calc(104px * var(--cz,1) * var(--dz,1)),1fr))}.mc .mc-grid.v-w,.mc[data-view=tv] .mc-grid.v-w{grid-template-columns:repeat(auto-fill,minmax(min(100%,calc(280px * var(--cz,1))),1fr))}}
 .mc[data-view=compact] .mc-shelf h2{font-size:calc(16px * var(--fz,1))}
 /* Liste: kapak · ad · durum · puan · beğeni · favori */
 .ml{display:flex;flex-direction:column;padding:0 var(--px) 8px}

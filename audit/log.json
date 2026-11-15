@@ -2437,5 +2437,35 @@
     "fix": "Gerçek px boyu, çekerken saydam panel, çift tıkla sıfırla, %100'e yapışma, ok tuşları"
    }
   ]
+ },
+ {
+  "at": "2026-11-15T15:33:48",
+  "change": "Medya Apple TV: filmler büyük posterle, bulanık küçük poster kaldırıldı; vitrin tam genişlik",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Sadece dikey posteri olan filmler geniş kartta bulanık zeminde minicik kalıyordu",
+    "fix": "Kart şeklini kapaklar belirliyor: posterli raflar büyük dikey poster"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Vitrin ve detay arka planı 1080px'e sıkışıyordu (Notlar'ın .wide sınıfıyla çakışma)",
+    "fix": "Sınıf adı değişti, görsel tam genişlik"
+   }
+  ]
  }
 ]

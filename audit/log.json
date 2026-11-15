@@ -1912,5 +1912,38 @@
     "fix": "Dosya bağlantılarına ?v= sürüm numarası"
    }
   ]
+ },
+ {
+  "at": "2026-11-15T09:56:06",
+  "change": "Medya: sol üstteki Workspace düğmeleri Medya'dayken gizlendi; görünüm ayarları genişledi — köşe yuvarlaklığı, isim/bilgi/puan rozeti aç-kapa, liste satır yüksekliği ve sütunları, ana sayfa vitrini, rafları aç-kapa ve sırala, üstteki kategorileri gizle; hepsi kalıcı",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   },
+   "medya ayar paneli": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Ayar paneli uzayınca sürgüler sıkışıp 16px'e iniyordu",
+    "fix": "Panel öğelerinin küçülmesi kapatıldı"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "open",
+    "text": "Raf satırında anahtar ve sıralama okları yan yana (denetçi 'yapışık düğme' bilgisi veriyor); her biri 28px+ ve ayrı amaçlı, bilerek bırakıldı"
+   }
+  ]
  }
 ]

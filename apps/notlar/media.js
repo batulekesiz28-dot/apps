@@ -56,8 +56,15 @@ const Media=(()=>{
     vcp:S('<rect x="1.5" y="1.5" width="3" height="4" rx=".6"/><rect x="6.5" y="1.5" width="3" height="4" rx=".6"/><rect x="11.5" y="1.5" width="3" height="4" rx=".6"/><rect x="1.5" y="8" width="3" height="4" rx=".6"/><rect x="6.5" y="8" width="3" height="4" rx=".6"/><rect x="11.5" y="8" width="3" height="4" rx=".6"/>'),
     vls:S('<rect x="1.5" y="2.5" width="3" height="3" rx=".6"/><rect x="1.5" y="10.5" width="3" height="3" rx=".6"/><path d="M6.5 4h8M6.5 12h8"/>'),home:S('<path d="M2.5 7.5L8 3l5.5 4.5M4 6.5V13h8V6.5"/>'),
     minus:S('<path d="M3 8h10"/>'),sync:S('<path d="M13 8a5 5 0 0 1-9 3M3 8a5 5 0 0 1 9-3"/><path d="M12 2v3h-3M4 14v-3h3"/>')};
-  const LOOK0={view:'tv',cover:100,icon:'m',font:'m',gap:100,dens:'n'};
-  const st={sec:'home',page:'home',qs:'',genre:'',sort:lsg('mc:sort','added'),kind:'',min:0,hero:0,base:[],look:{...LOOK0,...lsg('mc:look',{})}};
+  // ana sayfa rafları (sırası ve görünürlüğü kullanıcıda) · liste sütunları
+  const SH={cont:'Kaldığın yerden devam et',movies:'Filmler',series:'Diziler',anime:'Animeler',games:'Oyunlar',books:'Kitaplar',fav:'Favorilerin',top:'En sevdiklerin',docs:'Belgeler'};
+  const LC=[['cover','Kapak'],['st','Durum'],['rate','Puanım'],['score','Genel puan'],['like','Beğeni'],['fav','Favori']];
+  const LOOK0={view:'tv',cover:100,icon:'m',font:'m',gap:100,dens:'n',radius:8,title:1,meta:1,badge:1,hero:1,rowh:100,
+    lc:{cover:1,st:1,rate:1,score:0,like:1,fav:1},shelves:Object.keys(SH),off:[],tabsOff:[]};
+  function loadLook(){const s=lsg('mc:look',{})||{},L={...LOOK0,...s,lc:{...LOOK0.lc,...(s.lc||{})}};
+    L.shelves=[...(Array.isArray(s.shelves)?s.shelves.filter(k=>SH[k]):[]),...Object.keys(SH)].filter((k,i,a)=>a.indexOf(k)===i);
+    L.off=(Array.isArray(s.off)?s.off:[]).filter(k=>SH[k]);L.tabsOff=Array.isArray(s.tabsOff)?s.tabsOff:[];return L}
+  const st={sec:'home',page:'home',qs:'',genre:'',sort:lsg('mc:sort','added'),kind:'',min:0,hero:0,base:[],look:loadLook()};
   const V=()=>st.look.view;
   const all=()=>[...KB.items.values()].filter(i=>AT.includes(i.type));
   const inSec=(it,s)=>SEC[s].types.includes(it.type);
@@ -106,11 +113,11 @@ const Media=(()=>{
   /* görünüm: tv = Apple TV (geniş büyük kapaklar) · nf = Netflix (yoğun posterler) · compact (küçük, az metin) · list (satırlar) */
   const vOf=v=>V()==='tv'?(v==='r'?'r':'w'):V()==='compact'?'p':v;
   const likeIc=it=>it.like>0?`<span class="ml-lk up" title="Beğendim">${IC.up}</span>`:it.like<0?`<span class="ml-lk down" title="Beğenmedim">${IC.down}</span>`:'<span class="ml-lk none" title="Değerlendirmedim">—</span>';
-  function lrow(it){const s=stName(it);return`<article class="ml-r t-${it.type}" data-mi="${it.id}" tabindex="0" aria-label="${E(it.title)}">${poster(it,'ml-p')}
-      <span class="ml-t"><b>${E(it.title)}</b><small>${E(TN[it.type])}${metaShort(it)?' · '+metaShort(it):''}</small></span>
-      <span class="ml-s">${s?E(s):'<i>—</i>'}</span><span class="ml-sc">${it.rating?`<b>${it.rating}</b><small>/10</small>`:'<i>—</i>'}</span>${likeIc(it)}
-      <button class="ml-f${it.fav?' on':''}" data-mq="fav" aria-pressed="${it.fav}" aria-label="${it.fav?'Favorilerden çıkar':'Favorilere ekle'}" title="Favori">${IC.heart}</button></article>`}
-  const listHTML=l=>`<div class="ml"><div class="ml-hd" aria-hidden="true"><span></span><span>Ad</span><span>Durum</span><span>Puanım</span><span>Beğeni</span><span></span></div>${l.map(lrow).join('')}</div>`;
+  function lrow(it){const s=stName(it),c=st.look.lc;return`<article class="ml-r t-${it.type}" data-mi="${it.id}" tabindex="0" aria-label="${E(it.title)}">${c.cover?poster(it,'ml-p'):''}
+      <span class="ml-t"><b>${E(it.title)}</b>${st.look.meta?`<small>${E(TN[it.type])}${metaShort(it)?' · '+metaShort(it):''}</small>`:''}</span>
+      ${c.st?`<span class="ml-s">${s?E(s):'<i>—</i>'}</span>`:''}${c.rate?`<span class="ml-sc">${it.rating?`<b>${it.rating}</b><small>/10</small>`:'<i>—</i>'}</span>`:''}${c.score?`<span class="ml-gs">${it.score?scoreTxt(it):'<i>—</i>'}</span>`:''}${c.like?likeIc(it):''}
+      ${c.fav?`<button class="ml-f${it.fav?' on':''}" data-mq="fav" aria-pressed="${it.fav}" aria-label="${it.fav?'Favorilerden çıkar':'Favorilere ekle'}" title="Favori">${IC.heart}</button>`:''}</article>`}
+  const listHTML=l=>{const c=st.look.lc;return`<div class="ml"><div class="ml-hd" aria-hidden="true">${c.cover?'<span></span>':''}<span>Ad</span>${c.st?'<span>Durum</span>':''}${c.rate?'<span>Puanım</span>':''}${c.score?'<span>Genel puan</span>':''}${c.like?'<span>Beğeni</span>':''}${c.fav?'<span></span>':''}</div>${l.map(lrow).join('')}</div>`};
   const gridHTML=(l,s)=>V()==='list'?listHTML(l):`<div class="mc-grid v-${V()==='tv'?'w':s==='games'?'g':'p'}">${l.map(it=>card(it,V()==='tv'?'w':'p')).join('')}</div>`;
   function shelf(title,list,o={}){if(!list.length)return'';const v=vOf(o.v||'p');
     if(V()==='list')return`<section class="mc-shelf ml-shelf"><header><h2>${E(title)}</h2>${o.href?`<a class="mc-all" href="${o.href}">Tümünü gör${IC.r}</a>`:''}</header>${listHTML(list.slice(0,6))}</section>`;
@@ -121,7 +128,7 @@ const Media=(()=>{
   function featured(list){const day=new Date().toDateString();const sc=it=>(it.status==='doing'?6:0)+(it.fav?3:0)+(it.backdrop?4:0)+(it.cover?2:-20)+(parseFloat(it.score)||0)/3+(hash(it.id+day)%100)/40;
     return list.filter(i=>i.cover||i.backdrop).sort((a,b)=>sc(b)-sc(a)).slice(0,5)}
   function kicker(it){return it.status==='doing'?(it.type==='game'?'Şu an oynuyorsun':'Kaldığın yerden devam et'):it.status==='todo'?(it.type==='game'?'Oynamak istediklerinden':'İzleme listenden'):it.fav?'Favorilerinden':it.status==='done'||it.status==='played'?(it.type==='game'?'Oynadıkların arasından':'İzlediklerinden'):'Kütüphanenden'}
-  function hero(list){if(!list.length||V()==='compact'||V()==='list')return'';
+  function hero(list){if(!list.length||!st.look.hero||V()==='compact'||V()==='list')return'';
     return`<section class="mh" aria-roledescription="carousel" aria-label="Öne çıkanlar"><div class="mh-sl">${list.map((it,i)=>{const wide=!!it.backdrop;
       return`<div class="mh-s${i===st.hero%list.length?' on':''}" data-i="${i}" aria-hidden="${i!==st.hero%list.length}">
         <div class="mh-bg ${wide?'wide':'post'}">${IMG(it.backdrop||it.cover,wide?it.cover:it.cover2,'',i===0)}</div><div class="mh-gr"></div>
@@ -141,19 +148,21 @@ const Media=(()=>{
   const byAdded=l=>l.slice().sort((a,b)=>b.added-a.added),byScore=l=>l.slice().sort((a,b)=>(b.rating||parseFloat(b.score.replace(/[^\d.]/g,''))/(b.type==='game'?10:1)||0)-(a.rating||parseFloat(a.score.replace(/[^\d.]/g,''))/(a.type==='game'?10:1)||0));
   const byTouch=l=>l.slice().sort((a,b)=>(b.opened||b.updated)-(a.opened||a.updated));
   function homeHTML(){const l=all();if(!l.length)return emptyHome();const w=l.filter(i=>i.type!=='game'&&i.type!=='book');
-    const rev=l.filter(flagOf).length,of=t=>l.filter(i=>i.type===t);
+    const rev=l.filter(flagOf).length,of=t=>l.filter(i=>i.type===t),L=st.look;
+    const H={cont:()=>shelf(SH.cont,byTouch(w.filter(i=>i.status==='doing')),{v:'w2'}),
+      movies:()=>shelf(SH.movies,byAdded(of('movie')).slice(0,20),{href:'#lib/m/movies'}),
+      series:()=>shelf(SH.series,byAdded(of('series')).slice(0,20),{href:'#lib/m/series'}),
+      anime:()=>shelf(SH.anime,byAdded(of('anime')).slice(0,20),{cls:'anime',href:'#lib/m/anime'}),
+      games:()=>shelf(SH.games,byTouch(of('game')).slice(0,16),{v:'w',cls:'games',href:'#lib/m/games'}),
+      books:()=>shelf(SH.books,byAdded(of('book')).slice(0,20),{cls:'books',href:'#lib/m/books'}),
+      fav:()=>shelf(SH.fav,byTouch(l.filter(i=>i.fav)),{}),
+      top:()=>shelf(SH.top,byScore(w.filter(i=>i.status==='done')).slice(0,10),{v:'r',sub:'İzlediklerin arasında en yüksek puanlılar'}),
+      docs:()=>docsShelf()};
+    const rows=L.shelves.filter(k=>!L.off.includes(k)).map((k,n)=>n<3?H[k]():lazy(H[k]())).join('');
     return hero(featured(l))+`<div class="mc-shelves">
       ${(Library.impBanner?.()||'').replace('class="imp"','class="imp mc-imp"')}
       ${rev?`<a class="mc-rev" href="#lib/m/${secOf(l.find(flagOf).type)}/review">${IC.warn}<span><b>${rev} kayıt incelemeni bekliyor</b><small>Türü ya da posteri kesin olmayanları işaretledim — rastgele bir kategoriye atmadım.</small></span>${IC.r}</a>`:''}
-      ${shelf('Kaldığın yerden devam et',byTouch(w.filter(i=>i.status==='doing')),{v:'w2'})}
-      ${shelf('Filmler',byAdded(of('movie')).slice(0,20),{href:'#lib/m/movies'})}
-      ${shelf('Diziler',byAdded(of('series')).slice(0,20),{href:'#lib/m/series'})}
-      ${lazy(shelf('Animeler',byAdded(of('anime')).slice(0,20),{cls:'anime',href:'#lib/m/anime'}))}
-      ${lazy(shelf('Oyunlar',byTouch(of('game')).slice(0,16),{v:'w',cls:'games',href:'#lib/m/games'}))}
-      ${lazy(shelf('Kitaplar',byAdded(of('book')).slice(0,20),{cls:'books',href:'#lib/m/books'}))}
-      ${lazy(shelf('Favorilerin',byTouch(l.filter(i=>i.fav)),{}))}
-      ${lazy(shelf('En sevdiklerin',byScore(w.filter(i=>i.status==='done')).slice(0,10),{v:'r',sub:'İzlediklerin arasında en yüksek puanlılar'}))}
-      ${lazy(docsShelf())}</div>`}
+      ${rows||`<div class="mc-none"><span>${IC.gear}</span><b>Bütün rafları gizledin</b><p>Görünüm ayarlarından (dişli) “Ana sayfa rafları”nı aç.</p></div>`}</div>`}
   function docsShelf(){const d=[...KB.items.values()].filter(i=>!AT.includes(i.type));if(!d.length)return'';
     return`<section class="mc-shelf docs"><header><h2>Belgeler</h2><p>PDF'ler, makaleler, videolar</p><a class="mc-all" href="#lib/docs">Belgelere git${IC.r}</a></header><div class="mc-docs">${d.slice(0,8).map(it=>`<a class="mc-doc" href="#lib/i/${it.id}">${Library.cover(it,'mini')}<span><b>${E(it.title)}</b><small>${E((KB.TYPES[it.type]||KB.TYPES.file).n)}</small></span></a>`).join('')}</div></section>`}
   function emptyHome(){return`<section class="mc-empty"><div class="mc-e-art" aria-hidden="true">${['#E5484D','#B07CFF','#66C0F4','#F0A04B','#30A46C'].map((c,i)=>`<span style="--c:${c};--i:${i}"></span>`).join('')}</div>
@@ -195,11 +204,11 @@ const Media=(()=>{
   /* ── kabuk ── */
   const VIEWS=[['tv','Apple TV',IC.vtv],['nf','Netflix',IC.vnf],['compact','Kompakt',IC.vcp],['list','Liste',IC.vls]];
   const viewSeg=()=>`<div class="mc-vw" role="radiogroup" aria-label="Görünüm">${VIEWS.map(([k,n,ic])=>`<button role="radio" data-lv="${k}" aria-checked="${V()===k}" class="${V()===k?'on':''}" title="${n} görünümü" aria-label="${n} görünümü">${ic}</button>`).join('')}</div>`;
-  function nav(){const tabs=[['home','Ana sayfa','#lib',IC.home],...ORDER.map(k=>[k,SEC[k].n,'#lib/m/'+k,IC[SEC[k].ic]])];
+  function nav(){const tabs=[['home','Ana sayfa','#lib',IC.home],...ORDER.filter(k=>k===st.sec||!st.look.tabsOff.includes(k)).map(k=>[k,SEC[k].n,'#lib/m/'+k,IC[SEC[k].ic]])];
     const sub=st.sec!=='home'?SEC[st.sec].pages.map(([k,n])=>{const c=k==='home'?'':all().filter(i=>inSec(i,st.sec)&&inPage(i,k)).length;
         return`<a href="#lib/m/${st.sec}${k==='home'?'':'/'+k}" class="${st.page===k?'on':''}"${st.page===k?' aria-current="page"':''}>${n}${k==='home'?'':`<em>${c}</em>`}</a>`}).join('')+(()=>{const r=all().filter(i=>inSec(i,st.sec)&&flagOf(i)).length;return r?`<a href="#lib/m/${st.sec}/review" class="rev${st.page==='review'?' on':''}">${IC.warn}İnceleme<em>${r}</em></a>`:''})():'';
     return`<nav class="mc-nav" aria-label="Medya bölümleri"><a class="mc-brand" href="#lib" aria-label="Medya ana sayfa"><span>${IC.play}</span><b>Medya</b></a>
-      <div class="mc-tabs">${tabs.map(([k,n,h,ic])=>`<a href="${h}" class="t-${k}${st.sec===k?' on':''}"${st.sec===k?' aria-current="page"':''}>${ic}<span>${n}</span></a>`).join('')}<a href="#lib/docs" class="t-docs">${IC.link}<span>Belgeler</span></a></div>
+      <div class="mc-tabs">${tabs.map(([k,n,h,ic])=>`<a href="${h}" class="t-${k}${st.sec===k?' on':''}"${st.sec===k?' aria-current="page"':''}>${ic}<span>${n}</span></a>`).join('')}${st.look.tabsOff.includes('docs')?'':`<a href="#lib/docs" class="t-docs">${IC.link}<span>Belgeler</span></a>`}</div>
       <div class="mc-r"><label class="mc-s">${IC.search}<input data-ms value="${E(st.qs)}" placeholder="Ara" aria-label="Film, dizi, anime, oyun ve kitap ara" autocomplete="off"><kbd>/</kbd></label>
       ${viewSeg()}<button class="mc-gear" data-mset aria-label="Görünüm ayarları" title="Görünüm ayarları" aria-haspopup="dialog">${IC.gear}</button>
       <span class="mc-sync" aria-live="polite"${R.busy?'':' hidden'}>${IC.sync}<span>${R.busy?syncTxt():''}</span></span>
@@ -248,23 +257,43 @@ const Media=(()=>{
     root.addEventListener('touchend',e=>{if(lp===-1){e.preventDefault()}clearTimeout(lp);lp=0});root.addEventListener('touchmove',()=>{clearTimeout(lp)},{passive:true})}
   /* görünüm ayarları: anında uygulanır, mc:look'a kaydedilir (içerik verisine dokunmaz) */
   function applyLook(root=q('#view>.mc')){if(!root)return;const L=st.look,F={s:.92,m:1,l:1.1},IZ={s:'14px',m:'16px',l:'19px'},DZ={r:1.22,n:1,s:.8};
-    root.dataset.view=L.view;const sp=(k,v)=>root.style.setProperty(k,v);sp('--cz',L.cover/100);sp('--gz',L.gap/100);sp('--fz',F[L.font]||1);sp('--iz',IZ[L.icon]||'16px');sp('--dz',DZ[L.dens]||1)}
+    root.dataset.view=L.view;const sp=(k,v)=>root.style.setProperty(k,v);sp('--cz',L.cover/100);sp('--gz',L.gap/100);sp('--fz',F[L.font]||1);sp('--iz',IZ[L.icon]||'16px');sp('--dz',DZ[L.dens]||1);
+    sp('--r',L.radius+'px');sp('--rh',L.rowh/100);root.toggleAttribute('data-notitle',!L.title);root.toggleAttribute('data-nometa',!L.meta);root.toggleAttribute('data-nobadge',!L.badge);
+    const c=L.lc,W={st:'160px',rate:'76px',score:'84px',like:'56px',fav:'40px'},cov='calc(42px * var(--cz,1) * var(--rh,1))';
+    sp('--lcols',[c.cover?cov:'','minmax(0,1fr)',...['st','rate','score','like','fav'].map(k=>c[k]?W[k]:'')].filter(Boolean).join(' '));
+    sp('--lcols-m',[c.cover?cov:'','minmax(0,1fr)',c.rate?'auto':'',c.fav?'44px':''].filter(Boolean).join(' '))}
+  function saveLook(){lss('mc:look',st.look)}
   function setLook(k,v,redraw){st.look[k]=v;lss('mc:look',st.look);applyLook();if(redraw){swap();qa('.mc [data-lv]').forEach(b=>{const on=b.dataset.lv===V();b.classList.toggle('on',on);b.setAttribute('aria-checked',on)})}}
-  function settings(anchor){q('.mset')?.remove();const L=st.look,seg=(k,o)=>`<div class="mset-seg" role="radiogroup">${o.map(([v,n])=>`<button role="radio" data-lk="${k}" data-lval="${v}" aria-checked="${L[k]===v}" class="${L[k]===v?'on':''}">${n}</button>`).join('')}</div>`;
-    const el=document.createElement('div');el.className='mset';el.setAttribute('role','dialog');el.setAttribute('aria-label','Görünüm ayarları');
-    el.innerHTML=`<header><b>Görünüm</b><button class="mset-x" data-msx aria-label="Kapat">${IC.x}</button></header>
-      <label>Görünüm türü</label>${seg('view',VIEWS.map(([k,n])=>[k,n]))}
-      <label for="mset-c">Kapak boyutu <output>${L.cover}%</output></label><input id="mset-c" type="range" min="70" max="150" step="5" value="${L.cover}" data-lr="cover">
-      <label for="mset-g">Kart aralığı <output>${L.gap}%</output></label><input id="mset-g" type="range" min="40" max="200" step="10" value="${L.gap}" data-lr="gap">
+  function setHTML(){const L=st.look,seg=(k,o)=>`<div class="mset-seg" role="radiogroup">${o.map(([v,n])=>`<button role="radio" data-lk="${k}" data-lval="${v}" aria-checked="${L[k]===v}" class="${L[k]===v?'on':''}">${n}</button>`).join('')}</div>`;
+    const rng=(k,n,min,max,stp,u='%')=>`<label for="mset-${k}">${n} <output>${L[k]}${u}</output></label><input id="mset-${k}" type="range" min="${min}" max="${max}" step="${stp}" value="${L[k]}" data-lr="${k}" data-u="${u}">`;
+    const tg=(attr,k,n,on)=>`<button class="mset-tg" role="switch" ${attr}="${k}" aria-checked="${!!on}"><span>${n}</span><i aria-hidden="true"></i></button>`;
+    const sh=L.shelves;
+    return`<header><b>Görünüm</b><button class="mset-x" data-msx aria-label="Kapat">${IC.x}</button></header>
+      <h4>Görünüm türü</h4>${seg('view',VIEWS.map(([k,n])=>[k,n]))}
+      <h4>Kartlar</h4>${rng('cover','Kapak boyutu',60,160,5)}${rng('radius','Köşe yuvarlaklığı',0,24,1,'px')}${rng('gap','Kart aralığı',40,220,10)}
       <label>Izgara yoğunluğu</label>${seg('dens',[['r','Rahat'],['n','Normal'],['s','Sıkı']])}
-      <label>Yazı boyutu</label>${seg('font',[['s','Küçük'],['m','Orta'],['l','Büyük']])}
+      <div class="mset-tgs">${tg('data-lt','title','İsimleri göster',L.title)}${tg('data-lt','meta','Yıl, tür, yazar',L.meta)}${tg('data-lt','badge','Genel puan rozeti',L.badge)}</div>
+      <h4>Liste</h4>${rng('rowh','Satır yüksekliği',70,170,5)}
+      <label>Sütunlar</label><div class="mset-tgs">${LC.map(([k,n])=>tg('data-lc',k,n,L.lc[k])).join('')}</div>
+      <h4>Ana sayfa</h4><div class="mset-tgs">${tg('data-lt','hero','Büyük vitrin',L.hero)}</div>
+      <label>Raflar — aç/kapat, sırala</label><div class="mset-shs">${sh.map((k,n)=>`<div class="mset-sh${L.off.includes(k)?' off':''}">${tg('data-lsh',k,SH[k],!L.off.includes(k))}
+        <button data-lmv="${k}:-1" aria-label="${SH[k]} yukarı" ${n?'':'disabled'}>${IC.l}</button><button data-lmv="${k}:1" aria-label="${SH[k]} aşağı" ${n<sh.length-1?'':'disabled'}>${IC.r}</button></div>`).join('')}</div>
+      <h4>Üstteki kategoriler</h4><div class="mset-tgs">${[...ORDER,'docs'].map(k=>tg('data-ltab',k,k==='docs'?'Belgeler':SEC[k].n,!L.tabsOff.includes(k))).join('')}</div>
+      <h4>Yazı ve ikonlar</h4><label>Yazı boyutu</label>${seg('font',[['s','Küçük'],['m','Orta'],['l','Büyük']])}
       <label>İkon boyutu</label>${seg('icon',[['s','Küçük'],['m','Orta'],['l','Büyük']])}
-      <button class="mset-r" data-msr>Varsayılana dön</button>`;
-    q('#view>.mc').appendChild(el);const r=anchor.getBoundingClientRect();el.style.top=Math.round(r.bottom+8)+'px';el.style.right=Math.max(8,Math.round(innerWidth-r.right))+'px';
-    el.addEventListener('input',e=>{const t=e.target;if(t.dataset.lr){t.previousElementSibling.querySelector('output').textContent=t.value+'%';setLook(t.dataset.lr,+t.value)}});
-    el.addEventListener('click',e=>{const t=e.target;if(t.closest('[data-msx]'))return el.remove();
-      if(t.closest('[data-msr]')){st.look={...LOOK0};lss('mc:look',st.look);applyLook();swap();el.remove();settings(anchor);return}
-      const b=t.closest('[data-lk]');if(b){setLook(b.dataset.lk,b.dataset.lval,b.dataset.lk==='view');qa(`[data-lk="${b.dataset.lk}"]`,el).forEach(x=>{const on=x===b;x.classList.toggle('on',on);x.setAttribute('aria-checked',on)})}});
+      <button class="mset-r" data-msr>Hepsini varsayılana döndür</button>`}
+  function settings(anchor){q('.mset')?.remove();const el=document.createElement('div');el.className='mset';el.setAttribute('role','dialog');el.setAttribute('aria-label','Görünüm ayarları');
+    el.innerHTML=setHTML();document.body.appendChild(el);const place=()=>{const r=(q('[data-mset]')||anchor).getBoundingClientRect();el.style.top=Math.round(r.bottom+8)+'px';el.style.right=Math.max(8,Math.round(innerWidth-r.right))+'px'};place();
+    const redrawPanel=focusSel=>{const y=el.scrollTop;el.innerHTML=setHTML();el.scrollTop=y;if(focusSel)el.querySelector(focusSel)?.focus()};
+    el.addEventListener('input',e=>{const t=e.target;if(t.dataset.lr){t.previousElementSibling.querySelector('output').textContent=t.value+t.dataset.u;setLook(t.dataset.lr,+t.value)}});
+    el.addEventListener('click',e=>{const t=e.target,L=st.look;if(t.closest('[data-msx]'))return el.remove();
+      if(t.closest('[data-msr]')){st.look=JSON.parse(JSON.stringify(LOOK0));saveLook();applyLook();refresh();redrawPanel();return}
+      const b=t.closest('[data-lk]');if(b){setLook(b.dataset.lk,b.dataset.lval,b.dataset.lk==='view');qa(`[data-lk="${b.dataset.lk}"]`,el).forEach(x=>{const on=x===b;x.classList.toggle('on',on);x.setAttribute('aria-checked',on)});return}
+      const tg=t.closest('[data-lt]');if(tg){const k=tg.dataset.lt;setLook(k,L[k]?0:1,k==='hero');tg.setAttribute('aria-checked',!!L[k]);return}
+      const lc=t.closest('[data-lc]');if(lc){const k=lc.dataset.lc;L.lc[k]=L.lc[k]?0:1;saveLook();applyLook();swap();lc.setAttribute('aria-checked',!!L.lc[k]);return}
+      const shb=t.closest('[data-lsh]');if(shb){const k=shb.dataset.lsh;L.off=L.off.includes(k)?L.off.filter(x=>x!==k):[...L.off,k];saveLook();swap();redrawPanel(`[data-lsh="${k}"]`);return}
+      const mv=t.closest('[data-lmv]');if(mv){const[k,d]=mv.dataset.lmv.split(':'),a=L.shelves,i=a.indexOf(k),j=i+ +d;if(j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];saveLook();swap();redrawPanel(`[data-lmv="${k}:${d}"]:not([disabled])`)||0;return}
+      const tb=t.closest('[data-ltab]');if(tb){const k=tb.dataset.ltab;L.tabsOff=L.tabsOff.includes(k)?L.tabsOff.filter(x=>x!==k):[...L.tabsOff,k];saveLook();refresh();place();tb.setAttribute('aria-checked',!L.tabsOff.includes(k));return}});
     setTimeout(()=>el.querySelector('button.on,input')?.focus(),0)}
   addEventListener('pointerdown',e=>{const m=q('.mset');if(m&&!m.contains(e.target)&&!e.target.closest('[data-mset]'))m.remove()});
   addEventListener('keydown',e=>{if(e.key==='Escape'&&q('.mset')){q('.mset').remove();q('[data-mset]')?.focus()}});

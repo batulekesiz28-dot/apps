@@ -2354,5 +2354,28 @@
     "fix": "Her görünümde sağ üstte; kendi puanım mavi rozetle sol altta"
    }
   ]
+ },
+ {
+  "at": "2026-11-15T15:11:48",
+  "change": "Medya görünüm paneli: sürüklenerek boyutlanan örnek kapak, kapak yüksekliği, “Altında isim” anahtarı yukarıda",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "fixed",
+    "text": "Kapak boyutu sadece kaydırıcıyla ayarlanıyordu, yükseklik ayarı yoktu",
+    "fix": "Örnek kapak kenarından/köşesinden çekilebiliyor; kaydırıcılar da senkron"
+   }
+  ]
  }
 ]

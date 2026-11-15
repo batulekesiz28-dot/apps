@@ -59,7 +59,7 @@ const Media=(()=>{
   // ana sayfa rafları (sırası ve görünürlüğü kullanıcıda) · liste sütunları
   const SH={cont:'Kaldığın yerden devam et',movies:'Filmler',series:'Diziler',anime:'Animeler',games:'Oyunlar',books:'Kitaplar',fav:'Favorilerin',top:'En sevdiklerin',docs:'Belgeler'};
   const LC=[['cover','Kapak'],['st','Durum'],['rate','Puanım'],['score','Genel puan'],['like','Beğeni'],['fav','Favori']];
-  const LOOK0={view:'tv',cover:100,icon:'m',font:'m',gap:100,dens:'n',radius:8,title:1,meta:1,badge:1,hero:1,rowh:100,
+  const LOOK0={view:'tv',cover:100,icon:'m',font:'m',gap:100,dens:'n',radius:8,ar:100,title:1,meta:1,badge:1,hero:1,rowh:100,
     lc:{cover:1,st:1,rate:1,score:0,like:1,fav:1},shelves:Object.keys(SH),off:[],tabsOff:[]};
   function loadLook(){const s=lsg('mc:look',{})||{},L={...LOOK0,...s,lc:{...LOOK0.lc,...(s.lc||{})}};
     L.shelves=[...(Array.isArray(s.shelves)?s.shelves.filter(k=>SH[k]):[]),...Object.keys(SH)].filter((k,i,a)=>a.indexOf(k)===i);
@@ -267,7 +267,7 @@ const Media=(()=>{
   /* görünüm ayarları: anında uygulanır, mc:look'a kaydedilir (içerik verisine dokunmaz) */
   function applyLook(root=q('#view>.mc')){if(!root)return;const L=st.look,F={s:.92,m:1,l:1.1},IZ={s:'14px',m:'16px',l:'19px'},DZ={r:1.22,n:1,s:.8};
     root.dataset.view=L.view;const sp=(k,v)=>root.style.setProperty(k,v);sp('--cz',L.cover/100);sp('--gz',L.gap/100);sp('--fz',F[L.font]||1);sp('--iz',IZ[L.icon]||'16px');sp('--dz',DZ[L.dens]||1);
-    sp('--r',L.radius+'px');sp('--rh',L.rowh/100);root.toggleAttribute('data-notitle',!L.title);root.toggleAttribute('data-nometa',!L.meta);root.toggleAttribute('data-nobadge',!L.badge);
+    sp('--r',L.radius+'px');sp('--ar',(L.ar||100)/100);sp('--rh',L.rowh/100);root.toggleAttribute('data-notitle',!L.title);root.toggleAttribute('data-nometa',!L.meta);root.toggleAttribute('data-nobadge',!L.badge);
     const c=L.lc,W={st:'160px',rate:'76px',score:'84px',like:'56px',fav:'40px'},cov='calc(42px * var(--cz,1) * var(--rh,1))';
     sp('--lcols',[c.cover?cov:'','minmax(0,1fr)',...['st','rate','score','like','fav'].map(k=>c[k]?W[k]:'')].filter(Boolean).join(' '));
     sp('--lcols-m',[c.cover?cov:'','minmax(0,1fr)',c.rate?'auto':'',c.fav?'44px':''].filter(Boolean).join(' '))}
@@ -275,15 +275,23 @@ const Media=(()=>{
   /* bölüm/görünüm değişiminde kısa giriş (transform+opacity, ~280ms) */
   function enter(el){if(el&&motion())el.animate([{opacity:0,transform:'translateY(6px)'},{opacity:1,transform:'none'}],{duration:280,easing:'cubic-bezier(.16,1,.3,1)'})}
   function setLook(k,v,redraw){st.look[k]=v;lss('mc:look',st.look);applyLook();if(redraw){swap();enter(q('.mc .mc-main'));qa('.mc [data-lv]').forEach(b=>{const on=b.dataset.lv===V();b.classList.toggle('on',on);b.setAttribute('aria-checked',on)})}}
+  /* boyut önizlemesi: kütüphaneden rastgele bir kapak; kenarından/köşesinden çekilerek bütün kartlar boyutlanır */
+  let pvIt=null;
+  const pvPick=()=>{if(pvIt&&KB.items.has(pvIt.id))return pvIt;const l=[...KB.items.values()].filter(i=>AT.includes(i.type)&&(i.cover||i.backdrop||i.wide));pvIt=l.length?l[Math.random()*l.length|0]:null;return pvIt};
+  const pvBase=()=>V()==='tv'?{B:150,R:215/460}:{B:96,R:3/2};
+  function pvHTML(){const L=st.look,it=pvPick()||{id:'',type:'movie',title:'Örnek film',cover:''},wide=V()==='tv',{B}=pvBase();
+    return`<div class="mset-pv"><div class="mset-pf" style="width:${B*L.cover/100}px;--ar:${(L.ar||100)/100};--r:${L.radius}px">${wide?wideArt(it):poster(it)}
+      <span class="mset-hx" data-pvh="x" title="Genişlik"></span><span class="mset-hy" data-pvh="y" title="Yükseklik"></span><span class="mset-hc" data-pvh="xy" title="İkisi birden"></span></div>
+      <div class="mset-pc"${L.title?'':' hidden'}>${E(it.title)}</div></div><p class="mset-hint">Kenarından ya da köşesinden çek — bütün kartlar böyle olur</p>`}
   function setHTML(){const L=st.look,seg=(k,o)=>`<div class="mset-seg" role="radiogroup">${o.map(([v,n])=>`<button role="radio" data-lk="${k}" data-lval="${v}" aria-checked="${L[k]===v}" class="${L[k]===v?'on':''}">${n}</button>`).join('')}</div>`;
     const rng=(k,n,min,max,stp,u='%')=>`<label for="mset-${k}">${n} <output>${L[k]}${u}</output></label><input id="mset-${k}" type="range" min="${min}" max="${max}" step="${stp}" value="${L[k]}" data-lr="${k}" data-u="${u}">`;
     const tg=(attr,k,n,on)=>`<button class="mset-tg" role="switch" ${attr}="${k}" aria-checked="${!!on}"><span>${n}</span><i aria-hidden="true"></i></button>`;
     const sh=L.shelves;
     return`<header><b>Görünüm</b><button class="mset-x" data-msx aria-label="Kapat">${IC.x}</button></header>
       <h4>Görünüm türü</h4>${seg('view',VIEWS.map(([k,n])=>[k,n]))}
-      <h4>Kartlar</h4>${rng('cover','Kapak boyutu',60,160,5)}${rng('radius','Köşe yuvarlaklığı',0,24,1,'px')}${rng('gap','Kart aralığı',40,220,10)}
+      <h4>Kartlar</h4>${pvHTML()}<div class="mset-tgs">${tg('data-lt','title','Altında isim',L.title)}</div>${rng('cover','Kapak genişliği',60,160,5)}${rng('ar','Kapak yüksekliği',60,170,5)}${rng('radius','Köşe yuvarlaklığı',0,24,1,'px')}${rng('gap','Kart aralığı',40,220,10)}
       <label>Izgara yoğunluğu</label>${seg('dens',[['r','Rahat'],['n','Normal'],['s','Sıkı']])}
-      <div class="mset-tgs">${tg('data-lt','title','İsimleri göster',L.title)}${tg('data-lt','meta','Yıl, tür, yazar',L.meta)}${tg('data-lt','badge','Genel puan rozeti',L.badge)}</div>
+      <div class="mset-tgs">${tg('data-lt','meta','Yıl, tür, yazar',L.meta)}${tg('data-lt','badge','Genel puan rozeti',L.badge)}</div>
       <h4>Liste</h4>${rng('rowh','Satır yüksekliği',70,170,5)}
       <label>Sütunlar</label><div class="mset-tgs">${LC.map(([k,n])=>tg('data-lc',k,n,L.lc[k])).join('')}</div>
       <h4>Ana sayfa</h4><div class="mset-tgs">${tg('data-lt','hero','Büyük vitrin',L.hero)}</div>
@@ -296,11 +304,23 @@ const Media=(()=>{
   function settings(anchor){q('.mset')?.remove();const el=document.createElement('div');el.className='mset';el.setAttribute('role','dialog');el.setAttribute('aria-label','Görünüm ayarları');
     el.innerHTML=setHTML();document.body.appendChild(el);const place=()=>{const r=(q('[data-mset]')||anchor).getBoundingClientRect();el.style.top=Math.round(r.bottom+8)+'px';el.style.right=Math.max(8,Math.round(innerWidth-r.right))+'px'};place();
     const redrawPanel=focusSel=>{const y=el.scrollTop;el.innerHTML=setHTML();el.scrollTop=y;if(focusSel)el.querySelector(focusSel)?.focus()};
-    el.addEventListener('input',e=>{const t=e.target;if(t.dataset.lr){t.previousElementSibling.querySelector('output').textContent=t.value+t.dataset.u;setLook(t.dataset.lr,+t.value)}});
+    const pvSync=()=>{const L=st.look,f=el.querySelector('.mset-pf');if(f){f.style.width=pvBase().B*L.cover/100+'px';f.style.setProperty('--ar',(L.ar||100)/100);f.style.setProperty('--r',L.radius+'px')}
+      const c=el.querySelector('.mset-pc');if(c)c.hidden=!L.title;
+      for(const k of ['cover','ar']){const r=el.querySelector('#mset-'+k);if(r&&+r.value!==L[k]){r.value=L[k];r.previousElementSibling.querySelector('output').textContent=L[k]+'%'}}};
+    el.addEventListener('input',e=>{const t=e.target;if(t.dataset.lr){t.previousElementSibling.querySelector('output').textContent=t.value+t.dataset.u;setLook(t.dataset.lr,+t.value);pvSync()}});
+    el.addEventListener('pointerdown',e=>{const h=e.target.closest('[data-pvh]');if(!h)return;e.preventDefault();const f=h.parentElement,ax=h.dataset.pvh,{B,R}=pvBase(),x0=e.clientX,y0=e.clientY,w0=f.offsetWidth,h0=f.offsetHeight;
+      const L=st.look,c0=L.cover,a0=L.ar||100,cl=(v,a,b)=>Math.max(a,Math.min(b,Math.round(v/5)*5));let raf=0,last=null;
+      try{h.setPointerCapture(e.pointerId)}catch(_){}f.classList.add('drag');document.body.classList.add('mset-drag');
+      const step=()=>{raf=0;const ev=last;const w=ax==='y'?w0:w0+(ev.clientX-x0),hh=ax==='x'?h0*w/w0:h0+(ev.clientY-y0);
+        const cv=ax==='y'?c0:cl(w/B*100,60,160),ar=ax==='x'?a0:cl(hh/(Math.max(1,B*cv/100)*R)*100,60,170);
+        if(cv!==L.cover||ar!==L.ar){L.cover=cv;L.ar=ar;applyLook();pvSync()}};
+      const mv=ev=>{last=ev;if(!raf)raf=requestAnimationFrame(step)};
+      const up=()=>{h.removeEventListener('pointermove',mv);h.removeEventListener('pointerup',up);h.removeEventListener('pointercancel',up);if(raf){cancelAnimationFrame(raf);raf=0;if(last)step()}f.classList.remove('drag');document.body.classList.remove('mset-drag');saveLook()};
+      h.addEventListener('pointermove',mv);h.addEventListener('pointerup',up);h.addEventListener('pointercancel',up)});
     el.addEventListener('click',e=>{const t=e.target,L=st.look;if(t.closest('[data-msx]'))return el.remove();
       if(t.closest('[data-msr]')){st.look=JSON.parse(JSON.stringify(LOOK0));saveLook();applyLook();refresh();redrawPanel();return}
-      const b=t.closest('[data-lk]');if(b){setLook(b.dataset.lk,b.dataset.lval,b.dataset.lk==='view');qa(`[data-lk="${b.dataset.lk}"]`,el).forEach(x=>{const on=x===b;x.classList.toggle('on',on);x.setAttribute('aria-checked',on)});return}
-      const tg=t.closest('[data-lt]');if(tg){const k=tg.dataset.lt;setLook(k,L[k]?0:1,k==='hero');tg.setAttribute('aria-checked',!!L[k]);return}
+      const b=t.closest('[data-lk]');if(b){setLook(b.dataset.lk,b.dataset.lval,b.dataset.lk==='view');if(b.dataset.lk==='view'){redrawPanel();return}qa(`[data-lk="${b.dataset.lk}"]`,el).forEach(x=>{const on=x===b;x.classList.toggle('on',on);x.setAttribute('aria-checked',on)});return}
+      const tg=t.closest('[data-lt]');if(tg){const k=tg.dataset.lt;setLook(k,L[k]?0:1,k==='hero');tg.setAttribute('aria-checked',!!L[k]);pvSync();return}
       const lc=t.closest('[data-lc]');if(lc){const k=lc.dataset.lc;L.lc[k]=L.lc[k]?0:1;saveLook();applyLook();swap();lc.setAttribute('aria-checked',!!L.lc[k]);return}
       const shb=t.closest('[data-lsh]');if(shb){const k=shb.dataset.lsh;L.off=L.off.includes(k)?L.off.filter(x=>x!==k):[...L.off,k];saveLook();swap();redrawPanel(`[data-lsh="${k}"]`);return}
       const mv=t.closest('[data-lmv]');if(mv){const[k,d]=mv.dataset.lmv.split(':'),a=L.shelves,i=a.indexOf(k),j=i+ +d;if(j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];saveLook();swap();redrawPanel(`[data-lmv="${k}:${d}"]:not([disabled])`)||0;return}

@@ -2663,5 +2663,35 @@
     "fix": "Sadece puan/kaydırma/Esc sonrası kilitleniyor"
    }
   ]
+ },
+ {
+  "at": "2026-11-15T20:53:45",
+  "change": "Medya spot ışığı: 2 sn gecikme spotun kendisinde, ayrıntılar anında; oynamayan fragmanlar atlanıyor",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Bazı fragmanlarda 'Bu video kullanılamıyor' ekranı çıkıyordu",
+    "fix": "Birden çok aday; video oynamaya başlamadan gösterilmiyor, hata gelirse sıradaki deneniyor, bozuklar hatırlanıyor"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "fixed",
+    "text": "Etraf hemen bulanıklaşıyor, ayrıntılar ise geç geliyordu",
+    "fix": "Spot 2 sn durunca açılıyor, ayrıntılar anında"
+   }
+  ]
  }
 ]

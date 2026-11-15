@@ -103,37 +103,56 @@ const Media=(()=>{
      Kapağın üstüne gelir gelmez aranır (spot açılmadan önce), bulunan kimlik saklanır → ikinci seferde anında. Bulunamazsa 7 gün sonra yeniden denenir. ═ */
   const YT=lsg('mc:yt',{}),ytP=new Map(),okYT=v=>/^[\w-]{11}$/.test(v||'');
   const hasTrailer=it=>['movie','series','anime','game'].includes(it?.type);
-  function ytId(it){if(!hasTrailer(it))return Promise.resolve('');const c=YT[it.id];if(c&&(c.v||Date.now()-c.at<7*864e5))return Promise.resolve(c.v||'');
+  // aday listesi (birden çok): bir video oynamazsa sıradaki denenir; bozuk olduğu anlaşılanlar mc:ytbad'de (bir daha denenmez)
+  const YTB=lsg('mc:ytbad',{});const badYT=v=>{YTB[v]=Date.now();lss('mc:ytbad',YTB)};
+  function ytIds(it){if(!hasTrailer(it))return Promise.resolve([]);const c=YT[it.id],l=c?(c.l||(c.v?[c.v]:[])).filter(v=>!YTB[v]):null;
+    if(c&&(l.length||Date.now()-c.at<7*864e5))return Promise.resolve(l);
     if(ytP.has(it.id))return ytP.get(it.id);
-    const p=(async()=>{let v='',done=true;const wdq=async q=>{const e=await getJSON(`https://www.wikidata.org/w/api.php?action=wbgetclaims&entity=${q}&property=P1651&format=json&origin=*`);const cl=e?.claims?.P1651||[];return(cl.find(x=>x.rank==='preferred')||cl.find(x=>x.rank!=='deprecated'))?.mainsnak?.datavalue?.value||''};
+    const p=(async()=>{const out=[],add=v=>{if(okYT(v)&&!out.includes(v)&&!YTB[v])out.push(v)};let done=true;
+      const wdq=async q=>{const e=await getJSON(`https://www.wikidata.org/w/api.php?action=wbgetclaims&entity=${q}&property=P1651&format=json&origin=*`);const cl=(e?.claims?.P1651||[]).filter(x=>x.rank!=='deprecated');
+        cl.sort((a,b)=>(b.rank==='preferred')-(a.rank==='preferred')).slice(0,6).forEach(x=>add(x?.mainsnak?.datavalue?.value))};
       const byProp=async(pr,val)=>{const j=await getJSON(`https://www.wikidata.org/w/api.php?action=query&list=search&srsearch=haswbstatement:${pr}=${encodeURIComponent(val)}&srlimit=1&format=json&origin=*`);return j?.query?.search?.[0]?.title||''};
-      try{if(it.type==='anime'&&it.mal){const d=await getJSON(`https://api.jikan.moe/v4/anime/${it.mal}`);v=d?.data?.trailer?.youtube_id||''}
-        const key=tmdbKey();if(!okYT(v)&&key&&it.imdb&&it.type!=='game'){const f=await getJSON(`https://api.themoviedb.org/3/find/${it.imdb}?api_key=${encodeURIComponent(key)}&external_source=imdb_id`);
+      try{if(it.type==='anime'&&it.mal){const d=await getJSON(`https://api.jikan.moe/v4/anime/${it.mal}`);add(d?.data?.trailer?.youtube_id)}
+        const key=tmdbKey();if(key&&it.imdb&&it.type!=='game'){const f=await getJSON(`https://api.themoviedb.org/3/find/${it.imdb}?api_key=${encodeURIComponent(key)}&external_source=imdb_id`);
           const m=(f?.movie_results||[])[0],t=(f?.tv_results||[])[0],id=(m||t)?.id;if(id){const vs=await getJSON(`https://api.themoviedb.org/3/${m?'movie':'tv'}/${id}/videos?api_key=${encodeURIComponent(key)}`);
-            const L=(vs?.results||[]).filter(x=>x.site==='YouTube');v=(L.find(x=>x.type==='Trailer'&&x.official)||L.find(x=>x.type==='Trailer')||L.find(x=>x.type==='Teaser')||{}).key||''}}
-        if(!okYT(v)){let q=/^Q\d+$/.test(it.mid||'')?it.mid:'';if(!q&&it.imdb)q=await byProp('P345',it.imdb);if(!q&&it.steam)q=await byProp('P1733',it.steam);if(q)v=await wdq(q)}}
+            const V=(vs?.results||[]).filter(x=>x.site==='YouTube'),rk=x=>(x.type==='Trailer'?0:x.type==='Teaser'?2:4)+(x.official?0:1);V.sort((a,b)=>rk(a)-rk(b)).slice(0,5).forEach(x=>add(x.key))}}
+        let q=/^Q\d+$/.test(it.mid||'')?it.mid:'';if(!q&&it.imdb)q=await byProp('P345',it.imdb);if(!q&&it.steam)q=await byProp('P1733',it.steam);if(q)await wdq(q)}
       catch(e){done=false}
-      if(!okYT(v))v='';ytP.delete(it.id);if(done||v){YT[it.id]={v,at:Date.now()};lss('mc:yt',YT)}return v})();
+      ytP.delete(it.id);if(done||out.length){YT[it.id]={l:out,at:Date.now()};lss('mc:yt',YT)}return out})();
     ytP.set(it.id,p);return p}
   let ytWarm=false;function warmYT(){if(ytWarm)return;ytWarm=true;for(const h of['https://www.youtube-nocookie.com','https://i.ytimg.com','https://www.wikidata.org']){const l=document.createElement('link');l.rel='preconnect';l.href=h;l.crossOrigin='';document.head.appendChild(l)}}
-  // fragman alanı: önce YouTube kapak karesi (anında), sonra sessiz otomatik oynayan video yumuşakça gelir; tıkla → ses aç/kapa
-  function ytMount(slot,v){const auto=motion();slot.innerHTML=`<div class="msp-yv"><i class="msp-yth" style="background-image:url(https://i.ytimg.com/vi/${v}/hqdefault.jpg)"></i>
-      <button type="button" class="msp-ym" data-ym aria-label="${auto?'Sesi aç':'Fragmanı oynat'}" title="${auto?'Sesi aç':'Oynat'}">${auto?IC.vol0:IC.play}</button></div>`;
-    const box=slot.firstElementChild;let fr=null,muted=true;
-    const load=()=>{if(fr)return;fr=document.createElement('iframe');fr.className='msp-yf';fr.title='Fragman';fr.allow='autoplay; encrypted-media; picture-in-picture';fr.referrerPolicy='strict-origin-when-cross-origin';
-      fr.src=`https://www.youtube-nocookie.com/embed/${v}?autoplay=1&mute=1&controls=0&rel=0&playsinline=1&modestbranding=1&iv_load_policy=3&disablekb=1&loop=1&playlist=${v}&enablejsapi=1&origin=${encodeURIComponent(location.origin)}`;
-      fr.addEventListener('load',()=>setTimeout(()=>box.classList.add('ok'),350));box.insertBefore(fr,box.querySelector('[data-ym]'))};
-    const cmd=f=>{try{fr?.contentWindow?.postMessage(JSON.stringify({event:'command',func:f,args:[]}),'*')}catch{}};
-    box.addEventListener('click',e=>{e.stopPropagation();if(!fr){load();return}muted=!muted;cmd(muted?'mute':'unMute');
-      const b=box.querySelector('[data-ym]');b.innerHTML=muted?IC.vol0:IC.vol1;b.setAttribute('aria-label',muted?'Sesi aç':'Sesi kapat');b.title=muted?'Sesi aç':'Sesi kapat'});
-    if(auto)load()}
+  // silinmiş videonun kapak karesi 120×90 gri yer tutucudur → hiç denemeden ele
+  const thumbOK=v=>new Promise(res=>{const im=new Image();const t=setTimeout(()=>res(true),2500);im.onload=()=>{clearTimeout(t);res(im.naturalWidth>120)};im.onerror=()=>{clearTimeout(t);res(false)};im.src=`https://i.ytimg.com/vi/${v}/mqdefault.jpg`});
+  // fragman alanı: kapak karesi hemen görünür; video GİZLİ yüklenir, oynamaya başlayınca (IFrame API olayı) belirir.
+  // Hata (silinmiş / gömme kapalı / bölge) gelirse sıradaki aday denenir; hiçbiri olmazsa onFail → alan kalkar. Kullanıcı hata ekranı görmez.
+  function ytMount(slot,ids,onFail){const auto=motion();let i=-1,fr=null,muted=true,box=null,alive=true,tm=0;
+    const cleanup=()=>{removeEventListener('message',onMsg);clearInterval(tm)};
+    const onMsg=e=>{if(!fr||e.source!==fr.contentWindow)return;let d;try{d=typeof e.data==='string'?JSON.parse(e.data):e.data}catch{return}if(!d)return;
+      if(d.event==='onError'){badYT(ids[i]);next();return}
+      const ps=d.event==='onStateChange'?d.info:d.event==='infoDelivery'?d.info?.playerState:null;if(ps===1&&!box.classList.contains('ok')){clearInterval(tm);box.classList.add('ok')}};
+    addEventListener('message',onMsg);
+    const cmd=(f,a=[])=>{try{fr?.contentWindow?.postMessage(JSON.stringify({event:'command',func:f,args:a}),'*')}catch{}};
+    async function next(){if(!alive)return;fr?.remove();fr=null;clearInterval(tm);box?.classList.remove('ok');
+      while(++i<ids.length){if(await thumbOK(ids[i]))break;badYT(ids[i])}if(!alive)return;
+      if(i>=ids.length){alive=false;cleanup();onFail?.();return}
+      const v=ids[i];if(!box){slot.innerHTML=`<div class="msp-yv"><i class="msp-yth"></i><button type="button" class="msp-ym" data-ym aria-label="${auto?'Sesi aç':'Fragmanı oynat'}" title="${auto?'Sesi aç':'Oynat'}">${auto?IC.vol0:IC.play}</button></div>`;box=slot.firstElementChild;
+        box.addEventListener('click',e=>{e.stopPropagation();if(!fr){load();return}muted=!muted;cmd(muted?'mute':'unMute');if(!muted)cmd('setVolume',[70]);
+          const b=box.querySelector('[data-ym]');b.innerHTML=muted?IC.vol0:IC.vol1;b.setAttribute('aria-label',muted?'Sesi aç':'Sesi kapat');b.title=muted?'Sesi aç':'Sesi kapat'})}
+      box.querySelector('.msp-yth').style.backgroundImage=`url(https://i.ytimg.com/vi/${v}/hqdefault.jpg)`;if(auto)load()}
+    function load(){if(fr||!alive)return;const v=ids[i];fr=document.createElement('iframe');fr.className='msp-yf';fr.title='Fragman';fr.allow='autoplay; encrypted-media; picture-in-picture';fr.referrerPolicy='strict-origin-when-cross-origin';
+      fr.src=`https://www.youtube-nocookie.com/embed/${v}?autoplay=1&mute=1&controls=0&rel=0&playsinline=1&modestbranding=1&iv_load_policy=3&disablekb=1&loop=1&playlist=${v}&enablejsapi=1&origin=${encodeURIComponent(location.origin)}&widget_referrer=${encodeURIComponent(location.href)}`;
+      // IFrame API el sıkışması: oynatıcı olay göndermeye “listening” ile başlar
+      fr.addEventListener('load',()=>{const hi=()=>{try{fr?.contentWindow?.postMessage(JSON.stringify({event:'listening',id:1,channel:'widget'}),'*')}catch{}};hi();clearInterval(tm);let n=0;tm=setInterval(()=>{if(++n>40||box.classList.contains('ok'))clearInterval(tm);else hi()},250)});
+      box.insertBefore(fr,box.querySelector('[data-ym]'))}
+    slot._stop=()=>{alive=false;cleanup()};next()}
   /* ═ Spot ışığı: kapağın üstünde kısa bir an durunca ekranın geri kalanı bulanıklaşır, kapak yaylanarak öne çıkar.
      Puanlanmamışsa altta cam “★ Puanla” hapı: üstüne gelince açılır, imleci gezdirdikçe 1–10 akar, tıkla → kaydedilir. ═ */
   const SPT={t:0,card:null,el:null,v:0,block:null};
+  const SPOT_MS=2000; // imleç bir kapakta bu kadar durunca spot ışığı açılır (altında rahatça gezilebilsin diye)
   const RW=['','Berbat','Kötü','Zayıf','Vasat','İdare eder','Fena değil','İyi','Çok iyi','Harika','Başyapıt'];
   const fineHover=()=>matchMedia('(hover:hover) and (pointer:fine)').matches;
   // free: imleç uzaklaşarak kapattı → aynı karta dönünce yeniden açılabilir; diğer kapanışlarda (puan, kaydırma, Esc) imleç karttan çıkana kadar açılmaz
-  function spotOff(now,free){clearTimeout(SPT.t);clearTimeout(SPT.dt);SPT.t=0;if(SPT.card&&!free)SPT.block=SPT.card.dataset.mi;const el=SPT.el;SPT.el=null;SPT.card=null;SPT.v=0;if(!el)return;el.classList.remove('on');if(now||!motion())el.remove();else setTimeout(()=>el.remove(),260)}
+  function spotOff(now,free){clearTimeout(SPT.t);clearTimeout(SPT.dt);SPT.t=0;if(SPT.card&&!free)SPT.block=SPT.card.dataset.mi;const el=SPT.el;SPT.el=null;SPT.card=null;SPT.v=0;if(!el)return;el.querySelector('.msp-yt')?._stop?.();el.classList.remove('on');if(now||!motion())el.remove();else setTimeout(()=>el.remove(),260)}
   const srHTML=()=>`<div class="sr" role="slider" tabindex="0" aria-label="Puanla (1–10)" aria-valuemin="1" aria-valuemax="10" aria-valuenow="0"><i class="sr-fill"></i><span class="sr-tk" aria-hidden="true">${'<i></i>'.repeat(10)}</span><span class="sr-l">${IC.star}<b>Puanla</b></span></div>`;
   function spotOn(card){const it=KB.items.get(card.dataset.mi),art=card.querySelector('.mc-art');if(!it||!art||!card.isConnected)return;
     spotOff(true);const r=art.getBoundingClientRect();if(!r.width||r.top<40||r.bottom>innerHeight-10)return;
@@ -153,10 +172,10 @@ const Media=(()=>{
         if(osp>=260){const tw=Math.min(520,osp-8),th=tw*9/16,cy=r.top+r.height/2;slot.className='msp-yt '+(side==='r'?'l':'r');slot.style.width=tw+'px';
           slot.style.top=Math.max(16,Math.min(innerHeight-16-th,cy-th/2))+'px';slot.style.left=(side==='r'?fl-tw:fr)+'px';el.appendChild(slot)}
         else{slot.className='msp-yt in';inf.prepend(slot)}
-        ytId(it).then(v=>{if(SPT.el!==el)return;if(v){ytMount(slot,v);return}slot.remove();
-          inf.querySelector('.msp-a')?.insertAdjacentHTML('beforeend',`<a href="https://www.youtube.com/results?search_query=${encodeURIComponent(it.title+' '+(it.year||'')+' trailer')}" target="_blank" rel="noopener">Fragman${IC.r}</a>`)})}}
+        const fail=()=>{if(SPT.el!==el)return;slot.remove();if(!inf.querySelector('[data-ytq]'))inf.querySelector('.msp-a')?.insertAdjacentHTML('beforeend',`<a data-ytq href="https://www.youtube.com/results?search_query=${encodeURIComponent(it.title+' '+(it.year||'')+' trailer')}" target="_blank" rel="noopener">Fragman${IC.r}</a>`)};
+        ytIds(it).then(l=>{if(SPT.el!==el)return;if(l.length)ytMount(slot,l,fail);else fail()})}}
     document.body.appendChild(el);SPT.el=el;SPT.card=card;requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('on')));
-    clearTimeout(SPT.dt);if(el.querySelector('.msp-in'))SPT.dt=setTimeout(()=>{if(SPT.el===el)el.classList.add('det')},2200);
+    if(el.querySelector('.msp-in'))requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('det')));
     const inf=el.querySelector('.msp-in'),yt=el.querySelector('.msp-yt:not(.in)'),leave=e=>{const t=e.relatedTarget;if(t&&(f.contains(t)||inf?.contains(t)||yt?.contains(t)))return;if(SPT.el===el)spotOff(false,true)};
     if(yt){yt.addEventListener('pointerleave',leave);yt.addEventListener('wheel',e=>{spotOff(true);q('#scroll')?.scrollBy({top:e.deltaY,left:e.deltaX})},{passive:true})}
     f.addEventListener('pointerleave',leave);if(inf){inf.addEventListener('pointerleave',leave);inf.addEventListener('wheel',e=>{spotOff(true);q('#scroll')?.scrollBy({top:e.deltaY,left:e.deltaX})},{passive:true});
@@ -332,8 +351,8 @@ const Media=(()=>{
   /* ── olaylar ── */
   function wire(root){
     // spot ışığı: imleç bir kapakta ~0,3 sn durursa (geçip giderken tetiklenmez)
-    root.addEventListener('pointerover',e=>{if(!(e.pointerType==='pen'||(e.pointerType==='mouse'&&fineHover())))return;const c=e.target.closest?.('.mc-card[data-mi]');if(!c||c===SPT.card||c.dataset.mi===SPT.block)return;clearTimeout(SPT.t);SPT.over=c;{const it=KB.items.get(c.dataset.mi);if(hasTrailer(it)){warmYT();ytId(it)}}
-      SPT.t=setTimeout(()=>{if(Date.now()>(SPT.quiet||0)&&SPT.over===c&&!document.body.classList.contains('mset-drag')&&!q('.mset,.mq,.mrp'))spotOn(c)},320)});
+    root.addEventListener('pointerover',e=>{if(!(e.pointerType==='pen'||(e.pointerType==='mouse'&&fineHover())))return;const c=e.target.closest?.('.mc-card[data-mi]');if(!c||c===SPT.card||c.dataset.mi===SPT.block)return;clearTimeout(SPT.t);SPT.over=c;{const it=KB.items.get(c.dataset.mi);if(hasTrailer(it)){warmYT();ytIds(it)}}
+      SPT.t=setTimeout(()=>{if(Date.now()>(SPT.quiet||0)&&SPT.over===c&&!document.body.classList.contains('mset-drag')&&!q('.mset,.mq,.mrp'))spotOn(c)},SPOT_MS)});
     root.addEventListener('pointerout',e=>{const c=e.target.closest?.('.mc-card[data-mi]');if(c&&!c.contains(e.relatedTarget)){clearTimeout(SPT.t);if(SPT.over===c)SPT.over=null;if(c.dataset.mi===SPT.block)SPT.block=null}});
     root.addEventListener('click',e=>{const t=e.target;
       const rw=t.closest('[data-row]');if(rw){const r=rw.parentElement.querySelector('.mc-row');r.scrollBy({left:+rw.dataset.row*r.clientWidth*.86,behavior:motion()?'smooth':'auto'});return}
@@ -677,4 +696,4 @@ const Media=(()=>{
   function dismiss(){spotOff(true);qa('.mset,.mrp,.mq,.ma-bg').forEach(e=>e.remove())}
   // kaydırma, pencere değişimi, Esc → spot ışığı kapanır
   addEventListener('scroll',()=>{SPT.quiet=Date.now()+700;if(SPT.el)spotOff()},true);addEventListener('blur',()=>spotOff(true));addEventListener('resize',()=>spotOff(true));addEventListener('keydown',e=>{if(e.key==='Escape'&&SPT.el)spotOff()});
-  return{render,refresh,detail,close,imgErr,queue,addSheet,rateHTML,dismiss,patchCards,isMedia:t=>MT.includes(t),get st(){return st},get R(){return R},_rank:rank,_cleanG:cleanG,_yt:ytId}})();
+  return{render,refresh,detail,close,imgErr,queue,addSheet,rateHTML,dismiss,patchCards,isMedia:t=>MT.includes(t),get st(){return st},get R(){return R},_rank:rank,_cleanG:cleanG,_yt:ytIds}})();

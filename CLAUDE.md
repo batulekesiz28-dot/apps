@@ -49,6 +49,7 @@ Her işte bu dosyadaki standarda uy. Özet:
     Performans: raflar `lazy()` + IntersectionObserver, kart üzeri düğmeler `fillHov` ile ilk üzerine gelişte. Simge sınıfı `.mvi` (`.mi` Notlar'ın menü sınıfı — kullanma!).
   - `brain.js`+`brain.css` — `Brain`: `#brain[/<id>]`, canvas kuvvet grafiği (sayfa ●, kaynak ▮, konu ⬢, koleksiyon ◯), sürükle/kaydır/yakınlaştır, filtreler + yerel grafik (`brain:cfg`), yan panel (açıklama, bağlı notlar/içerik, öneriler → **Bağla** onayı, AI öneri). Hep koyu tasarım.
   - Modüller ana script'ten ÖNCE yüklenir: yükleme anında Notlar global'lerine dokunma, sadece çalışırken.
+  - **Önbellek:** `index.html` içindeki yerel CSS/JS bağlantıları `?v=<tarih+harf>` taşır (ör. `media.css?v=20261115b`). Notlar'ın herhangi bir CSS/JS dosyasını değiştirince bu numarayı HEPSİNDE birlikte artır — yoksa hub içinde açılan Notlar eski dosyayı gösterir (Ctrl+Shift+R iframe'i yenilemez).
 - `apps/studylog` — çalışma sayacı, günler/hedefler/takip; görevler (`addTask`), rozetler (`checkMiles`), içgörüler (`insightsHTML`). Yerel anahtar `studylog:v1`, Firestore `hub/studylog`.
 - `apps/saat` — dünya saati · `apps/denetci` — denetim uygulaması · `apps/oneriler` — öneriler (`audit/ideas.json`)
 - `apps/arena` — **AI Warfront** (eski AI Arena'nın yerini aldı): okyanusta 2–3 ada ülkesi, her birini bir yapay zekâ yönetir. Tek dosya `index.html`, üç katman:

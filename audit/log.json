@@ -1889,5 +1889,28 @@
     "text": "Telefonda kapsüller sığmadığı için soldan başlayıp yana kayıyor"
    }
   ]
+ },
+ {
+  "at": "2026-11-15T09:47:03",
+  "change": "Notlar: CSS/JS dosyalarına sürüm numarası eklendi; güncellemeler hub içinde de hemen görünsün",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Güncellemeler yayınlansa da tarayıcı eski stil/kod dosyalarını gösteriyordu",
+    "fix": "Dosya bağlantılarına ?v= sürüm numarası"
+   }
+  ]
  }
 ]

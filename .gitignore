@@ -1,1 +1,4 @@
 apps/arena/server/.env
+
+# test ekran görüntüleri (yanlışlıkla eklenmesin)
+apps/notlar/*.png

@@ -116,7 +116,8 @@ const Media=(()=>{
   /* görünüm: tv = Apple TV (geniş büyük kapaklar) · nf = Netflix (yoğun posterler) · compact (küçük, az metin) · list (satırlar) */
   // Apple TV: kart şeklini kapaklar belirler — yatay görseli olanların çoğunluğu varsa geniş kart, yoksa büyük dikey poster (küçültülmüş/bulanık poster yok)
   const hasWide=it=>!!(it.wide||it.backdrop);
-  const wideOK=l=>{const a=l.filter(i=>i.cover||hasWide(i));return!a.length||a.filter(hasWide).length*2>=a.length};
+  // geniş karta sadece neredeyse hepsinin (%85) yatay görseli varsa geçilir; dikey poster geniş karta sığdırılırsa ince şerit kalacak kadar kırpılıyordu
+  const wideOK=l=>{const a=l.filter(i=>i.cover||hasWide(i));return!a.length||a.filter(hasWide).length>=a.length*.85};
   const vOf=(v,l=[])=>V()==='tv'?(v==='r'?'r':wideOK(l)?'w':'p'):V()==='compact'?'p':v;
   const likeIc=it=>it.like>0?`<span class="ml-lk up" title="Beğendim">${IC.up}</span>`:it.like<0?`<span class="ml-lk down" title="Beğenmedim">${IC.down}</span>`:'<span class="ml-lk none" title="Değerlendirmedim">—</span>';
   function lrow(it){const s=stName(it),c=st.look.lc;return`<article class="ml-r t-${it.type}" data-mi="${it.id}" tabindex="0" aria-label="${E(it.title)}">${c.cover?poster(it,'ml-p'):''}

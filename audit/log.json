@@ -2490,5 +2490,28 @@
     "fix": "Her bölüm kendi ayarını saklıyor; eski ayar her bölüme başlangıç olarak kopyalandı"
    }
   ]
+ },
+ {
+  "at": "2026-11-15T15:49:44",
+  "change": "Medya: anime (ve karışık raflar) kapakları geniş karta sığdırılıp aşırı kırpılmıyor",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Animelerin yarısında yatay görsel varken raf geniş karta geçiyor, dikey posterler ince şerit kalacak kadar büyütülüp kırpılıyordu",
+    "fix": "Geniş kart için %85 yatay görsel şartı; yoksa hepsi tam dikey poster"
+   }
+  ]
  }
 ]

@@ -36,7 +36,7 @@ Son güncelleme: 2026-11-15
 | Bağımsız bölümler | Görünüm ayarları **her bölümde ayrı** (Ana sayfa, Filmler, Diziler, Animeler, Oyunlar, Kitaplar; `mc:look:<bölüm>`). Biri diğerini etkilemez. Ortak olan tek şey üstteki kategori sekmelerinin açık/kapalı oluşu. Panel başlığında hangi bölüm olduğu yazar. |
 | Puan | Beğen/beğenme/boş + 1–10 + favori (`rateHTML`); sağ tık → Puan ver. |
 | Kart rozetleri | IMDb (genel) puanı **sağ üstte** (sarı “IMDb” yazısıyla), **benim puanım mavi, sol altta**, favori kalbi sağ altta, “incele” uyarısı sol üstte. Puan kartın altındaki yazıda tekrar edilmez. |
-| Apple TV kart şekli | Rafın/ızgaranın kapakları belirler: yatay görseli olanlar çoğunluktaysa (oyunlar) geniş kart, değilse (çoğu film/dizi) **büyük dikey poster**. Bulanık zeminli küçük poster YOK; geniş rafta tek tük dikey poster kartı doldurur (kırpılır). Vitrine sadece yatay arka planı olanlar çıkar. |
+| Apple TV kart şekli | Rafın/ızgaranın kapakları belirler: neredeyse hepsinin (%85) yatay görseli varsa (oyunlar) geniş kart, değilse (çoğu film/dizi) **büyük dikey poster**. Bulanık zeminli küçük poster YOK; geniş rafta tek tük dikey poster kartı doldurur (kırpılır). Vitrine sadece yatay arka planı olanlar çıkar. |
 
 ## Takvim, Görevler
 | Alan | Geçerli karar |

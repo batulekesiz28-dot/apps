@@ -2956,5 +2956,28 @@
     "fix": "1 saniyeye indirildi"
    }
   ]
+ },
+ {
+  "at": "2026-11-16T23:19:07",
+  "change": "Notlar: yapıştırılan linkler önizleme kartı oluyor (YouTube video, görsel)",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "fixed",
+    "text": "Notlara yapıştırılan linkler düz yazı olarak kalıyordu",
+    "fix": "Boş satıra yapıştırınca önizleme kartı; YouTube sayfada oynar; görsel resim olur; istenirse düz bağlantıya çevrilir"
+   }
+  ]
  }
 ]

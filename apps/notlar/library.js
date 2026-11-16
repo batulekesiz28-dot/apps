@@ -455,4 +455,4 @@ const Library=(()=>{
 
   function closeAll(){closeDetail(true);closeReader(true);q('.la-bg')?.remove();LA=null;dismiss()}
   function dismiss(){document.querySelectorAll('.lmenu,.lpick').forEach(e=>e.remove())}
-  return{render,soft,closeAll,dismiss,findCovers,doImport,impBanner,loadPack,toastUndo,open,launch,addSheet,addFiles,libCard,pagePanel,itemPicker,pagePicker,cover,get st(){return st}}})();
+  return{meta,render,soft,closeAll,dismiss,findCovers,doImport,impBanner,loadPack,toastUndo,open,launch,addSheet,addFiles,libCard,pagePanel,itemPicker,pagePicker,cover,get st(){return st}}})();

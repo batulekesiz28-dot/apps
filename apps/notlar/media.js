@@ -74,7 +74,9 @@ const Media=(()=>{
 
   /* ── görseller ── */
   function imgErr(im){const a=im.dataset.alt;if(a){im.dataset.alt='';im.src=a}else{im.closest('.mp,.mw,.mh-bg,.mx-bd')?.classList.add('noimg');im.remove()}}
-  const IMG=(src,alt,cls='',eager)=>src?`<img class="${cls}" src="${E(src)}"${alt&&alt!==src?` data-alt="${E(alt)}"`:''} alt="" ${eager?'fetchpriority="high"':'loading="lazy"'} decoding="async" referrerpolicy="no-referrer" onload="this.classList.add('ok')" onerror="Media.imgErr(this)">`:'';
+  const IMG=(src,alt,cls='',eager)=>src?`<img class="${cls}" src="${E(src)}"${alt&&alt!==src?` data-alt="${E(alt)}"`:''} alt="" ${eager?'fetchpriority="high"':'loading="lazy"'} decoding="async" referrerpolicy="no-referrer" onload="Media.imgOk(this)" onerror="Media.imgErr(this)">`:'';
+  // dikey poster kutusuna kare/yatay görsel (logo, tanıtım resmi) gelirse kırpma: ortala, sığdır
+  function imgOk(im){im.classList.add('ok');const r=im.naturalWidth/Math.max(1,im.naturalHeight);if(r>.9&&im.parentElement?.classList.contains('mp'))im.classList.add('fitc')}
   // görsel yoksa: içeriğin adıyla tasarlanmış, türüne göre değişen tipografik kapak (rastgele görsel değil)
   function fallback(it){const g=(it.genres||[])[0]||'';
     return`<div class="fp fp-${it.type}" aria-hidden="true"><span class="fp-k">${TN[it.type]}${it.year?' · '+E(it.year):''}</span><b class="fp-t">${E(it.title)}</b>${g?`<span class="fp-g">${E(g)}</span>`:''}</div>`}
@@ -381,7 +383,7 @@ const Media=(()=>{
     document.getElementById('app')?.classList.add('mc-on');
     if(typeof setCrumb==='function')setCrumb(IC.play,st.sec==='home'?'Medya':SEC[st.sec].n,'');
     if(changed&&!o.soft)q('#scroll').scrollTop=0;else if(changed)q('#scroll').scrollTop=0;
-    heroStart();arrows();lazyWatch();Library.loadPack?.().then(migrate);queue()}
+    heroStart();arrows();lazyWatch();Library.loadPack?.().then(migrate);queue();if(!aniFix.done){aniFix.done=1;setTimeout(()=>aniFix(),2500)}}
   function refresh(){const root=q('#view>.mc');if(!root)return;const sc=q('#scroll'),y=sc.scrollTop,rows=qa('.mc-row',root).map(r=>r.scrollLeft),f=document.activeElement,inS=f&&f.matches('[data-ms]');
     if(inS){const m=q('.mc-main',root);m.innerHTML=body()}else{const b=body();root.innerHTML=nav()+`<main class="mc-main">${b}</main>`;root.classList.toggle('has-hero',!!q('.mh',root))}
     lazyWatch();qa('.mc-row',root).forEach((r,i)=>r.scrollLeft=rows[i]||0);sc.scrollTop=y;heroStart();arrows();if(q('.mx-bg'))detailRefresh()}
@@ -675,14 +677,33 @@ const Media=(()=>{
     const fin=v=>{if(done)return;done=true;window[cb]=()=>{};s.remove();res(v)};
     window[cb]=d=>{const r=(d?.results||[]).find(x=>norm(x.trackName)===norm(term)&&(!year||Math.abs(parseInt(x.releaseDate)-year)<=1));fin(r?.artworkUrl100?r.artworkUrl100.replace(/\/\d+x\d+bb\.(jpg|png)$/,'/600x900bb.jpg'):'')};
     s.onerror=()=>fin('');setTimeout(()=>fin(''),9000);s.src=`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&media=movie&entity=movie&limit=10&callback=${cb}`;document.head.appendChild(s)})}
-  let jk=Promise.resolve();const jikan=id=>{const p=jk.then(()=>getJSON(`https://api.jikan.moe/v4/anime/${id}`));jk=p.catch(()=>{}).then(()=>new Promise(z=>setTimeout(z,420)));return p};
+  // Jikan (MyAnimeList): istekler sıraya girer (hız sınırı ~3/sn)
+  let jk=Promise.resolve();const jget=u=>{const p=jk.then(()=>getJSON(u));jk=p.catch(()=>{}).then(()=>new Promise(z=>setTimeout(z,420)));return p};
+  const jikan=id=>jget(`https://api.jikan.moe/v4/anime/${id}`);
+  // MyAnimeList'te adıyla ara: başlık (orijinal/İngilizce/eş adlar) eşleşmeli, yıl biliniyorsa ±1
+  async function malSearch(title,year){if(!title)return null;const j=await jget(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(title)}&limit=8`);const L=j?.data||[];const nt=norm(title);
+    const names=d=>[d.title,d.title_english,d.title_japanese,...(d.title_synonyms||[]),...(d.titles||[]).map(x=>x.title)].filter(Boolean).map(norm);
+    const yr=d=>+(d.year||d.aired?.prop?.from?.year||0),okY=d=>!year||!yr(d)||Math.abs(yr(d)-year)<=1;
+    const ex=L.filter(d=>okY(d)&&names(d).includes(nt)),pre=L.filter(d=>okY(d)&&names(d).some(n=>n.startsWith(nt)||nt.startsWith(n)));
+    const pick=a=>a.sort((x,y)=>(y.type==='TV')-(x.type==='TV')||(y.members||0)-(x.members||0))[0];return pick(ex)||(year?pick(pre):null)||null}
+  const malCover=d=>d?.images?.webp?.large_image_url||d?.images?.jpg?.large_image_url||'';
+  /* bir kerelik onarım: kapağı MyAnimeList'ten gelmeyen animelere MAL posteri (elle seçilenlere dokunmaz; 7 günde bir yeniden dener) */
+  let aniBusy=false;
+  async function aniFix(){if(aniBusy||R.busy)return;const T=lsg('mc:anifix',{}),now=Date.now();
+    const L=[...KB.items.values()].filter(it=>it.type==='anime'&&it.match!=='manual'&&!/myanimelist\.net/.test(it.cover||'')&&!(T[it.id]&&now-T[it.id]<7*864e5));if(!L.length)return;aniBusy=true;let n=0;
+    for(const it0 of L){try{const h=HINT.get(hk(it0)),y=+it0.year||h?.y||0;let d=it0.mal?(await jikan(it0.mal))?.data:null;
+        if(!d)d=await malSearch(it0.title,y);if(!d&&h?.en&&norm(h.en)!==norm(it0.title))d=await malSearch(h.en,y);
+        const it=KB.items.get(it0.id);T[it0.id]=Date.now();if(d&&it&&malCover(d)){if(it.cover&&it.cover!==malCover(d))it.cover2=it.cover;it.cover=malCover(d);it.mal=it.mal||String(d.mal_id);if(!it.eps&&d.episodes)it.eps=+d.episodes;KB.saveItem(it,true);patchCards([it.id]);n++}}
+      catch(e){if(e instanceof NetErr)break}}
+    lss('mc:anifix',T);aniBusy=false;if(n)say(`${n} animenin kapağı MyAnimeList posteriyle değiştirildi`)}
   const wsum=(lang,t)=>getJSON(`https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(t)}`).catch(()=>null);
   const tmdbKey=()=>lsg('mc:tmdb','')||'';
   async function enrich(c,type){const o={mid:c.id,imdb:c.imdb,steam:c.steam,mal:c.mal,wiki:c.tr&&!c.en?'tr:'+c.tr:c.en,year:c.year?String(c.year):'',cover:'',cover2:'',backdrop:'',wide:'',desc:'',eps:0,
       genres:[...(c.gtr.size?[...c.gtr].map(g=>cleanG(g,true)):[...c.gen].map(g=>cleanG(g)))].filter((g,i,a)=>g&&a.indexOf(g)===i).slice(0,4),
       platforms:[...new Set([...c.pl].map(p=>PF[p]||p))].sort((a,b)=>(PFO.indexOf(a)+99)%99-(PFO.indexOf(b)+99)%99).slice(0,6)};
     if(type==='game'&&c.steam){const b=`https://cdn.cloudflare.steamstatic.com/steam/apps/${c.steam}/`;o.cover=b+'library_600x900_2x.jpg';o.backdrop=b+'library_hero.jpg';o.wide=b+'header.jpg';if(!o.platforms.includes('PC'))o.platforms.unshift('PC')}
-    if(type==='anime'&&c.mal){try{const d=(await jikan(c.mal))?.data;if(d){o.cover=d.images?.webp?.large_image_url||d.images?.jpg?.large_image_url||'';o.eps=+d.episodes||0;if(!o.year)o.year=String(d.year||d.aired?.prop?.from?.year||'');
+    if(type==='anime'){try{let d=c.mal?(await jikan(c.mal))?.data:null;if(!d){d=await malSearch(c.label||c.en||'',+c.year||0);if(!d&&c.en&&c.en!==c.label)d=await malSearch(String(c.en).replace(/_/g,' ').replace(/\s*\([^)]*\)$/,''),+c.year||0);if(d)o.mal=String(d.mal_id)}
+      if(d){o.cover=malCover(d);o.eps=+d.episodes||0;if(!o.year)o.year=String(d.year||d.aired?.prop?.from?.year||'');
         const gj=[...(d.genres||[]),...(d.themes||[]).slice(0,1),...(d.demographics||[])].map(g=>cleanG(g.name));if(gj.length)o.genres=[...new Set(gj)].slice(0,4);o._syn=d.synopsis||''}}catch(e){if(e instanceof NetErr)throw e}}
     if(type==='series'&&c.imdb){try{const t=await getJSON(`https://api.tvmaze.com/lookup/shows?imdb=${c.imdb}`);if(t){o.cover=t.image?.original||t.image?.medium||'';if(t.genres?.length)o.genres=t.genres.map(g=>cleanG(g)).slice(0,4);if(!o.year&&t.premiered)o.year=t.premiered.slice(0,4);
         o._syn=String(t.summary||'').replace(/<[^>]+>/g,'').trim()}}catch(e){if(e instanceof NetErr)throw e}}
@@ -752,4 +773,4 @@ const Media=(()=>{
   function dismiss(){spotOff(true);qa('.mset,.mrp,.mq,.ma-bg,.mnp').forEach(e=>e.remove())}
   // kaydırma, pencere değişimi, Esc → spot ışığı kapanır
   addEventListener('scroll',()=>{SPT.quiet=Date.now()+700;if(SPT.el)spotOff()},true);addEventListener('blur',()=>spotOff(true));addEventListener('resize',()=>spotOff(true));addEventListener('keydown',e=>{if(e.key==='Escape'&&SPT.el)spotOff()});
-  return{render,refresh,detail,close,imgErr,queue,addSheet,rateHTML,dismiss,patchCards,isMedia:t=>MT.includes(t),get st(){return st},get R(){return R},_rank:rank,_cleanG:cleanG,_yt:ytIds}})();
+  return{render,refresh,detail,close,imgErr,imgOk,queue,addSheet,rateHTML,dismiss,patchCards,isMedia:t=>MT.includes(t),get st(){return st},get R(){return R},_rank:rank,_cleanG:cleanG,_yt:ytIds}})();

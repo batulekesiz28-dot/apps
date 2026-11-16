@@ -2880,5 +2880,35 @@
     "fix": "Detayda Notlarım listesi + Yeni not + Var olan notu bağla; ana sayfada 'Not aldıkların' rafı; spot ışığında not sayısı"
    }
   ]
+ },
+ {
+  "at": "2026-11-16T23:00:16",
+  "change": "Medya: anime kapakları MyAnimeList posterinden; kare/yatay görseller kırpılmıyor",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "MyAnimeList kimliği olmayan animelerde kapak Wikipedia'dan (logo, manga cildi, yatay görsel) geliyor, karta oturmuyordu",
+    "fix": "MyAnimeList'te adıyla aranıp resmî poster alınıyor; mevcut animeler bir kez onarılıyor (eski kapak yedekte)"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "fixed",
+    "text": "Kare/yatay görseller dikey kartta kırpılıyordu",
+    "fix": "Bu görseller kartın ortasına sığdırılıyor"
+   }
+  ]
  }
 ]

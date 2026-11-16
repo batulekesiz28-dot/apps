@@ -630,3 +630,23 @@ html[data-motion=off] .msp-yt{transition:none;transform:none}
 .msp-yr.r::after{border-width:0 3px 3px 0;border-radius:0 0 5px 0}
 .msp-yt:hover .msp-yr::after,.msp-yt.rs .msp-yr::after{opacity:1}
 .msp-yt.rs .msp-yf{pointer-events:none}.msp-yt.rs{transition:none}
+
+/* Notlarım: Workspace notları ↔ Medya */
+.mx-notes h3 span{margin-left:6px;font-size:12px;font-weight:600;color:var(--mink3)}
+.mx-nl{display:flex;flex-direction:column;margin:0 0 12px}
+.mx-nt{display:flex;align-items:center;gap:12px;min-height:52px;padding:8px 10px;margin:0 -10px;border-radius:10px;color:var(--mink);text-decoration:none;transition:background .15s}
+.mx-nt:hover{background:rgba(255,255,255,.06)}.mx-nt:focus-visible{outline:2px solid rgba(255,255,255,.8);outline-offset:-2px}
+.mx-ni{font-size:18px;width:24px;text-align:center;flex-shrink:0}.mx-nb{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.mx-nb b{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mx-nb small{font-size:12.5px;color:var(--mink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mx-nt em{font-style:normal;font-size:12px;color:var(--mink3);flex-shrink:0}
+.mx-ne{margin:0 0 12px;font-size:13.5px;color:var(--mink3);max-width:60ch}
+.mx-na{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.mx-qn{display:flex;flex-direction:column;gap:6px}.mx-qn>span{font-size:12px;font-weight:600;color:var(--mink3)}
+.mnp{position:fixed;z-index:620;width:320px;max-height:340px;display:flex;flex-direction:column;padding:8px;border-radius:14px;color:#F5F5F7;font-family:var(--sys,system-ui);
+  background:rgba(30,30,34,.94);-webkit-backdrop-filter:blur(24px) saturate(1.6);backdrop-filter:blur(24px) saturate(1.6);box-shadow:inset 0 0 0 .5px rgba(255,255,255,.14),0 24px 60px -16px rgba(0,0,0,.75)}
+.mnp-s{display:flex;align-items:center;gap:8px;height:36px;padding:0 10px;margin-bottom:6px;border-radius:9px;background:rgba(255,255,255,.07)}.mnp-s .mvi{width:15px;height:15px;color:rgba(255,255,255,.55)}
+.mnp-s input{flex:1;min-width:0;border:0;background:none;color:inherit;font:inherit;font-size:14px;outline:none}
+.mnp-l{overflow-y:auto;display:flex;flex-direction:column}
+.mnp-l button{display:flex;align-items:center;gap:10px;min-height:38px;padding:0 8px;border-radius:8px;text-align:left;color:inherit}.mnp-l button:hover,.mnp-l button:focus-visible{background:rgba(255,255,255,.08);outline:none}
+.mnp-l b{flex:1;min-width:0;font-size:13.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mnp-l small{font-size:12px;color:rgba(255,255,255,.55)}
+.mnp-e{margin:8px;font-size:13px;color:rgba(255,255,255,.6)}

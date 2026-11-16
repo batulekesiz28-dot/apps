@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════
-   Notlar — zaman yönetimi katmanı (Takvim · Aktiviteler · Görevler · İstatistikler)
+   Notlar — zaman yönetimi katmanı (Takvim · Görevler · İstatistikler; aktiviteler takvimde etkinlik olarak durur)
    Tek veri, her yerde aynı kayıt:
      aktivite  → TM.acts  ('A_…')  {title,cat,date,start,end,dur,desc,note,status,page}
      kategori  → TM.cats  [{id,name,color,icon}]  (kullanıcı ekleyebilir/düzenleyebilir)
@@ -183,21 +183,6 @@ const Time=(()=>{
       <div class="ag-l">${L.length?L.map(agRow).join(''):'<div class="ag-none">Etkinlik yok — ızgarada boş bir saate tıkla ya da yukarıya yaz.</div>'}</div></div>
       <div class="ag-sec"><div class="ag-h">Görevler</div><div class="tm-dl tk-list" data-drop-day="${d}">${Tasks.dayList(d)}</div></div>${tk.length?`<div class="ag-sec"><div class="ag-h">Notlardaki yapılacaklar</div><div class="tm-dl">${tk.map(taskRow).join('')}</div></div>`:''}`}
 
-  /* ═════ AKTİVİTELER ═════ */
-  let F={st:'all',cat:'',q:''};
-  function renderActs(){setCrumb(I.clock,'Aktiviteler');const all=[...TM.acts.values()],t=today();
-    let L=all.filter(a=>(F.st==='all'||a.status===F.st)&&(!F.cat||a.cat===F.cat)&&(!F.q||(a.title+' '+a.desc+' '+a.note+' '+TM.cat(a.cat).name).toLocaleLowerCase('tr').includes(F.q)));
-    const up=L.filter(a=>a.date>=t&&a.status!=='done').sort((a,b)=>a.date.localeCompare(b.date)||(TM.hm(a.start)??-1)-(TM.hm(b.start)??-1)),past=L.filter(a=>!up.includes(a)).sort((a,b)=>b.date.localeCompare(a.date)||(TM.hm(b.start)??-1)-(TM.hm(a.start)??-1));
-    const group=list=>{let h='',last='';for(const a of list){if(a.date!==last){last=a.date;const sum=list.filter(x=>x.date===a.date).reduce((s,x)=>s+x.dur,0);h+=`<div class="tm-dg"><b>${E(dayLabel(a.date))}</b><span>${E(fmtWd(a.date))}${sum?' · '+fm(sum):''}</span></div>`}h+=actRow(a)}return h};
-    $('#view').innerHTML=`<div class="wrap tm-page"><div class="tm-ph"><h1>Aktiviteler</h1><button class="tm-btn pri" data-newact>${I.plus}Ayrıntılı ekle</button></div>
-      ${qaHTML('Ne yaptın ya da ne yapacaksın? ör. “Oyun 21:00-22:30 bitti”, “cuma 9-11 İş rapor”','')}
-      <div class="tm-filt sbar ws-sbar"><div class="tm-mseg">${[['all','Hepsi'],['plan','Planlandı'],['doing','Devam'],['done','Tamamlandı']].map(([k,l])=>`<button data-fst="${k}" class="${F.st===k?'on':''}">${l}</button>`).join('')}</div>
-        <select class="tm-sel" data-fcat aria-label="Kategori filtresi"><option value="">Tüm kategoriler</option>${TM.cats.map(c=>`<option value="${c.id}"${F.cat===c.id?' selected':''}>${E(c.icon)} ${E(c.name)}</option>`).join('')}<option value="__edit">Kategorileri düzenle…</option></select>
-        <input class="tm-srch" data-fq value="${E(F.q)}" placeholder="Ara…" aria-label="Aktivitelerde ara"></div>
-      ${all.length?`${up.length?`<div class="sh"><span>Yaklaşan ve planlanan</span><span class="rule"></span></div><div class="tm-list">${group(up)}</div>`:''}
-        <div class="sh"><span>Geçmiş</span><span class="rule"></span></div><div class="tm-list">${past.length?group(past):'<div class="none">Filtreye uyan geçmiş aktivite yok.</div>'}</div>`
-      :`<div class="tm-empty"><b>Henüz aktivite yok</b><p>Yukarıya yazıp Enter'a bas. Saat, süre, gün ve kategoriyi cümleden kendim anlarım; takvime, istatistiklere ve gün notuna otomatik bağlanır.</p></div>`}</div>`}
-
   /* ═════ GÖREVLER ═════ */
   function renderTasks(){return Tasks.render()}
 
@@ -220,7 +205,7 @@ const Time=(()=>{
       <div class="tm-kpis"><div><small>Tamamlanan süre</small><b>${fm(mDone)}</b></div><div><small>Planlanan + yapılan</small><b>${fm(mPlan)}</b></div><div><small>Aktivite</small><b>${done.length}<span> / ${L.length}</span></b></div><div><small>Görev</small><b>${tkd}<span> / ${tk.length}</span></b></div><div><small>Günlük ortalama</small><b>${fm(avg)}</b></div><div><small>Seri</small><b>${streak} gün</b></div></div>
       ${L.length?`<div class="sh"><span>Günlere göre tamamlanan süre</span><span class="rule"></span></div>${byCat.length>1?`<div class="tm-lg">${byCat.map(([c])=>`<span><i style="background:${c.color}"></i>${E(c.name)}</span>`).join('')}</div>`:''}
         <svg class="tm-chart" viewBox="0 0 ${W} ${H+36}" role="img" aria-label="Günlük tamamlanan süre">${svg}</svg>
-        <div class="sh"><span>Kategorilere göre</span><span class="rule"></span></div><div class="tm-bars">${byCat.length?byCat.map(([c,v])=>`<button class="tm-hb" data-qcatf="${c.id}"><span>${E(c.icon)} ${E(c.name)}</span><span class="tm-tr"><i style="width:${100*v/cmax}%;background:${c.color}"></i></span><span>${fm(v)} · %${Math.round(100*v/Math.max(1,mDone))}</span></button>`).join(''):'<div class="none">Bu aralıkta tamamlanmış aktivite yok.</div>'}</div>
+        <div class="sh"><span>Kategorilere göre</span><span class="rule"></span></div><div class="tm-bars">${byCat.length?byCat.map(([c,v])=>`<div class="tm-hb"><span>${E(c.icon)} ${E(c.name)}</span><span class="tm-tr"><i style="width:${100*v/cmax}%;background:${c.color}"></i></span><span>${fm(v)} · %${Math.round(100*v/Math.max(1,mDone))}</span></div>`).join(''):'<div class="none">Bu aralıkta tamamlanmış aktivite yok.</div>'}</div>
         ${plan.length?`<div class="sh"><span>Bekleyen planlar · ${plan.length}</span><span class="rule"></span></div><div class="tm-list">${plan.slice(0,8).map(a=>actRow(a,true)).join('')}</div>`:''}`
       :`<div class="tm-empty"><b>Bu aralıkta kayıt yok</b><p>Aktivite ekledikçe zaman kullanımın burada grafiklere dönüşür. Hiçbir sayı uydurulmaz.</p></div>`}
       ${Tasks.statsHTML(b,e)}
@@ -243,23 +228,19 @@ const Time=(()=>{
       if(t.closest('[data-newact]')){newAct({date:today()});return}
       const qc=t.closest('[data-qcat]');if(qc){const inp=$('.tm-qa[data-qa] input');lss('time:lastcat',qc.dataset.qcat);if(inp&&inp.value.trim()){const f=inp.form;f.dataset.cat=qc.dataset.qcat;f.requestSubmit();delete f.dataset.cat}else newAct({cat:qc.dataset.qcat,date:today()});return}
       if(t.closest('[data-catm]')){catManager(rerender);return}
-      const fs=t.closest('[data-fst]');if(fs){F.st=fs.dataset.fst;rerender();return}
       const sr=t.closest('[data-sr]');if(sr){SR=sr.dataset.sr;lss('time:srange',SR);rerender();return}
       const sd=t.closest('[data-sday]');if(sd){selDay=sd.dataset.sday;calMode='day';lss('time:calmode','day');go('#cal');return}
-      const cf=t.closest('[data-qcatf]');if(cf){F={st:'all',cat:cf.dataset.qcatf,q:''};go('#acts');return}
       const fl=t.closest('[data-fullstats]');if(fl){e.preventDefault();try{if(window.parent!==window&&parent.HUB?.open){parent.HUB.open('p:istatistik');return}}catch{}location.href='../istatistik/'+(location.search.includes('local')?'?local':'');return}
       if(cur()==='cal'&&calMode!=='month'&&t.closest('.tm-col'))slotClick(e)});
     v.addEventListener('keydown',e=>{const st=e.target.closest?.('[data-act-st]');if(st&&(e.key==='Enter'||e.key===' ')){e.preventDefault();st.click()}const ev=e.target.closest?.('.tm-ev');if(ev&&e.key==='Enter')open(ev.dataset.ev)});
-    v.addEventListener('change',e=>{if(e.target.matches('[data-fcat]')){if(e.target.value==='__edit'){e.target.value=F.cat;catManager(rerender);return}F.cat=e.target.value;rerender()}});
-    v.addEventListener('input',e=>{if(e.target.matches('[data-fq]')){F.q=e.target.value.toLocaleLowerCase('tr');clearTimeout(bind.t);bind.t=setTimeout(()=>{const pos=e.target.selectionStart;rerender();const n=$('[data-fq]');if(n){n.focus();n.setSelectionRange(pos,pos)}},200)}});
     v.addEventListener('pointerdown',e=>{if(e.target.closest('.tm-ev'))gridDrag(e)});
     /* ay görünümünde aktivite sürükle → başka güne */
     v.addEventListener('dragstart',e=>{const c=e.target.closest?.('[data-mact]');if(!c)return;e.dataTransfer.setData('text/x-act',c.dataset.mact);e.dataTransfer.effectAllowed='move'},true);
     v.addEventListener('dragover',e=>{if([...e.dataTransfer.types].includes('text/x-act')&&e.target.closest('.cd')){e.preventDefault();$$('.cd.over').forEach(x=>x.classList.remove('over'));e.target.closest('.cd').classList.add('over')}},true);
     v.addEventListener('drop',e=>{const id=e.dataTransfer.getData('text/x-act'),cd=e.target.closest('.cd');if(!id||!cd)return;e.preventDefault();e.stopPropagation();const a=TM.acts.get(id);if(a){a.date=cd.dataset.day;TM.save(a);selDay=a.date;toast(`${a.title} → ${dayLabel(a.date)}`)}},true);
-    TM.on(()=>{if(!busy&&['cal','acts','tasks','stats'].includes(cur()))rerender()})}
-  function rerender(soft){if(typeof renderView==='function'&&['cal','acts','tasks','stats'].includes(cur()))renderView(!soft)}
+    TM.on(()=>{if(!busy&&['cal','tasks','stats'].includes(cur()))rerender()})}
+  function rerender(soft){if(typeof renderView==='function'&&['cal','tasks','stats'].includes(cur()))renderView(!soft)}
   /* ay görünümü hücrelerine aktivite şeritleri */
   function monthChips(d){const L=TM.onDay(d);if(!L.length)return'';return L.slice(0,3).map(a=>{const c=TM.cat(a.cat);return`<div class="tm-mc st-${a.status}" draggable="true" data-mact="${a.id}" data-act-open="${a.id}" style="--c:${c.color}" title="${E(a.title)}${a.start?' · '+a.start:''}"><i></i><span>${a.start?`<em>${a.start}</em> `:''}${E(a.title)}</span></div>`}).join('')+(L.length>3?`<div class="more">+${L.length-3} aktivite</div>`:'')}
   function dismiss(){const e=document.querySelector('.tm-ed-bg');if(e){e.remove();busy=false}}
-  return{dismiss,get calMode(){return calMode},renderGrid,dayPanelExtra,monthChips,miniCal,navGrp,qaHTML,renderActs,renderTasks,renderStats,bind,newAct,quickAdd,parse,tasks,modeSeg}})();
+  return{dismiss,get calMode(){return calMode},renderGrid,dayPanelExtra,monthChips,miniCal,navGrp,qaHTML,renderTasks,renderStats,bind,newAct,quickAdd,parse,tasks,modeSeg}})();

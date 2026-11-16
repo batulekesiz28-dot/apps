@@ -1,21 +1,5 @@
-/* Notlar bölüm seçimi (#home) + Ders notu (#ders) — sade satırlar, kart yığını yok */
+/* Ders notu (#ders) — sade satırlar, kart yığını yok */
 .dz-ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
-
-/* ── bölüm seçimi ── */
-.nh{padding-top:clamp(28px,8vh,88px)}
-.nh-h h1{margin:0;font-size:clamp(30px,4vw,40px);font-weight:700;letter-spacing:-.025em}
-.nh-h p{margin:6px 0 0;font-size:15px;color:var(--ink2)}
-.nh-l{display:flex;flex-direction:column;margin-top:28px;border-top:1px solid var(--line)}
-.nh-o{display:flex;align-items:center;gap:16px;min-height:76px;padding:12px 10px;border-bottom:1px solid var(--line);color:var(--ink);text-decoration:none;border-radius:0;transition:background .2s}
-.nh-o:hover{background:var(--hover)}.nh-o:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:10px}
-.nh-i{display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:color-mix(in srgb,var(--ink) 6%,transparent);color:var(--ink)}
-.nh-i .dz-ic{width:22px;height:22px}
-.nh-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
-.nh-t b{font-size:17px;font-weight:600;letter-spacing:-.01em}
-.nh-t small{font-size:13px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.nh-o .ch{width:16px;height:16px;color:var(--ink3);transition:transform .25s cubic-bezier(.2,.9,.3,1)}.nh-o:hover .ch{transform:translateX(3px)}
-.nh-kb{margin:18px 0 0;font-size:12px;color:var(--ink3)}
-@media (hover:none){.nh-kb{display:none}}
 
 /* ── ders notu ── */
 .dz-h{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:8px 0 18px}
@@ -56,5 +40,5 @@
 .dz-foot{margin:22px 0 0;font-size:12.5px;color:var(--ink3);max-width:60ch}
 @media (max-width:640px){
   .dz-top{flex-wrap:wrap;gap:8px}.dz-n{flex:1 1 100%}.dz-g{flex:1;justify-items:start;min-width:0}.dz-bar{width:100%}
-  .dz-step button{width:40px;height:40px}.dz-add{height:40px}.dz-ns{margin-left:0}.dz-note{min-height:40px}.nh-o{min-height:72px}}
-@media (prefers-reduced-motion:reduce){.dz-bar i,.nh-o .ch{transition:none}}
+  .dz-step button{width:40px;height:40px}.dz-add{height:40px}.dz-ns{margin-left:0}.dz-note{min-height:40px}}
+@media (prefers-reduced-motion:reduce){.dz-bar i{transition:none}}

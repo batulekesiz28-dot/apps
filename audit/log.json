@@ -2797,5 +2797,42 @@
     "fix": "Animeler bölümü ve anime rafları MyAnimeList kapak oranında"
    }
   ]
+ },
+ {
+  "at": "2026-11-16T22:37:46",
+  "change": "Notlar: üçe bölme ve Aktiviteler kaldırıldı; sayfalar üst şeride sabitlenebiliyor",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "fixed",
+    "text": "Notlar girişinde Work/Ders/Library seçimi istenmedi; Aktiviteler sayfası istenmedi",
+    "fix": "İkisi de kaldırıldı (veriler duruyor); Dersler ana sayfada kısayol"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "fixed",
+    "text": "Sık kullanılan sayfalar üst şeride sabitlenemiyordu",
+    "fix": "Soldaki listeden sürükle-bırak ya da ⋯ → Üste sabitle; sıralanır, kaldırılır, bulutta senkron"
+   },
+   {
+    "app": "notlar",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Kenar paneli açıkken sayfanın ⋯ menüsü karartmanın altında kalıyor, tıklanamıyordu",
+    "fix": "Menü katmanı panelin üstüne alındı"
+   }
+  ]
  }
 ]

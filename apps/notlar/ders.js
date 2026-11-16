@@ -1,7 +1,5 @@
-/* Notlar bölümleri + Ders notları (Study Log'a bağlı)
-   - #home  → bölüm seçimi (Work · Ders notu · Library)
-   - #work  → eski Notlar ana sayfası (renderHome)
-   - #ders  → dersler: Study Log'daki dersler (subjects), haftalık hedef (goalW), bu haftaki çalışma (sessions)
+/* Ders notları (Study Log'a bağlı) — #ders (Notlar ana sayfasındaki “Dersler” kısayolu)
+   - dersler: Study Log'daki dersler (subjects), haftalık hedef (goalW), bu haftaki çalışma (sessions)
    Veri Study Log'un kendisi: yerel 'studylog:v1' {set,sessions} · bulut hub/studylog (+ sessions alt koleksiyonu).
    Her dersin defteri bir Notlar sayfası: tpl 'ders:<dersId>'; ders notları onun alt sayfaları.
    Yükleme anında Notlar global'lerine dokunmaz; sadece çalışırken (pages, newPage, save, go, esc…). */
@@ -13,10 +11,8 @@ const Ders=(()=>{
   const weekStart=()=>{const d=new Date();d.setDate(d.getDate()-(d.getDay()+6)%7);return ymd(d)};
   const fm=m=>{m=Math.round(m||0);const h=Math.floor(m/60),r=m%60;return h?(r?`${h} sa ${r} dk`:`${h} sa`):`${r} dk`};
   const S=(p,c='')=>`<svg class="dz-ic ${c}" viewBox="0 0 20 20" aria-hidden="true">${p}</svg>`;
-  const IC={work:S('<rect x="3" y="6" width="14" height="10.5" rx="2.4"/><path d="M7.5 6V4.6c0-.6.5-1.1 1.1-1.1h2.8c.6 0 1.1.5 1.1 1.1V6M3 10.5h14"/>'),
-    ders:S('<path d="M10 4.5 2.5 8 10 11.5 17.5 8z"/><path d="M5.5 9.5v3.6c1.2 1.2 2.8 1.9 4.5 1.9s3.3-.7 4.5-1.9V9.5M17.5 8v4.5"/>'),
-    lib:S('<path d="M4 3.5v13M7.5 3.5v13M11 4.2l3.6 12.1"/>'),chev:S('<path d="m8 5 5 5-5 5"/>','ch'),
-    plus:S('<path d="M10 4.5v11M4.5 10h11"/>'),minus:S('<path d="M4.5 10h11"/>'),note:S('<path d="M5.5 3h6l3 3v11h-9z"/><path d="M11.5 3v3h3M8 10h4.5M8 13h4.5"/>')};
+  const IC={ders:S('<path d="M10 4.5 2.5 8 10 11.5 17.5 8z"/><path d="M5.5 9.5v3.6c1.2 1.2 2.8 1.9 4.5 1.9s3.3-.7 4.5-1.9V9.5M17.5 8v4.5"/>'),
+        plus:S('<path d="M10 4.5v11M4.5 10h11"/>'),minus:S('<path d="M4.5 10h11"/>'),note:S('<path d="M5.5 3h6l3 3v11h-9z"/><path d="M11.5 3v3h3M8 10h4.5M8 13h4.5"/>')};
 
   /* ── veri ── */
   function readLocal(){try{const d=JSON.parse(localStorage.getItem(LK)||'null');set=d?.set||null;const ws=weekStart();sess=(d?.sessions||[]).filter(s=>s.date>=ws)}catch{set=null;sess=[]}ready=true}
@@ -40,18 +36,6 @@ const Ders=(()=>{
   function ensureRoot(s){let p=rootOf(s.id);if(!p){p=newPage({title:s.name,icon:'📘'});p.tpl='ders:'+s.id;save(p,true)}return p}
   function newNote(s){const r=ensureRoot(s),p=newPage({title:''});p.parent=r.id;save(p,true);FRESH?.add?.(p.id);go('#p/'+p.id)}
   const notesOf=id=>{const r=rootOf(id);return r?descendants(r.id).sort((a,b)=>b.updated-a.updated):[]};
-
-  /* ── #home: bölüm seçimi ── */
-  function hub(){setCrumb('','');
-    const nW=[...pages.values()].filter(p=>!isDers(p)&&!p.tpl?.startsWith?.('ders:')).length,nD=subjects().length,nL=typeof KB!=='undefined'?KB.items.size:0;
-    const o=(h,ic,t,s,k)=>`<a class="nh-o" href="${h}" data-k="${k}"><span class="nh-i">${ic}</span><span class="nh-t"><b>${t}</b><small>${s}</small></span>${IC.chev}</a>`;
-    $('#view').innerHTML=`<div class="wrap nh"><header class="nh-h"><h1>Notlar</h1><p>Nereye yazmak istiyorsun?</p></header>
-      <nav class="nh-l" aria-label="Not bölümleri">
-        ${o('#work',IC.work,'Work','İş notları, günlük, projeler'+(nW?` · ${nW} sayfa`:''),'1')}
-        ${o('#ders',IC.ders,'Ders notu','Dersler, notlar ve haftalık hedefler · Study Log’a bağlı'+(nD?` · ${nD} ders`:''),'2')}
-        ${o('#lib',IC.lib,'Library','Kitaplar, belgeler, filmler ve diziler'+(nL?` · ${nL} içerik`:''),'3')}
-      </nav><p class="nh-kb">Klavye: 1 · 2 · 3</p></div>`;
-    stagger?.('.nh-o')}
 
   /* ── #ders ── */
   function render(){setCrumb(IC.ders,'Ders notu');const L=subjects(),ws=weekStart();
@@ -82,7 +66,5 @@ const Ders=(()=>{
     v.addEventListener('submit',e=>{if(!e.target.matches('[data-dz-sub]'))return;e.preventDefault();const name=e.target.n.value.trim();if(!name)return;
       const L=subjects();if(L.some(s=>s.name.toLocaleLowerCase('tr')===name.toLocaleLowerCase('tr'))){toast('Bu ders zaten var');return}
       const s={id:'s'+Date.now().toString(36),name,color:PAL.find(c=>!L.some(x=>(x.color||'').toLowerCase()===c.toLowerCase()))||PAL[L.length%PAL.length],goalW:0};write({subjects:[...L,s],...(set?.sel?{}:{sel:s.id})});toast(name+' eklendi · Study Log’da da var');
-      setTimeout(()=>$('[data-dz-sub] input')?.focus(),30)});
-    document.addEventListener('keydown',e=>{if(view!=='notes'||e.metaKey||e.ctrlKey||e.altKey||/INPUT|TEXTAREA/.test(document.activeElement?.tagName)||document.activeElement?.isContentEditable)return;
-      const a=$(`.nh-o[data-k="${e.key}"]`);if(a){e.preventDefault();a.click()}})}
-  return{startLocal,startCloud,stop,on,hub,render,bind,isDers,weekMin,subjects}})();
+      setTimeout(()=>$('[data-dz-sub] input')?.focus(),30)})}
+  return{startLocal,startCloud,stop,on,render,bind,isDers,weekMin,subjects}})();

@@ -20,7 +20,7 @@ Son güncelleme: 2026-11-15
 ## Gezinme
 | Alan | Geçerli karar |
 |---|---|
-| Notlar üst şerit | Ortada cam kapsül `#tnav`: Takvim · Aktiviteler · Görevler · Notlar · İstatistikler. Sol menü yok; sayfa ağacı soldaki düğmeyle açılan panel. |
+| Notlar üst şerit | Ortada cam kapsül `#tnav`: Takvim · Görevler · Notlar · İstatistikler + sabitlenen sayfalar. Sol menü yok; sayfa ağacı soldaki düğmeyle açılan panel. |
 | Bölümler | Workspace / Library / AI Center (`#modes`, sağ üstte). |
 | Akıllı başlık | Uzun listelerde araç satırı aşağı kaydırınca gizlenir, yukarı kaydırınca gelir (`.sbar`, `smartBar()`). |
 | Araçlar | Arama, filtre, görünüm, ayar, Ekle: **sağda**, tek satırda. Başlık solda. |
@@ -40,11 +40,12 @@ Son güncelleme: 2026-11-15
 | Kart rozetleri | IMDb (genel) puanı **sağ üstte** (sarı “IMDb” yazısıyla), **benim puanım mavi, sol altta**, favori kalbi sağ altta, “incele” uyarısı sol üstte. Puan kartın altındaki yazıda tekrar edilmez. |
 | Apple TV kart şekli | Rafın/ızgaranın kapakları belirler: neredeyse hepsinin (%85) yatay görseli varsa (oyunlar) geniş kart, değilse (çoğu film/dizi) **büyük dikey poster**. Bulanık zeminli küçük poster YOK; geniş rafta tek tük dikey poster kartı doldurur (kırpılır). Vitrine sadece yatay arka planı olanlar çıkar. |
 
-## Notlar bölümleri
+## Notlar
 | Alan | Geçerli karar |
 |---|---|
-| Notlar sekmesi | Önce sade **bölüm seçimi**: Work · Ders notu · Library (satırlar, kart yok; klavye 1·2·3). |
-| Ders notu | Study Log'a bağlı: dersler, bu haftaki çalışma çubuğu, haftalık hedef (− / +30 dk), her dersin kendi defteri ve notları; yeni ders Study Log'a da eklenir. Süre Study Log sayacıyla tutulur. |
+| Notlar sekmesi | Doğrudan Notion tarzı Notlar ana sayfası. Üçe bölme (Work · Ders · Library seçimi) KALDIRILDI — kullanıcı sevmedi. Ders notu ana sayfadaki “Dersler” kısayolundan. |
+| Aktiviteler | Sekme ve sayfa KALDIRILDI. Etkinlik verisi silinmedi; takvimde durur. |
+| Üste sabitleme | Soldaki sayfa listesinden bir sayfa üst şeride (Takvim · Görevler · Notlar · İstatistikler'in yanına) sürüklenip sabitlenir; ⋯ menüsünden de. Şeritte sürükle = sırala; dışarı bırak / sağ tık = kaldır. Alt sayfası açıkken de sekmesi vurgulu. Bulutta senkron. |
 
 ## Hub widget'ları
 | Alan | Geçerli karar |

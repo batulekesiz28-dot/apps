@@ -238,7 +238,7 @@ const Tasks=(()=>{
     if(!was&&rowEl&&!matchMedia('(prefers-reduced-motion: reduce)').matches&&document.documentElement.dataset.motion!=='off'){busy=true;rowEl.classList.add('tk-pop');const c=rowEl.querySelector('.tk-chk');c?.classList.add('on');
       setTimeout(()=>{busy=false;refresh()},520)}else refresh();
     if(!was&&t.series){const k=streak(TK.tasks.get(t.series));if(k.cur>=3)toast(`🔥 ${t.title}: ${k.cur} gün seri`)}}
-  function refresh(){if(typeof view!=='undefined'&&view==='tasks')render();else if(typeof renderView==='function'&&['cal','stats','acts'].includes(view))renderView(true)}
+  function refresh(){if(typeof view!=='undefined'&&view==='tasks')render();else if(typeof renderView==='function'&&['cal','stats'].includes(view))renderView(true)}
 
   /* ── sürükle-bırak: sırala, güne / duruma / projeye taşı ── */
   let dragId=null;

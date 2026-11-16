@@ -7,8 +7,8 @@ const pid=await p.evaluate(()=>{const T=Date.now(),f=n=>{const x=new Date();x.se
  const C=TM.cats.map(c=>c.id);for(let i=0;i<6;i++)TM.add({title:'Etkinlik '+i,cat:C[i%C.length],date:f(i%3-1),start:'1'+i+':00',end:'1'+i+':45',dur:45,status:'plan'});
  const pg=newPage({title:'Proje notları'});pg.blocks=[B('h1','Hedefler'),B('p','Metin.'),B('todo','Görev')];touch(pg);return pg.id});
 await p.goto(U+'tasks');await p.waitForTimeout(500);const ti=p.locator('[data-tkadd] input, input[data-tkadd]').first();for(const t of ['Rapor yaz','Market']){await ti.fill(t);await ti.press('Enter')}
-const R=['home','p/'+pid,'cal','acts','tasks','stats','timeline','tpl','lib','lib/m/movies','lib/m/movies/done','lib/m/series/dropped','lib/m/books','lib/docs','brain'];
-const cases=R.map(r=>[r,null]).concat([['lib/m/movies/done','list'],['lib/m/movies/done','nf'],['lib/m/movies/done','compact'],['lib/m/movies','detail'],['lib','settings'],['tasks','taskdp'],['acts','editor'],['cal','week']]);
+const R=['home','p/'+pid,'cal','tasks','stats','timeline','tpl','lib','lib/m/movies','lib/m/movies/done','lib/m/series/dropped','lib/m/books','lib/docs','brain'];
+const cases=R.map(r=>[r,null]).concat([['lib/m/movies/done','list'],['lib/m/movies/done','nf'],['lib/m/movies/done','compact'],['lib/m/movies','detail'],['lib','settings'],['tasks','taskdp'],['cal','week']]);
 for(const [r,x] of cases){await p.goto(U+r);await p.waitForTimeout(1000);
   try{if(x&&['list','nf','compact'].includes(x)){await p.locator(`[data-lv=${x}]`).first().click({timeout:3000}).catch(async()=>{await p.locator('[data-mset]').click();await p.locator(`.mset [data-lk=view][data-lval=${x}]`).click()});await p.waitForTimeout(500)}
   if(x==='detail'){await p.locator('.mc-main [data-mi]').first().click();await p.waitForTimeout(900)}

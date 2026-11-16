@@ -653,3 +653,27 @@ html[data-motion=off] .msp-yt{transition:none;transform:none}
 
 /* kare/yatay görsel dikey poster kutusunda: kırpılmaz, ortalanır */
 .mp img.fitc{object-fit:contain;background:#0D0D10}
+/* ═ Yeni sezonlar: kategori sırasının en sağında tek düğme + açılır liste ═ */
+.mc-tabs .mc-ns{position:relative;display:inline-flex;align-items:center;gap:7px;height:32px;margin-left:7px;padding:0 13px 0 15px;border-radius:999px;font:500 13.5px/1 var(--sys);letter-spacing:-.01em;color:rgba(255,255,255,.82);white-space:nowrap;transition:background .2s,color .2s}
+.mc-tabs .mc-ns::before{content:"";position:absolute;left:-4px;top:9px;bottom:9px;width:.5px;background:rgba(255,255,255,.18)}
+.mc-tabs .mc-ns:hover,.mc-tabs .mc-ns[aria-expanded=true]{background:rgba(255,255,255,.1);color:#fff}
+.mc-tabs .mc-ns .mvi{width:15px;height:15px}
+.mc-ns em{font-style:normal;min-width:18px;height:18px;padding:0 5px;border-radius:9px;display:grid;place-items:center;font-size:11px;font-weight:700;color:#0B0B0D;background:#F5C451}.mc-ns em:empty{display:none}
+.mc-ns.busy .mvi{animation:nsr 1.6s ease-in-out infinite}@keyframes nsr{50%{transform:rotate(-14deg)}}
+.mnsp{position:fixed;z-index:620;max-height:min(72vh,560px);display:flex;flex-direction:column;border-radius:16px;color:#F5F5F7;font-family:var(--sys,system-ui);
+  background:rgba(28,28,32,.96);-webkit-backdrop-filter:blur(26px) saturate(1.6);backdrop-filter:blur(26px) saturate(1.6);box-shadow:inset 0 0 0 .5px rgba(255,255,255,.14),0 28px 70px -18px rgba(0,0,0,.8);animation:msetIn .2s cubic-bezier(.16,1,.3,1)}
+.mnsp header{display:flex;align-items:center;justify-content:space-between;padding:12px 12px 6px 16px}.mnsp header b{font-size:15px;font-weight:600}
+.mns-x{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;color:rgba(255,255,255,.6)}.mns-x:hover{background:rgba(255,255,255,.08);color:#fff}
+.mns-l{overflow-y:auto;padding:0 8px 6px}
+.mnsp h4{margin:10px 8px 4px;font-size:11.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.5)}
+.mns-r{display:flex;align-items:center;gap:12px;width:100%;min-height:58px;padding:6px 8px;border-radius:10px;text-align:left;color:inherit;transition:background .15s}.mns-r:hover,.mns-r:focus-visible{background:rgba(255,255,255,.07);outline:none}
+.mns-p{width:34px;height:48px;flex-shrink:0;border-radius:5px;overflow:hidden;background:rgba(255,255,255,.08)}.mns-p img{width:100%;height:100%;object-fit:cover}
+.mns-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}.mns-t b{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mns-t small{font-size:12.5px;color:rgba(255,255,255,.62);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mns-k{font-style:normal;flex-shrink:0;font-size:11px;font-weight:600;color:rgba(255,255,255,.55);padding:3px 7px;border-radius:6px;background:rgba(255,255,255,.07)}
+.mns-e{margin:14px 10px 18px;font-size:13.5px;color:rgba(255,255,255,.62);line-height:1.5}
+.mnsp footer{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px 12px 16px;border-top:.5px solid rgba(255,255,255,.1);font-size:12px;color:rgba(255,255,255,.5)}
+.mnsp footer button{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 11px;border-radius:999px;font-size:12.5px;font-weight:600;color:#fff;background:rgba(255,255,255,.1)}.mnsp footer button:hover{background:rgba(255,255,255,.18)}
+.mnsp footer button:disabled{opacity:.5}.mnsp footer .mvi{width:13px;height:13px}
+@media (max-width:900px){.mc-tabs .mc-ns span{display:none}.mc-tabs .mc-ns{padding:0 11px}}
+@media (prefers-reduced-motion:reduce){.mc-ns.busy .mvi{animation:none}}

@@ -40,7 +40,7 @@ const Media=(()=>{
   const stName=it=>stMap(it)[stOf(it)]||'';
   const inPage=(it,k)=>k==='fav'?it.fav:k==='played'?['played','done'].includes(it.status):k==='all'?true:stOf(it)===k;
   const S=p=>`<svg class="mvi" viewBox="0 0 16 16" aria-hidden="true">${p}</svg>`;
-  const IC={vol0:S('<path d="M3 6.2h2.4L8.8 3.5v9L5.4 9.8H3z"/><path d="m11 6.3 3.2 3.4M14.2 6.3 11 9.7"/>'),vol1:S('<path d="M3 6.2h2.4L8.8 3.5v9L5.4 9.8H3z"/><path d="M11.2 5.6a3.4 3.4 0 0 1 0 4.8M12.9 3.9a5.8 5.8 0 0 1 0 8.2"/>'),play:S('<path d="M5 3.5v9l7.5-4.5z" fill="currentColor" stroke="none"/>'),plus:S('<path d="M8 3v10M3 8h10"/>'),check:S('<path d="M3.5 8.5l3 3 6-7"/>'),
+  const IC={bell:S('<path d="M4.2 11.5V7.4a3.8 3.8 0 0 1 7.6 0v4.1l1.2 1.3H3z"/><path d="M6.6 14.2a1.5 1.5 0 0 0 2.8 0"/>'),vol0:S('<path d="M3 6.2h2.4L8.8 3.5v9L5.4 9.8H3z"/><path d="m11 6.3 3.2 3.4M14.2 6.3 11 9.7"/>'),vol1:S('<path d="M3 6.2h2.4L8.8 3.5v9L5.4 9.8H3z"/><path d="M11.2 5.6a3.4 3.4 0 0 1 0 4.8M12.9 3.9a5.8 5.8 0 0 1 0 8.2"/>'),play:S('<path d="M5 3.5v9l7.5-4.5z" fill="currentColor" stroke="none"/>'),plus:S('<path d="M8 3v10M3 8h10"/>'),check:S('<path d="M3.5 8.5l3 3 6-7"/>'),
     heart:S('<path d="M8 13.5S2.5 10.2 2.5 6.3A2.8 2.8 0 0 1 8 5a2.8 2.8 0 0 1 5.5 1.3C13.5 10.2 8 13.5 8 13.5z"/>'),more:S('<circle cx="3.5" cy="8" r="1.1" fill="currentColor" stroke="none"/><circle cx="8" cy="8" r="1.1" fill="currentColor" stroke="none"/><circle cx="12.5" cy="8" r="1.1" fill="currentColor" stroke="none"/>'),
     x:S('<path d="M4 4l8 8M12 4l-8 8"/>'),search:S('<circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/>'),l:S('<path d="M10 3.5L5.5 8l4.5 4.5"/>'),r:S('<path d="M6 3.5L10.5 8 6 12.5"/>'),
     clock:S('<circle cx="8" cy="8" r="5.5"/><path d="M8 5v3.2l2 1.3"/>'),edit:S('<path d="M10.5 2.5l3 3-8 8H2.5v-3z"/>'),trash:S('<path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.6 9h5.8l.6-9"/>'),
@@ -355,7 +355,7 @@ const Media=(()=>{
     const sub=st.sec!=='home'?SEC[st.sec].pages.map(([k,n])=>{const c=k==='home'?'':all().filter(i=>inSec(i,st.sec)&&inPage(i,k)).length;
         return`<a href="#lib/m/${st.sec}${k==='home'?'':'/'+k}" class="${st.page===k?'on':''}"${st.page===k?' aria-current="page"':''}>${n}${k==='home'?'':`<em>${c}</em>`}</a>`}).join('')+(()=>{const r=all().filter(i=>inSec(i,st.sec)&&flagOf(i)).length;return r?`<a href="#lib/m/${st.sec}/review" class="rev${st.page==='review'?' on':''}">${IC.warn}İnceleme<em>${r}</em></a>`:''})():'';
     return`<nav class="mc-nav" aria-label="Medya bölümleri"><a class="mc-brand" href="#lib" aria-label="Medya ana sayfa"><span>${IC.play}</span><b>Medya</b></a>
-      <div class="mc-tabs">${tabs.map(([k,n,h,ic])=>`<a href="${h}" class="t-${k}${st.sec===k?' on':''}"${st.sec===k?' aria-current="page"':''}>${ic}<span>${n}</span></a>`).join('')}${st.look.tabsOff.includes('docs')?'':`<a href="#lib/docs" class="t-docs">${IC.link}<span>Belgeler</span></a>`}</div>
+      <div class="mc-tabs">${tabs.map(([k,n,h,ic])=>`<a href="${h}" class="t-${k}${st.sec===k?' on':''}"${st.sec===k?' aria-current="page"':''}>${ic}<span>${n}</span></a>`).join('')}${st.look.tabsOff.includes('docs')?'':`<a href="#lib/docs" class="t-docs">${IC.link}<span>Belgeler</span></a>`}<button type="button" class="mc-ns" data-ns aria-haspopup="dialog" aria-expanded="false" title="Yeni sezonu gelen ya da gelecek olanlar">${IC.bell}<span>Yeni sezonlar</span><em></em></button></div>
       <div class="mc-r"><span class="mc-sync" aria-live="polite"${R.busy?'':' hidden'}>${IC.sync}<span>${R.busy?syncTxt():''}</span></span></div></nav>${bar(sub)}`}
   /* sayfa kontrol alanı: solda başlık + durum sekmeleri, sağda araçlar (arama · filtre · görünüm · ayar).
      Kaydırınca saklanır (.sbar → Notlar'ın akıllı başlık denetleyicisi), yukarı kaydırınca geri gelir. */
@@ -383,7 +383,7 @@ const Media=(()=>{
     document.getElementById('app')?.classList.add('mc-on');
     if(typeof setCrumb==='function')setCrumb(IC.play,st.sec==='home'?'Medya':SEC[st.sec].n,'');
     if(changed&&!o.soft)q('#scroll').scrollTop=0;else if(changed)q('#scroll').scrollTop=0;
-    heroStart();arrows();lazyWatch();Library.loadPack?.().then(migrate);queue();if(!aniFix.done){aniFix.done=1;setTimeout(()=>aniFix(),2500)}}
+    heroStart();arrows();lazyWatch();Library.loadPack?.().then(migrate);queue();if(!aniFix.done){aniFix.done=1;setTimeout(()=>aniFix(),2500);setTimeout(()=>nsRun(),6000)}nsPaint()}
   function refresh(){const root=q('#view>.mc');if(!root)return;const sc=q('#scroll'),y=sc.scrollTop,rows=qa('.mc-row',root).map(r=>r.scrollLeft),f=document.activeElement,inS=f&&f.matches('[data-ms]');
     if(inS){const m=q('.mc-main',root);m.innerHTML=body()}else{const b=body();root.innerHTML=nav()+`<main class="mc-main">${b}</main>`;root.classList.toggle('has-hero',!!q('.mh',root))}
     lazyWatch();qa('.mc-row',root).forEach((r,i)=>r.scrollLeft=rows[i]||0);sc.scrollTop=y;heroStart();arrows();if(q('.mx-bg'))detailRefresh()}
@@ -401,6 +401,7 @@ const Media=(()=>{
       const hd=t.closest('[data-hd]');if(hd){heroGo(+hd.dataset.hd);return}
       const mk=t.closest('[data-mk]');if(mk){st.kind=mk.dataset.mk;swap();return}
       const lv=t.closest('[data-lv]');if(lv){setLook('view',lv.dataset.lv,true);q('.mset')&&qa('.mset [data-lk=view]').forEach(x=>{const on=x.dataset.lval===V();x.classList.toggle('on',on);x.setAttribute('aria-checked',on)});return}
+      const nb=t.closest('[data-ns]');if(nb){nsPanel(nb);if(!nsBusy)nsRun();return}
       const ms=t.closest('[data-mset]');if(ms){q('.mset')?q('.mset').remove():settings(ms);return}
       const mg=t.closest('[data-mg]');if(mg){st.genre=mg.dataset.mg;swap();return}
       const ad=t.closest('[data-madd]');if(ad){addSheet(ad.dataset.madd||'');return}
@@ -687,6 +688,56 @@ const Media=(()=>{
     const ex=L.filter(d=>okY(d)&&names(d).includes(nt)),pre=L.filter(d=>okY(d)&&names(d).some(n=>n.startsWith(nt)||nt.startsWith(n)));
     const pick=a=>a.sort((x,y)=>(y.type==='TV')-(x.type==='TV')||(y.members||0)-(x.members||0))[0];return pick(ex)||(year?pick(pre):null)||null}
   const malCover=d=>d?.images?.webp?.large_image_url||d?.images?.jpg?.large_image_url||'';
+  /* ═ Yeni sezonlar: izlediğin / izlemekte olduğun / yarım bıraktığın dizi, anime ve filmlerde yeni sezon (devam) geliyor mu, yeni mi geldi.
+     Dizi: TVmaze sezonları · Anime: Jikan devam zinciri (/full → relations Sequel) · Film: Wikidata P156 (devamı) + P577. Sonuç 3 gün saklanır (mc:ns). ═ */
+  const NS=lsg('mc:ns',{}),NSD=3*864e5;let nsBusy=false,nsProg=[0,0];
+  const nsWatch=it=>['series','anime','movie'].includes(it.type)&&['done','doing','dropped'].includes(it.status);
+  const ymdL=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`,tdy=()=>ymdL(new Date());
+  const dd=(a,b)=>Math.round((new Date(a+'T00:00')-new Date(b+'T00:00'))/864e5);
+  const soft=p=>p.catch(e=>{if(e instanceof NetErr)throw e;return null});
+  let tvq=Promise.resolve();const tvget=u=>{const p=tvq.then(()=>getJSON(u));tvq=p.catch(()=>{}).then(()=>new Promise(z=>setTimeout(z,550)));return p}; // TVmaze: ~20 istek/10 sn
+  async function nsSeries(it){let sh=it.imdb?await soft(tvget(`https://api.tvmaze.com/lookup/shows?imdb=${it.imdb}`)):null;
+    if(!sh){const x=await soft(tvget(`https://api.tvmaze.com/singlesearch/shows?q=${encodeURIComponent(it.title)}`));if(x&&(!it.year||!x.premiered||Math.abs(parseInt(x.premiered)-+it.year)<=1)&&norm(x.name)===norm(it.title))sh=x}
+    if(!sh)return null;const L=((await soft(tvget(`https://api.tvmaze.com/shows/${sh.id}/seasons`)))||[]).filter(x=>x.number>0),t=tdy();
+    const up=L.find(x=>x.premiereDate&&x.premiereDate>t);if(up)return{k:'up',date:up.premiereDate,label:`${up.number}. sezon`};
+    const last=[...L].reverse().find(x=>x.premiereDate);if(last&&dd(t,last.premiereDate)<=60)return{k:'new',date:last.premiereDate,label:`${last.number}. sezon`};
+    const tba=L.find(x=>!x.premiereDate);if(tba&&sh.status!=='Ended')return{k:'tba',label:`${tba.number}. sezon`};return null}
+  async function nsAnime(it){if(!it.mal)return null;let d=(await jget(`https://api.jikan.moe/v4/anime/${it.mal}/full`))?.data,last=d,hop=0;
+    while(d&&hop++<8){const sq=(d.relations||[]).find(r=>r.relation==='Sequel')?.entry?.find(e=>e.type==='anime');if(!sq)break;d=(await jget(`https://api.jikan.moe/v4/anime/${sq.mal_id}/full`))?.data;if(d)last=d}
+    if(!last)return null;const t=tdy(),from=(last.aired?.from||'').slice(0,10),own=String(last.mal_id)===String(it.mal),name=last.title_english||last.title;
+    if(last.status==='Not yet aired')return from&&from>t?{k:'up',date:from,label:name}:{k:'tba',label:name};
+    if(last.status==='Currently Airing')return{k:'new',date:from||t,label:name,airing:true};
+    if(!own&&from&&dd(t,from)<=60)return{k:'new',date:from,label:name};return null}
+  async function nsMovie(it){if(!/^Q\d+$/.test(it.mid||''))return null;const e=await getJSON(`https://www.wikidata.org/w/api.php?action=wbgetclaims&entity=${it.mid}&property=P156&format=json&origin=*`);
+    const q=e?.claims?.P156?.[0]?.mainsnak?.datavalue?.value?.id;if(!q)return null;const j=await getJSON(`https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${q}&props=claims|labels&languages=tr|en&format=json&origin=*`),en=j?.entities?.[q];
+    const name=en?.labels?.tr?.value||en?.labels?.en?.value||'Devam filmi',raw=(en?.claims?.P577||[]).map(c=>c.mainsnak?.datavalue?.value?.time).filter(Boolean).map(x=>x.slice(1,11)).sort()[0];
+    if(!raw)return{k:'tba',label:name};const date=raw.replace(/-00/g,'-01'),n=dd(date,tdy());const pr=raw.slice(5,7)==='00'?'y':raw.slice(8,10)==='00'?'m':'';if(n>0)return{k:'up',date,label:name,pr};if(-n<=60)return{k:'new',date,label:name};return null}
+  async function nsRun(force){if(nsBusy)return;const L=[...KB.items.values()].filter(nsWatch).filter(it=>force||!NS[it.id]||Date.now()-NS[it.id].at>NSD);if(!L.length){nsPaint();return}
+    nsBusy=true;nsProg=[0,L.length];nsPaint();
+    for(const it of L){try{const r=it.type==='series'?await nsSeries(it):it.type==='anime'?await nsAnime(it):await nsMovie(it);NS[it.id]={at:Date.now(),r:r||null}}
+      catch(e){if(e instanceof NetErr)break}nsProg[0]++;lss('mc:ns',NS);nsPaint()}
+    nsBusy=false;nsPaint()}
+  // liste: tarihler bugüne göre yeniden değerlendirilir (gelen “yakında” → “geldi”; 60 günü geçen “geldi” düşer)
+  function nsList(){const t=tdy(),out=[];for(const it of KB.items.values()){const x=NS[it.id]?.r;if(!x||!nsWatch(it))continue;let k=x.k;
+      if(k==='up'&&x.date<=t)k='new';if(k==='new'&&!x.airing&&x.date&&dd(t,x.date)>60)continue;out.push({it,...x,k})}
+    const o={new:0,up:1,tba:2};return out.sort((a,b)=>o[a.k]-o[b.k]||(a.k==='new'?(b.date||'').localeCompare(a.date||''):(a.date||'9').localeCompare(b.date||'9')))}
+  function nsPaint(){const b=q('.mc-ns');if(!b)return;const n=nsList().filter(x=>x.k!=='tba').length;b.querySelector('em').textContent=n||'';b.classList.toggle('busy',nsBusy);if(q('.mnsp'))nsPanel(b,true)}
+  function nsPanel(anchor,keep){const old=q('.mnsp');if(old&&!keep){old.remove();anchor.setAttribute('aria-expanded','false');return}
+    const L=nsList(),t=tdy(),fd=d=>new Date(d+'T00:00').toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:d.slice(0,4)!==t.slice(0,4)?'numeric':undefined});
+    const when=x=>x.k==='up'?(x.pr==='y'?`${x.date.slice(0,4)} içinde`:x.pr==='m'?new Date(x.date+'T00:00').toLocaleDateString('tr-TR',{month:'long',year:'numeric'}):`${fd(x.date)} · ${dd(x.date,t)} gün sonra`):x.k==='new'?(x.airing?'Şu an yayında':`${fd(x.date)} · ${dd(t,x.date)?dd(t,x.date)+' gün önce':'bugün'} başladı`):'Duyuruldu · tarih belli değil';
+    const row=x=>`<button class="mns-r" data-nsi="${x.it.id}"><span class="mns-p">${x.it.cover?`<img src="${E(x.it.cover)}" alt="" loading="lazy" referrerpolicy="no-referrer">`:''}</span><span class="mns-t"><b>${E(x.it.title)}</b><small>${E(short(x))} · ${E(when(x))}</small></span><em class="mns-k t-${x.it.type}">${E(TN[x.it.type])}</em></button>`;
+    // devam sezonunun adı dizinin adıyla başlıyorsa tekrar etme (“Attack on Titan: Final Season” → “Final Season”)
+    const short=x=>{const t0=x.it.title,l=x.label||'';return l.toLocaleLowerCase('tr').startsWith(t0.toLocaleLowerCase('tr'))?(l.slice(t0.length).replace(/^[\s:–—-]+/,'')||l):l};
+    const sec=(k,h)=>{const g=L.filter(x=>x.k===k);return g.length?`<h4>${h}</h4>${g.map(row).join('')}`:''};
+    const last=Math.max(0,...Object.values(NS).map(v=>v.at||0));
+    const html=`<header><b>Yeni sezonlar</b><button class="mns-x" data-nsx aria-label="Kapat">${IC.x}</button></header><div class="mns-l">${L.length?sec('new','Geldi')+sec('up','Yakında')+sec('tba','Tarihi belli değil')
+        :`<p class="mns-e">${nsBusy?'Kontrol ediliyor…':'İzlediğin dizi, anime ve filmlerde şimdilik yeni sezon görünmüyor.'}</p>`}</div>
+      <footer><span>${nsBusy?`Kontrol ediliyor · ${nsProg[0]}/${nsProg[1]}`:last?`Son kontrol ${new Date(last).toLocaleDateString('tr-TR',{day:'numeric',month:'short'})}`:''}</span><button data-nsr ${nsBusy?'disabled':''}>${IC.sync}Şimdi kontrol et</button></footer>`;
+    let m=old;if(!m){m=document.createElement('div');m.className='mnsp';m.setAttribute('role','dialog');m.setAttribute('aria-label','Yeni sezonlar');document.body.appendChild(m);anchor.setAttribute('aria-expanded','true');
+      m.addEventListener('click',e=>{const r=e.target.closest('[data-nsi]');if(r){m.remove();open(r.dataset.nsi);return}if(e.target.closest('[data-nsx]')){m.remove();return}if(e.target.closest('[data-nsr]'))nsRun(true)});
+      setTimeout(()=>addEventListener('pointerdown',function f(e){if(!m.isConnected){removeEventListener('pointerdown',f,true);return}if(!m.contains(e.target)&&!e.target.closest('.mc-ns')){m.remove();removeEventListener('pointerdown',f,true)}},true),0)}
+    const y=m.querySelector('.mns-l')?.scrollTop||0;m.innerHTML=html;m.querySelector('.mns-l').scrollTop=y;
+    const r=anchor.getBoundingClientRect(),w=Math.min(380,innerWidth-16);m.style.width=w+'px';m.style.top=(r.bottom+8)+'px';m.style.left=Math.max(8,Math.min(innerWidth-w-8,r.right-w))+'px'}
   /* bir kerelik onarım: kapağı MyAnimeList'ten gelmeyen animelere MAL posteri (elle seçilenlere dokunmaz; 7 günde bir yeniden dener) */
   let aniBusy=false;
   async function aniFix(){if(aniBusy||R.busy)return;const T=lsg('mc:anifix',{}),now=Date.now();
@@ -770,7 +821,7 @@ const Media=(()=>{
       const it=KB.addItem({type:t,title,year:y,status:f.s.value,tags:[TN[t].toLocaleLowerCase('tr')]});if(y)HINT.set(hk(it),{en:title,y:+y});close();say(`“${title}” eklendi — posteri aranıyor`);queue();open(it.id)})}
 
   /* sayfa değişince geçici arayüz kalmasın (Notlar route() çağırır) */
-  function dismiss(){spotOff(true);qa('.mset,.mrp,.mq,.ma-bg,.mnp').forEach(e=>e.remove())}
+  function dismiss(){spotOff(true);qa('.mset,.mrp,.mq,.ma-bg,.mnp,.mnsp').forEach(e=>e.remove())}
   // kaydırma, pencere değişimi, Esc → spot ışığı kapanır
   addEventListener('scroll',()=>{SPT.quiet=Date.now()+700;if(SPT.el)spotOff()},true);addEventListener('blur',()=>spotOff(true));addEventListener('resize',()=>spotOff(true));addEventListener('keydown',e=>{if(e.key==='Escape'&&SPT.el)spotOff()});
   return{render,refresh,detail,close,imgErr,imgOk,queue,addSheet,rateHTML,dismiss,patchCards,isMedia:t=>MT.includes(t),get st(){return st},get R(){return R},_rank:rank,_cleanG:cleanG,_yt:ytIds}})();

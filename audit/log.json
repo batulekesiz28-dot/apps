@@ -2834,5 +2834,28 @@
     "fix": "Menü katmanı panelin üstüne alındı"
    }
   ]
+ },
+ {
+  "at": "2026-11-16T22:45:26",
+  "change": "Takvim: doğum günleri (her yıl, yaş), her yıl tekrarlayan etkinlik, ay/yıl seçici, yaklaşan doğum günleri",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "fixed",
+    "text": "Doğum günü gibi her yıl tekrarlayan şeyler girilemiyordu; ileri tarihlere gitmek zahmetliydi",
+    "fix": "Doğum günü türü (yaşla), her yıl tekrarla, cümleyle ekleme, ay/yıl seçici, yaklaşan doğum günleri listesi"
+   }
+  ]
  }
 ]

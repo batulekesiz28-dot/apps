@@ -283,3 +283,23 @@
   .cal .tm-gs{height:62vh}
   .tmc-d{width:40px;height:40px;font-size:13px}.tmc-h .tb{width:40px;height:40px}.dp-a{height:40px}.ag-ev{min-height:44px}
 }
+
+/* ── doğum günleri ve her yıl tekrar eden etkinlikler ── */
+.tm-kind{display:flex;gap:2px;padding:3px;margin-bottom:12px;border-radius:10px;background:color-mix(in srgb,var(--ink) 5%,transparent)}
+.tm-kind button{flex:1;height:32px;border-radius:7px;font-size:13px;font-weight:500;color:var(--ink2);transition:background .2s,color .2s}
+.tm-kind button.on{background:var(--card);color:var(--ink);box-shadow:0 0 0 .5px var(--line2),0 1px 3px rgba(0,0,0,.1)}
+.tm-ed .tm-bd-only{display:none}.tm-ed.bday .tm-bd-only{display:grid}.tm-ed.bday p.tm-bd-only{display:block}.tm-ed.bday .tm-ev-only{display:none}
+.tm-ed.bday .tm-row.tm-bd-only{grid-template-columns:1fr 1fr}
+.tm-ed label small{font-weight:400;color:var(--ink3)}
+.tm-hint{margin:-4px 0 4px;font-size:12.5px;color:var(--ink3)}
+.tm-rep{display:flex;align-items:center;gap:8px;min-height:32px;font-size:13px;color:var(--ink2);cursor:pointer}.tm-rep input{width:16px;height:16px;accent-color:var(--accent)}.tm-rep small{color:var(--ink3)}
+.tm-mc.is-bd,.tm-chip.is-bd{font-weight:600}
+.bd-up .row{min-width:0}.bd-up .row>b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bd-up .row>small{flex-shrink:0;white-space:nowrap}
+.bd-up .row b small{display:inline;margin-left:4px;font-weight:400;color:var(--ink3)}
+/* ay/yıl seçici */
+.cal-mj{display:inline-flex;align-items:center;gap:6px;font:inherit;letter-spacing:inherit;color:inherit;padding:2px 8px;margin:-2px -8px;border-radius:10px;transition:background .2s}
+.cal-mj:hover{background:var(--hover)}.cal-mj .li{width:16px;height:16px;color:var(--ink3);fill:none;stroke:currentColor;stroke-width:1.6}
+.mj{padding:6px}.mj-y{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.mj-y b{font-size:15px;font-weight:600;font-variant-numeric:tabular-nums}
+.mj-g{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.mj-g button{height:38px;border-radius:9px;font-size:13.5px;color:var(--ink2);transition:background .15s}.mj-g button:hover{background:var(--hover);color:var(--ink)}
+.mj-g button.now{color:var(--accent);font-weight:600}.mj-g button.on{background:var(--ink);color:var(--bg)}

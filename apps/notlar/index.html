@@ -438,13 +438,13 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
 @media (max-width:760px){.pgb{min-height:58px}.tw,.tw0{width:36px;height:40px}.ni.tr{padding-left:calc(2px + var(--dp,0)*14px)}.sub-add{height:44px}.crumb .cr{height:40px;max-width:120px}.pgn{display:none}.mv-q{height:40px}}
 </style>
 <script>/* mat cam tasarımı: bir kereliğine koyu temaya geç (sonra tema düğmesi serbest) */try{if(!localStorage.getItem('notlar:glass1')){localStorage.setItem('notlar:glass1','1');localStorage.setItem('notlar:theme','"dark"')}}catch(e){}</script>
-<script src="../../shared/skin.js?v=20261116x"></script>
-<link rel="stylesheet" href="library.css?v=20261116x">
-<link rel="stylesheet" href="brain.css?v=20261116x">
-<link rel="stylesheet" href="media.css?v=20261116x">
-<link rel="stylesheet" href="time.css?v=20261116x">
-<link rel="stylesheet" href="tasks.css?v=20261116x">
-<link rel="stylesheet" href="ders.css?v=20261116x">
+<script src="../../shared/skin.js?v=20261116z"></script>
+<link rel="stylesheet" href="library.css?v=20261116z">
+<link rel="stylesheet" href="brain.css?v=20261116z">
+<link rel="stylesheet" href="media.css?v=20261116z">
+<link rel="stylesheet" href="time.css?v=20261116z">
+<link rel="stylesheet" href="tasks.css?v=20261116z">
+<link rel="stylesheet" href="ders.css?v=20261116z">
 <style id="tnavCss">
 /* ── Üst gezinme (sol menü yerine) — ince cam şerit, kayan seçili vurgu ── */
 .app,.app[data-mode=lib],.app[data-mode=brain]{grid-template-columns:1fr}
@@ -487,7 +487,7 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
 #app.pin-drag .tnav{box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--accent) 40%,transparent)}
 .tnav.pin-over{background:color-mix(in srgb,var(--accent) 12%,transparent)}
 </style>
-<link rel="stylesheet" href="glass.css?v=20261116x">
+<link rel="stylesheet" href="glass.css?v=20261116z">
 </head>
 <body>
 <div class="app" id="app">
@@ -532,13 +532,13 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
   </div>
 </div>
 <div class="toasts" id="toasts"></div>
-<script src="kb.js?v=20261116x"></script>
-<script src="library.js?v=20261116x"></script>
-<script src="media.js?v=20261116x"></script>
-<script src="brain.js?v=20261116x"></script>
-<script src="time.js?v=20261116x"></script>
-<script src="tasks.js?v=20261116x"></script>
-<script src="ders.js?v=20261116x"></script>
+<script src="kb.js?v=20261116z"></script>
+<script src="library.js?v=20261116z"></script>
+<script src="media.js?v=20261116z"></script>
+<script src="brain.js?v=20261116z"></script>
+<script src="time.js?v=20261116z"></script>
+<script src="tasks.js?v=20261116z"></script>
+<script src="ders.js?v=20261116z"></script>
 
 <script>
 'use strict';
@@ -929,7 +929,7 @@ function renderCal(dir,quiet){
     cells+=`<div class="cd${dd.getMonth()!==m?' out':''}${s===t?' today':''}${s===selDay?' sel':''}${i%7>4?' wk':''}" data-day="${s}"><span class="dn">${dd.getDate()}</span><div class="chips">${Time.monthChips(s)}${Tasks.monthChips(s)}${its.slice(0,3).map(p=>`<div class="c2" draggable="true" data-pid="${p.id}" title="${esc(titleOf(p))}">${iconOf(p)}<span>${esc(titleOf(p))}</span></div>`).join('')}${its.length>3?`<div class="more">+${its.length-3}</div>`:''}${fdn?`<div class="more fdn">📌 ${fdn} tarihli satır</div>`:''}</div></div>`}
   const isCur=y===new Date().getFullYear()&&m===new Date().getMonth();
   $('#view').innerHTML=`<div class="wide cal"><div>
-    <div class="cal-h"><h1>${MONTHS[m]} <em>${y}</em></h1>${Time.navGrp('cal','Önceki ay','Sonraki ay',isCur)}${Time.modeSeg()}</div>
+    <div class="cal-h"><h1><button class="cal-mj" data-mjump aria-haspopup="dialog" title="Ay ya da yıl seç">${MONTHS[m]} <em>${y}</em><svg class="li" viewBox="0 0 16 16" aria-hidden="true"><path d="m4.5 6.5 3.5 3.5 3.5-3.5"/></svg></button></h1>${Time.navGrp('cal','Önceki ay','Sonraki ay',isCur)}${Time.modeSeg()}</div>
     <div class="dow">${DOW.map(d=>`<span>${d}</span>`).join('')}</div>
     <div class="grid" id="grid" style="--wk:${weeks}">${cells}</div></div>
     <aside class="dp" id="dp"></aside></div>`;
@@ -937,14 +937,22 @@ function renderCal(dir,quiet){
   if(dir)anim($('#grid'),[{opacity:0,transform:`translateX(${dir*28}px)`},{opacity:1,transform:'none'}],{duration:480,easing:OUT});
   else if(!quiet)stagger('.cd');
 }
+// ay/yıl seçici: başlığa tıkla → yılı ‹ › ile değiştir, aya tıkla (ileri tarihlere hızlı gitmek için)
+function monthJump(anchor){let yy=calM.getFullYear();const draw=()=>`<div class="mj"><div class="mj-y"><button class="tb" data-mjy="-1" aria-label="Önceki yıl">${IC.chevL}</button><b>${yy}</b><button class="tb" data-mjy="1" aria-label="Sonraki yıl">${IC.chevR}</button></div>
+    <div class="mj-g">${MONTHS.map((n,i)=>`<button data-mjm="${i}" class="${yy===calM.getFullYear()&&i===calM.getMonth()?'on':''}${yy===new Date().getFullYear()&&i===new Date().getMonth()?' now':''}">${n.slice(0,3)}</button>`).join('')}</div></div>`;
+  const pop=float(anchor,draw(),{w:264});
+  pop.addEventListener('click',e=>{const y=e.target.closest('[data-mjy]');if(y){yy+=+y.dataset.mjy;pop.innerHTML=draw();return}
+    const m=e.target.closest('[data-mjm]');if(m){const nm=new Date(yy,+m.dataset.mjm,1),dir=nm>calM?1:-1;calM=nm;const sd=new Date(selDay+'T00:00');selDay=ymd(new Date(yy,+m.dataset.mjm,Math.min(sd.getDate(),new Date(yy,+m.dataset.mjm+1,0).getDate())));hideFloat();renderCal(dir)}})}
 function renderDay(animate){
   const its=[...pages.values()].filter(p=>p.date===selDay).sort((a,b)=>a.created-b.created);
   const quick=['daily','meet','todo','client','class','week'];
-  $('#dp').innerHTML=`${Time.qaHTML('Yeni etkinlik — ör. Spor 18:00 yarın',selDay)}${Time.calMode!=='month'?Time.miniCal(selDay):''}
+  const up=TM.upcoming(120).slice(0,6),dl=n=>n===0?'bugün':n===1?'yarın':`${n} gün sonra`;
+  $('#dp').innerHTML=`${Time.qaHTML('Yeni etkinlik — ör. “Spor 18:00 yarın” ya da “Ayşe doğum günü 12 mart”',selDay)}${Time.calMode!=='month'?Time.miniCal(selDay):''}
     <div class="dp-h"><div class="wd">${esc(fmtWd(selDay))}${selDay===today()?' · bugün':''}</div><h2>${esc(fmtShort(selDay))}</h2></div>
     ${Time.dayPanelExtra(selDay)}<div class="ag-sec"><div class="ag-h">Notlar</div><div class="lst">${its.length?its.map(p=>`<button class="row" data-pid="${p.id}"><span class="e">${iconOf(p)}</span><b>${esc(titleOf(p))}</b><small>${rel(p.updated)}</small></button>`).join(''):'<div class="ag-none">Bu güne bağlı not yok.</div>'}</div></div>
     ${(()=>{const e=dateIndex().get(selDay);return e&&e.blocks.length?`<div class="sh"><span>Bu güne tarihli satırlar</span><span class="rule"></span></div><div class="lst">${e.blocks.slice(0,8).map(o=>`<button class="row" data-pid="${o.p.id}"><span class="e">${o.b.t==='todo'?(o.b.c?'☑️':'⬜'):'📌'}</span><b>${esc(plain(o.b.h).slice(0,60))}</b><small>${esc(titleOf(o.p))}</small></button>`).join('')}</div>`:''})()}
-    <div class="dp-f"><button class="dp-a" data-day-open="${selDay}">${IC.plus} Günün notu</button><button class="dp-a" data-addday="">${IC.plus} Boş sayfa</button><button class="dp-a" data-addmore>Şablon…</button></div>`;
+    ${up.length?`<div class="ag-sec bd-up"><div class="ag-h">Yaklaşan doğum günleri</div><div class="lst">${up.map(({a,d,diff})=>`<button class="row" data-act-open="${a.id}"><span class="e">🎂</span><b>${esc(a.title)}${a.byear?` <small>· ${+d.slice(0,4)-a.byear}</small>`:''}</b><small>${esc(new Date(d+'T00:00').toLocaleDateString('tr-TR',{day:'numeric',month:'short'}))} · ${dl(diff)}</small></button>`).join('')}</div></div>`:''}
+    <div class="dp-f"><button class="dp-a" data-bday>🎂 Doğum günü</button><button class="dp-a" data-day-open="${selDay}">${IC.plus} Günün notu</button><button class="dp-a" data-addday="">${IC.plus} Boş sayfa</button><button class="dp-a" data-addmore>Şablon…</button></div>`;
   if(animate)anim($('#dp'),[{opacity:.3,transform:'translateY(4px)'},{opacity:1,transform:'none'}],{duration:360,easing:OUT});
 }
 function addOnDay(k,day){const t=TPL.find(x=>x.k===k);const p=newPage({tpl:k||undefined,date:day,title:k==='daily'?fmtLong(day):undefined});go('#p/'+p.id)}
@@ -952,6 +960,8 @@ function addOnDay(k,day){const t=TPL.find(x=>x.k===k);const p=newPage({tpl:k||un
 /* Global click delegation for views */
 $('#view').addEventListener('click',e=>{
   const g=e.target.closest('[data-go]');if(g){go(g.dataset.go);return}
+  if(e.target.closest('[data-bday]')){Time.newBday(selDay);return}
+  const mj=e.target.closest('[data-mjump]');if(mj){monthJump(mj);return}
   if(e.target.closest('[data-act=new]')){go('#p/'+newPage().id);return}
   const tp=e.target.closest('[data-tpl]');if(tp){const p=newPage({tpl:tp.dataset.tpl});go('#p/'+p.id);return}
   const cv=e.target.closest('[data-cal]');if(cv){const d=+cv.dataset.cal;if(d===0){const n=new Date();calM=new Date(n.getFullYear(),n.getMonth(),1);selDay=today();renderCal(1)}else{calM=new Date(calM.getFullYear(),calM.getMonth()+d,1);renderCal(d)}return}

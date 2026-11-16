@@ -55,6 +55,7 @@ Son güncelleme: 2026-11-15
 ## Takvim, Görevler
 | Alan | Geçerli karar |
 |---|---|
+| Doğum günleri / her yıl | Etkinlik `rep:'yearly'` her yıl görünür; doğum günü `kind:'bday'` (🎂, pembe, isteğe bağlı doğum yılı → yaş). Hızlı ekleme: “Ayşe doğum günü 12 mart (2004)”, “… her yıl/yıldönümü”. Düzenleyicide Etkinlik / Doğum günü seçimi. Gün panelinde “🎂 Doğum günü” düğmesi + Yaklaşan doğum günleri. Ay başlığına tıkla → ay/yıl seçici. Tekrarlayanlar sürüklenip taşınmaz. |
 | Takvim | Ay/hafta/gün; sade ızgara, aktiviteler kategori rengiyle ince. Ay ızgarasında görev sadece gösterge (`.tk-ci`), tamamlama gün panelinde. |
 | Görevler | Sade: 4 sekme (bugün, yaklaşan, tekrarlanan, tamamlananlar), tek satır hızlı ekleme. Kanban/proje/takvim görünümü **yok** (kodu silindi). |
 

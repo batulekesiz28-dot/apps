@@ -156,7 +156,7 @@ const Media=(()=>{
   /* ═ Spot ışığı: kapağın üstünde kısa bir an durunca ekranın geri kalanı bulanıklaşır, kapak yaylanarak öne çıkar.
      Puanlanmamışsa altta cam “★ Puanla” hapı: üstüne gelince açılır, imleci gezdirdikçe 1–10 akar, tıkla → kaydedilir. ═ */
   const SPT={t:0,card:null,el:null,v:0,block:null};
-  const SPOT_MS=2000; // imleç bir kapakta bu kadar durunca spot ışığı açılır (altında rahatça gezilebilsin diye)
+  const SPOT_MS=1000; // imleç bir kapakta bu kadar durunca spot ışığı açılır (altında rahatça gezilebilsin diye)
   const RW=['','Berbat','Kötü','Zayıf','Vasat','İdare eder','Fena değil','İyi','Çok iyi','Harika','Başyapıt'];
   const fineHover=()=>matchMedia('(hover:hover) and (pointer:fine)').matches;
   // free: imleç uzaklaşarak kapattı → aynı karta dönünce yeniden açılabilir; diğer kapanışlarda (puan, kaydırma, Esc) imleç karttan çıkana kadar açılmaz

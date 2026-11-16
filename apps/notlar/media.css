@@ -79,7 +79,9 @@
 .mc-card{position:relative;flex-shrink:0;width:var(--card);cursor:pointer;outline:none}
 .mc-art{position:relative;border-radius:var(--r);transition:transform .4s cubic-bezier(.2,.8,.2,1),box-shadow .4s;will-change:transform}
 .mp,.mw{position:relative;overflow:hidden;border-radius:var(--r);background:var(--mbg2);box-shadow:0 1px 0 rgba(255,255,255,.05) inset}
-.mp{aspect-ratio:2/calc(3 * var(--ar,1))}.mw{aspect-ratio:460/calc(215 * var(--ar,1))}
+.mp{aspect-ratio:2/calc(3 * var(--ar,1))}
+/* Animeler bölümü: MyAnimeList kapak oranı (~225×318) — kapak kırpılmadan oturur */
+.mc[data-sec=anime] .mp,.mc-shelf.an .mp,.mc-grid.an .mp{aspect-ratio:225/calc(318 * var(--ar,1))}.mw{aspect-ratio:460/calc(215 * var(--ar,1))}
 .mp img,.mw img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .45s}.mp img.ok,.mw img.ok{opacity:1}
 /* resim yoksa: içeriğin adıyla tasarlanmış kapak */
 .fp{position:absolute;inset:0;display:flex;flex-direction:column;padding:12% 11%;color:#fff;overflow:hidden;

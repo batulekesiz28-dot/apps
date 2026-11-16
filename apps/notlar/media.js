@@ -234,17 +234,18 @@ const Media=(()=>{
   const hasWide=it=>!!(it.wide||it.backdrop);
   // geniş karta sadece neredeyse hepsinin (%85) yatay görseli varsa geçilir; dikey poster geniş karta sığdırılırsa ince şerit kalacak kadar kırpılıyordu
   const wideOK=l=>{const a=l.filter(i=>i.cover||hasWide(i));return!a.length||a.filter(hasWide).length>=a.length*.85};
-  const vOf=(v,l=[])=>V()==='tv'?(v==='r'?'r':wideOK(l)?'w':'p'):V()==='compact'?'p':v;
+  // geniş kart (w/w2) her görünümde sadece yatay görseli olan raflarda; dikey poster geniş karta sığdırılıp aşırı kırpılmasın
+  const vOf=(v,l=[])=>V()==='tv'?(v==='r'?'r':wideOK(l)?'w':'p'):V()==='compact'?'p':((v==='w'||v==='w2')&&!wideOK(l)?'p':v);
   const likeIc=it=>it.like>0?`<span class="ml-lk up" title="Beğendim">${IC.up}</span>`:it.like<0?`<span class="ml-lk down" title="Beğenmedim">${IC.down}</span>`:'<span class="ml-lk none" title="Değerlendirmedim">—</span>';
   function lrow(it){const s=stName(it),c=st.look.lc;return`<article class="ml-r t-${it.type}" data-mi="${it.id}" tabindex="0" aria-label="${E(it.title)}">${c.cover?poster(it,'ml-p'):''}
       <span class="ml-t"><b>${E(it.title)}</b>${st.look.meta?`<small>${E(TN[it.type])}${metaShort(it)?' · '+metaShort(it):''}</small>`:''}</span>
       ${c.st?`<span class="ml-s">${s?E(s):'<i>—</i>'}</span>`:''}${c.rate?`<button class="ml-sc" data-mq="rate" title="Puanla" aria-label="${it.rating?`Puanım ${it.rating}/10 — değiştir`:'Puanla'}">${it.rating?`<b>${it.rating}</b><small>/10</small>`:`${IC.star}<i>Puanla</i>`}</button>`:''}${c.score?`<span class="ml-gs">${it.score?scoreTxt(it):'<i>—</i>'}</span>`:''}${c.like?likeIc(it):''}
       ${c.fav?`<button class="ml-f${it.fav?' on':''}" data-mq="fav" aria-pressed="${it.fav}" aria-label="${it.fav?'Favorilerden çıkar':'Favorilere ekle'}" title="Favori">${IC.heart}</button>`:''}</article>`}
   const listHTML=l=>{const c=st.look.lc;return`<div class="ml"><div class="ml-hd" aria-hidden="true">${c.cover?'<span></span>':''}<span>Ad</span>${c.st?'<span>Durum</span>':''}${c.rate?'<span>Puanım</span>':''}${c.score?'<span>Genel puan</span>':''}${c.like?'<span>Beğeni</span>':''}${c.fav?'<span></span>':''}</div>${l.map(lrow).join('')}</div>`};
-  const gridHTML=(l,s)=>V()==='list'?listHTML(l):(()=>{const tw=V()==='tv'&&wideOK(l);return`<div class="mc-grid v-${tw?'w':s==='games'?'g':'p'}">${l.map(it=>card(it,tw?'w':'p')).join('')}</div>`})();
+  const gridHTML=(l,s)=>V()==='list'?listHTML(l):(()=>{const tw=V()==='tv'&&wideOK(l);return`<div class="mc-grid v-${tw?'w':s==='games'?'g':'p'}${l.length&&l.every(i=>i.type==='anime')?' an':''}">${l.map(it=>card(it,tw?'w':'p')).join('')}</div>`})();
   function shelf(title,list,o={}){if(!list.length)return'';const v=vOf(o.v||'p',list);
     if(V()==='list')return`<section class="mc-shelf ml-shelf"><header><h2>${E(title)}</h2>${o.href?`<a class="mc-all" href="${o.href}">Tümünü gör${IC.r}</a>`:''}</header>${listHTML(list.slice(0,6))}</section>`;
-    return`<section class="mc-shelf${o.cls?' '+o.cls:''}"><header><h2>${E(title)}</h2>${o.sub?`<p>${E(o.sub)}</p>`:''}${o.href?`<a class="mc-all" href="${o.href}">Tümünü gör${IC.r}</a>`:''}</header>
+    return`<section class="mc-shelf${o.cls?' '+o.cls:''}${list.every(i=>i.type==='anime')?' an':''}"><header><h2>${E(title)}</h2>${o.sub?`<p>${E(o.sub)}</p>`:''}${o.href?`<a class="mc-all" href="${o.href}">Tümünü gör${IC.r}</a>`:''}</header>
       <div class="mc-rw"><button class="mc-arr l" data-row="-1" aria-label="Sola kaydır" tabindex="-1">${IC.l}</button><div class="mc-row v-${v}">${list.map((it,i)=>card(it,v,i+1)).join('')}</div><button class="mc-arr r" data-row="1" aria-label="Sağa kaydır" tabindex="-1">${IC.r}</button></div></section>`}
 
   /* ── öne çıkan alan ── */

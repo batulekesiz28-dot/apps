@@ -206,7 +206,7 @@ const Library=(()=>{
   /* ── detay ekranı ── */
   let dId=null;
   function media(it){const s=coverSrc(it);
-    if(it.type==='youtube'&&it.yt)return`<div class="ld-yt"><iframe src="https://www.youtube-nocookie.com/embed/${esc(it.yt)}?rel=0" title="${esc(it.title)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture; fullscreen" allowfullscreen loading="lazy"></iframe></div>`;
+    if(it.type==='youtube'&&it.yt)return`<div class="ld-yt">${VP.html({yt:it.yt,title:it.title,autoplay:false})}</div>`;
     if(it.type==='image'&&(s||it.file))return`<div class="ld-img">${s?`<img src="${esc(s)}" alt="${esc(it.title)}" referrerpolicy="no-referrer">`:''}</div>`;
     return`<div class="ld-cv">${cover(it,'xl')}${it.type==='pdf'?`<button class="ld-read" data-go="${it.id}">${sv('read')}${it.progress>.01?`Kaldığın yerden oku · %${Math.round(it.progress*100)}`:'Uygulamada oku'}</button>`:''}</div>`}
   function chipsCols(it){const cs=[...KB.cols.values()];return cs.map(c=>`<button class="cc${it.cols.includes(c.id)?' on':''}" data-tc="${c.id}" style="--c:${esc(c.color)}"><i></i>${esc(c.emoji)} ${esc(c.name)}</button>`).join('')+`<button class="cc add" data-act="newcol2">${sv('plus')}Yeni</button>`}
@@ -231,11 +231,11 @@ const Library=(()=>{
           <p class="hint">${KB.AI.ok()?'Öneriler sadece sen onaylarsan uygulanır.':'Claude anahtarı yok; yerel öneriler çalışır. Anahtarı Netleştir uygulamasından ekleyebilirsin.'}</p></section>
         <footer class="ld-f">${esc(fmtD(it.added))} tarihinde eklendi${it.opened?` · son açılış ${esc(rel(it.opened))}`:''}${it.file?` · ${esc(it.file.name)} (${size(it.file.size)}) — dosya bu cihazda`:''}</footer></div></article>`}
   function openDetail(id){const it=KB.items.get(id);if(!it){toast('İçerik bulunamadı');return go('#lib'+(st.base?'/'+st.base:''))}if(MEDIA.includes(it.type))return Media.detail(id);dId=id;touchOpened(it);
-    const bg=document.createElement('div');bg.className='ld-bg';bg.innerHTML=detailHTML(it);document.body.appendChild(bg);wireDetail(bg);
+    const bg=document.createElement('div');bg.className='ld-bg';bg.innerHTML=detailHTML(it);VP.scan(bg);document.body.appendChild(bg);wireDetail(bg);
     if(motionOK()){bg.animate([{opacity:0},{opacity:1}],{duration:200,easing:EASE});q('.ld',bg).animate([{opacity:0,transform:'translateY(24px) scale(.985)'},{opacity:1,transform:'none'}],{duration:520,easing:OUT})}
     setTimeout(()=>q('[data-dx]',bg)?.focus({preventScroll:true}),60)}
   function refreshDetail(){const bg=q('.ld-bg');if(!bg||!dId)return;const it=KB.items.get(dId);if(!it)return closeDetail();const a=document.activeElement;if(a&&bg.contains(a)&&a.matches('textarea,input,[contenteditable]'))return;
-    const sc=q('.ld-info',bg)?.scrollTop||0,yt=q('.ld-yt',bg);bg.innerHTML=detailHTML(it);if(yt)q('.ld-media .ld-yt',bg)?.replaceWith(yt);q('.ld-info',bg).scrollTop=sc}
+    const sc=q('.ld-info',bg)?.scrollTop||0,yt=q('.ld-yt',bg);bg.innerHTML=detailHTML(it);if(yt)q('.ld-media .ld-yt',bg)?.replaceWith(yt);else VP.scan(bg);q('.ld-info',bg).scrollTop=sc}
   function closeDetail(instant){Media.close(instant);const bg=q('.ld-bg');if(!bg)return;dId=null;if(instant||!motionOK())return bg.remove();bg.animate([{opacity:1},{opacity:0}],{duration:160,easing:EASE}).finished.then(()=>bg.remove(),()=>bg.remove())}
   const back=()=>{history.length>1&&location.hash.startsWith('#lib/i/')?history.back():go('#lib'+(st.base?'/'+st.base:''))};
   function wireDetail(bg){

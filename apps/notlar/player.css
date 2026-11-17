@@ -1,0 +1,42 @@
+/* Ortak video oynatıcı (player.js · VP). YouTube'un kendi arayüzü görünmez; denetimler sadece imleç üstündeyken, çıkınca anında kaybolur. */
+.vp{position:relative;display:block;width:100%;aspect-ratio:16/9;overflow:hidden;background:#000;color:#fff;border-radius:inherit;outline:none;cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;isolation:isolate}
+.vp-f{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000;pointer-events:none}
+.vp svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+/* kapak: başlarken ve (YouTube'da) duraklayınca/bitince — YouTube'un duraklatma ekranını örter */
+.vp-cv{position:absolute;inset:0;z-index:1;background:#000 center/cover no-repeat;opacity:0;pointer-events:none;transition:opacity .25s}
+.vp-cv::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,.28)}
+.vp.yt:is(.idle,.wait,.paused) .vp-cv,.vp.idle:not(.yt) .vp-cv{opacity:1}
+.vp:not(.yt) .vp-cv:not([style]){display:none}
+/* büyük oynat düğmesi: duraklayınca */
+.vp-big{position:absolute;left:50%;top:50%;z-index:2;display:grid;place-items:center;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;color:#fff;
+  background:rgba(0,0,0,.5);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.25),0 10px 30px -10px rgba(0,0,0,.6);
+  opacity:0;transform:scale(.88);pointer-events:none;transition:opacity .2s,transform .3s cubic-bezier(.2,.9,.3,1.2)}
+.vp-big svg{width:26px;height:26px;margin-left:3px}
+.vp.paused .vp-big{opacity:1;transform:none;pointer-events:auto}
+.vp-big:hover{background:rgba(0,0,0,.7)}.vp-big:focus-visible{outline:2px solid #fff;outline-offset:3px}
+/* yükleniyor */
+.vp.wait::after{content:"";position:absolute;left:50%;top:50%;z-index:2;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;border:2.5px solid rgba(255,255,255,.25);border-top-color:#fff;animation:vpspin .8s linear infinite}
+@keyframes vpspin{to{transform:rotate(360deg)}}
+/* alt şerit: sadece imleç üstündeyken (çıkınca geçişsiz, anında kaybolur) */
+.vp-ui{position:absolute;left:10px;right:10px;bottom:10px;z-index:3;display:flex;align-items:center;gap:2px;height:40px;padding:0 6px;border-radius:999px;cursor:default;
+  background:rgba(0,0,0,.55);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);
+  opacity:0;transform:translateY(6px);pointer-events:none;transition:none}
+@media (hover:hover){.vp:hover .vp-ui{opacity:1;transform:none;pointer-events:auto;transition:opacity .16s,transform .22s cubic-bezier(.2,.9,.3,1)}}
+.vp:is(.ui,.kb,.drag,:focus-visible,:has(.vp-ui :focus-visible)) .vp-ui{opacity:1;transform:none;pointer-events:auto;transition:opacity .16s,transform .22s cubic-bezier(.2,.9,.3,1)}
+.vp-ui button{display:grid;place-items:center;flex-shrink:0;width:32px;height:32px;border-radius:50%;color:#fff;transition:background .15s}
+.vp-ui button:hover{background:rgba(255,255,255,.16)}.vp-ui button:focus-visible{outline:2px solid #fff;outline-offset:-2px}
+.vp-pp svg{width:14px;height:14px}
+.vp-bar{position:relative;flex:1;min-width:40px;height:28px;margin:0 6px;cursor:pointer;touch-action:none;outline:none}
+.vp-bar::before,.vp-bar i{content:"";position:absolute;left:0;right:0;top:50%;height:4px;margin-top:-2px;border-radius:99px;background:rgba(255,255,255,.28);transition:height .15s,margin .15s}
+.vp-bar i{background:#fff;transform-origin:left;transform:scaleX(var(--p,0));transition:height .15s,margin .15s,transform .25s linear}
+.vp-bar::after{content:"";position:absolute;top:50%;left:calc(var(--p,0) * 100%);width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.5);transform:scale(0);transition:transform .15s}
+.vp-bar:is(:hover,:focus-visible)::before,.vp-bar:is(:hover,:focus-visible) i,.vp.drag .vp-bar::before,.vp.drag .vp-bar i{height:6px;margin-top:-3px}
+.vp-bar:is(:hover,:focus-visible)::after,.vp.drag .vp-bar::after{transform:scale(1)}
+.vp.drag .vp-bar i{transition:none}
+.vp-ui time{padding:0 6px 0 2px;font-size:12px;font-variant-numeric:tabular-nums;color:rgba(255,255,255,.85);white-space:nowrap}
+.vp.nr .vp-ui time{display:none}.vp.xs .vp-ui [data-vp="-10"],.vp.xs .vp-ui [data-vp="10"]{display:none}
+.vp:fullscreen{width:100vw;height:100vh;aspect-ratio:auto;border-radius:0}
+.vp-ph{width:100%;aspect-ratio:16/9;background:#000}
+@media (hover:none){.vp-ui{height:46px}.vp-ui button{width:40px;height:40px}}
+@media (prefers-reduced-motion:reduce){.vp-cv,.vp-big,.vp-ui,.vp-bar i,.vp-bar::after{transition:none!important}.vp.wait::after{animation-duration:2s}}
+html[data-motion=off] :is(.vp-cv,.vp-big,.vp-ui,.vp-bar i,.vp-bar::after){transition:none!important}

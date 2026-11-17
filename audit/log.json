@@ -3231,5 +3231,47 @@
     "text": "Gerçek YouTube/site önizlemesi bu ortamda denenemedi (internet yok); sahte yanıtlarla doğrulandı"
    }
   ]
+ },
+ {
+  "at": "2026-11-17",
+  "change": "Ortak video oynatıcı: YouTube'un kendi düğmeleri hiç görünmez; kendi denetimlerimiz sadece imleç üstündeyken (çıkınca anında kaybolur). Bağlantı önizlemesine boyut ayarı.",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "İlk saniyelerde duraklatılan video, ‘otomatik oynatma engellendi mi’ kontrolüyle sessizce yeniden başlıyordu",
+    "fix": "Kontrol sadece hiç başlamamış videoda çalışıyor"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Düğmeye tıklayıp klavye kullanınca denetimler imleç çıktıktan sonra da görünür kalıyordu",
+    "fix": "İmleç çıkınca odak bırakılıyor; Tab ile gezerken görünür kalıyor"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "open",
+    "text": "Vimeo videoları kendi oynatıcısıyla kalıyor (denetimleri dışarıdan gizlenemiyor)"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "open",
+    "text": "Gerçek YouTube'la denenemedi (internet yok); YouTube gibi davranan sahte oynatıcıyla doğrulandı. YouTube başlarken kısa süre başlık gösterebilir"
+   }
+  ]
  }
 ]

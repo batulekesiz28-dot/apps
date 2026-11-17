@@ -438,13 +438,14 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
 @media (max-width:760px){.pgb{min-height:58px}.tw,.tw0{width:36px;height:40px}.ni.tr{padding-left:calc(2px + var(--dp,0)*14px)}.sub-add{height:44px}.crumb .cr{height:40px;max-width:120px}.pgn{display:none}.mv-q{height:40px}}
 </style>
 <script>/* mat cam tasarımı: bir kereliğine koyu temaya geç (sonra tema düğmesi serbest) */try{if(!localStorage.getItem('notlar:glass1')){localStorage.setItem('notlar:glass1','1');localStorage.setItem('notlar:theme','"dark"')}}catch(e){}</script>
-<script src="../../shared/skin.js?v=20261117t"></script>
-<link rel="stylesheet" href="library.css?v=20261117t">
-<link rel="stylesheet" href="brain.css?v=20261117t">
-<link rel="stylesheet" href="media.css?v=20261117t">
-<link rel="stylesheet" href="time.css?v=20261117t">
-<link rel="stylesheet" href="tasks.css?v=20261117t">
-<link rel="stylesheet" href="ders.css?v=20261117t">
+<script src="../../shared/skin.js?v=20261117u"></script>
+<link rel="stylesheet" href="player.css?v=20261117u">
+<link rel="stylesheet" href="library.css?v=20261117u">
+<link rel="stylesheet" href="brain.css?v=20261117u">
+<link rel="stylesheet" href="media.css?v=20261117u">
+<link rel="stylesheet" href="time.css?v=20261117u">
+<link rel="stylesheet" href="tasks.css?v=20261117u">
+<link rel="stylesheet" href="ders.css?v=20261117u">
 <style id="tnavCss">
 /* ── Üst gezinme (sol menü yerine) — ince cam şerit, kayan seçili vurgu ── */
 .app,.app[data-mode=lib],.app[data-mode=brain]{grid-template-columns:1fr}
@@ -506,7 +507,7 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
 .lk-play{position:absolute;left:50%;top:50%;width:64px;height:64px;margin:-32px 0 0 -32px;display:grid;place-items:center;border-radius:50%;background:rgba(255,255,255,.92);box-shadow:0 10px 30px -8px rgba(0,0,0,.6);transition:transform .25s cubic-bezier(.2,.9,.3,1.3)}
 .lk-play svg{width:24px;height:24px;fill:#111;margin-left:3px}.lk-yt:hover .lk-play{transform:scale(1.08)}
 .lk-ycap{position:absolute;left:0;right:0;bottom:0;display:flex;flex-direction:column;gap:2px;padding:28px 16px 12px;color:#fff;background:linear-gradient(0deg,rgba(0,0,0,.75),transparent)}.lk-ycap b{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lk-ycap small{font-size:12px;opacity:.8}
-.lk-yt iframe{position:absolute;inset:0;width:100%;height:100%;border:0}.lk-yt.on .lk-play,.lk-yt.on .lk-ycap,.lk-yt.on .lk-x{display:none}
+.lk-yt>.vp{position:absolute;inset:0;height:100%;aspect-ratio:auto;cursor:pointer}.lk-yt.on .lk-play,.lk-yt.on .lk-ycap,.lk-yt.on .lk-x{display:none}
 .lk-img{position:relative;margin:0;outline:none;border-radius:10px}.lk-img img{display:block;max-width:100%;max-height:560px;border-radius:10px}
 .lk-x{position:absolute;top:8px;right:8px;z-index:2;display:grid;place-items:center;width:28px;height:28px;border-radius:8px;color:var(--ink2);background:var(--card);box-shadow:0 0 0 .5px var(--line2),0 4px 10px -4px rgba(0,0,0,.25);opacity:0;transition:opacity .15s}
 .lk-x svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round}
@@ -533,8 +534,12 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
 .txt a[href^="http"]:hover::after{background:var(--ink)}
 .blk.has-pv{flex-wrap:wrap}
 .lkpv{flex:0 0 100%;min-width:0;margin:6px 0 10px}
-.lkpv-c{position:relative;max-width:560px;border-radius:12px;overflow:hidden;background:var(--card);box-shadow:0 0 0 .5px var(--line2),0 10px 30px -18px rgba(0,0,0,.45)}
-.lkpv-v{position:relative;aspect-ratio:16/9;background:#000}.lkpv-v iframe,.lkpv-v video{position:absolute;inset:0;width:100%;height:100%;border:0}
+.lkpv-c{position:relative;width:min(100%,var(--lkpvw,560px));border-radius:12px;overflow:hidden;background:var(--card);box-shadow:0 0 0 .5px var(--line2),0 10px 30px -18px rgba(0,0,0,.45)}
+.lkpv-v{position:relative;aspect-ratio:16/9;background:#000}.lkpv-v iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.lkpv-r{position:absolute;right:0;bottom:0;z-index:4;width:22px;height:22px;cursor:nwse-resize;touch-action:none}
+.lkpv-r::after{content:"";position:absolute;right:5px;bottom:5px;width:9px;height:9px;border:solid var(--ink3);border-width:0 2px 2px 0;border-radius:0 0 3px 0;opacity:0;transition:opacity .15s}
+.lkpv-c:hover .lkpv-r::after,.lkpv-c.rs .lkpv-r::after{opacity:1}.lkpv-c.rs{user-select:none}
+@media (hover:none){.lkpv-r{width:36px;height:36px}.lkpv-r::after{opacity:1}}
 .lkpv-img{display:block;max-width:100%;max-height:420px;margin:0 auto}
 .lkpv .lk{margin:0;box-shadow:none;border-radius:0}.lkpv .lk-x{display:none}
 .lkpv-ld{display:flex;align-items:center;gap:10px;min-height:64px;padding:0 16px;font-size:13px;color:var(--ink3)}
@@ -546,7 +551,7 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
 @media (prefers-reduced-motion:reduce){.txt a[href^="http"]::after{transition:none}.lkpv-ld i{animation:none}}
 html[data-motion=off] .txt a[href^="http"]::after{transition:none}
 </style>
-<link rel="stylesheet" href="glass.css?v=20261117t">
+<link rel="stylesheet" href="glass.css?v=20261117u">
 </head>
 <body>
 <div class="app" id="app">
@@ -591,13 +596,14 @@ html[data-motion=off] .txt a[href^="http"]::after{transition:none}
   </div>
 </div>
 <div class="toasts" id="toasts"></div>
-<script src="kb.js?v=20261117t"></script>
-<script src="library.js?v=20261117t"></script>
-<script src="media.js?v=20261117t"></script>
-<script src="brain.js?v=20261117t"></script>
-<script src="time.js?v=20261117t"></script>
-<script src="tasks.js?v=20261117t"></script>
-<script src="ders.js?v=20261117t"></script>
+<script src="player.js?v=20261117u"></script>
+<script src="kb.js?v=20261117u"></script>
+<script src="library.js?v=20261117u"></script>
+<script src="media.js?v=20261117u"></script>
+<script src="brain.js?v=20261117u"></script>
+<script src="time.js?v=20261117u"></script>
+<script src="tasks.js?v=20261117u"></script>
+<script src="ders.js?v=20261117u"></script>
 
 <script>
 'use strict';
@@ -1020,7 +1026,7 @@ function addOnDay(k,day){const t=TPL.find(x=>x.k===k);const p=newPage({tpl:k||un
 $('#view').addEventListener('click',e=>{
   const g=e.target.closest('[data-go]');if(g){go(g.dataset.go);return}
   const lx=e.target.closest('[data-lkx]');if(lx&&P){e.preventDefault();e.stopPropagation();const b=blockOf(lx.closest('.blk').dataset.id);if(b){const u=b.url;Object.assign(b,{t:'p',h:`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(b.title&&b.kind!=='image'?b.title:u)}</a>`});['url','title','desc','img','site','fav','yt','kind','ld'].forEach(k=>delete b[k]);relinkNode(b);edited()}return}
-  const yp=e.target.closest('[data-lkplay]');if(yp&&!yp.querySelector('iframe')){const v=yp.dataset.lkplay;yp.insertAdjacentHTML('beforeend',`<iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(v)}?autoplay=1&rel=0&playsinline=1" title="YouTube videosu" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`);yp.classList.add('on');return}
+  const yp=e.target.closest('[data-lkplay]');if(yp&&!yp.querySelector('.vp')){const v=yp.dataset.lkplay;yp.append(VP.make({yt:v,title:yp.querySelector('.lk-ycap b')?.textContent||'YouTube videosu'}).el);yp.classList.add('on');return}
   if(e.target.closest('[data-bday]')){Time.newBday(selDay);return}
   const mj=e.target.closest('[data-mjump]');if(mj){monthJump(mj);return}
   if(e.target.closest('[data-act=new]')){go('#p/'+newPage().id);return}
@@ -1548,19 +1554,26 @@ function lkClose(blk){blk.querySelector(':scope>.lkpv')?.remove();blk.classList.
 function lkToggle(a){const blk=a.closest('.blk');if(!blk)return;const href=a.getAttribute('href'),cur=blk.querySelector(':scope>.lkpv');lkClose(blk);if(cur&&cur.dataset.u===href)return;
   const host=(()=>{try{return new URL(href).hostname.replace(/^www\./,'')}catch{return href}})(),yt=lkYT(href),vm=(href.match(/vimeo\.com\/(?:video\/)?(\d+)/)||[])[1];
   const p=document.createElement('div');p.className='lkpv';p.dataset.u=href;
-  const vid=id=>{const st=lkStart(href);return`<div class="lkpv-v"><iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?autoplay=1&rel=0&playsinline=1&modestbranding=1${st?'&start='+st:''}" title="YouTube videosu" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>`};
+  const vid=id=>VP.html({yt:id,start:lkStart(href),title:host});
   const bar=`<div class="lkpv-bar"><span title="${esc(href)}">${esc(host)}</span><button data-lkpo>Sekmede aç ↗</button><button data-lkpc aria-label="Önizlemeyi kapat">Kapat</button></div>`;
   let body;
   if(yt)body=vid(yt);
   else if(vm)body=`<div class="lkpv-v"><iframe src="https://player.vimeo.com/video/${vm}?autoplay=1" title="Vimeo videosu" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>`;
-  else if(/\.(mp4|webm|m4v|mov|ogv)(\?|#|$)/i.test(href))body=`<div class="lkpv-v"><video src="${esc(href)}" controls autoplay playsinline></video></div>`;
+  else if(/\.(mp4|webm|m4v|mov|ogv)(\?|#|$)/i.test(href))body=VP.html({src:href,title:host});
   else if(/\.(png|jpe?g|gif|webp|avif|svg)(\?|#|$)/i.test(href))body=`<img class="lkpv-img" src="${esc(href)}" alt="" loading="lazy">`;
   else body=`<div class="lkpv-ld" data-lkld><i></i>Önizleme hazırlanıyor…</div>`;
-  p.innerHTML=`<div class="lkpv-c">${body+bar}</div>`;blk.appendChild(p);blk.classList.add('has-pv');lkMark();
+  p.innerHTML=`<div class="lkpv-c">${body+bar}<span class="lkpv-r" title="Sürükle: boyutlandır · çift tık: varsayılan" aria-hidden="true"></span></div>`;VP.scan(p);lkSize(p);blk.appendChild(p);blk.classList.add('has-pv');lkMark();
   if(!motionOff())p.animate([{opacity:0,transform:'translateY(-6px)'},{opacity:1,transform:'none'}],{duration:260,easing:'cubic-bezier(.2,.9,.3,1)'});
   p.addEventListener('click',e=>{if(e.target.closest('[data-lkpo]')){openHref(href);return}if(e.target.closest('[data-lkpc]'))lkClose(blk)});
   const ld=p.querySelector('[data-lkld]');if(ld)(async()=>{let m={};try{m=await Library.meta(href)}catch{}if(!p.isConnected)return;
-    ld.outerHTML=m.yt?vid(m.yt):linkCard({url:href,title:m.title||host,desc:m.desc||'',img:m.cover&&m.type!=='image'?m.cover:'',site:m.site||'',fav:m.favicon||'',kind:m.type||'web'})})()}
+    ld.outerHTML=m.yt?vid(m.yt):linkCard({url:href,title:m.title||host,desc:m.desc||'',img:m.cover&&m.type!=='image'?m.cover:'',site:m.site||'',fav:m.favicon||'',kind:m.type||'web'});VP.scan(p)})()}
+/* önizleme boyu: sağ alt köşeden sürükle (hepsi için aynı genişlik, notlar:lkpvw); çift tık → varsayılan 560 */
+function lkSize(p){const h=p.querySelector('.lkpv-r'),c=p.querySelector('.lkpv-c');if(!h)return;
+  h.addEventListener('pointerdown',e=>{if(e.button)return;e.preventDefault();e.stopPropagation();try{h.setPointerCapture(e.pointerId)}catch{}const x0=e.clientX,w0=c.getBoundingClientRect().width,mx=p.getBoundingClientRect().width;c.classList.add('rs');
+    const mv=ev=>{const w=Math.round(Math.max(240,Math.min(mx,w0+ev.clientX-x0)));document.documentElement.style.setProperty('--lkpvw',w+'px')},up=()=>{h.removeEventListener('pointermove',mv);h.removeEventListener('pointerup',up);h.removeEventListener('pointercancel',up);c.classList.remove('rs');try{localStorage.setItem('notlar:lkpvw',parseInt(getComputedStyle(document.documentElement).getPropertyValue('--lkpvw'))||560)}catch{}};
+    h.addEventListener('pointermove',mv);h.addEventListener('pointerup',up);h.addEventListener('pointercancel',up)});
+  h.addEventListener('dblclick',e=>{e.stopPropagation();document.documentElement.style.setProperty('--lkpvw','560px');try{localStorage.removeItem('notlar:lkpvw')}catch{}})}
+try{const w=+localStorage.getItem('notlar:lkpvw');if(w)document.documentElement.style.setProperty('--lkpvw',w+'px')}catch{}
 $('#view').addEventListener('mouseover',e=>{const a=e.target.closest?.('.txt a[href]');if(!a||view!=='page'){return}clearTimeout(lkT);if(lkEl&&lkEl._a===a)return;lkT=setTimeout(()=>{lkShow(a);if(lkEl)lkEl._a=a},350)});
 $('#view').addEventListener('mouseout',e=>{const a=e.target.closest?.('.txt a[href]');if(a&&!a.contains(e.relatedTarget)){clearTimeout(lkT);lkT=setTimeout(()=>{if(lkEl&&!lkEl.matches(':hover'))lkHide()},250)}});
 // tıklayınca aç (yazı seçerken değil); Alt+tık → imleci link içine koy (düzenleme)

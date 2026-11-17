@@ -620,7 +620,8 @@ html[data-motion=off] .msp-x{transition:none;transform:none}
 .msp-yv.ok .msp-yf{opacity:1}.msp-yv.ok .msp-yth{opacity:0}
 .msp-ym{position:absolute;right:10px;bottom:10px;z-index:2;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;color:#fff;background:rgba(0,0,0,.55);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2)}
 .msp-ym .mvi{width:15px;height:15px}.msp-yv:hover .msp-ym{background:rgba(0,0,0,.75)}
-.msp-ym{opacity:0;transition:opacity .3s}.msp-yv.ok .msp-ym{opacity:1}
+/* fragman denetimleri sadece imleç üstündeyken; çıkınca geçişsiz, anında kaybolur */
+.msp-ym{opacity:0;pointer-events:none;transition:none}.msp-yv.ok:is(:hover,.kb,.skd,:has(:focus-visible)) .msp-ym{opacity:1;pointer-events:auto;transition:opacity .16s}
 @media (prefers-reduced-motion:reduce){.msp-yt{transition:opacity .2s;transform:none}}
 html[data-motion=off] .msp-yt{transition:none;transform:none}
 /* fragman boyutu: dış alt köşeden sürükle (çift tık: varsayılan) */
@@ -631,14 +632,10 @@ html[data-motion=off] .msp-yt{transition:none;transform:none}
 .msp-yt:hover .msp-yr::after,.msp-yt.rs .msp-yr::after{opacity:1}
 .msp-yt.rs .msp-yf{pointer-events:none}.msp-yt.rs{transition:none}
 /* sarma: üstüne gelince alt şerit (10 sn geri · çubuk · 10 sn ileri · süre); yokken altta ince ilerleme çizgisi */
-.msp-pg{position:absolute;left:0;right:0;bottom:0;z-index:1;height:3px;background:rgba(255,255,255,.18);opacity:0;transition:opacity .3s;pointer-events:none}
-.msp-pg i{position:absolute;inset:0;background:rgba(255,255,255,.85);transform-origin:left;transform:scaleX(var(--p,0));transition:transform .25s linear}
-.msp-yv.ok.hsk .msp-pg{opacity:1}
 .msp-sk{position:absolute;left:10px;right:94px;bottom:10px;z-index:2;display:flex;align-items:center;gap:2px;height:34px;padding:0 12px 0 2px;border-radius:999px;color:#fff;cursor:default;
   background:rgba(0,0,0,.55);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);
-  opacity:0;transform:translateY(6px);transition:opacity .25s,transform .3s cubic-bezier(.2,.9,.3,1);pointer-events:none}
-.msp-yv.ok.hsk:is(:hover,:focus-within,.kb,.skd) .msp-sk{opacity:1;transform:none;pointer-events:auto}
-.msp-yv.ok.hsk:is(:hover,:focus-within,.kb,.skd) .msp-pg{opacity:0}
+  opacity:0;transform:translateY(6px);transition:none;pointer-events:none}
+.msp-yv.ok.hsk:is(:hover,.kb,.skd,:has(:focus-visible)) .msp-sk{opacity:1;transform:none;pointer-events:auto;transition:opacity .16s,transform .22s cubic-bezier(.2,.9,.3,1)}
 .msp-sk button{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;flex-shrink:0;color:#fff;transition:background .15s}
 .msp-sk button:hover{background:rgba(255,255,255,.16)}.msp-sk button:focus-visible{outline:2px solid #fff;outline-offset:-2px}
 .msp-sk .mvi{width:14px;height:14px}
@@ -648,12 +645,12 @@ html[data-motion=off] .msp-yt{transition:none;transform:none}
 .msp-bar::after{content:"";position:absolute;top:50%;left:calc(var(--p,0) * 100%);width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.5);transform:scale(0);transition:transform .15s}
 .msp-bar:is(:hover,:focus-visible)::before,.msp-bar:is(:hover,:focus-visible) i,.skd .msp-bar::before,.skd .msp-bar i{height:6px;margin-top:-3px}
 .msp-bar:is(:hover,:focus-visible)::after,.skd .msp-bar::after{transform:scale(1)}
-.skd .msp-bar i,.skd .msp-pg i{transition:none}
+.skd .msp-bar i{transition:none}
 .msp-sk time{font-size:12px;font-variant-numeric:tabular-nums;color:rgba(255,255,255,.85);white-space:nowrap}
 .msp-yv.nr .msp-sk time{display:none}.msp-yv.nr .msp-sk{padding-right:4px}
-.msp-yv.xs .msp-sk{display:none}.msp-yv.ok.hsk.xs:hover .msp-pg{opacity:1}
-@media (prefers-reduced-motion:reduce){.msp-sk,.msp-pg i,.msp-bar i{transition:opacity .2s}}
-html[data-motion=off] :is(.msp-sk,.msp-pg i,.msp-bar i,.msp-bar::after){transition:none}
+.msp-yv.xs .msp-sk{display:none}
+@media (prefers-reduced-motion:reduce){.msp-yv .msp-sk,.msp-bar i{transition:none!important}}
+html[data-motion=off] :is(.msp-yv .msp-sk,.msp-yv .msp-ym,.msp-bar i,.msp-bar::after){transition:none!important}
 
 /* Notlarım: Workspace notları ↔ Medya */
 .mx-notes h3 span{margin-left:6px;font-size:12px;font-weight:600;color:var(--mink3)}
@@ -740,9 +737,7 @@ html[data-motion=off] :is(.msp-sk,.msp-pg i,.msp-bar i,.msp-bar::after){transiti
 .mpip-h{display:flex;align-items:center;gap:8px;height:38px;padding:0 6px 0 12px;background:#141418;cursor:grab;touch-action:none;user-select:none}
 .mpip.drag .mpip-h{cursor:grabbing}.mpip-h b{flex:1;min-width:0;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mpip-h button{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;color:rgba(255,255,255,.7)}.mpip-h button:hover{background:rgba(255,255,255,.1);color:#fff}.mpip-h .mvi{width:14px;height:14px}
-.mpip-k{display:flex;align-items:center;gap:0;flex-shrink:0}
-.mpip-k time{min-width:44px;padding:0 2px;font-size:12px;font-variant-numeric:tabular-nums;text-align:center;color:rgba(255,255,255,.7);white-space:nowrap}
-.mpip-v{position:relative;aspect-ratio:16/9}.mpip-v iframe,.mpip-v video{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}
+.mpip-v{position:relative;aspect-ratio:16/9}.mpip-v>.vp{position:absolute;inset:0;height:100%;aspect-ratio:auto}
 .mpip.drag .mpip-v{pointer-events:none}
 .mpip-r{position:absolute;right:0;bottom:0;width:22px;height:22px;cursor:nwse-resize;touch-action:none;z-index:2}
 .mpip-r::after{content:"";position:absolute;right:5px;bottom:5px;width:9px;height:9px;border-right:2px solid rgba(255,255,255,.7);border-bottom:2px solid rgba(255,255,255,.7);border-radius:0 0 3px 0;opacity:0;transition:opacity .2s}

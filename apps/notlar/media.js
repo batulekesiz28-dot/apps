@@ -57,14 +57,14 @@ const Media=(()=>{
     vls:S('<rect x="1.5" y="2.5" width="3" height="3" rx=".6"/><rect x="1.5" y="10.5" width="3" height="3" rx=".6"/><path d="M6.5 4h8M6.5 12h8"/>'),home:S('<path d="M2.5 7.5L8 3l5.5 4.5M4 6.5V13h8V6.5"/>'),
     minus:S('<path d="M3 8h10"/>'),sync:S('<path d="M13 8a5 5 0 0 1-9 3M3 8a5 5 0 0 1 9-3"/><path d="M12 2v3h-3M4 14v-3h3"/>')};
   // ana sayfa rafları (sırası ve görünürlüğü kullanıcıda) · liste sütunları
-  const SH={cont:'Kaldığın yerden devam et',notes:'Not aldıkların',movies:'Filmler',series:'Diziler',anime:'Animeler',games:'Oyunlar',books:'Kitaplar',fav:'Favorilerin',top:'En sevdiklerin',docs:'Belgeler'};
+  const SH={cont:'Kaldığın yerden devam et',arec:'Yeni çıkan popüler animeler',notes:'Not aldıkların',movies:'Filmler',series:'Diziler',anime:'Animeler',games:'Oyunlar',books:'Kitaplar',fav:'Favorilerin',top:'En sevdiklerin',docs:'Belgeler'};
   const LC=[['cover','Kapak'],['st','Durum'],['rate','Puanım'],['score','Genel puan'],['like','Beğeni'],['fav','Favori']];
   const LOOK0={view:'tv',cover:100,icon:'m',font:'m',gap:100,dens:'n',radius:8,ar:100,title:1,meta:1,badge:1,hero:1,rowh:100,
     lc:{cover:1,st:1,rate:1,score:0,like:1,fav:1},shelves:Object.keys(SH),off:[],tabsOff:[]};
   /* görünüm her bölüm için AYRI (ana sayfa, filmler, diziler, animeler, oyunlar, kitaplar): mc:look:<bölüm>.
      İlk açılışta ortak eski ayar (mc:look) kopyalanır; üstteki kategori sekmeleri (tabsOff) ortak kalır. */
   function loadLook(sec='home'){const g=lsg('mc:look',{})||{},s=lsg('mc:look:'+sec,null)||g,L={...LOOK0,...s,lc:{...LOOK0.lc,...(s.lc||{})}};
-    L.shelves=[...(Array.isArray(s.shelves)?s.shelves.filter(k=>SH[k]):[]),...Object.keys(SH)].filter((k,i,a)=>a.indexOf(k)===i);
+    L.shelves=(Array.isArray(s.shelves)?s.shelves.filter(k=>SH[k]):[]).filter((k,i,a)=>a.indexOf(k)===i);Object.keys(SH).forEach((k,i)=>{if(!L.shelves.includes(k))L.shelves.splice(Math.min(i,L.shelves.length),0,k)});
     L.off=(Array.isArray(s.off)?s.off:[]).filter(k=>SH[k]);L.tabsOff=Array.isArray(g.tabsOff)?g.tabsOff:[];return L}
   const st={sec:'home',page:'home',qs:'',genre:'',sort:lsg('mc:sort','added'),kind:'',min:0,hero:0,base:[],look:loadLook()};
   const V=()=>st.look.view;
@@ -230,7 +230,7 @@ const Media=(()=>{
   function lazy(html){if(!html)return'';const k='z'+(++lzN);LZ.set(k,html);return`<div class="mc-lz" data-lz="${k}"></div>`}
   function lazyWatch(){io?.disconnect();if(!('IntersectionObserver'in window)){qa('.mc [data-lz]').forEach(fillLz);return}
     io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){io.unobserve(e.target);fillLz(e.target)}}),{root:q('#scroll'),rootMargin:'900px 0px'});qa('.mc [data-lz]').forEach(z=>io.observe(z))}
-  function fillLz(z){const h=LZ.get(z.dataset.lz);LZ.delete(z.dataset.lz);if(h==null)return;z.outerHTML=h;arrows()}
+  function fillLz(z){const h=LZ.get(z.dataset.lz);LZ.delete(z.dataset.lz);if(h==null)return;z.outerHTML=h;arrows();if(h.includes('data-arec'))arecFill()}
   /* görünüm: tv = Apple TV (geniş büyük kapaklar) · nf = Netflix (yoğun posterler) · compact (küçük, az metin) · list (satırlar) */
   // Apple TV: kart şeklini kapaklar belirler — yatay görseli olanların çoğunluğu varsa geniş kart, yoksa büyük dikey poster (küçültülmüş/bulanık poster yok)
   const hasWide=it=>!!(it.wide||it.backdrop);
@@ -307,6 +307,7 @@ const Media=(()=>{
       books:()=>shelf(SH.books,byAdded(of('book')).slice(0,20),{cls:'books',href:'#lib/m/books'}),
       fav:()=>shelf(SH.fav,byTouch(l.filter(i=>i.fav)),{}),
       top:()=>shelf(SH.top,byScore(w.filter(i=>i.status==='done')).slice(0,10),{v:'r',sub:'İzlediklerin arasında en yüksek puanlılar'}),
+      arec:()=>recShelf(),
       notes:()=>{const N=noteIndex();return shelf(SH.notes,l.filter(i=>N.has(i.id)).sort((a,b)=>N.get(b.id)[0].updated-N.get(a.id)[0].updated).slice(0,20),{sub:'Workspace’teki notlarına bağlı yapımlar'})},
       docs:()=>docsShelf()};
     const rows=L.shelves.filter(k=>!L.off.includes(k)).map((k,n)=>n<3?H[k]():lazy(H[k]())).join('');
@@ -322,6 +323,7 @@ const Media=(()=>{
   function secHome(s){const l=all().filter(i=>inSec(i,s));if(!l.length)return secEmpty(s,'home');const g=s==='games',b=s==='books',ser=s==='series'||s==='anime';
     const genres=topGenres(l).slice(0,4),p=k=>l.filter(i=>stOf(i)===k);
     return hero(featured(l))+`<div class="mc-shelves">
+      ${s==='anime'?recShelf():''}
       ${shelf(g?'Şu an oynadıkların':b?'Okuduğun kitaplar':'Devam ettiklerin',byTouch(p('doing')),{v:g?'w':b?'p':'w2',href:`#lib/m/${s}/doing`})}
       ${shelf(g?'Oynamak istediklerin':b?'Okumak istediklerin':'İzlemek istediklerin',byScore(p('todo')),{href:`#lib/m/${s}/todo`})}
       ${shelf('Son eklenenler',byAdded(l).slice(0,20),{href:`#lib/m/${s}/all`})}
@@ -329,6 +331,39 @@ const Media=(()=>{
       ${lazy(shelf(g?'En yüksek puanlı oyunların':b?'Okudukların':'En yüksek puanlılar',byScore(l.filter(i=>['done','played'].includes(stOf(i)))).slice(0,10),{v:b?'p':'r',href:`#lib/m/${s}/${g?'played':'done'}`}))}
       ${genres.map(gn=>lazy(shelf(gn,byScore(l.filter(i=>i.genres.includes(gn))).slice(0,18),{href:`#lib/m/${s}/all?g=${encodeURIComponent(gn)}`}))).join('')}
       ${lazy(shelf('Favorilerin',l.filter(i=>i.fav),{href:`#lib/m/${s}/fav`}))}</div>`}
+  /* ═ Yeni çıkan popüler animeler (öneri): MyAnimeList “bu sezon” (Jikan seasons/now, 2 sayfa) → listende olmayanlar,
+     takipçi sayısına göre + sevdiğin türlere uyanlar öne. 12 saat önbellek (mc:arec). Kart → önizleme (özet, puan) → “İzlemek istiyorum”. ═ */
+  const AREC_TTL=12*36e5;let arecP=null;
+  const arecPack=d=>({mal:d.mal_id,t:d.title_english||d.title,o:d.title,img:malCover(d),sc:d.score||0,mem:d.members||0,eps:d.episodes||0,g:(d.genres||[]).concat((d.themes||[]).slice(0,1)).map(x=>cleanG(x.name)).filter(Boolean).slice(0,4),
+    syn:String(d.synopsis||'').replace(/\s*\[Written by MAL Rewrite\]\s*/,'').slice(0,900),y:d.year||+(d.aired?.from||'').slice(0,4)||0,from:(d.aired?.from||'').slice(0,10),tr:d.trailer?.youtube_id||'',st:(d.studios||[]).map(x=>x.name).slice(0,2).join(', '),air:d.status==='Currently Airing'});
+  function arecLoad(force){const c=lsg('mc:arec',null);if(!force&&c&&Date.now()-c.at<AREC_TTL)return Promise.resolve(c.d);if(arecP)return arecP;
+    arecP=(async()=>{try{const out=[],seen=new Set();for(const pg of[1,2]){const j=await jget(`https://api.jikan.moe/v4/seasons/now?sfw=true&limit=25&page=${pg}`);for(const d of j?.data||[]){if(seen.has(d.mal_id))continue;seen.add(d.mal_id);out.push(arecPack(d))}if(!j?.pagination?.has_next_page)break}
+        if(out.length)lss('mc:arec',{at:Date.now(),d:out});return out}catch(e){return c?.d||[]}finally{arecP=null}})();return arecP}
+  function arecPick(list){const mine=[...KB.items.values()].filter(i=>i.type==='anime'),mal=new Set(mine.map(i=>String(i.mal)).filter(Boolean)),tt=new Set(mine.map(i=>norm(i.title)));
+    const fav=new Map();mine.filter(i=>['done','doing'].includes(stOf(i))&&(i.rating>=7||i.like>0||i.fav||!i.rating)).forEach(i=>i.genres.forEach(g=>fav.set(g,(fav.get(g)||0)+1)));
+    return list.filter(d=>!mal.has(String(d.mal))&&!tt.has(norm(d.t))&&!tt.has(norm(d.o))).map(d=>{const why=d.g.filter(g=>fav.has(g));return{...d,why,rk:Math.log10(1+d.mem)+why.reduce((a,g)=>a+Math.min(1,fav.get(g)/3),0)*.6+(d.sc||0)/20}}).sort((a,b)=>b.rk-a.rk).slice(0,20)}
+  const arecCard=d=>`<article class="mc-card v-p t-anime mrc" data-rid="${d.mal}" tabindex="0" aria-label="${E(d.t)} — önizle"><div class="mc-art"><div class="mp">${d.img?`<img src="${E(d.img)}" alt="" loading="lazy" referrerpolicy="no-referrer" onload="Media.imgOk(this)">`:''}</div>${d.sc?`<span class="mc-sc"><i>MAL</i>${d.sc.toFixed(1)}</span>`:''}${d.air?'<span class="mrc-new">Yeni</span>':''}</div>
+    <div class="mc-cap"><b>${E(d.t)}</b><small>${E([d.g.slice(0,2).join(', '),d.eps?d.eps+' bölüm':''].filter(Boolean).join(' · ')||'Anime')}</small></div></article>`;
+  function recShelf(){return`<section class="mc-shelf an mrec" data-arec><header><h2>Yeni çıkan popüler animeler</h2><p>Bu sezon yayında · listende olmayanlar · sevdiğin türler önde</p></header>
+    <div class="mc-rw"><button class="mc-arr l" data-row="-1" aria-label="Sola kaydır" tabindex="-1">${IC.l}</button><div class="mc-row v-p">${'<article class="mc-card v-p mrc-sk"><div class="mc-art"><div class="mp"></div></div></article>'.repeat(6)}</div><button class="mc-arr r" data-row="1" aria-label="Sağa kaydır" tabindex="-1">${IC.r}</button></div></section>`}
+  let arecData=[];
+  async function arecFill(){const box=qa('#view>.mc [data-arec]');if(!box.length)return;const L=arecPick(await arecLoad());arecData=L;
+    for(const b of qa('#view>.mc [data-arec]')){if(!L.length){b.remove();continue}b.querySelector('.mc-row').innerHTML=L.map(arecCard).join('')}}
+  function arecOpen(id){const d=arecData.find(x=>String(x.mal)===String(id));if(!d)return;q('.mrcp-bg')?.remove();const bg=document.createElement('div');bg.className='mrcp-bg';
+    const meta=[d.y?String(d.y):'',d.eps?d.eps+' bölüm':'',d.st].filter(Boolean).join(' · '),when=d.air?'Şu an yayında':d.from?new Date(d.from+'T00:00').toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'})+' tarihinde başlıyor':'';
+    bg.innerHTML=`<div class="mrcp" role="dialog" aria-modal="true" aria-label="${E(d.t)}"><button class="mns-x mrcp-x" data-rx aria-label="Kapat">${IC.x}</button>
+      <div class="mrcp-p">${d.img?`<img src="${E(d.img)}" alt="" referrerpolicy="no-referrer">`:''}</div>
+      <div class="mrcp-b"><span class="mrcp-k">${E(when)}</span><h3>${E(d.t)}</h3>${d.o&&d.o!==d.t?`<p class="mrcp-o">${E(d.o)}</p>`:''}
+        <p class="mrcp-m">${d.sc?`<span class="mc-sc"><i>MAL</i>${d.sc.toFixed(1)}</span>`:''}${E(meta)}</p>
+        ${d.g.length?`<p class="mrcp-g">${d.g.map(g=>`<span class="${d.why.includes(g)?'on':''}">${E(g)}</span>`).join('')}</p>`:''}
+        ${d.why.length?`<p class="mrcp-w">${E(d.why.slice(0,2).join(' ve '))} sevdiğin için önerildi</p>`:''}
+        ${d.syn?`<p class="mrcp-s">${E(d.syn)}</p>`:''}
+        <div class="mrcp-a"><button class="mb pri" data-radd>${IC.plus}İzlemek istiyorum</button>${d.tr?`<a class="mb" href="https://www.youtube.com/watch?v=${E(d.tr)}" target="_blank" rel="noopener">${IC.play}Fragman</a>`:''}<a class="mb" href="https://myanimelist.net/anime/${d.mal}" target="_blank" rel="noopener">MyAnimeList${IC.r}</a></div></div></div>`;
+    document.body.appendChild(bg);if(motion())bg.firstElementChild.animate([{opacity:0,transform:'translateY(10px) scale(.98)'},{opacity:1,transform:'none'}],{duration:320,easing:'cubic-bezier(.16,1,.3,1)'});bg.querySelector('[data-radd]').focus();
+    const close=()=>bg.remove();bg.addEventListener('click',e=>{if(e.target===bg||e.target.closest('[data-rx]'))return close();
+      if(e.target.closest('[data-radd]')){const it=KB.addItem({type:'anime',title:d.t,year:d.y?String(d.y):'',mal:String(d.mal),cover:d.img,eps:d.eps,genres:d.g,desc:d.syn,status:'todo',match:'ok',metaAt:Date.now(),reviewed:true,tags:['anime']});
+        close();say(`“${d.t}” izlemek istediklerine eklendi`);arecData=arecData.filter(x=>x!==d);qa(`[data-rid="${d.mal}"]`).forEach(c=>c.remove())}});
+    bg.addEventListener('keydown',e=>{if(e.key==='Escape'){e.stopPropagation();close()}})}
   function topGenres(l){const m=new Map();l.forEach(i=>i.genres.forEach(g=>m.set(g,(m.get(g)||0)+1)));return[...m].filter(x=>x[1]>=3).sort((a,b)=>b[1]-a[1]).map(x=>x[0])}
   function secEmpty(s,page){const g=s==='games',b=s==='books',m={home:[g?'Oyun kütüphanen boş':b?'Henüz kitap yok':'Henüz bir şey yok',g?'Oynadığın ya da oynamak istediğin oyunları ekle; Steam kapakları ve platform bilgisi otomatik gelir.':b?'Bir kitap ekle; kapağı ve yazarı otomatik bulunur.':'Bir içerik ekle; posteri, yılı ve türü otomatik bulunur.'],dropped:['Yarım bıraktığın bir şey yok','Bir diziyi “Yarım bıraktım” yaparsan burada durur.'],
       done:['Henüz izlediğin bir şey yok','Bir içeriği “İzledim” olarak işaretlediğinde burada görünür.'],doing:[g?'Şu an oynadığın bir oyun yok':'Devam ettiğin bir şey yok',g?'Bir oyunu “Oynuyorum” yap, burada bekler.':'Bir diziyi “İzliyorum” yap; kaldığın sezon/bölümü de tutarım.'],
@@ -383,7 +418,7 @@ const Media=(()=>{
     document.getElementById('app')?.classList.add('mc-on');
     if(typeof setCrumb==='function')setCrumb(IC.play,st.sec==='home'?'Medya':SEC[st.sec].n,'');
     if(changed&&!o.soft)q('#scroll').scrollTop=0;else if(changed)q('#scroll').scrollTop=0;
-    heroStart();arrows();lazyWatch();Library.loadPack?.().then(migrate);queue();if(!aniFix.done){aniFix.done=1;setTimeout(()=>aniFix(),2500);setTimeout(()=>nsRun(),6000)}nsPaint()}
+    heroStart();arrows();lazyWatch();Library.loadPack?.().then(migrate);queue();arecFill();if(!aniFix.done){aniFix.done=1;setTimeout(()=>aniFix(),2500);setTimeout(()=>nsRun(),6000)}nsPaint()}
   function refresh(){const root=q('#view>.mc');if(!root)return;const sc=q('#scroll'),y=sc.scrollTop,rows=qa('.mc-row',root).map(r=>r.scrollLeft),f=document.activeElement,inS=f&&f.matches('[data-ms]');
     if(inS){const m=q('.mc-main',root);m.innerHTML=body()}else{const b=body();root.innerHTML=nav()+`<main class="mc-main">${b}</main>`;root.classList.toggle('has-hero',!!q('.mh',root))}
     lazyWatch();qa('.mc-row',root).forEach((r,i)=>r.scrollLeft=rows[i]||0);sc.scrollTop=y;heroStart();arrows();if(q('.mx-bg'))detailRefresh()}
@@ -401,6 +436,7 @@ const Media=(()=>{
       const hd=t.closest('[data-hd]');if(hd){heroGo(+hd.dataset.hd);return}
       const mk=t.closest('[data-mk]');if(mk){st.kind=mk.dataset.mk;swap();return}
       const lv=t.closest('[data-lv]');if(lv){setLook('view',lv.dataset.lv,true);q('.mset')&&qa('.mset [data-lk=view]').forEach(x=>{const on=x.dataset.lval===V();x.classList.toggle('on',on);x.setAttribute('aria-checked',on)});return}
+      const rc=t.closest('[data-rid]');if(rc){arecOpen(rc.dataset.rid);return}
       const nb=t.closest('[data-ns]');if(nb){nsPanel(nb);if(!nsBusy)nsRun();return}
       const ms=t.closest('[data-mset]');if(ms){q('.mset')?q('.mset').remove():settings(ms);return}
       const mg=t.closest('[data-mg]');if(mg){st.genre=mg.dataset.mg;swap();return}
@@ -409,7 +445,7 @@ const Media=(()=>{
       const mq=t.closest('[data-mq]');if(mq){e.preventDefault();e.stopPropagation();const id=mq.dataset.id||mq.closest('[data-mi]')?.dataset.mi;if(mq.dataset.mq==='more')return menu(id,mq);if(mq.dataset.mq==='rate')return ratePop(id,mq);act(id,mq.dataset.mq);return}
       const mo=t.closest('[data-mo]');if(mo){open(mo.dataset.mo);return}
       const c=t.closest('[data-mi]');if(c&&!t.closest('a')){open(c.dataset.mi)}});
-    root.addEventListener('keydown',e=>{const c=e.target.closest?.('[data-mi]');if(c&&e.target===c&&(e.key==='Enter'||e.key===' ')){e.preventDefault();open(c.dataset.mi)}
+    root.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches?.('[data-rid]')){e.preventDefault();arecOpen(e.target.dataset.rid);return}const c=e.target.closest?.('[data-mi]');if(c&&e.target===c&&(e.key==='Enter'||e.key===' ')){e.preventDefault();open(c.dataset.mi)}
       if(c&&e.target===c&&(e.key==='ArrowRight'||e.key==='ArrowLeft')){const sib=e.key==='ArrowRight'?c.nextElementSibling:c.previousElementSibling;if(sib?.matches('[data-mi]')){e.preventDefault();sib.focus();sib.scrollIntoView({block:'nearest',inline:'nearest',behavior:motion()?'smooth':'auto'})}}
       if(e.target.matches('[data-ms]')){if(e.key==='Escape'){e.target.value='';st.qs='';refresh();e.target.blur()}if(e.key==='Enter'){const f=q('.mc-main [data-mi]');if(f)open(f.dataset.mi)}}});
     root.addEventListener('input',e=>{if(e.target.matches('[data-ms]')){clearTimeout(root.sT);root.sT=setTimeout(()=>{st.qs=e.target.value.trim();q('.mc-main',root).innerHTML=body();arrows();heroStart();lazyWatch()},140)}});
@@ -548,7 +584,7 @@ const Media=(()=>{
     return`<section class="mx-s mx-notes"><h3>Notlarım${L.length?` <span>${L.length}</span>`:''}</h3>
       ${L.length?`<div class="mx-nl">${L.map(p=>`<a class="mx-nt" href="#p/${p.id}"><span class="mx-ni">${E(iconOf(p))}</span><span class="mx-nb"><b>${E(titleOf(p))}</b><small>${E((firstText(p)||'').slice(0,90))}</small></span><em>${E(rel(p.updated))}</em></a>`).join('')}</div>`
         :`<p class="mx-ne">Bu yapım için Workspace’te not yok. Yeni not, Notlar’daki “Medya notları” sayfasının altına girer ve burada görünür.</p>`}
-      <div class="mx-na"><button class="mb pr" data-nnew>${IC.plus}Yeni not</button><button class="mb" data-nlink>${IC.link}Var olan notu bağla</button></div>
+      <div class="mx-na"><button class="mb pri" data-nnew>${IC.plus}Yeni not</button><button class="mb" data-nlink>${IC.link}Var olan notu bağla</button></div>
       <label class="mx-qn"><span>Kısa not</span><textarea data-dn aria-label="Kısa not" placeholder="${g?'Nerede kaldın, neyi sevdin, hangi zorlukta oynuyorsun…':'Ne düşündün, en sevdiğin sahne, kimle izledin…'}">${E(it.note)}</textarea></label></section>`}
   function detailHTML(it){const s=secOf(it.type),g=it.type==='game',f=flagOf(it),wide=!!it.backdrop;
     const links=[it.wiki&&[`https://${it.wiki.startsWith('tr:')?'tr':'en'}.wikipedia.org/wiki/${it.wiki.replace(/^tr:/,'')}`,'Wikipedia'],it.imdb&&[`https://www.imdb.com/title/${it.imdb}/`,'IMDb'],it.mal&&[`https://myanimelist.net/anime/${it.mal}`,'MyAnimeList'],it.steam&&[`https://store.steampowered.com/app/${it.steam}/`,'Steam']].filter(Boolean);
@@ -821,7 +857,7 @@ const Media=(()=>{
       const it=KB.addItem({type:t,title,year:y,status:f.s.value,tags:[TN[t].toLocaleLowerCase('tr')]});if(y)HINT.set(hk(it),{en:title,y:+y});close();say(`“${title}” eklendi — posteri aranıyor`);queue();open(it.id)})}
 
   /* sayfa değişince geçici arayüz kalmasın (Notlar route() çağırır) */
-  function dismiss(){spotOff(true);qa('.mset,.mrp,.mq,.ma-bg,.mnp,.mnsp').forEach(e=>e.remove())}
+  function dismiss(){spotOff(true);qa('.mset,.mrp,.mq,.ma-bg,.mnp,.mnsp,.mrcp-bg').forEach(e=>e.remove())}
   // kaydırma, pencere değişimi, Esc → spot ışığı kapanır
   addEventListener('scroll',()=>{SPT.quiet=Date.now()+700;if(SPT.el)spotOff()},true);addEventListener('blur',()=>spotOff(true));addEventListener('resize',()=>spotOff(true));addEventListener('keydown',e=>{if(e.key==='Escape'&&SPT.el)spotOff()});
   return{render,refresh,detail,close,imgErr,imgOk,queue,addSheet,rateHTML,dismiss,patchCards,isMedia:t=>MT.includes(t),get st(){return st},get R(){return R},_rank:rank,_cleanG:cleanG,_yt:ytIds}})();

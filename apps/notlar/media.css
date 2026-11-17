@@ -3,7 +3,7 @@
    Her bölüm kendi dünyası: Ana sayfa (altın) · Film & Dizi (sinema kırmızısı, derin siyah)
    · Anime (mor-neon gece) · Oyunlar (Steam laciverti, kapsül kartlar).
    ════════════════════════════════════════════════════════════ */
-.mc,.mx-bg,.ma-bg,.mq,.msp{--mbg:#0A0A0C;--mbg2:#141418;--mink:#F5F3EE;--mink2:#C9C7C2;--mink3:#A3A19C;--mline:rgba(255,255,255,.09);--mglass:rgba(22,22,26,.78);--acc:#F2C14E;--acc-ink:#15110A;--px:clamp(16px,3.2vw,48px);--card:clamp(128px,11vw,180px);--r:8px}
+.mc,.mx-bg,.ma-bg,.mq,.msp,.mrcp-bg,.mnsp,.mnp{--mbg:#0A0A0C;--mbg2:#141418;--mink:#F5F3EE;--mink2:#C9C7C2;--mink3:#A3A19C;--mline:rgba(255,255,255,.09);--mglass:rgba(22,22,26,.78);--acc:#F2C14E;--acc-ink:#15110A;--px:clamp(16px,3.2vw,48px);--card:clamp(128px,11vw,180px);--r:8px}
 .mvi{width:16px;height:16px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .grow{flex:1}
 
@@ -677,3 +677,23 @@ html[data-motion=off] .msp-yt{transition:none;transform:none}
 .mnsp footer button:disabled{opacity:.5}.mnsp footer .mvi{width:13px;height:13px}
 @media (max-width:900px){.mc-tabs .mc-ns span{display:none}.mc-tabs .mc-ns{padding:0 11px}}
 @media (prefers-reduced-motion:reduce){.mc-ns.busy .mvi{animation:none}}
+
+/* ═ Yeni çıkan popüler animeler (öneri rafı + önizleme) ═ */
+.mrec header p{margin:2px 0 0;font-size:13px;color:var(--mink3)}
+.mrc-new{position:absolute;z-index:2;left:7px;top:7px;padding:3px 7px;border-radius:6px;font:700 11px/1.2 var(--sys,system-ui);letter-spacing:.02em;color:#0B0B0D;background:#F5C451}
+.mrc-sk .mp{background:linear-gradient(90deg,rgba(255,255,255,.04),rgba(255,255,255,.09),rgba(255,255,255,.04));background-size:200% 100%;animation:msk 1.2s linear infinite}
+.mrcp-bg{position:fixed;inset:0;z-index:640;display:grid;place-items:center;padding:20px;background:rgba(0,0,0,.55);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.mrcp{position:relative;display:flex;gap:22px;width:min(760px,100%);max-height:min(86vh,640px);padding:22px;border-radius:20px;color:#F5F5F7;font-family:var(--sys,system-ui);background:#16161A;box-shadow:inset 0 0 0 .5px rgba(255,255,255,.12),0 40px 100px -30px rgba(0,0,0,.9)}
+.mrcp-x{position:absolute;top:12px;right:12px}
+.mrcp-p{width:200px;flex-shrink:0;aspect-ratio:225/318;border-radius:12px;overflow:hidden;background:rgba(255,255,255,.06)}.mrcp-p img{width:100%;height:100%;object-fit:cover}
+.mrcp-b{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;overflow-y:auto;padding-right:28px}
+.mrcp-k{font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#F5C451}
+.mrcp h3{margin:0;font-size:24px;font-weight:700;letter-spacing:-.02em;line-height:1.15}
+.mrcp-o{margin:-4px 0 0;font-size:13px;color:rgba(255,255,255,.55)}
+.mrcp-m{margin:0;display:flex;align-items:center;flex-wrap:wrap;gap:8px;font-size:13px;color:rgba(255,255,255,.75)}.mrcp-m .mc-sc{position:static}
+.mrcp-g{margin:0;display:flex;flex-wrap:wrap;gap:6px}.mrcp-g span{padding:3px 9px;border-radius:999px;font-size:12px;color:rgba(255,255,255,.75);background:rgba(255,255,255,.08)}.mrcp-g span.on{color:#0B0B0D;background:#F5C451}
+.mrcp-w{margin:0;font-size:12.5px;color:#F5C451}
+.mrcp-s{margin:4px 0 0;font-size:14px;line-height:1.55;color:rgba(255,255,255,.82)}
+.mrcp-a{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;padding-top:10px}
+@media (max-width:640px){.mrcp{flex-direction:column;gap:14px;padding:18px;max-height:90vh;overflow-y:auto}.mrcp-p{width:120px}.mrcp-b{overflow:visible;padding-right:0}}
+@media (prefers-reduced-motion:reduce){.mrc-sk .mp{animation:none}}

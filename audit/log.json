@@ -2979,5 +2979,35 @@
     "fix": "Boş satıra yapıştırınca önizleme kartı; YouTube sayfada oynar; görsel resim olur; istenirse düz bağlantıya çevrilir"
    }
   ]
+ },
+ {
+  "at": "2026-11-17T00:12:23",
+  "change": "Medya: Yeni çıkan popüler animeler önerisi",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "fixed",
+    "text": "Yeni çıkan popüler animeler önerilmiyordu",
+    "fix": "Ana sayfa ve Animeler'de öneri rafı; önizleme ve tek tıkla listeye ekleme"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Medya notlarındaki 'Yeni not' ana düğmesi vurgusuz görünüyordu (yanlış sınıf adı)",
+    "fix": "Düzeltildi"
+   }
+  ]
  }
 ]

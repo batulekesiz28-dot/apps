@@ -2582,6 +2582,8 @@ let pillT=0;
 function showPill(ms=2400){const p=$('#pill');p.classList.remove('hide');clearTimeout(pillT);if(ms)pillT=setTimeout(hidePill,ms)}
 function hidePill(){const p=$('#pill');if(p.matches(':hover')||p.contains(document.activeElement))return;p.classList.add('hide')}
 $('#hot').addEventListener('pointerenter',()=>showPill(0));
+// dış sitelerde (YouTube gibi) imlecin hareketi görülemez → imleç şeritten/üst kenardan çıkınca kendisi kapansın
+for(const id of ['#hot','#pill'])$(id).addEventListener('pointerleave',()=>{if(W.app&&!W.min){clearTimeout(pillT);pillT=setTimeout(hidePill,900)}});
 $('#hot').addEventListener('pointerleave',()=>{clearTimeout(pillT);pillT=setTimeout(hidePill,900)});
 $('#pill').addEventListener('pointerenter',()=>clearTimeout(pillT));
 $('#pill').addEventListener('pointerleave',()=>{clearTimeout(pillT);pillT=setTimeout(hidePill,900)});

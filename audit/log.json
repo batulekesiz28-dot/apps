@@ -3531,5 +3531,34 @@
     "fix": "Dosyalar zip'in köküne alındı; kurulum adımlarına 'içinde manifest.json görünen klasörü seç' eklendi"
    }
   ]
+ },
+ {
+  "at": "2026-11-17",
+  "change": "YouTube yavaşlığı incelendi: hub arka planda çizim yapmıyor (0/sn). Üst kontrol şeridi dış sitelerde imleç çıkınca kapanıyor",
+  "scores": {
+   "hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "hub masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "hub",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "YouTube gibi dış sitelerde üstteki bulanık cam şerit bir kez açılınca ekranda kalabiliyordu",
+    "fix": "İmleç şeritten/üst kenardan çıkınca 0,9 sn sonra kapanıyor"
+   },
+   {
+    "app": "hub",
+    "sev": "bilgi",
+    "status": "open",
+    "text": "YouTube'un hub içinde ilk açılışı yavaş: tarayıcı başka site içindeki sitelere ayrı önbellek kullanıyor; ikinci açılışta hızlanır"
+   }
+  ]
  }
 ]

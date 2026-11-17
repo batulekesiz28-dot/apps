@@ -353,6 +353,7 @@
 .mset-kr input{flex:1;min-width:0;height:32px;padding:0 10px;border:0;border-radius:8px;background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 .5px rgba(255,255,255,.14);color:#fff;font:inherit;font-size:13px;outline:none}
 .mset-kr input:focus{box-shadow:inset 0 0 0 1px rgba(255,255,255,.5)}
 .mset-ks{flex-shrink:0;max-width:46%;font-size:12px;color:rgba(235,235,245,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mset-ks.ok{color:#7ee2a8}.mset-ks.bad{color:#ff9a8f}
+.mset-ytpos{align-self:flex-start;margin-top:8px;height:30px;padding:0 12px;border-radius:999px;font-size:12.5px;color:#fff;background:rgba(255,255,255,.1)}.mset-ytpos:hover{background:rgba(255,255,255,.18)}
 .mset-kd{display:block;margin-top:4px;font-size:12px;color:rgba(235,235,245,.5)}.mset-ks:empty{display:none}
 .mset-kh{margin:8px 0 0;font-size:12px;line-height:1.45;color:rgba(235,235,245,.55)}
 @media (max-width:600px){.mset-kr input{height:40px}}
@@ -620,6 +621,12 @@ html[data-motion=off] .msp-x{transition:none;transform:none}
 /* fragman: bilginin karşı tarafında 16:9; önce YouTube kapak karesi, video gelince yumuşak geçiş; tıkla → ses */
 .msp-yt{position:absolute;box-sizing:content-box;opacity:0;transform:scale(.96);transition:opacity .4s .05s,transform .6s .05s cubic-bezier(.2,.9,.22,1.1);pointer-events:none}
 .msp-yt.l{padding-right:34px}.msp-yt.r{padding-left:34px}
+/* serbest fragman (taşınmış): kendi yerinde, köşeden boyutlanır */
+.msp-yt.f{padding:0;transform-origin:center}.msp-yt.mv{transition:none;cursor:grabbing}.msp-yt.mv .msp-yv{box-shadow:0 40px 90px -20px rgba(0,0,0,.95),0 0 0 1px rgba(255,255,255,.3)}
+.msp-ymv{position:absolute;top:0;z-index:4;display:grid;place-items:center;width:64px;height:22px;transform:translateX(-50%);cursor:grab;touch-action:none;opacity:0;transition:none}
+.msp-yt:is(.f,.in) .msp-ymv{left:50%}.msp-yt.in .msp-yr{display:none}.msp-yt.l .msp-ymv{left:calc((100% - 34px) / 2)}.msp-yt.r .msp-ymv{left:calc(34px + (100% - 34px) / 2)}
+.msp-ymv i{display:block;width:36px;height:5px;border-radius:99px;background:rgba(255,255,255,.85);box-shadow:0 1px 6px rgba(0,0,0,.6)}
+.msp-yt.ready:is(:hover,.mv) .msp-ymv{opacity:1;transition:opacity .16s}.msp-yt.mv .msp-ymv{cursor:grabbing}
 .msp.det .msp-yt.ready{opacity:1;transform:none;pointer-events:auto}
 .msp-yt.in{position:relative;width:100%;transform:none;opacity:1;margin-bottom:4px;display:none}.msp-yt.in.ready{display:block}
 .msp-yv{position:relative;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000;cursor:pointer;box-shadow:0 30px 70px -24px rgba(0,0,0,.95),0 0 0 1px rgba(255,255,255,.14)}
@@ -635,6 +642,7 @@ html[data-motion=off] .msp-yt{transition:none;transform:none}
 /* fragman boyutu: dış alt köşeden sürükle (çift tık: varsayılan) */
 .msp-yr{position:absolute;bottom:-10px;z-index:3;width:26px;height:26px;cursor:nesw-resize;touch-action:none}
 .msp-yr.l{left:-10px}.msp-yr.r{right:-10px;cursor:nwse-resize}
+.msp-yt.f .msp-yr.r{right:-10px}
 .msp-yr::after{content:"";position:absolute;inset:7px;border:solid rgba(255,255,255,.75);border-width:0 0 3px 3px;border-radius:0 0 0 5px;opacity:0;transition:opacity .2s}
 .msp-yr.r::after{border-width:0 3px 3px 0;border-radius:0 0 5px 0}
 .msp-yt:hover .msp-yr::after,.msp-yt.rs .msp-yr::after{opacity:1}

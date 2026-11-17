@@ -3358,5 +3358,42 @@
     "text": "KinoCheck gerçek internette denenemedi; çalışmazsa sessizce atlanıyor, bağlantı testinde görünüyor"
    }
   ]
+ },
+ {
+  "at": "2026-11-17",
+  "change": "Bulanık ekrandaki fragman serbest pencere: tutamaçtan/videodan sürükleyerek taşınıyor, köşeden boyutlanıyor, yeri ve boyu hatırlanıyor",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Yan tarafta az yer varken fragman ekranın solundan taşıyordu",
+    "fix": "Yan yerleşim için gereken yer ve en büyük genişlik doğru hesaplanıyor"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Tutamaca çift tık eski yere döndürmüyordu (ilk basış taşıma başlatıyordu)",
+    "fix": "Taşıma 3 px hareketten sonra başlıyor; çift tık eski yerine alıyor"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Fragman uzağa taşınınca imleç oraya giderken spot kapanıyordu",
+    "fix": "Serbest fragmanda 700 ms ulaşma payı"
+   }
+  ]
  }
 ]

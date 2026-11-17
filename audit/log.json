@@ -3195,5 +3195,41 @@
     "text": "Gerçek YouTube’la denenemedi (bu ortamda internet yok); süre/konum bilgisi YouTube’un oynatıcı mesajlarından geliyor, sahte oynatıcıyla doğrulandı"
    }
   ]
+ },
+ {
+  "at": "2026-11-17",
+  "change": "Notlar: yazıdaki bağlantıların sağında minik ok; basınca altta önizleme (YouTube/Vimeo/video oynar, diğer siteler kart)",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Önizleme satırın altına değil yazının sağına düşüyordu",
+    "fix": "Önizleme tam satır kaplıyor, içindeki kart en fazla 560px"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Açık okun dönmesi için bağlantıya sınıf eklemek nota kaydedilebilirdi",
+    "fix": "Dönüş ayrı bir stil kuralıyla yapılıyor; nota hiçbir şey yazılmıyor"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "open",
+    "text": "Gerçek YouTube/site önizlemesi bu ortamda denenemedi (internet yok); sahte yanıtlarla doğrulandı"
+   }
+  ]
  }
 ]

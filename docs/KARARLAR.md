@@ -54,6 +54,7 @@ Son güncelleme: 2026-11-15
 | Aktiviteler | Sekme ve sayfa KALDIRILDI. Etkinlik verisi silinmedi; takvimde durur. |
 | Satır içi bağlantı | Yazı seç → biçim çubuğu 🔗 ya da **Ctrl/Cmd+K** → küçük adres kutusu (prompt YOK; “google.com” → https://). Linke tıkla → yeni sekmede açılır (Alt+tık: imleç). Üstüne gel → Aç · Düzenle · Kaldır. Seçim yokken Ctrl/Cmd+K komut paleti. |
 | Bağlantı önizlemesi | Boş satıra tek link yapıştırınca önizleme kartı (başlık, açıklama, site simgesi, görsel; Library `meta` → microlink). YouTube → sayfada oynayan video (youtube-nocookie, tıklayınca), görsel linki → resim. Yazının içine yapıştırılan link satır içi bağlantı kalır; Shift+yapıştır da düz bırakır. Karttaki ≡ düğmesi düz bağlantıya çevirir. |
+| Bağlantı oku (satır içi önizleme) | Yazıdaki dış bağlantıların sağında minik ⌄ ok. Oka tıkla → bloğun hemen altında önizleme açılır: YouTube (t= başlangıç saniyesiyle)/Vimeo/video dosyası oynar, görsel görünür, diğer siteler kart (başlık, açıklama). Altında “Sekmede aç ↗” ve “Kapat”; oka tekrar basınca kapanır, açıkken ok döner. Bağlantı metnine tıklamak eskisi gibi sekmede açar. Üstüne gelince çıkan menüde de “Önizle”. Önizleme nota kaydedilmez. |
 | Üste sabitleme | Soldaki sayfa listesinden bir sayfa üst şeride (Takvim · Görevler · Notlar · İstatistikler'in yanına) sürüklenip sabitlenir; ⋯ menüsünden de. Şeritte sürükle = sırala; dışarı bırak / sağ tık = kaldır. Alt sayfası açıkken de sekmesi vurgulu. Bulutta senkron. |
 
 ## Hub widget'ları

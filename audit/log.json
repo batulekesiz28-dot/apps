@@ -3129,5 +3129,35 @@
     "fix": "Kapak karesi geçerliyse spotla birlikte hemen beliriyor, video gelince oynuyor"
    }
   ]
+ },
+ {
+  "at": "2026-11-17T12:32:36",
+  "change": "Medya: eksik posterler için ikinci arama; fragman için taşınabilir mini oynatıcı",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Bazı kayıtlarda poster yoktu",
+    "fix": "Başka kaynaklardan (AniList, TVmaze, iTunes, Wikipedia) otomatik ikinci arama; tür ve yıl kontrolüyle"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "fixed",
+    "text": "Fragman sadece spot ışığında, sabit yerde oynuyordu",
+    "fix": "Ayrı pencerede oynat: sürüklenebilir, boyutlanabilir, sayfa değişince kapanmaz"
+   }
+  ]
  }
 ]

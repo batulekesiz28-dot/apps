@@ -40,7 +40,7 @@ const Media=(()=>{
   const stName=it=>stMap(it)[stOf(it)]||'';
   const inPage=(it,k)=>k==='fav'?it.fav:k==='played'?['played','done'].includes(it.status):k==='all'?true:stOf(it)===k;
   const S=p=>`<svg class="mvi" viewBox="0 0 16 16" aria-hidden="true">${p}</svg>`;
-  const IC={bell:S('<path d="M4.2 11.5V7.4a3.8 3.8 0 0 1 7.6 0v4.1l1.2 1.3H3z"/><path d="M6.6 14.2a1.5 1.5 0 0 0 2.8 0"/>'),vol0:S('<path d="M3 6.2h2.4L8.8 3.5v9L5.4 9.8H3z"/><path d="m11 6.3 3.2 3.4M14.2 6.3 11 9.7"/>'),vol1:S('<path d="M3 6.2h2.4L8.8 3.5v9L5.4 9.8H3z"/><path d="M11.2 5.6a3.4 3.4 0 0 1 0 4.8M12.9 3.9a5.8 5.8 0 0 1 0 8.2"/>'),play:S('<path d="M5 3.5v9l7.5-4.5z" fill="currentColor" stroke="none"/>'),plus:S('<path d="M8 3v10M3 8h10"/>'),check:S('<path d="M3.5 8.5l3 3 6-7"/>'),
+  const IC={pop:S('<rect x="2.5" y="3.5" width="11" height="9" rx="2"/><rect x="8" y="8" width="4" height="3" rx=".8" fill="currentColor" stroke="none"/>'),bell:S('<path d="M4.2 11.5V7.4a3.8 3.8 0 0 1 7.6 0v4.1l1.2 1.3H3z"/><path d="M6.6 14.2a1.5 1.5 0 0 0 2.8 0"/>'),vol0:S('<path d="M3 6.2h2.4L8.8 3.5v9L5.4 9.8H3z"/><path d="m11 6.3 3.2 3.4M14.2 6.3 11 9.7"/>'),vol1:S('<path d="M3 6.2h2.4L8.8 3.5v9L5.4 9.8H3z"/><path d="M11.2 5.6a3.4 3.4 0 0 1 0 4.8M12.9 3.9a5.8 5.8 0 0 1 0 8.2"/>'),play:S('<path d="M5 3.5v9l7.5-4.5z" fill="currentColor" stroke="none"/>'),plus:S('<path d="M8 3v10M3 8h10"/>'),check:S('<path d="M3.5 8.5l3 3 6-7"/>'),
     heart:S('<path d="M8 13.5S2.5 10.2 2.5 6.3A2.8 2.8 0 0 1 8 5a2.8 2.8 0 0 1 5.5 1.3C13.5 10.2 8 13.5 8 13.5z"/>'),more:S('<circle cx="3.5" cy="8" r="1.1" fill="currentColor" stroke="none"/><circle cx="8" cy="8" r="1.1" fill="currentColor" stroke="none"/><circle cx="12.5" cy="8" r="1.1" fill="currentColor" stroke="none"/>'),
     x:S('<path d="M4 4l8 8M12 4l-8 8"/>'),search:S('<circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/>'),l:S('<path d="M10 3.5L5.5 8l4.5 4.5"/>'),r:S('<path d="M6 3.5L10.5 8 6 12.5"/>'),
     clock:S('<circle cx="8" cy="8" r="5.5"/><path d="M8 5v3.2l2 1.3"/>'),edit:S('<path d="M10.5 2.5l3 3-8 8H2.5v-3z"/>'),trash:S('<path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.6 9h5.8l.6-9"/>'),
@@ -132,7 +132,7 @@ const Media=(()=>{
   const thumbOK=v=>new Promise(res=>{const im=new Image();const t=setTimeout(()=>res('unk'),2500);im.onload=()=>{clearTimeout(t);res(im.naturalWidth>120?'ok':'bad')};im.onerror=()=>{clearTimeout(t);res('unk')};im.src=`https://i.ytimg.com/vi/${v}/mqdefault.jpg`});
   // fragman alanı: kapak karesi hemen görünür; video GİZLİ yüklenir, oynamaya başlayınca (IFrame API olayı) belirir.
   // Hata (silinmiş / gömme kapalı / bölge) gelirse sıradaki aday denenir; hiçbiri olmazsa onFail → alan kalkar. Kullanıcı hata ekranı görmez.
-  function ytMount(slot,ids,onFail){const auto=true;let i=-1,fr=null,muted=true,box=null,alive=true,tm=0;
+  function ytMount(slot,ids,onFail,title){const auto=true;let i=-1,fr=null,muted=true,box=null,alive=true,tm=0;
     const cleanup=()=>{removeEventListener('message',onMsg);clearInterval(tm)};
     const onMsg=e=>{if(!fr||e.source!==fr.contentWindow)return;let d;try{d=typeof e.data==='string'?JSON.parse(e.data):e.data}catch{return}if(!d)return;
       if(d.event==='onError'){if([2,100,101,150,153].includes(+d.info))badYT(ids[i]);next();return}
@@ -142,8 +142,8 @@ const Media=(()=>{
     async function next(){if(!alive)return;fr?.remove();fr=null;clearInterval(tm);box?.classList.remove('ok');
       let th='';while(++i<ids.length){const c=ids[i];if(c.startsWith('mp:'))break;th=await thumbOK(c.slice(3));if(th!=='bad')break;badYT(c)}if(!alive)return;
       if(i>=ids.length){alive=false;cleanup();onFail?.();return}
-      const c=ids[i],mp=c.startsWith('mp:'),v=c.slice(3);if(!box){slot.insertAdjacentHTML('afterbegin',`<div class="msp-yv"><i class="msp-yth"></i><button type="button" class="msp-ym" data-ym aria-label="${auto?'Sesi aç':'Fragmanı oynat'}" title="${auto?'Sesi aç':'Oynat'}">${auto?IC.vol0:IC.play}</button></div>`);box=slot.firstElementChild;
-        box.addEventListener('click',e=>{if(e.target.closest('.msp-yr'))return;e.stopPropagation();if(!fr){load();return}muted=!muted;if(fr.tagName==='VIDEO'){fr.muted=muted;if(!muted)fr.volume=.7}else{cmd(muted?'mute':'unMute');if(!muted)cmd('setVolume',[70])}
+      const c=ids[i],mp=c.startsWith('mp:'),v=c.slice(3);if(!box){slot.insertAdjacentHTML('afterbegin',`<div class="msp-yv"><i class="msp-yth"></i><button type="button" class="msp-ym" data-ym aria-label="${auto?'Sesi aç':'Fragmanı oynat'}" title="${auto?'Sesi aç':'Oynat'}">${auto?IC.vol0:IC.play}</button><button type="button" class="msp-ym msp-yp" data-yp aria-label="Ayrı pencerede oynat" title="Ayrı pencerede oynat — istediğin yere taşı">${IC.pop}</button></div>`);box=slot.firstElementChild;
+        box.addEventListener('click',e=>{if(e.target.closest('.msp-yr'))return;e.stopPropagation();if(e.target.closest('[data-yp]')){const c0=ids[i];alive=false;cleanup();spotOff(true);pip(c0,title);return}if(!fr){load();return}muted=!muted;if(fr.tagName==='VIDEO'){fr.muted=muted;if(!muted)fr.volume=.7}else{cmd(muted?'mute':'unMute');if(!muted)cmd('setVolume',[70])}
           const b=box.querySelector('[data-ym]');b.innerHTML=muted?IC.vol0:IC.vol1;b.setAttribute('aria-label',muted?'Sesi aç':'Sesi kapat');b.title=muted?'Sesi aç':'Sesi kapat'})}
       box.querySelector('.msp-yth').style.backgroundImage=mp?'none':`url(https://i.ytimg.com/vi/${v}/hqdefault.jpg)`;if(!auto||th==='ok')slot.classList.add('ready');if(auto)load()}
     const playing=()=>{clearInterval(tm);box.classList.add('ok');slot.classList.add('ready')};
@@ -156,6 +156,25 @@ const Media=(()=>{
       fr.addEventListener('load',()=>{const me=fr;setTimeout(()=>{if(alive&&fr===me&&!box.classList.contains('ok'))playing()},1600);const hi=()=>{try{fr?.contentWindow?.postMessage(JSON.stringify({event:'listening',id:1,channel:'widget'}),'*')}catch{}};hi();clearInterval(tm);let n=0;tm=setInterval(()=>{if(++n>40||box.classList.contains('ok'))clearInterval(tm);else hi()},250)});
       box.insertBefore(fr,box.querySelector('[data-ym]'))}
     slot._stop=()=>{alive=false;cleanup()};next()}
+  /* ═ Mini oynatıcı: fragman ayrı, sürüklenebilir ve köşesinden boyutlanabilir pencerede (sesli, kontrollü) oynar;
+     Medya'da/Notlar'da gezinirken kapanmaz. Konum ve genişlik hatırlanır (mc:pip). Tek pencere: yenisi eskisinin yerini alır. ═ */
+  function pip(c,title){q('.mpip')?.remove();const P=Object.assign({w:440,x:null,y:null},lsg('mc:pip',{})),v=c.slice(3),mp=c.startsWith('mp:'),el=document.createElement('div');
+    el.className='mpip';el.setAttribute('role','dialog');el.setAttribute('aria-label','Fragman: '+(title||''));
+    el.innerHTML=`<header class="mpip-h" title="Sürükleyerek taşı"><b>${E(title||'Fragman')}</b><button data-pipx aria-label="Kapat" title="Kapat">${IC.x}</button></header>
+      <div class="mpip-v">${mp?`<video src="${E(v)}" controls autoplay playsinline></video>`:`<iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(v)}?autoplay=1&rel=0&playsinline=1&modestbranding=1" title="${E(title||'Fragman')}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`}</div>
+      <span class="mpip-r" title="Boyutlandır" aria-hidden="true"></span>`;
+    document.body.appendChild(el);
+    const place=()=>{const w=Math.max(260,Math.min(innerWidth-16,P.w)),h=w*9/16+38,x=P.x??innerWidth-w-24,y=P.y??innerHeight-h-24;el.style.width=w+'px';el.style.left=Math.max(8,Math.min(innerWidth-w-8,x))+'px';el.style.top=Math.max(8,Math.min(innerHeight-h-8,y))+'px'};
+    const save=()=>{const r=el.getBoundingClientRect();P.x=Math.round(r.left);P.y=Math.round(r.top);P.w=Math.round(r.width);lss('mc:pip',P)};place();
+    if(motion())el.animate([{opacity:0,transform:'scale(.92) translateY(10px)'},{opacity:1,transform:'none'}],{duration:360,easing:'cubic-bezier(.16,1,.3,1)'});
+    const grab=(h,mv)=>h.addEventListener('pointerdown',e=>{if(e.button!==0||e.target.closest('button'))return;e.preventDefault();const x0=e.clientX,y0=e.clientY,r0=el.getBoundingClientRect();try{h.setPointerCapture(e.pointerId)}catch{}el.classList.add('drag');
+      const m=ev=>{mv(ev.clientX-x0,ev.clientY-y0,r0);place()},u=()=>{h.removeEventListener('pointermove',m);h.removeEventListener('pointerup',u);h.removeEventListener('pointercancel',u);el.classList.remove('drag');save()};
+      h.addEventListener('pointermove',m);h.addEventListener('pointerup',u);h.addEventListener('pointercancel',u)});
+    grab(el.querySelector('.mpip-h'),(dx,dy,r0)=>{P.x=r0.left+dx;P.y=r0.top+dy});
+    grab(el.querySelector('.mpip-r'),(dx,dy,r0)=>{P.x=r0.left;P.y=r0.top;P.w=Math.max(260,Math.min(innerWidth-16,r0.width+Math.max(dx,dy*16/9)))});
+    el.querySelector('.mpip-h').addEventListener('dblclick',()=>{P.w=P.w>=700?440:Math.min(innerWidth-48,860);place();save()});
+    const onR=()=>{if(!el.isConnected)return removeEventListener('resize',onR);place()};addEventListener('resize',onR);
+    el.querySelector('[data-pipx]').addEventListener('click',()=>{removeEventListener('resize',onR);el.remove()})}
   /* ═ Spot ışığı: kapağın üstünde kısa bir an durunca ekranın geri kalanı bulanıklaşır, kapak yaylanarak öne çıkar.
      Puanlanmamışsa altta cam “★ Puanla” hapı: üstüne gelince açılır, imleci gezdirdikçe 1–10 akar, tıkla → kaydedilir. ═ */
   const SPT={t:0,card:null,el:null,v:0,block:null};
@@ -193,7 +212,7 @@ const Media=(()=>{
           hd.addEventListener('dblclick',e=>{e.stopPropagation();lss('mc:ytw',480);size(480)});hd.addEventListener('click',e=>e.stopPropagation())}
         else{slot.className='msp-yt in';inf.prepend(slot)}
         const fail=()=>{if(SPT.el!==el)return;slot.remove();if(!inf.querySelector('[data-ytq]'))inf.querySelector('.msp-a')?.insertAdjacentHTML('beforeend',`<a data-ytq href="https://www.youtube.com/results?search_query=${encodeURIComponent(it.title+' '+(it.year||'')+' trailer')}" target="_blank" rel="noopener">Fragman${IC.r}</a>`)};
-        ytIds(it).then(l=>{if(SPT.el!==el)return;if(l.length)ytMount(slot,l,fail);else fail()})}}
+        ytIds(it).then(l=>{if(SPT.el!==el)return;if(l.length)ytMount(slot,l,fail,it.title);else fail()})}}
     document.body.appendChild(el);SPT.el=el;SPT.card=card;requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('on')));
     if(el.querySelector('.msp-in'))requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('det')));
     const inf=el.querySelector('.msp-in'),yt=el.querySelector('.msp-yt:not(.in)'),leave=e=>{if(SPT.rs)return;const t=e.relatedTarget;if(t&&(f.contains(t)||inf?.contains(t)||yt?.contains(t)))return;if(SPT.el===el)spotOff(false,true)};
@@ -467,7 +486,7 @@ const Media=(()=>{
     document.getElementById('app')?.classList.add('mc-on');
     if(typeof setCrumb==='function')setCrumb(IC.play,st.sec==='home'?'Medya':SEC[st.sec].n,'');
     if(changed&&!o.soft)q('#scroll').scrollTop=0;else if(changed)q('#scroll').scrollTop=0;
-    heroStart();arrows();lazyWatch();Library.loadPack?.().then(migrate);queue();arecFill();if(!aniFix.done){aniFix.done=1;setTimeout(()=>aniFix(),2500);setTimeout(()=>nsRun(),6000)}nsPaint()}
+    heroStart();arrows();lazyWatch();Library.loadPack?.().then(migrate);queue();arecFill();if(!aniFix.done){aniFix.done=1;setTimeout(()=>aniFix(),2500);setTimeout(()=>nsRun(),6000);setTimeout(()=>coverFix(),9000)}nsPaint()}
   function refresh(){const root=q('#view>.mc');if(!root)return;const sc=q('#scroll'),y=sc.scrollTop,rows=qa('.mc-row',root).map(r=>r.scrollLeft),f=document.activeElement,inS=f&&f.matches('[data-ms]');
     if(inS){const m=q('.mc-main',root);m.innerHTML=body()}else{const b=body();root.innerHTML=nav()+`<main class="mc-main">${b}</main>`;root.classList.toggle('has-hero',!!q('.mh',root))}
     lazyWatch();qa('.mc-row',root).forEach((r,i)=>r.scrollLeft=rows[i]||0);sc.scrollTop=y;heroStart();arrows();if(q('.mx-bg'))detailRefresh()}
@@ -832,6 +851,23 @@ const Media=(()=>{
       setTimeout(()=>addEventListener('pointerdown',function f(e){if(!m.isConnected){removeEventListener('pointerdown',f,true);return}if(!m.contains(e.target)&&!e.target.closest('.mc-ns')){m.remove();removeEventListener('pointerdown',f,true)}},true),0)}
     const y=m.querySelector('.mns-l')?.scrollTop||0;m.innerHTML=html;m.querySelector('.mns-l').scrollTop=y;
     const r=anchor.getBoundingClientRect(),w=Math.min(380,innerWidth-16);m.style.width=w+'px';m.style.top=(r.bottom+8)+'px';m.style.left=Math.max(8,Math.min(innerWidth-w-8,r.right-w))+'px'}
+  /* ═ Eksik posterler: eşleştirmede poster bulunamayan kayıtlara başka kaynaklardan bir kez daha bak (elle seçilenler hariç; 7 günde bir).
+     Anime → AniList · Dizi → TVmaze ad araması · Film → iTunes · hepsi → Wikipedia (sayfa gerçekten o türdense). Ad + yıl tutmalı. ═ */
+  let cfBusy=false;
+  const KIND_RX={movie:/film|movie/i,series:/dizi|series|television|tv/i,anime:/anime|manga|dizi|series/i,game:/oyun|game/i};
+  async function coverFix(){if(cfBusy||R.busy)return;const T=lsg('mc:cfix',{}),now=Date.now();
+    const L=[...KB.items.values()].filter(it=>MT.includes(it.type)&&!it.cover&&it.match!=='manual'&&it.metaAt&&!(T[it.id]&&now-T[it.id]<7*864e5));if(!L.length)return;cfBusy=true;let n=0;
+    for(const it0 of L){try{const h=HINT.get(hk(it0)),y=+it0.year||h?.y||0,names=[it0.title,h?.en].filter((x,i,a)=>x&&a.indexOf(x)===i);let img='',extra={};
+        for(const nm of names){if(img)break;
+          if(it0.type==='anime'){const d=await alGQL(`query($q:String){Media(search:$q,type:ANIME){idMal coverImage{extraLarge large} startDate{year} title{romaji english}}}`,{q:nm}).catch(()=>null);const m=d?.Media;
+            if(m&&[m.title?.romaji,m.title?.english].filter(Boolean).map(norm).some(t=>t===norm(nm)||t.startsWith(norm(nm)))&&(!y||!m.startDate?.year||Math.abs(m.startDate.year-y)<=1)){img=m.coverImage?.extraLarge||m.coverImage?.large||'';if(m.idMal&&!it0.mal)extra.mal=String(m.idMal)}}
+          else if(it0.type==='series'){const x=await soft(tvget(`https://api.tvmaze.com/singlesearch/shows?q=${encodeURIComponent(nm)}`));if(x&&norm(x.name)===norm(nm)&&(!y||!x.premiered||Math.abs(parseInt(x.premiered)-y)<=1))img=x.image?.original||x.image?.medium||''}
+          else if(it0.type==='movie'){img=await itunes(nm,y||0)}
+          if(!img){for(const[lg,tt]of[['tr',nm],['en',it0.type==='game'?nm+' (video game)':it0.type==='movie'?nm+' (film)':it0.type==='series'?nm+' (TV series)':nm],['en',nm]]){const w=await wsum(lg,tt);
+              const src=w?.originalimage?.source||w?.thumbnail?.source||'';if(w&&w.type!=='disambiguation'&&src&&!/\.svg/i.test(src)&&!/logo|icon|flag/i.test(src)&&KIND_RX[it0.type]?.test(w.description||'')){img=src;break}}}}
+        const it=KB.items.get(it0.id);T[it0.id]=Date.now();if(img&&it&&!it.cover){Object.assign(it,{cover:img,...extra});if(it.match==='none')it.match='unsure';KB.saveItem(it,true);patchCards([it.id]);n++}}
+      catch(e){if(e instanceof NetErr)break}}
+    lss('mc:cfix',T);cfBusy=false;if(n)say(`${n} kayda poster bulundu`)}
   /* bir kerelik onarım: kapağı MyAnimeList'ten gelmeyen animelere MAL posteri (elle seçilenlere dokunmaz; 7 günde bir yeniden dener) */
   let aniBusy=false;
   async function aniFix(){if(aniBusy||R.busy)return;const T=lsg('mc:anifix',{}),now=Date.now();

@@ -40,7 +40,7 @@ const Media=(()=>{
   const stName=it=>stMap(it)[stOf(it)]||'';
   const inPage=(it,k)=>k==='fav'?it.fav:k==='played'?['played','done'].includes(it.status):k==='all'?true:stOf(it)===k;
   const S=p=>`<svg class="mvi" viewBox="0 0 16 16" aria-hidden="true">${p}</svg>`;
-  const IC={pop:S('<rect x="2.5" y="3.5" width="11" height="9" rx="2"/><rect x="8" y="8" width="4" height="3" rx=".8" fill="currentColor" stroke="none"/>'),bell:S('<path d="M4.2 11.5V7.4a3.8 3.8 0 0 1 7.6 0v4.1l1.2 1.3H3z"/><path d="M6.6 14.2a1.5 1.5 0 0 0 2.8 0"/>'),vol0:S('<path d="M3 6.2h2.4L8.8 3.5v9L5.4 9.8H3z"/><path d="m11 6.3 3.2 3.4M14.2 6.3 11 9.7"/>'),vol1:S('<path d="M3 6.2h2.4L8.8 3.5v9L5.4 9.8H3z"/><path d="M11.2 5.6a3.4 3.4 0 0 1 0 4.8M12.9 3.9a5.8 5.8 0 0 1 0 8.2"/>'),play:S('<path d="M5 3.5v9l7.5-4.5z" fill="currentColor" stroke="none"/>'),plus:S('<path d="M8 3v10M3 8h10"/>'),check:S('<path d="M3.5 8.5l3 3 6-7"/>'),
+  const IC={rw:S('<path d="M8 4 4 8l4 4M12.5 4l-4 4 4 4"/>'),ff:S('<path d="M8 4l4 4-4 4M3.5 4l4 4-4 4"/>'),pop:S('<rect x="2.5" y="3.5" width="11" height="9" rx="2"/><rect x="8" y="8" width="4" height="3" rx=".8" fill="currentColor" stroke="none"/>'),bell:S('<path d="M4.2 11.5V7.4a3.8 3.8 0 0 1 7.6 0v4.1l1.2 1.3H3z"/><path d="M6.6 14.2a1.5 1.5 0 0 0 2.8 0"/>'),vol0:S('<path d="M3 6.2h2.4L8.8 3.5v9L5.4 9.8H3z"/><path d="m11 6.3 3.2 3.4M14.2 6.3 11 9.7"/>'),vol1:S('<path d="M3 6.2h2.4L8.8 3.5v9L5.4 9.8H3z"/><path d="M11.2 5.6a3.4 3.4 0 0 1 0 4.8M12.9 3.9a5.8 5.8 0 0 1 0 8.2"/>'),play:S('<path d="M5 3.5v9l7.5-4.5z" fill="currentColor" stroke="none"/>'),plus:S('<path d="M8 3v10M3 8h10"/>'),check:S('<path d="M3.5 8.5l3 3 6-7"/>'),
     heart:S('<path d="M8 13.5S2.5 10.2 2.5 6.3A2.8 2.8 0 0 1 8 5a2.8 2.8 0 0 1 5.5 1.3C13.5 10.2 8 13.5 8 13.5z"/>'),more:S('<circle cx="3.5" cy="8" r="1.1" fill="currentColor" stroke="none"/><circle cx="8" cy="8" r="1.1" fill="currentColor" stroke="none"/><circle cx="12.5" cy="8" r="1.1" fill="currentColor" stroke="none"/>'),
     x:S('<path d="M4 4l8 8M12 4l-8 8"/>'),search:S('<circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/>'),l:S('<path d="M10 3.5L5.5 8l4.5 4.5"/>'),r:S('<path d="M6 3.5L10.5 8 6 12.5"/>'),
     clock:S('<circle cx="8" cy="8" r="5.5"/><path d="M8 5v3.2l2 1.3"/>'),edit:S('<path d="M10.5 2.5l3 3-8 8H2.5v-3z"/>'),trash:S('<path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.6 9h5.8l.6-9"/>'),
@@ -132,38 +132,69 @@ const Media=(()=>{
   const thumbOK=v=>new Promise(res=>{const im=new Image();const t=setTimeout(()=>res('unk'),2500);im.onload=()=>{clearTimeout(t);res(im.naturalWidth>120?'ok':'bad')};im.onerror=()=>{clearTimeout(t);res('unk')};im.src=`https://i.ytimg.com/vi/${v}/mqdefault.jpg`});
   // fragman alanı: kapak karesi hemen görünür; video GİZLİ yüklenir, oynamaya başlayınca (IFrame API olayı) belirir.
   // Hata (silinmiş / gömme kapalı / bölge) gelirse sıradaki aday denenir; hiçbiri olmazsa onFail → alan kalkar. Kullanıcı hata ekranı görmez.
-  function ytMount(slot,ids,onFail,title){const auto=true;let i=-1,fr=null,muted=true,box=null,alive=true,tm=0;
-    const cleanup=()=>{removeEventListener('message',onMsg);clearInterval(tm)};
+  /* Sarma (ileri/geri): YouTube IFrame API mesajları (infoDelivery: currentTime/duration; oynarken arada tahmin edilir) ya da <video>.
+     S.t şu anki saniye, S.d süre; seekTo(t) / seek(±sn). tick(S) arayüzü boyar (sürüklerken boyamaz). */
+  const fmtT=s=>{s=Math.max(0,Math.floor(s||0));return`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`};
+  function playerCtl(fr,tick){const S={t:0,d:0,b:0,at:0,ps:-1,drag:false},yt=fr.tagName==='IFRAME',upd=()=>{if(!S.drag)tick?.(S)};let iv=0,hs=0;
+    if(yt){S.post=(f,a=[])=>{try{fr.contentWindow?.postMessage(JSON.stringify({event:'command',func:f,args:a}),'*')}catch{}};
+      S.msg=e=>{if(e.source!==fr.contentWindow)return;let d;try{d=typeof e.data==='string'?JSON.parse(e.data):e.data}catch{return}if(!d)return;const i=d.info,now=performance.now();
+        if(d.event==='onStateChange'){S.b=S.t;S.at=now;S.ps=+i;upd()}
+        else if(d.event==='infoDelivery'&&i&&typeof i==='object'){if(i.playerState!=null){S.b=S.t;S.at=now;S.ps=+i.playerState}if(i.currentTime!=null){S.t=S.b=+i.currentTime;S.at=now}if(+i.duration>0)S.d=+i.duration;upd()}};
+      addEventListener('message',S.msg);
+      fr.addEventListener('load',()=>{let n=0;clearInterval(hs);const hi=()=>{try{fr.contentWindow?.postMessage(JSON.stringify({event:'listening',id:2,channel:'widget'}),'*')}catch{}};hi();hs=setInterval(()=>{if(++n>40||S.d)clearInterval(hs);else hi()},250)});
+      iv=setInterval(()=>{if(S.ps===1&&S.at){S.t=Math.min(S.d||1e9,S.b+(performance.now()-S.at)/1000);upd()}},250)}
+    else{const f=()=>{S.t=fr.currentTime||0;S.d=isFinite(fr.duration)?fr.duration:0;upd()};['timeupdate','loadedmetadata','durationchange','seeked'].forEach(k=>fr.addEventListener(k,f))}
+    S.seekTo=t=>{t=Math.max(0,S.d?Math.min(S.d-.5,t):t);S.t=S.b=t;S.at=performance.now();if(yt)S.post('seekTo',[t,true]);else try{fr.currentTime=t}catch{}upd()};
+    S.seek=dt=>S.seekTo(S.t+dt);
+    S.off=()=>{clearInterval(iv);clearInterval(hs);if(S.msg)removeEventListener('message',S.msg)};
+    return S}
+  function ytMount(slot,ids,onFail,title){const auto=true;let i=-1,fr=null,muted=true,box=null,alive=true,tm=0,ctl=null;
+    const cleanup=()=>{removeEventListener('message',onMsg);clearInterval(tm);ctl?.off();ctl=null};
+    const paint=S=>{if(!box)return;const p=S.d?Math.min(1,S.t/S.d):0;box.style.setProperty('--p',p.toFixed(4));box.classList.toggle('hsk',S.d>0);const tx=box.querySelector('.msp-sk time');if(tx)tx.textContent=fmtT(S.t)+' / '+fmtT(S.d);const b=box.querySelector('.msp-bar');if(b){b.setAttribute('aria-valuemax',Math.round(S.d));b.setAttribute('aria-valuenow',Math.round(S.t));b.setAttribute('aria-valuetext',fmtT(S.t)+' / '+fmtT(S.d))}};
+    const ctlOn=()=>{ctl?.off();ctl=playerCtl(fr,paint);slot._ctl=ctl;slot._fit?.()};
     const onMsg=e=>{if(!fr||e.source!==fr.contentWindow)return;let d;try{d=typeof e.data==='string'?JSON.parse(e.data):e.data}catch{return}if(!d)return;
       if(d.event==='onError'){if([2,100,101,150,153].includes(+d.info))badYT(ids[i]);next();return}
       const ps=d.event==='onStateChange'?d.info:d.event==='infoDelivery'?d.info?.playerState:null;if(ps===1&&!box.classList.contains('ok'))playing()};
     addEventListener('message',onMsg);
     const cmd=(f,a=[])=>{try{fr?.contentWindow?.postMessage(JSON.stringify({event:'command',func:f,args:a}),'*')}catch{}};
-    async function next(){if(!alive)return;fr?.remove();fr=null;clearInterval(tm);box?.classList.remove('ok');
+    async function next(){if(!alive)return;fr?.remove();fr=null;ctl?.off();ctl=null;slot._ctl=null;clearInterval(tm);box?.classList.remove('ok');
       let th='';while(++i<ids.length){const c=ids[i];if(c.startsWith('mp:'))break;th=await thumbOK(c.slice(3));if(th!=='bad')break;badYT(c)}if(!alive)return;
       if(i>=ids.length){alive=false;cleanup();onFail?.();return}
-      const c=ids[i],mp=c.startsWith('mp:'),v=c.slice(3);if(!box){slot.insertAdjacentHTML('afterbegin',`<div class="msp-yv"><i class="msp-yth"></i><button type="button" class="msp-ym" data-ym aria-label="${auto?'Sesi aç':'Fragmanı oynat'}" title="${auto?'Sesi aç':'Oynat'}">${auto?IC.vol0:IC.play}</button><button type="button" class="msp-ym msp-yp" data-yp aria-label="Ayrı pencerede oynat" title="Ayrı pencerede oynat — istediğin yere taşı">${IC.pop}</button></div>`);box=slot.firstElementChild;
-        box.addEventListener('click',e=>{if(e.target.closest('.msp-yr'))return;e.stopPropagation();if(e.target.closest('[data-yp]')){const c0=ids[i];alive=false;cleanup();spotOff(true);pip(c0,title);return}if(!fr){load();return}muted=!muted;if(fr.tagName==='VIDEO'){fr.muted=muted;if(!muted)fr.volume=.7}else{cmd(muted?'mute':'unMute');if(!muted)cmd('setVolume',[70])}
-          const b=box.querySelector('[data-ym]');b.innerHTML=muted?IC.vol0:IC.vol1;b.setAttribute('aria-label',muted?'Sesi aç':'Sesi kapat');b.title=muted?'Sesi aç':'Sesi kapat'})}
+      const c=ids[i],mp=c.startsWith('mp:'),v=c.slice(3);if(!box){slot.insertAdjacentHTML('afterbegin',`<div class="msp-yv"><i class="msp-yth"></i><i class="msp-pg"><i></i></i><div class="msp-sk"><button type="button" data-sk="-10" aria-label="10 saniye geri" title="10 sn geri (←)">${IC.rw}</button><span class="msp-bar" role="slider" tabindex="0" aria-label="Fragmanda konum" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0"><i></i></span><button type="button" data-sk="10" aria-label="10 saniye ileri" title="10 sn ileri (→)">${IC.ff}</button><time>0:00</time></div><button type="button" class="msp-ym" data-ym aria-label="${auto?'Sesi aç':'Fragmanı oynat'}" title="${auto?'Sesi aç':'Oynat'}">${auto?IC.vol0:IC.play}</button><button type="button" class="msp-ym msp-yp" data-yp aria-label="Ayrı pencerede oynat" title="Ayrı pencerede oynat — istediğin yere taşı">${IC.pop}</button></div>`);box=slot.firstElementChild;
+        box.addEventListener('click',e=>{if(e.target.closest('.msp-yr'))return;e.stopPropagation();const k=e.target.closest('[data-sk]');if(k){ctl?.seek(+k.dataset.sk);return}if(e.target.closest('.msp-sk'))return;if(e.target.closest('[data-yp]')){const c0=ids[i],t0=ctl?.t||0;alive=false;cleanup();spotOff(true);pip(c0,title,t0);return}if(!fr){load();return}muted=!muted;if(fr.tagName==='VIDEO'){fr.muted=muted;if(!muted)fr.volume=.7}else{cmd(muted?'mute':'unMute');if(!muted)cmd('setVolume',[70])}
+          const b=box.querySelector('[data-ym]');b.innerHTML=muted?IC.vol0:IC.vol1;b.setAttribute('aria-label',muted?'Sesi aç':'Sesi kapat');b.title=muted?'Sesi aç':'Sesi kapat'});
+        // çubuk: tıkla/sürükle → o saniyeye; odaktayken ← → 5 sn
+        const bar=box.querySelector('.msp-bar');bar.addEventListener('pointerdown',e=>{if(e.button||!ctl?.d)return;e.preventDefault();e.stopPropagation();try{bar.setPointerCapture(e.pointerId)}catch{}const r=bar.getBoundingClientRect(),c=ctl,at=ev=>Math.max(0,Math.min(1,(ev.clientX-r.left)/r.width));c.drag=true;box.classList.add('skd');
+          const mv=ev=>{const p=at(ev);box.style.setProperty('--p',p.toFixed(4));box.querySelector('.msp-sk time').textContent=fmtT(p*c.d)+' / '+fmtT(c.d)},up=ev=>{bar.removeEventListener('pointermove',mv);bar.removeEventListener('pointerup',up);bar.removeEventListener('pointercancel',up);c.drag=false;box.classList.remove('skd');if(ev.type==='pointerup')c.seekTo(at(ev)*c.d);else paint(c)};mv(e);
+          bar.addEventListener('pointermove',mv);bar.addEventListener('pointerup',up);bar.addEventListener('pointercancel',up)});
+        bar.addEventListener('keydown',e=>{const d={ArrowLeft:-5,ArrowRight:5,ArrowDown:-10,ArrowUp:10}[e.key];if(d&&ctl){e.preventDefault();e.stopPropagation();ctl.seek(d)}else if((e.key==='Home'||e.key==='End')&&ctl?.d){e.preventDefault();ctl.seekTo(e.key==='Home'?0:ctl.d)}});
+        const fit=()=>{const w=box.clientWidth;box.classList.toggle('nr',w<340);box.classList.toggle('xs',w<250)};box.addEventListener('pointerenter',fit);slot._fit=fit;
+        slot._kb=()=>{fit();box.classList.add('kb');clearTimeout(box._kt);box._kt=setTimeout(()=>box.classList.remove('kb'),1600)}}
       box.querySelector('.msp-yth').style.backgroundImage=mp?'none':`url(https://i.ytimg.com/vi/${v}/hqdefault.jpg)`;if(!auto||th==='ok')slot.classList.add('ready');if(auto)load()}
     const playing=()=>{clearInterval(tm);box.classList.add('ok');slot.classList.add('ready')};
     function load(){if(fr||!alive)return;const c=ids[i],v=c.slice(3);
       if(c.startsWith('mp:')){fr=document.createElement('video');fr.className='msp-yf';fr.muted=muted;fr.autoplay=true;fr.loop=true;fr.playsInline=true;fr.preload='auto';fr.src=v;
-        fr.addEventListener('playing',playing,{once:true});fr.addEventListener('loadeddata',()=>slot.classList.add('ready'),{once:true});fr.addEventListener('canplay',()=>setTimeout(()=>{if(fr&&!fr.paused)playing()},300),{once:true});fr.addEventListener('error',()=>{if(fr?.error?.code===4&&navigator.onLine)badYT(c);next()},{once:true});box.insertBefore(fr,box.querySelector('[data-ym]'));fr.play?.().catch(()=>{});return}
+        fr.addEventListener('playing',playing,{once:true});fr.addEventListener('loadeddata',()=>slot.classList.add('ready'),{once:true});fr.addEventListener('canplay',()=>setTimeout(()=>{if(fr&&!fr.paused)playing()},300),{once:true});fr.addEventListener('error',()=>{if(fr?.error?.code===4&&navigator.onLine)badYT(c);next()},{once:true});box.insertBefore(fr,box.querySelector('[data-ym]'));ctlOn();fr.play?.().catch(()=>{});return}
       fr=document.createElement('iframe');fr.className='msp-yf';fr.title='Fragman';fr.allow='autoplay; encrypted-media; picture-in-picture';fr.referrerPolicy='strict-origin-when-cross-origin';
       fr.src=`https://www.youtube-nocookie.com/embed/${v}?autoplay=1&mute=1&controls=0&rel=0&playsinline=1&modestbranding=1&iv_load_policy=3&disablekb=1&loop=1&playlist=${v}&enablejsapi=1&origin=${encodeURIComponent(location.origin)}&widget_referrer=${encodeURIComponent(location.href)}`;
       // IFrame API el sıkışması: oynatıcı olay göndermeye “listening” ile başlar
       fr.addEventListener('load',()=>{const me=fr;setTimeout(()=>{if(alive&&fr===me&&!box.classList.contains('ok'))playing()},1600);const hi=()=>{try{fr?.contentWindow?.postMessage(JSON.stringify({event:'listening',id:1,channel:'widget'}),'*')}catch{}};hi();clearInterval(tm);let n=0;tm=setInterval(()=>{if(++n>40||box.classList.contains('ok'))clearInterval(tm);else hi()},250)});
-      box.insertBefore(fr,box.querySelector('[data-ym]'))}
+      box.insertBefore(fr,box.querySelector('[data-ym]'));ctlOn()}
     slot._stop=()=>{alive=false;cleanup()};next()}
   /* ═ Mini oynatıcı: fragman ayrı, sürüklenebilir ve köşesinden boyutlanabilir pencerede (sesli, kontrollü) oynar;
      Medya'da/Notlar'da gezinirken kapanmaz. Konum ve genişlik hatırlanır (mc:pip). Tek pencere: yenisi eskisinin yerini alır. ═ */
-  function pip(c,title){q('.mpip')?.remove();const P=Object.assign({w:440,x:null,y:null},lsg('mc:pip',{})),v=c.slice(3),mp=c.startsWith('mp:'),el=document.createElement('div');
+  function pip(c,title,t0=0){const old=q('.mpip');old?._off?.();old?.remove();t0=Math.max(0,Math.floor(+t0||0));const P=Object.assign({w:440,x:null,y:null},lsg('mc:pip',{})),v=c.slice(3),mp=c.startsWith('mp:'),el=document.createElement('div');
     el.className='mpip';el.setAttribute('role','dialog');el.setAttribute('aria-label','Fragman: '+(title||''));
-    el.innerHTML=`<header class="mpip-h" title="Sürükleyerek taşı"><b>${E(title||'Fragman')}</b><button data-pipx aria-label="Kapat" title="Kapat">${IC.x}</button></header>
-      <div class="mpip-v">${mp?`<video src="${E(v)}" controls autoplay playsinline></video>`:`<iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(v)}?autoplay=1&rel=0&playsinline=1&modestbranding=1" title="${E(title||'Fragman')}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`}</div>
+    el.innerHTML=`<header class="mpip-h" title="Sürükleyerek taşı"><b>${E(title||'Fragman')}</b><span class="mpip-k"><button data-pk="-10" aria-label="10 saniye geri" title="10 sn geri (←)">${IC.rw}</button><time>${fmtT(t0)}</time><button data-pk="10" aria-label="10 saniye ileri" title="10 sn ileri (→)">${IC.ff}</button></span><button data-pipx aria-label="Kapat" title="Kapat">${IC.x}</button></header>
+      <div class="mpip-v">${mp?`<video src="${E(v)}" controls autoplay playsinline></video>`:`<iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(v)}?autoplay=1&rel=0&playsinline=1&modestbranding=1&enablejsapi=1&origin=${encodeURIComponent(location.origin)}${t0>1?'&start='+t0:''}" title="${E(title||'Fragman')}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`}</div>
       <span class="mpip-r" title="Boyutlandır" aria-hidden="true"></span>`;
     document.body.appendChild(el);
+    const pv=el.querySelector('.mpip-v video,.mpip-v iframe'),tx=el.querySelector('.mpip-k time');if(mp&&t0>1)pv.addEventListener('loadedmetadata',()=>{try{pv.currentTime=t0}catch{}},{once:true});
+    const pc=playerCtl(pv,S=>{tx.textContent=fmtT(S.t)+(S.d?' / '+fmtT(S.d):'')});if(!mp){pc.t=pc.b=t0}
+    el.querySelector('.mpip-k').addEventListener('click',e=>{const k=e.target.closest('[data-pk]');if(k)pc.seek(+k.dataset.pk)});
+    // ← → 5 sn: imleç penceredeyken ya da odak penceredeyken (yazı alanında değil)
+    const kp=e=>{const d={ArrowLeft:-5,ArrowRight:5}[e.key];if(!d||!el.isConnected||e.defaultPrevented||e.target.closest?.('input,textarea,select,[contenteditable="true"]'))return;if(!(el.matches(':hover')||el.contains(document.activeElement)))return;e.preventDefault();pc.seek(d)};addEventListener('keydown',kp);
+    el._off=()=>{pc.off();removeEventListener('keydown',kp)};
     const place=()=>{const w=Math.max(260,Math.min(innerWidth-16,P.w)),h=w*9/16+38,x=P.x??innerWidth-w-24,y=P.y??innerHeight-h-24;el.style.width=w+'px';el.style.left=Math.max(8,Math.min(innerWidth-w-8,x))+'px';el.style.top=Math.max(8,Math.min(innerHeight-h-8,y))+'px'};
     const save=()=>{const r=el.getBoundingClientRect();P.x=Math.round(r.left);P.y=Math.round(r.top);P.w=Math.round(r.width);lss('mc:pip',P)};place();
     if(motion())el.animate([{opacity:0,transform:'scale(.92) translateY(10px)'},{opacity:1,transform:'none'}],{duration:360,easing:'cubic-bezier(.16,1,.3,1)'});
@@ -174,7 +205,7 @@ const Media=(()=>{
     grab(el.querySelector('.mpip-r'),(dx,dy,r0)=>{P.x=r0.left;P.y=r0.top;P.w=Math.max(260,Math.min(innerWidth-16,r0.width+Math.max(dx,dy*16/9)))});
     el.querySelector('.mpip-h').addEventListener('dblclick',()=>{P.w=P.w>=700?440:Math.min(innerWidth-48,860);place();save()});
     const onR=()=>{if(!el.isConnected)return removeEventListener('resize',onR);place()};addEventListener('resize',onR);
-    el.querySelector('[data-pipx]').addEventListener('click',()=>{removeEventListener('resize',onR);el.remove()})}
+    el.querySelector('[data-pipx]').addEventListener('click',()=>{removeEventListener('resize',onR);el._off();el.remove()})}
   /* ═ Spot ışığı: kapağın üstünde kısa bir an durunca ekranın geri kalanı bulanıklaşır, kapak yaylanarak öne çıkar.
      Puanlanmamışsa altta cam “★ Puanla” hapı: üstüne gelince açılır, imleci gezdirdikçe 1–10 akar, tıkla → kaydedilir. ═ */
   const SPT={t:0,card:null,el:null,v:0,block:null};
@@ -954,5 +985,7 @@ const Media=(()=>{
   /* sayfa değişince geçici arayüz kalmasın (Notlar route() çağırır) */
   function dismiss(){spotOff(true);qa('.mset,.mrp,.mq,.ma-bg,.mnp,.mnsp,.mrcp-bg,.mnt-bg').forEach(e=>e.remove())}
   // kaydırma, pencere değişimi, Esc → spot ışığı kapanır
-  addEventListener('scroll',()=>{SPT.quiet=Date.now()+700;if(SPT.el)spotOff()},true);addEventListener('blur',()=>spotOff(true));addEventListener('resize',()=>spotOff(true));addEventListener('keydown',e=>{if(e.key==='Escape'&&SPT.el)spotOff()});
+  addEventListener('scroll',()=>{SPT.quiet=Date.now()+700;if(SPT.el)spotOff()},true);addEventListener('blur',()=>spotOff(true));addEventListener('resize',()=>spotOff(true));addEventListener('keydown',e=>{if(e.key==='Escape'&&SPT.el)spotOff();
+    // spot açıkken ← → fragmanı 5 sn sarar (puan hapı / yazı alanı odaktaysa onlar kullanır)
+    if((e.key==='ArrowLeft'||e.key==='ArrowRight')&&SPT.el&&!e.defaultPrevented&&!e.target.closest?.('input,textarea,select,[contenteditable="true"],.sr,.msp-bar')){const sl=SPT.el.querySelector('.msp-yt'),c=sl?._ctl;if(c?.d){e.preventDefault();c.seek(e.key==='ArrowLeft'?-5:5);sl._kb?.()}}});
   return{netTest,render,refresh,detail,close,imgErr,imgOk,queue,addSheet,rateHTML,dismiss,patchCards,isMedia:t=>MT.includes(t),get st(){return st},get R(){return R},_rank:rank,_cleanG:cleanG,_yt:ytIds}})();

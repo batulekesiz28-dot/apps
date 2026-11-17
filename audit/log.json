@@ -3159,5 +3159,41 @@
     "fix": "Ayrı pencerede oynat: sürüklenebilir, boyutlanabilir, sayfa değişince kapanmaz"
    }
   ]
+ },
+ {
+  "at": "2026-11-17",
+  "change": "Fragmana ileri/geri sarma: spot fragmanında 10 sn geri/ileri, ilerleme çubuğu (tıkla/sürükle), süre; ← → 5 sn; mini oynatıcıda başlıkta sarma ve kaldığı saniyeden devam",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Yeni “süre biliniyor” sınıfı (.sk) Notlar’ın yükleniyor iskeletiyle çakıştı, fragman 85 piksele küçüldü",
+    "fix": "Sınıf adı .hsk yapıldı"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Çok dar fragmanda sarma şeridi sığmıyor",
+    "fix": "340 pikselin altında süre, 250’nin altında şerit gizlenir; ince ilerleme çizgisi kalır"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "open",
+    "text": "Gerçek YouTube’la denenemedi (bu ortamda internet yok); süre/konum bilgisi YouTube’un oynatıcı mesajlarından geliyor, sahte oynatıcıyla doğrulandı"
+   }
+  ]
  }
 ]

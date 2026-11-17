@@ -3430,5 +3430,41 @@
     "text": "Gerçek YouTube Music'le denenemedi (internet yok); bağı kesen ve kesmeyen sahte siteyle doğrulandı"
    }
   ]
+ },
+ {
+  "at": "2026-11-17",
+  "change": "YouTube Music hub'ın içinde: küçük AppShell eklentisi kuruluysa kendi sekmesinde açılıyor; değilse kurulum penceresi. Müzik sekmesi uyutulmuyor; başka pencereye geçince galaksi duruyor",
+  "scores": {
+   "hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "hub masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "hub",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "YouTube Music ayrı pencerede açılıyordu, arkadaki galaksi çalışmaya devam ettiği için kasıyordu",
+    "fix": "Eklentiyle hub içinde sekme; hub odak kaybedince galaksi duruyor"
+   },
+   {
+    "app": "hub",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Başka uygulamaya geçince arka plandaki sekmeler uyutulabiliyordu — müzik dururdu",
+    "fix": "Müzik (win) sekmeleri uyutulmuyor"
+   },
+   {
+    "app": "hub",
+    "sev": "bilgi",
+    "status": "open",
+    "text": "Gerçek YouTube Music'le denenemedi (internet yok); gömme yasağı koyan sahte sunucuyla: eklentisiz boş kaldı, eklentiyle açıldı. Oturum için 3. taraf çerezlerine izin gerekebilir"
+   }
+  ]
  }
 ]

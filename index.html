@@ -426,6 +426,11 @@ body.linking,body.linking .node,body.linking #stage{cursor:crosshair}
 .sh-b::-webkit-scrollbar{display:none}
 .sh-f{display:flex;align-items:center;gap:8px;padding:12px 18px;border-top:.5px solid var(--line2)}
 .sh-f .grow{flex:1;font-size:11.5px;color:var(--ink3)}
+.gom p{margin:0 0 14px;font-size:13.5px;line-height:1.55;color:var(--ink2)}.gom p b{color:var(--ink)}
+.gom ol{margin:0 0 14px;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:13.5px;line-height:1.5}
+.gom li::marker{color:var(--ink3);font-variant-numeric:tabular-nums}.gom a{color:var(--ink);font-weight:600;text-underline-offset:3px}
+.gom code{padding:2px 6px;border-radius:6px;background:var(--hover);font-size:12.5px}.gom li .btn{height:26px;padding:0 9px;margin-left:4px}
+.gom .gom-n{margin:0;font-size:12.5px;color:var(--ink3)}
 .x{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;color:var(--ink3)}
 .x:hover{background:var(--hover);color:var(--ink)}
 .x svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round}
@@ -1884,6 +1889,9 @@ function setPaused(p){if(document.body.classList.contains('inworld'))p=true;paus
 const touchInput=()=>{lastInput=performance.now()};
 ['pointermove','pointerdown','keydown','wheel'].forEach(ev=>addEventListener(ev,touchInput,{passive:true,capture:true}));
 document.addEventListener('visibilitychange',()=>setPaused(document.hidden||(!!W.app&&!W.min)));
+// hub odağı başka pencereye (ör. YouTube Music penceresi) kaptırınca galaksi durur → o pencere kasmaz; geri gelince devam
+addEventListener('blur',()=>setTimeout(()=>{if(!document.hasFocus()&&document.activeElement?.tagName!=='IFRAME')setPaused(true)},0));
+addEventListener('focus',()=>{if(!calmOn)setPaused(document.hidden||(!!W.app&&!W.min))});
 
 /* Pointer on empty canvas */
 addEventListener('pointermove',e=>{if(e.pointerType==='mouse'||ptr.down){ptr.x=e.clientX;ptr.y=e.clientY;if(ptr.sx<-1e3){ptr.sx=ptr.x;ptr.sy=ptr.y}ptr.tAmp=wDrag||e.target.closest?.('.wg,.zbar,.top')?0:1;wakeMesh()}
@@ -2584,7 +2592,7 @@ function mountFrame(t){const f=document.createElement('iframe'),a=t.app;f.classN
   t.loading=true;f.addEventListener('load',()=>frameLoaded(t,f));W.el.appendChild(f);t.fr=f}
 function dropFrame(t){if(t.fr){t.fr.remove();t.fr=null}if(t.blob){URL.revokeObjectURL(t.blob);t.blob=null}t.loading=false}
 // keep memory in check: the least recently used background apps go to sleep (reloaded when you come back)
-function sleepExtra(){const live=mru().filter(t=>t.fr);for(const t of live.slice(MAXLIVE))if(t!==curTab())dropFrame(t)}
+function sleepExtra(){const live=mru().filter(t=>t.fr&&!t.app.win);for(const t of live.slice(MAXLIVE))if(t!==curTab())dropFrame(t)} // müzik (win) sekmeleri uyumaz: arkada çalmaya devam eder
 let progA=null;
 function progress(){const p=$('#prog');progA?.cancel();p.style.opacity=1;
   progA=anim(p,[{transform:'scaleX(0)'},{transform:'scaleX(.35)',offset:.2},{transform:'scaleX(.85)'}],{duration:2600,easing:'cubic-bezier(.1,.6,.2,1)',fill:'forwards'})}
@@ -2618,8 +2626,22 @@ function openWin(a){hidePeek(true);const name='appshell-'+a.slug,sk='appshell:wi
     const at=Date.now(),rec=WINS[a.slug]={w,cut:false};
     const iv=setInterval(()=>{if(!w.closed)return;clearInterval(iv);if(WINS[a.slug]!==rec)return;
       if(Date.now()-at<5000){rec.cut=true;try{sessionStorage.setItem(sk,String(at))}catch{}}else delete WINS[a.slug]},400)}}
+/* Hub içinde açma: tarayıcıda AppShell eklentisi (extensions/appshell-gom) kuruluysa gömülemeyen site de normal sekme olur.
+   Eklenti sayfaya data-appshell-gom="1" koyar. Yoksa kurulum penceresi (telefonda eklenti olmadığından doğrudan ayrı pencere). */
+const gomOK=()=>document.documentElement.dataset.appshellGom==='1';
+function gomSheet(a){if(matchMedia('(pointer:coarse)').matches){openWin(a);return}const n=esc(a.name);
+  sheet(`${n} · hub içinde`,`<div class="gom"><p>${n} başka sitelerin içinde açılmayı engelliyor. Tarayıcına <b>bir kerelik küçük bir eklenti</b> kurarsan hub'ın içinde, kendi sekmesinde açılır. Eklenti sadece bu hub'da ve sadece ${n} için çalışır; başka hiçbir siteye dokunmaz.</p>
+    <ol><li><a href="extensions/appshell-gom.zip" download>Eklentiyi indir</a>, zip'i bir klasöre çıkar.</li>
+      <li>Adres çubuğuna <code>chrome://extensions</code> yaz <button class="btn ghost" data-gc>Kopyala</button></li>
+      <li>Sağ üstte <b>Geliştirici modu</b>nu aç.</li>
+      <li><b>Paketlenmemiş öğe yükle</b> → çıkardığın klasörü seç.</li>
+      <li>Bu sayfayı yenile — ${n} artık burada açılır.</li></ol>
+    <p class="gom-n">Hesabın görünmezse bir kez normal sekmede music.youtube.com'da oturum aç.</p></div>`,
+    `<button class="btn ghost" data-gw>Ayrı pencerede aç</button><span class="grow"></span><button class="btn solid" data-gr>Kurdum, yenile</button>`,
+    s=>s.addEventListener('click',e=>{if(e.target.closest('[data-gc]')){navigator.clipboard?.writeText('chrome://extensions').then(()=>toast('Kopyalandı — adres çubuğuna yapıştır'),()=>{});return}
+      if(e.target.closest('[data-gw]')){closeSheet();openWin(a);return}if(e.target.closest('[data-gr]'))location.reload()}))}
 function openApp(a,el){
-  if(!a||justDragged||linkDrag)return;if(a.win){openWin(a);return}hidePeek(true);
+  if(!a||justDragged||linkDrag)return;if(a.win&&!gomOK()){gomSheet(a);return}hidePeek(true);
   let t=tabOf(a.key);
   if(!t){t={key:a.key,app:a,fr:null,blob:null,t:0,loading:false};TABS.push(t)}
   else if(a.url&&a.url!==t.app.url&&t.fr&&a.kind!=='draft'){t.app=a;try{t.fr.contentWindow.location.replace(bust(a.url))}catch{t.fr.src=bust(a.url)}}

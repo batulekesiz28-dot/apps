@@ -3309,5 +3309,54 @@
     "text": "Gerçek YouTube'la denenemedi (internet yok); ses komutları sahte oynatıcıyla doğrulandı"
    }
   ]
+ },
+ {
+  "at": "2026-11-17",
+  "change": "Fragmanlar artık bütün kaynaklardan aynı anda aranıyor (yavaş servis beklenmiyor); TMDB/YouTube anahtar alanları; KinoCheck kaynağı; film kartları da ~460×400'e büyüyebiliyor",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Fragman kaynakları sırayla bekleniyordu; yavaş bağlantıda 10–20 sn sürüyordu",
+    "fix": "Hepsi aynı anda; yavaş iTunes (6 sn) ve Wikidata (7 sn) varken fragman 1,3 sn'de oynadı"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "TMDB anahtarı destekleniyordu ama girilecek yer yoktu",
+    "fix": "Görünüm panelinde Fragman kaynakları: TMDB ve YouTube anahtarı, yapıştırınca denenir"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Film kartları en fazla ~285 px genişliyordu",
+    "fix": "Tavan bölüme göre hesaplanıyor; film kartı 488×403'e çıktı"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "open",
+    "text": "Oyun fragmanları için anahtarsız iyi bir kaynak yok (Steam tarayıcıdan sorgulanamıyor); YouTube anahtarı gerekiyor"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "open",
+    "text": "KinoCheck gerçek internette denenemedi; çalışmazsa sessizce atlanıyor, bağlantı testinde görünüyor"
+   }
+  ]
  }
 ]

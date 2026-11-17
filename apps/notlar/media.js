@@ -109,24 +109,46 @@ const Media=(()=>{
   try{['mc:ytbad','mc:yt','mc:yt2','mc:yt3','mc:yt4','mc:arec'].forEach(k=>localStorage.removeItem(k))}catch{} // eski sürümlerin kalıntıları
   // “bozuk” = sadece gerçekten silinmiş/gömme kapalı video (bağlantı hatası DEĞİL); 30 gün sonra unutulur
   const YTB=(()=>{const o=lsg('mc:ytbad2',{}),n=Date.now();for(const k in o)if(n-o[k]>30*864e5)delete o[k];return o})();const badYT=v=>{YTB[v]=Date.now();lss('mc:ytbad2',YTB)};
+  /* Bütün kaynaklar AYNI ANDA sorulur (biri yavaşsa/yanıt vermiyorsa diğerleri beklemez). İlk aday gelince 450 ms daha
+     beklenir (daha iyi sıradaki gelsin diye), sonra liste döner; geri kalanlar arka planda bitince önbelleğe (mc:yt5) yazılır.
+     Sıra (küçük = önce): YouTube araması/TMDB/KinoCheck 0–1 · AniList, iTunes 2 · Wikidata, Jikan 3. En fazla 9 sn beklenir.
+     YouTube anahtarı (mc:ytkey) oyunlarda hep, diğerlerinde sadece hiçbir kaynak bulamazsa kullanılır (günlük kota için). */
+  const ytKey=()=>lsg('mc:ytkey','')||'';
+  async function ytSearch(it,add){const k=ytKey();if(!k)return;const g=it.type==='game',yr=parseInt(it.year)||'';
+    const j=await getJSON(`https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&videoEmbeddable=true&maxResults=5&q=${encodeURIComponent(`${it.title} ${yr} ${g?'game trailer':it.type==='anime'?'anime trailer':'trailer'}`)}&key=${encodeURIComponent(k)}`);
+    if(j?.error)throw new Error(j.error.message||'YouTube');const nt=norm(it.title);
+    (j?.items||[]).map(x=>({v:x.id?.videoId,t:norm(x.snippet?.title||'')})).filter(x=>x.v).forEach((x,n)=>add(x.v,(/trailer|fragman|teaser/.test(x.t)?0:.6)+(x.t.includes(nt)?0:.3)+n*.05))}
   function ytIds(it){if(!hasTrailer(it))return Promise.resolve([]);const c=YT[it.id],l=c?(c.l||[]).filter(v=>!YTB[v]):null;
     if(c&&(l.length||Date.now()-c.at<7*864e5))return Promise.resolve(l);
     if(ytP.has(it.id))return ytP.get(it.id);
-    const p=(async()=>{const out=[],add=v=>{v=okYT(v)?'yt:'+v:v;if(/^(yt|mp):/.test(v||'')&&!out.includes(v)&&!YTB[v])out.push(v)};let done=true;
+    const p=new Promise(resolve=>{const C=[];let pend=0,done=true,res=false,grace=0,ytTried=false;
+      const list=()=>C.slice().sort((a,b)=>a.r-b.r).map(x=>x.v).slice(0,8);
+      const fin=()=>{if(res)return;res=true;clearTimeout(grace);clearTimeout(cap);resolve(list())};
+      const add=(v,r=3)=>{v=okYT(v)?'yt:'+v:v;if(!/^(yt|mp):/.test(v||'')||YTB[v])return;const o=C.find(x=>x.v===v);if(o){o.r=Math.min(o.r,r);return}C.push({v,r});if(!res&&!grace)grace=setTimeout(fin,450)};
+      const all=()=>{if(!C.length&&!ytTried&&ytKey()){ytTried=true;task(()=>ytSearch(it,add));return}
+        fin();ytP.delete(it.id);const L=list();if(done||L.length){YT[it.id]={l:L,at:Date.now()};lss('mc:yt5',YT)}};
+      const task=f=>{pend++;Promise.resolve().then(f).catch(()=>{done=false}).finally(()=>{if(--pend===0)all()})};
+      const cap=setTimeout(fin,9000);
       const wdq=async q=>{const e=await getJSON(`https://www.wikidata.org/w/api.php?action=wbgetclaims&entity=${q}&property=P1651&format=json&origin=*`);const cl=(e?.claims?.P1651||[]).filter(x=>x.rank!=='deprecated');
-        cl.sort((a,b)=>(b.rank==='preferred')-(a.rank==='preferred')).slice(0,6).forEach(x=>add(x?.mainsnak?.datavalue?.value))};
+        cl.sort((a,b)=>(b.rank==='preferred')-(a.rank==='preferred')).slice(0,6).forEach((x,n)=>add(x?.mainsnak?.datavalue?.value,3+n*.05))};
       const byProp=async(pr,val)=>{const j=await getJSON(`https://www.wikidata.org/w/api.php?action=query&list=search&srsearch=haswbstatement:${pr}=${encodeURIComponent(val)}&srlimit=1&format=json&origin=*`);return j?.query?.search?.[0]?.title||''};
-      try{if(it.type==='movie'||it.type==='series'){const yr=parseInt(it.year)||0,k=it.type==='series'?'tv':'mv',en=(it.wiki&&!it.wiki.startsWith('tr:')?it.wiki:'').replace(/_/g,' ').replace(/\s*\([^)]*\)\s*$/,'');
-          let u=await itPrev(it.title,yr,k,'tr');if(!u&&en&&norm(en)!==norm(it.title))u=await itPrev(en,yr,k,'us');if(!u)u=await itPrev(it.title,yr,k,'us');if(u)add('mp:'+u)}
-        if(it.type==='anime'){try{const v=it.mal?{m:+it.mal}:{q:it.title};const d=await alGQL(`query($m:Int,$q:String){Media(idMal:$m,search:$q,type:ANIME){trailer{id site}}}`,v);if(d?.Media?.trailer?.site==='youtube')add(d.Media.trailer.id)}catch(e){done=false}
-          if(it.mal&&!out.length){try{const d=await jget(`https://api.jikan.moe/v4/anime/${it.mal}`);add(d?.data?.trailer?.youtube_id)}catch(e){if(!out.length)done=false}}}
-        const key=tmdbKey();if(key&&it.imdb&&it.type!=='game'){const f=await getJSON(`https://api.themoviedb.org/3/find/${it.imdb}?api_key=${encodeURIComponent(key)}&external_source=imdb_id`);
-          const m=(f?.movie_results||[])[0],t=(f?.tv_results||[])[0],id=(m||t)?.id;if(id){const vs=await getJSON(`https://api.themoviedb.org/3/${m?'movie':'tv'}/${id}/videos?api_key=${encodeURIComponent(key)}`);
-            const V=(vs?.results||[]).filter(x=>x.site==='YouTube'),rk=x=>(x.type==='Trailer'?0:x.type==='Teaser'?2:4)+(x.official?0:1);V.sort((a,b)=>rk(a)-rk(b)).slice(0,5).forEach(x=>add(x.key))}}
-        let q=/^Q\d+$/.test(it.mid||'')?it.mid:'';if(!q&&it.imdb)q=await byProp('P345',it.imdb);if(!q&&it.steam)q=await byProp('P1733',it.steam);if(q)await wdq(q)}
-      catch(e){done=false}
-      ytP.delete(it.id);if(done||out.length){YT[it.id]={l:out,at:Date.now()};lss('mc:yt5',YT)}return out})();
+      const tv=it.type==='series';
+      if(it.type==='movie'||tv){const yr=parseInt(it.year)||0,k=tv?'tv':'mv',en=(it.wiki&&!it.wiki.startsWith('tr:')?it.wiki:'').replace(/_/g,' ').replace(/\s*\([^)]*\)\s*$/,'');
+        task(async()=>{const u=await itPrev(it.title,yr,k,'tr');if(u)add('mp:'+u,2)});
+        task(async()=>{const u=await itPrev(en&&norm(en)!==norm(it.title)?en:it.title,yr,k,'us');if(u)add('mp:'+u,2.2)});
+        // KinoCheck: IMDb kimliğiyle resmî fragman (anahtarsız)
+        if(it.imdb)task(async()=>{const d=await getJSON(`https://api.kinocheck.com/${tv?'shows':'movies'}?imdb_id=${encodeURIComponent(it.imdb)}&language=en`);
+          add(d?.trailer?.youtube_video_id,1);(d?.videos||[]).slice(0,4).forEach((x,n)=>add(x?.youtube_video_id,1.4+n*.05))})}
+      if(it.type==='anime'){task(async()=>{const v=it.mal?{m:+it.mal}:{q:it.title};const d=await alGQL(`query($m:Int,$q:String){Media(idMal:$m,search:$q,type:ANIME){trailer{id site}}}`,v);if(d?.Media?.trailer?.site==='youtube')add(d.Media.trailer.id,2)});
+        if(it.mal)task(async()=>{const d=await jget(`https://api.jikan.moe/v4/anime/${it.mal}`);add(d?.data?.trailer?.youtube_id,3)})}
+      const key=tmdbKey();if(key&&it.imdb&&it.type!=='game')task(async()=>{const f=await getJSON(`https://api.themoviedb.org/3/find/${it.imdb}?api_key=${encodeURIComponent(key)}&external_source=imdb_id`);
+        const m=(f?.movie_results||[])[0],t=(f?.tv_results||[])[0],id=(m||t)?.id;if(!id)return;const vs=await getJSON(`https://api.themoviedb.org/3/${m?'movie':'tv'}/${id}/videos?api_key=${encodeURIComponent(key)}`);
+        const V=(vs?.results||[]).filter(x=>x.site==='YouTube'),rk=x=>(x.type==='Trailer'?0:x.type==='Teaser'?.4:.8)+(x.official?0:.2);V.sort((a,b)=>rk(a)-rk(b)).slice(0,5).forEach(x=>add(x.key,.5+rk(x)))});
+      if(it.type==='game'&&ytKey()){ytTried=true;task(()=>ytSearch(it,add))}
+      task(async()=>{let q=/^Q\d+$/.test(it.mid||'')?it.mid:'';if(!q&&it.imdb)q=await byProp('P345',it.imdb);if(!q&&it.steam)q=await byProp('P1733',it.steam);if(q)await wdq(q)})});
     ytP.set(it.id,p);return p}
+  // anahtar eklenince/değişince: daha önce hiçbir şey bulunamayanlar yeniden aranır
+  function ytForgetEmpty(){for(const k in YT)if(!(YT[k].l||[]).length)delete YT[k];lss('mc:yt5',YT)}
   let ytWarm=false;function warmYT(){if(ytWarm)return;ytWarm=true;for(const h of['https://www.youtube-nocookie.com','https://i.ytimg.com','https://www.wikidata.org']){const l=document.createElement('link');l.rel='preconnect';l.href=h;l.crossOrigin='';document.head.appendChild(l)}}
   // silinmiş videonun kapak karesi 120×90 gri yer tutucudur → hiç denemeden ele
   const thumbOK=v=>new Promise(res=>{const im=new Image();const t=setTimeout(()=>res('unk'),2500);im.onload=()=>{clearTimeout(t);res(im.naturalWidth>120?'ok':'bad')};im.onerror=()=>{clearTimeout(t);res('unk')};im.src=`https://i.ytimg.com/vi/${v}/mqdefault.jpg`});
@@ -397,6 +419,9 @@ const Media=(()=>{
       ['Wikidata arama','Poster eşleştirme','j','https://query.wikidata.org/sparql?format=json&query='+encodeURIComponent('SELECT ?x WHERE{BIND(1 AS ?x)}')],
       ['TVmaze','Dizi kapakları ve yeni sezonlar','j','https://api.tvmaze.com/shows/1'],
       ['YouTube','Fragman oynatıcı','img','https://i.ytimg.com/vi/dQw4w9WgXcQ/mqdefault.jpg'],
+      ['KinoCheck','Film/dizi fragmanları (anahtarsız)','j','https://api.kinocheck.com/movies?imdb_id=tt0111161&language=en'],
+      ...(tmdbKey()?[['TMDB (anahtarın)','Film/dizi fragmanları ve posterleri','j','https://api.themoviedb.org/3/configuration?api_key='+encodeURIComponent(tmdbKey())]]:[]),
+      ...(ytKey()?[['YouTube araması (anahtarın)','Oyun ve kalan fragmanlar','j','https://www.googleapis.com/youtube/v3/videos?part=id&id=dQw4w9WgXcQ&key='+encodeURIComponent(ytKey())]]:[]),
       ['Önizleme (microlink)','Notlardaki link kartları','j','https://api.microlink.io/?url=https://example.com']];
     const row=(t,r)=>`<li class="${r?r.ok?'ok':'no':'wait'}"><span class="mnt-i" aria-hidden="true">${r?r.ok?'✓':'✕':'…'}</span><span class="mnt-n"><b>${E(t[0])}</b><small>${E(t[1])}</small></span><em>${r?r.ok?r.ms+' ms':E(r.why):'deneniyor'}</em></li>`;
     const R=T.map(()=>null);const paint=()=>{const done=R.every(Boolean),bad=R.filter(r=>r&&!r.ok).length;
@@ -571,26 +596,37 @@ const Media=(()=>{
   /* boyut önizlemesi: kütüphaneden rastgele bir kapak; kenarından/köşesinden çekilerek bütün kartlar boyutlanır */
   let pvIt=null;
   const pvPick=()=>{const inSec=i=>st.sec==='home'||secOf(i.type)===st.sec;if(pvIt&&KB.items.has(pvIt.id)&&inSec(pvIt))return pvIt;const l=[...KB.items.values()].filter(i=>AT.includes(i.type)&&inSec(i)&&(i.cover||i.backdrop||i.wide));pvIt=l.length?l[Math.random()*l.length|0]:null;return pvIt};
+  /* boyut sınırları: her bölümde/görünümde kart en az ~480 px genişliğe kadar büyüyebilir (dar film posterleri de oyunlar gibi 460×400'e çıkar).
+     Genişlik yüzdesinin tavanı o anki kartın %100'deki genişliğinden hesaplanır (en az %160, en çok %400); yükseklik %40–170. */
+  const szLim=()=>{const a=q('#view>.mc .mc-main .mc-card[data-mi]')||q('#view>.mc .mc-card[data-mi]'),cz=(st.look.cover||100)/100,w=a?a.getBoundingClientRect().width/cz:0;
+    return{cv:w>20?Math.min(400,Math.max(160,Math.ceil(480/w*20)*5)):300,arMin:40,arMax:170}};
   const pvBase=()=>V()==='tv'&&hasWide(pvPick()||{})?{B:150,R:215/460}:{B:96,R:3/2};
   function pvHTML(){const L=st.look,it=pvPick()||{id:'',type:'movie',title:'Örnek film',cover:''},wide=V()==='tv'&&hasWide(it),{B}=pvBase();
     return`<div class="mset-pv"><div class="mset-pf" style="width:${B*L.cover/100}px;--ar:${(L.ar||100)/100};--r:${L.radius}px">${wide?wideArt(it):poster(it)}
-      <span class="mset-hx" data-pvh="x" tabindex="0" role="slider" aria-label="Kapak genişliği" aria-valuemin="60" aria-valuemax="160" aria-valuenow="${L.cover}" title="Genişlik · çift tıkla: sıfırla"></span>
-      <span class="mset-hy" data-pvh="y" tabindex="0" role="slider" aria-label="Kapak yüksekliği" aria-valuemin="60" aria-valuemax="170" aria-valuenow="${L.ar||100}" title="Yükseklik · çift tıkla: sıfırla"></span>
+      <span class="mset-hx" data-pvh="x" tabindex="0" role="slider" aria-label="Kapak genişliği" aria-valuemin="60" aria-valuemax="${szLim().cv}" aria-valuenow="${L.cover}" title="Genişlik · çift tıkla: sıfırla"></span>
+      <span class="mset-hy" data-pvh="y" tabindex="0" role="slider" aria-label="Kapak yüksekliği" aria-valuemin="40" aria-valuemax="170" aria-valuenow="${L.ar||100}" title="Yükseklik · çift tıkla: sıfırla"></span>
       <span class="mset-hc" data-pvh="xy" title="İkisi birden · çift tıkla: sıfırla" aria-hidden="true"></span></div>
       <div class="mset-pc"${L.title?'':' hidden'}>${E(it.title)}</div><div class="mset-sz" aria-live="polite"></div></div>
       <p class="mset-hint">Kenarından ya da köşesinden çek · çift tık sıfırlar</p>`}
   // ekrandaki gerçek kartın boyu (px) — önizleme küçük ölçekli, bu sayı gerçeği söyler
   const realSize=()=>{const a=q('#view>.mc .mc-main .mc-art, #view>.mc .mc-art');if(!a)return'';const r=a.getBoundingClientRect();return r.width?`${Math.round(r.width)} × ${Math.round(r.height)} px`:''};
+  // anahtar satırı: yapıştır → kaydedilir ve denenir (✓/✕); bulunamayan fragmanlar yeniden aranır
+  const keyRow=(k,n,d,u)=>{const v=lsg(k,'')||'';return`<div class="mset-key"><label for="mk-${k.slice(3)}">${n}<a href="${u}" target="_blank" rel="noopener">Nasıl alınır ↗</a></label>
+    <div class="mset-kr"><input id="mk-${k.slice(3)}" type="password" autocomplete="off" spellcheck="false" placeholder="Yapıştır" value="${E(v)}" data-key="${k}" aria-describedby="mks-${k.slice(3)}"><span id="mks-${k.slice(3)}" class="mset-ks${v?' ok':''}" aria-live="polite">${v?'Kayıtlı':''}</span></div><small class="mset-kd">${d}</small></div>`};
+  async function keyTest(k,v){if(!v)return'';try{const j=await getJSON(k==='mc:tmdb'?`https://api.themoviedb.org/3/configuration?api_key=${encodeURIComponent(v)}`:`https://www.googleapis.com/youtube/v3/videos?part=id&id=dQw4w9WgXcQ&key=${encodeURIComponent(v)}`);
+    return j&&!j.error&&!j.status_code?'ok':'bad'}catch(e){return'net'}}
   function setHTML(){const L=st.look,seg=(k,o)=>`<div class="mset-seg" role="radiogroup">${o.map(([v,n])=>`<button role="radio" data-lk="${k}" data-lval="${v}" aria-checked="${L[k]===v}" class="${L[k]===v?'on':''}">${n}</button>`).join('')}</div>`;
     const rng=(k,n,min,max,stp,u='%')=>`<label for="mset-${k}">${n} <output>${L[k]}${u}</output></label><input id="mset-${k}" type="range" min="${min}" max="${max}" step="${stp}" value="${L[k]}" data-lr="${k}" data-u="${u}">`;
     const tg=(attr,k,n,on)=>`<button class="mset-tg" role="switch" ${attr}="${k}" aria-checked="${!!on}"><span>${n}</span><i aria-hidden="true"></i></button>`;
     const sh=L.shelves;
     return`<header><b>Görünüm <span class="mset-sc">· ${st.sec==='home'?'Ana sayfa':E(SEC[st.sec].n)}</span></b><button class="mset-x" data-msx aria-label="Kapat">${IC.x}</button></header>
       <h4>Görünüm türü</h4>${seg('view',VIEWS.map(([k,n])=>[k,n]))}
-      <h4>Kartlar</h4>${pvHTML()}<div class="mset-tgs">${tg('data-lt','title','Altında isim',L.title)}</div>${rng('cover','Kapak genişliği',60,160,5)}${rng('ar','Kapak yüksekliği',60,170,5)}${rng('radius','Köşe yuvarlaklığı',0,24,1,'px')}${rng('gap','Kart aralığı',40,220,10)}
+      <h4>Kartlar</h4>${pvHTML()}<div class="mset-tgs">${tg('data-lt','title','Altında isim',L.title)}</div>${rng('cover','Kapak genişliği',60,szLim().cv,5)}${rng('ar','Kapak yüksekliği',40,170,5)}${rng('radius','Köşe yuvarlaklığı',0,24,1,'px')}${rng('gap','Kart aralığı',40,220,10)}
       <label>Izgara yoğunluğu</label>${seg('dens',[['r','Rahat'],['n','Normal'],['s','Sıkı']])}
       <div class="mset-tgs">${tg('data-lt','meta','Yıl, tür, yazar',L.meta)}${tg('data-lt','badge','Genel puan rozeti',L.badge)}</div>
       <h4>Fragman</h4><div class="mset-tgs">${tg('data-lyt','on','Üstüne gelince fragman',!lsg('mc:ytoff',false))}</div><label for="mset-ytw">Fragman genişliği <output>${lsg('mc:ytw',480)}px</output></label><input id="mset-ytw" type="range" min="240" max="960" step="20" value="${lsg('mc:ytw',480)}" data-ytw>
+      <h4>Fragman kaynakları</h4>${keyRow('mc:tmdb','TMDB anahtarı','Film ve dizilerin neredeyse hepsi','https://www.themoviedb.org/settings/api')}${keyRow('mc:ytkey','YouTube anahtarı','Oyunlar ve bulunamayan her şey','https://console.cloud.google.com/apis/library/youtube.googleapis.com')}
+      <p class="mset-kh">İkisi de ücretsiz, isteğe bağlı. Sadece bu tarayıcıda saklanır, kimseyle paylaşılmaz.</p>
       <h4>Liste</h4>${rng('rowh','Satır yüksekliği',70,170,5)}
       <label>Sütunlar</label><div class="mset-tgs">${LC.map(([k,n])=>tg('data-lc',k,n,L.lc[k])).join('')}</div>
       <h4>Ana sayfa</h4><div class="mset-tgs">${tg('data-lt','hero','Büyük vitrin',L.hero)}</div>
@@ -614,13 +650,16 @@ const Media=(()=>{
     el.addEventListener('dblclick',e=>{const h=e.target.closest('[data-pvh]');if(!h)return;const L=st.look,ax=h.dataset.pvh;setSize(ax==='y'?L.cover:100,ax==='x'?(L.ar||100):100);saveLook()});
     el.addEventListener('keydown',e=>{const h=e.target.closest('[data-pvh]');if(!h)return;const L=st.look,d=e.shiftKey?10:5,cl=(v,a,b)=>Math.max(a,Math.min(b,v));let cv=L.cover,ar=L.ar||100;
       if(e.key==='ArrowRight')cv+=d;else if(e.key==='ArrowLeft')cv-=d;else if(e.key==='ArrowDown')ar+=d;else if(e.key==='ArrowUp')ar-=d;else if(e.key==='Home'||e.key==='0'){cv=100;ar=100}else return;
-      e.preventDefault();setSize(cl(cv,60,160),cl(ar,60,170));saveLook()});
+      e.preventDefault();const Z=szLim();setSize(cl(cv,60,Math.max(Z.cv,L.cover)),cl(ar,Z.arMin,Z.arMax));saveLook()});
+    el.addEventListener('change',async e=>{const t=e.target;if(!t.matches('[data-key]'))return;const k=t.dataset.key,v=t.value.trim(),ks=t.parentElement.querySelector('.mset-ks');lss(k,v);ytForgetEmpty();
+      if(!v){ks.className='mset-ks';ks.textContent='Kaldırıldı';return}ks.className='mset-ks';ks.textContent='Deneniyor…';const r=await keyTest(k,v);if(!ks.isConnected)return;
+      ks.className='mset-ks '+(r==='ok'?'ok':'bad');ks.textContent=r==='ok'?'✓ Çalışıyor':r==='bad'?'✕ Anahtar geçersiz':'Kaydedildi · şu an denenemedi'});
     el.addEventListener('input',e=>{const t=e.target;if(t.matches('[data-ytw]')){t.previousElementSibling.querySelector('output').textContent=t.value+'px';lss('mc:ytw',+t.value);return}if(t.dataset.lr){t.previousElementSibling.querySelector('output').textContent=t.value+t.dataset.u;setLook(t.dataset.lr,+t.value);pvSync()}});
     el.addEventListener('pointerdown',e=>{const h=e.target.closest('[data-pvh]');if(!h)return;e.preventDefault();const f=h.parentElement,ax=h.dataset.pvh,{B,R}=pvBase(),x0=e.clientX,y0=e.clientY,w0=f.offsetWidth,h0=f.offsetHeight;
-      const L=st.look,c0=L.cover,a0=L.ar||100,cl=(v,a,b)=>{v=Math.abs(v-100)<=7?100:Math.round(v/5)*5;return Math.max(a,Math.min(b,v))};let raf=0,last=null;
+      const L=st.look,c0=L.cover,a0=L.ar||100,Z=szLim(),cl=(v,a,b)=>{v=Math.abs(v-100)<=7?100:Math.round(v/5)*5;return Math.max(a,Math.min(b,v))};let raf=0,last=null;
       try{h.setPointerCapture(e.pointerId)}catch(_){}f.classList.add('drag');el.classList.add('see');document.body.classList.add('mset-drag');
       const step=()=>{raf=0;const ev=last;const w=ax==='y'?w0:w0+(ev.clientX-x0),hh=ax==='x'?h0*w/w0:h0+(ev.clientY-y0);
-        const cv=ax==='y'?c0:cl(w/B*100,60,160),ar=ax==='x'?a0:cl(hh/(Math.max(1,B*cv/100)*R)*100,60,170);
+        const cv=ax==='y'?c0:cl(w/B*100,60,Math.max(Z.cv,c0)),ar=ax==='x'?a0:cl(hh/(Math.max(1,B*cv/100)*R)*100,Z.arMin,Z.arMax);
         setSize(cv,ar)};
       const mv=ev=>{last=ev;if(!raf)raf=requestAnimationFrame(step)};
       const up=()=>{h.removeEventListener('pointermove',mv);h.removeEventListener('pointerup',up);h.removeEventListener('pointercancel',up);if(raf){cancelAnimationFrame(raf);raf=0;if(last)step()}f.classList.remove('drag');el.classList.remove('see');document.body.classList.remove('mset-drag');saveLook()};
@@ -819,7 +858,7 @@ const Media=(()=>{
     const fin=v=>{if(done)return;done=true;window[cb]=()=>{};s.remove();res(v)};const nt=norm(term);
     window[cb]=d=>{const L=(d?.results||[]).filter(x=>x.previewUrl);const nm=x=>norm(kind==='tv'?(x.collectionName||'').replace(/,?\s*(season|sezon)\s*\d+.*$/i,''):x.trackName||'');
       const yr=x=>!year||Math.abs(parseInt(x.releaseDate)-year)<=1;const r=L.find(x=>nm(x)===nt&&yr(x))||L.find(x=>(nm(x).startsWith(nt)||nt.startsWith(nm(x)))&&nm(x).length>2&&yr(x)&&year)||(year?null:L.find(x=>nm(x).startsWith(nt)));fin(r?.previewUrl||'')};
-    s.onerror=()=>fin('');setTimeout(()=>fin(''),7000);
+    s.onerror=()=>fin('');setTimeout(()=>fin(''),4000);
     s.src=`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&${kind==='tv'?'media=tvShow&entity=tvSeason':'media=movie&entity=movie'}&country=${cc}&limit=15&callback=${cb}`;document.head.appendChild(s)})}
   function itunes(term,year){return new Promise(res=>{const cb='__mcit'+Math.random().toString(36).slice(2);const s=document.createElement('script');let done=false;
     const fin=v=>{if(done)return;done=true;window[cb]=()=>{};s.remove();res(v)};

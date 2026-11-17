@@ -438,14 +438,14 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
 @media (max-width:760px){.pgb{min-height:58px}.tw,.tw0{width:36px;height:40px}.ni.tr{padding-left:calc(2px + var(--dp,0)*14px)}.sub-add{height:44px}.crumb .cr{height:40px;max-width:120px}.pgn{display:none}.mv-q{height:40px}}
 </style>
 <script>/* mat cam tasarımı: bir kereliğine koyu temaya geç (sonra tema düğmesi serbest) */try{if(!localStorage.getItem('notlar:glass1')){localStorage.setItem('notlar:glass1','1');localStorage.setItem('notlar:theme','"dark"')}}catch(e){}</script>
-<script src="../../shared/skin.js?v=20261117u"></script>
-<link rel="stylesheet" href="player.css?v=20261117u">
-<link rel="stylesheet" href="library.css?v=20261117u">
-<link rel="stylesheet" href="brain.css?v=20261117u">
-<link rel="stylesheet" href="media.css?v=20261117u">
-<link rel="stylesheet" href="time.css?v=20261117u">
-<link rel="stylesheet" href="tasks.css?v=20261117u">
-<link rel="stylesheet" href="ders.css?v=20261117u">
+<script src="../../shared/skin.js?v=20261117v"></script>
+<link rel="stylesheet" href="player.css?v=20261117v">
+<link rel="stylesheet" href="library.css?v=20261117v">
+<link rel="stylesheet" href="brain.css?v=20261117v">
+<link rel="stylesheet" href="media.css?v=20261117v">
+<link rel="stylesheet" href="time.css?v=20261117v">
+<link rel="stylesheet" href="tasks.css?v=20261117v">
+<link rel="stylesheet" href="ders.css?v=20261117v">
 <style id="tnavCss">
 /* ── Üst gezinme (sol menü yerine) — ince cam şerit, kayan seçili vurgu ── */
 .app,.app[data-mode=lib],.app[data-mode=brain]{grid-template-columns:1fr}
@@ -534,7 +534,9 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
 .txt a[href^="http"]:hover::after{background:var(--ink)}
 .blk.has-pv{flex-wrap:wrap}
 .lkpv{flex:0 0 100%;min-width:0;margin:6px 0 10px}
-.lkpv-c{position:relative;width:min(100%,var(--lkpvw,560px));border-radius:12px;overflow:hidden;background:var(--card);box-shadow:0 0 0 .5px var(--line2),0 10px 30px -18px rgba(0,0,0,.45)}
+.lkpv{position:relative}
+.lkpv-c:has(.vp){--w:min(var(--lkpvw,560px),calc(100cqw - 48px),calc((100vh - 150px) * 16 / 9))}
+.lkpv-c{--w:min(var(--lkpvw,560px),calc(100cqw - 48px));position:relative;width:var(--w);margin-left:min(0px,calc((100% - var(--w)) / 2));border-radius:12px;overflow:hidden;background:var(--card);box-shadow:0 0 0 .5px var(--line2),0 10px 30px -18px rgba(0,0,0,.45)}
 .lkpv-v{position:relative;aspect-ratio:16/9;background:#000}.lkpv-v iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .lkpv-r{position:absolute;right:0;bottom:0;z-index:4;width:22px;height:22px;cursor:nwse-resize;touch-action:none}
 .lkpv-r::after{content:"";position:absolute;right:5px;bottom:5px;width:9px;height:9px;border:solid var(--ink3);border-width:0 2px 2px 0;border-radius:0 0 3px 0;opacity:0;transition:opacity .15s}
@@ -546,12 +548,19 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
 .lkpv-ld i{width:16px;height:16px;border-radius:50%;border:2px solid var(--line2);border-top-color:var(--ink2);animation:lkspin .8s linear infinite}@keyframes lkspin{to{transform:rotate(360deg)}}
 .lkpv-bar{display:flex;align-items:center;gap:8px;height:36px;padding:0 6px 0 12px;font-size:12.5px;color:var(--ink3);border-top:.5px solid var(--line)}
 .lkpv-bar span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.lkpv-bar button{height:28px;padding:0 10px;border-radius:7px;font-size:12.5px;font-weight:500;color:var(--ink2)}.lkpv-bar button:hover{background:var(--hover);color:var(--ink)}
+.lkpv-bar button{display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 10px;border-radius:7px;font-size:12.5px;font-weight:500;color:var(--ink2)}.lkpv-bar button:hover{background:var(--hover);color:var(--ink)}
 @media (hover:none){.lkpv-bar button{height:40px}.lkpv-bar{height:44px}}
+.lkpv-bar svg,.lkpv-menu svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.lkpv-menu{position:absolute;z-index:40;display:flex;flex-direction:column;min-width:210px;padding:5px;border-radius:12px;background:var(--card);box-shadow:0 0 0 .5px var(--line2),0 16px 40px -14px rgba(0,0,0,.45)}
+.lkpv-menu button{display:flex;align-items:center;gap:8px;height:32px;padding:0 10px;border-radius:8px;font-size:13px;color:var(--ink);text-align:left}
+.lkpv-menu button:hover:not(:disabled),.lkpv-menu button:focus-visible{background:var(--hover);outline:none}.lkpv-menu button:disabled{color:var(--ink3)}
+.lkpv-menu i{width:14px;flex-shrink:0}.lkpv-menu hr{margin:4px 6px;border:0;border-top:.5px solid var(--line)}
+.lkpv-menu small{padding:6px 10px 4px;font-size:12px;color:var(--ink3)}
+@media (hover:none){.lkpv-menu button{height:40px}}
 @media (prefers-reduced-motion:reduce){.txt a[href^="http"]::after{transition:none}.lkpv-ld i{animation:none}}
 html[data-motion=off] .txt a[href^="http"]::after{transition:none}
 </style>
-<link rel="stylesheet" href="glass.css?v=20261117u">
+<link rel="stylesheet" href="glass.css?v=20261117v">
 </head>
 <body>
 <div class="app" id="app">
@@ -596,14 +605,14 @@ html[data-motion=off] .txt a[href^="http"]::after{transition:none}
   </div>
 </div>
 <div class="toasts" id="toasts"></div>
-<script src="player.js?v=20261117u"></script>
-<script src="kb.js?v=20261117u"></script>
-<script src="library.js?v=20261117u"></script>
-<script src="media.js?v=20261117u"></script>
-<script src="brain.js?v=20261117u"></script>
-<script src="time.js?v=20261117u"></script>
-<script src="tasks.js?v=20261117u"></script>
-<script src="ders.js?v=20261117u"></script>
+<script src="player.js?v=20261117v"></script>
+<script src="kb.js?v=20261117v"></script>
+<script src="library.js?v=20261117v"></script>
+<script src="media.js?v=20261117v"></script>
+<script src="brain.js?v=20261117v"></script>
+<script src="time.js?v=20261117v"></script>
+<script src="tasks.js?v=20261117v"></script>
+<script src="ders.js?v=20261117v"></script>
 
 <script>
 'use strict';
@@ -1555,7 +1564,7 @@ function lkToggle(a){const blk=a.closest('.blk');if(!blk)return;const href=a.get
   const host=(()=>{try{return new URL(href).hostname.replace(/^www\./,'')}catch{return href}})(),yt=lkYT(href),vm=(href.match(/vimeo\.com\/(?:video\/)?(\d+)/)||[])[1];
   const p=document.createElement('div');p.className='lkpv';p.dataset.u=href;
   const vid=id=>VP.html({yt:id,start:lkStart(href),title:host});
-  const bar=`<div class="lkpv-bar"><span title="${esc(href)}">${esc(host)}</span><button data-lkpo>Sekmede aç ↗</button><button data-lkpc aria-label="Önizlemeyi kapat">Kapat</button></div>`;
+  const bar=`<div class="lkpv-bar"><span title="${esc(href)}">${esc(host)}</span><button data-lkps aria-haspopup="menu" title="Önizleme boyutu"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9.5 2.5h4v4M6.5 13.5h-4v-4M13.5 2.5 9 7M2.5 13.5 7 9"/></svg>Boyut</button><button data-lkpo>Sekmede aç ↗</button><button data-lkpc aria-label="Önizlemeyi kapat">Kapat</button></div>`;
   let body;
   if(yt)body=vid(yt);
   else if(vm)body=`<div class="lkpv-v"><iframe src="https://player.vimeo.com/video/${vm}?autoplay=1" title="Vimeo videosu" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>`;
@@ -1564,16 +1573,34 @@ function lkToggle(a){const blk=a.closest('.blk');if(!blk)return;const href=a.get
   else body=`<div class="lkpv-ld" data-lkld><i></i>Önizleme hazırlanıyor…</div>`;
   p.innerHTML=`<div class="lkpv-c">${body+bar}<span class="lkpv-r" title="Sürükle: boyutlandır · çift tık: varsayılan" aria-hidden="true"></span></div>`;VP.scan(p);lkSize(p);blk.appendChild(p);blk.classList.add('has-pv');lkMark();
   if(!motionOff())p.animate([{opacity:0,transform:'translateY(-6px)'},{opacity:1,transform:'none'}],{duration:260,easing:'cubic-bezier(.2,.9,.3,1)'});
-  p.addEventListener('click',e=>{if(e.target.closest('[data-lkpo]')){openHref(href);return}if(e.target.closest('[data-lkpc]'))lkClose(blk)});
+  p.addEventListener('click',e=>{const ps=e.target.closest('[data-lkps]');if(ps){const om=p.querySelector('.lkpv-menu');om?om._close():lkMenu(p,ps);return}if(e.target.closest('[data-lkpo]')){openHref(href);return}if(e.target.closest('[data-lkpc]'))lkClose(blk)});
   const ld=p.querySelector('[data-lkld]');if(ld)(async()=>{let m={};try{m=await Library.meta(href)}catch{}if(!p.isConnected)return;
     ld.outerHTML=m.yt?vid(m.yt):linkCard({url:href,title:m.title||host,desc:m.desc||'',img:m.cover&&m.type!=='image'?m.cover:'',site:m.site||'',fav:m.favicon||'',kind:m.type||'web'});VP.scan(p)})()}
-/* önizleme boyu: sağ alt köşeden sürükle (hepsi için aynı genişlik, notlar:lkpvw); çift tık → varsayılan 560 */
+/* önizleme boyu (hepsi için ortak, notlar:lkpvw): hazır boylar s/m/l/w ya da sürükleyerek px.
+   Satırdan genişse önizleme sayfaya taşar ve satıra göre ortalanır (en fazla sayfa genişliği − 48). Köşeye çift tık → Orta. */
+const LKPS=[['s','Küçük','360px'],['m','Orta','560px'],['l','Satır genişliği','100%'],['w','Geniş — sayfa boyu','1400px']];
+const lkWget=()=>{try{return localStorage.getItem('notlar:lkpvw')||'m'}catch{return'm'}};
+function lkW(v){const m=LKPS.find(x=>x[0]===v);document.documentElement.style.setProperty('--lkpvw',m?m[2]:(+v>0?(+v)+'px':'560px'))}
+function lkWset(v){lkW(v);try{if(v==='m')localStorage.removeItem('notlar:lkpvw');else localStorage.setItem('notlar:lkpvw',v)}catch{}}
+lkW(lkWget());
 function lkSize(p){const h=p.querySelector('.lkpv-r'),c=p.querySelector('.lkpv-c');if(!h)return;
-  h.addEventListener('pointerdown',e=>{if(e.button)return;e.preventDefault();e.stopPropagation();try{h.setPointerCapture(e.pointerId)}catch{}const x0=e.clientX,w0=c.getBoundingClientRect().width,mx=p.getBoundingClientRect().width;c.classList.add('rs');
-    const mv=ev=>{const w=Math.round(Math.max(240,Math.min(mx,w0+ev.clientX-x0)));document.documentElement.style.setProperty('--lkpvw',w+'px')},up=()=>{h.removeEventListener('pointermove',mv);h.removeEventListener('pointerup',up);h.removeEventListener('pointercancel',up);c.classList.remove('rs');try{localStorage.setItem('notlar:lkpvw',parseInt(getComputedStyle(document.documentElement).getPropertyValue('--lkpvw'))||560)}catch{}};
+  h.addEventListener('pointerdown',e=>{if(e.button)return;e.preventDefault();e.stopPropagation();try{h.setPointerCapture(e.pointerId)}catch{}
+    const x0=e.clientX,w0=c.getBoundingClientRect().width,row=p.getBoundingClientRect().width,mx=Math.max(row,($('#scroll')?.clientWidth||innerWidth)-48);let last=w0;c.classList.add('rs');
+    // satırdan genişken önizleme ortalı büyür → imleç kenarda kalsın diye iki kat
+    const mv=ev=>{const dx=ev.clientX-x0;last=Math.round(Math.max(240,Math.min(mx,w0+dx*(Math.max(w0,w0+dx)>row+1?2:1))));document.documentElement.style.setProperty('--lkpvw',last+'px')},
+      up=()=>{h.removeEventListener('pointermove',mv);h.removeEventListener('pointerup',up);h.removeEventListener('pointercancel',up);c.classList.remove('rs');lkWset(String(last))};
     h.addEventListener('pointermove',mv);h.addEventListener('pointerup',up);h.addEventListener('pointercancel',up)});
-  h.addEventListener('dblclick',e=>{e.stopPropagation();document.documentElement.style.setProperty('--lkpvw','560px');try{localStorage.removeItem('notlar:lkpvw')}catch{}})}
-try{const w=+localStorage.getItem('notlar:lkpvw');if(w)document.documentElement.style.setProperty('--lkpvw',w+'px')}catch{}
+  h.addEventListener('dblclick',e=>{e.stopPropagation();lkWset('m')})}
+/* “Boyut” menüsü: hazır boylar + (videoysa) tam ekran. Önizlemenin içinde durur; dışarı tıklayınca/Esc ile kapanır. */
+function lkMenu(p,btn){p.querySelector('.lkpv-menu')?.remove();const cur=lkWget(),vp=p.querySelector('.vp'),m=document.createElement('div');m.className='lkpv-menu';m.setAttribute('role','menu');
+  const ck='<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5 6.5 11.5 12.5 4.5"/></svg>';
+  m.innerHTML=LKPS.map(([k,n])=>`<button role="menuitemradio" aria-checked="${cur===k}" data-lkw="${k}">${cur===k?ck:'<i></i>'}${n}</button>`).join('')+(+cur>0?`<button role="menuitemradio" aria-checked="true" disabled>${ck}Özel · ${+cur} px</button>`:'')+(vp?`<hr><button role="menuitem" data-lkfull><i></i>Tam ekran</button>`:'')+`<small>Köşeden sürükleyerek de ayarlanır</small>`;
+  const pr=p.getBoundingClientRect(),br=btn.getBoundingClientRect();m.style.top=(br.bottom-pr.top+6)+'px';m.style.right=Math.max(0,pr.right-br.right)+'px';p.appendChild(m);
+  if(!motionOff())m.animate([{opacity:0,transform:'translateY(-4px) scale(.98)'},{opacity:1,transform:'none'}],{duration:160,easing:'cubic-bezier(.2,.9,.3,1)'});
+  const close=()=>{m.remove();removeEventListener('pointerdown',out,true)},out=e=>{if(!m.contains(e.target)&&!btn.contains(e.target))close()};m._close=close;setTimeout(()=>addEventListener('pointerdown',out,true),0);
+  m.addEventListener('click',e=>{e.stopPropagation();const b=e.target.closest('[data-lkw]');if(b){lkWset(b.dataset.lkw);close();return}if(e.target.closest('[data-lkfull]')){close();vp.querySelector('[data-vp=full]')?.click()}});
+  m.addEventListener('keydown',e=>{const bs=[...m.querySelectorAll('button:not(:disabled)')],i=bs.indexOf(document.activeElement);if(e.key==='Escape'){e.preventDefault();e.stopPropagation();close();btn.focus()}else if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();bs[(i+(e.key==='ArrowDown'?1:-1)+bs.length)%bs.length]?.focus()}});
+  m.querySelector('[aria-checked="true"]:not(:disabled),button')?.focus({preventScroll:true})}
 $('#view').addEventListener('mouseover',e=>{const a=e.target.closest?.('.txt a[href]');if(!a||view!=='page'){return}clearTimeout(lkT);if(lkEl&&lkEl._a===a)return;lkT=setTimeout(()=>{lkShow(a);if(lkEl)lkEl._a=a},350)});
 $('#view').addEventListener('mouseout',e=>{const a=e.target.closest?.('.txt a[href]');if(a&&!a.contains(e.relatedTarget)){clearTimeout(lkT);lkT=setTimeout(()=>{if(lkEl&&!lkEl.matches(':hover'))lkHide()},250)}});
 // tıklayınca aç (yazı seçerken değil); Alt+tık → imleci link içine koy (düzenleme)

@@ -3273,5 +3273,41 @@
     "text": "Gerçek YouTube'la denenemedi (internet yok); YouTube gibi davranan sahte oynatıcıyla doğrulandı. YouTube başlarken kısa süre başlık gösterebilir"
    }
   ]
+ },
+ {
+  "at": "2026-11-17",
+  "change": "Videolara ses seviyesi kaydırıcısı (ortak, hatırlanır); bağlantı önizlemesine Boyut menüsü (Küçük/Orta/Satır/Geniş/Tam ekran) ve sayfa genişliğine kadar sürükleme",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Geniş modda video ekran yüksekliğinden taşıyordu",
+    "fix": "Video ekran yüksekliğine sığacak kadar genişliyor"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Ses kaydırıcısını sürükleyince etrafında beyaz odak çerçevesi kalıyordu",
+    "fix": "Fare üstündeyken çerçeve gizli; klavyeyle gelince görünüyor"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "open",
+    "text": "Gerçek YouTube'la denenemedi (internet yok); ses komutları sahte oynatıcıyla doğrulandı"
+   }
+  ]
  }
 ]

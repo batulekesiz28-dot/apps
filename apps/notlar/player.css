@@ -22,7 +22,7 @@
   background:rgba(0,0,0,.55);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);
   opacity:0;transform:translateY(6px);pointer-events:none;transition:none}
 @media (hover:hover){.vp:hover .vp-ui{opacity:1;transform:none;pointer-events:auto;transition:opacity .16s,transform .22s cubic-bezier(.2,.9,.3,1)}}
-.vp:is(.ui,.kb,.drag,:focus-visible,:has(.vp-ui :focus-visible)) .vp-ui{opacity:1;transform:none;pointer-events:auto;transition:opacity .16s,transform .22s cubic-bezier(.2,.9,.3,1)}
+.vp:is(.ui,.kb,.drag,.vd,:focus-visible,:has(.vp-ui :focus-visible)) .vp-ui{opacity:1;transform:none;pointer-events:auto;transition:opacity .16s,transform .22s cubic-bezier(.2,.9,.3,1)}
 .vp-ui button{display:grid;place-items:center;flex-shrink:0;width:32px;height:32px;border-radius:50%;color:#fff;transition:background .15s}
 .vp-ui button:hover{background:rgba(255,255,255,.16)}.vp-ui button:focus-visible{outline:2px solid #fff;outline-offset:-2px}
 .vp-pp svg{width:14px;height:14px}
@@ -33,10 +33,19 @@
 .vp-bar:is(:hover,:focus-visible)::before,.vp-bar:is(:hover,:focus-visible) i,.vp.drag .vp-bar::before,.vp.drag .vp-bar i{height:6px;margin-top:-3px}
 .vp-bar:is(:hover,:focus-visible)::after,.vp.drag .vp-bar::after{transform:scale(1)}
 .vp.drag .vp-bar i{transition:none}
+.vp-vol{display:flex;align-items:center;flex-shrink:0}
+/* ses seviyesi: ses düğmesinin üstüne gelince yana açılır */
+.vp-vs{position:relative;flex-shrink:0;width:0;height:28px;margin:0;opacity:0;pointer-events:none;cursor:pointer;touch-action:none;outline:none;transition:width .22s cubic-bezier(.2,.9,.3,1),margin .22s cubic-bezier(.2,.9,.3,1),opacity .15s}
+.vp-vol:is(:hover,:has(:focus-visible)) .vp-vs,.vp.vd .vp-vs{width:68px;margin:0 8px 0 4px;opacity:1;pointer-events:auto}
+.vp.xs .vp-vol:is(:hover,:has(:focus-visible)) .vp-vs,.vp.xs.vd .vp-vs{width:52px}
+.vp-vs::before,.vp-vs i{content:"";position:absolute;left:0;right:0;top:50%;height:4px;margin-top:-2px;border-radius:99px;background:rgba(255,255,255,.28)}
+.vp-vs i{background:#fff;transform-origin:left;transform:scaleX(var(--v,0))}
+.vp-vs::after{content:"";position:absolute;top:50%;left:calc(var(--v,0) * 100%);width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.5)}
+.vp-vs:focus-visible:not(:hover){outline:2px solid #fff;outline-offset:4px;border-radius:6px}
 .vp-ui time{padding:0 6px 0 2px;font-size:12px;font-variant-numeric:tabular-nums;color:rgba(255,255,255,.85);white-space:nowrap}
 .vp.nr .vp-ui time{display:none}.vp.xs .vp-ui [data-vp="-10"],.vp.xs .vp-ui [data-vp="10"]{display:none}
 .vp:fullscreen{width:100vw;height:100vh;aspect-ratio:auto;border-radius:0}
 .vp-ph{width:100%;aspect-ratio:16/9;background:#000}
 @media (hover:none){.vp-ui{height:46px}.vp-ui button{width:40px;height:40px}}
-@media (prefers-reduced-motion:reduce){.vp-cv,.vp-big,.vp-ui,.vp-bar i,.vp-bar::after{transition:none!important}.vp.wait::after{animation-duration:2s}}
-html[data-motion=off] :is(.vp-cv,.vp-big,.vp-ui,.vp-bar i,.vp-bar::after){transition:none!important}
+@media (prefers-reduced-motion:reduce){.vp-vs,.vp-cv,.vp-big,.vp-ui,.vp-bar i,.vp-bar::after{transition:none!important}.vp.wait::after{animation-duration:2s}}
+html[data-motion=off] :is(.vp-vs,.vp-cv,.vp-big,.vp-ui,.vp-bar i,.vp-bar::after){transition:none!important}

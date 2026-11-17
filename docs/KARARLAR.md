@@ -48,6 +48,7 @@ Son güncelleme: 2026-11-15
 |---|---|
 | Notlar sekmesi | Doğrudan Notion tarzı Notlar ana sayfası. Üçe bölme (Work · Ders · Library seçimi) KALDIRILDI — kullanıcı sevmedi. Ders notu ana sayfadaki “Dersler” kısayolundan. |
 | Aktiviteler | Sekme ve sayfa KALDIRILDI. Etkinlik verisi silinmedi; takvimde durur. |
+| Satır içi bağlantı | Yazı seç → biçim çubuğu 🔗 ya da **Ctrl/Cmd+K** → küçük adres kutusu (prompt YOK; “google.com” → https://). Linke tıkla → yeni sekmede açılır (Alt+tık: imleç). Üstüne gel → Aç · Düzenle · Kaldır. Seçim yokken Ctrl/Cmd+K komut paleti. |
 | Bağlantı önizlemesi | Boş satıra tek link yapıştırınca önizleme kartı (başlık, açıklama, site simgesi, görsel; Library `meta` → microlink). YouTube → sayfada oynayan video (youtube-nocookie, tıklayınca), görsel linki → resim. Yazının içine yapıştırılan link satır içi bağlantı kalır; Shift+yapıştır da düz bırakır. Karttaki ≡ düğmesi düz bağlantıya çevirir. |
 | Üste sabitleme | Soldaki sayfa listesinden bir sayfa üst şeride (Takvim · Görevler · Notlar · İstatistikler'in yanına) sürüklenip sabitlenir; ⋯ menüsünden de. Şeritte sürükle = sırala; dışarı bırak / sağ tık = kaldır. Alt sayfası açıkken de sekmesi vurgulu. Bulutta senkron. |
 

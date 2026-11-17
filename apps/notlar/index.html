@@ -438,13 +438,13 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
 @media (max-width:760px){.pgb{min-height:58px}.tw,.tw0{width:36px;height:40px}.ni.tr{padding-left:calc(2px + var(--dp,0)*14px)}.sub-add{height:44px}.crumb .cr{height:40px;max-width:120px}.pgn{display:none}.mv-q{height:40px}}
 </style>
 <script>/* mat cam tasarımı: bir kereliğine koyu temaya geç (sonra tema düğmesi serbest) */try{if(!localStorage.getItem('notlar:glass1')){localStorage.setItem('notlar:glass1','1');localStorage.setItem('notlar:theme','"dark"')}}catch(e){}</script>
-<script src="../../shared/skin.js?v=20261117k"></script>
-<link rel="stylesheet" href="library.css?v=20261117k">
-<link rel="stylesheet" href="brain.css?v=20261117k">
-<link rel="stylesheet" href="media.css?v=20261117k">
-<link rel="stylesheet" href="time.css?v=20261117k">
-<link rel="stylesheet" href="tasks.css?v=20261117k">
-<link rel="stylesheet" href="ders.css?v=20261117k">
+<script src="../../shared/skin.js?v=20261117l"></script>
+<link rel="stylesheet" href="library.css?v=20261117l">
+<link rel="stylesheet" href="brain.css?v=20261117l">
+<link rel="stylesheet" href="media.css?v=20261117l">
+<link rel="stylesheet" href="time.css?v=20261117l">
+<link rel="stylesheet" href="tasks.css?v=20261117l">
+<link rel="stylesheet" href="ders.css?v=20261117l">
 <style id="tnavCss">
 /* ── Üst gezinme (sol menü yerine) — ince cam şerit, kayan seçili vurgu ── */
 .app,.app[data-mode=lib],.app[data-mode=brain]{grid-template-columns:1fr}
@@ -514,8 +514,20 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
 @media (hover:none){.lk-x{opacity:1}}
 @media (max-width:640px){.lk{min-height:84px}.lk-i{width:30%}.lk-t{padding:10px 12px}.lk-d{-webkit-line-clamp:1}}
 @media (prefers-reduced-motion:reduce){.lk-ld .lk-i.sk{animation:none}.lk-yt>img,.lk-play{transition:none}}
+
+/* satır içi bağlantı: adres kutusu + üstüne gelince menü */
+.lnkpop{position:fixed;z-index:430;display:flex;align-items:center;gap:6px;width:min(420px,calc(100vw - 16px));padding:6px 6px 6px 12px;border-radius:12px;background:var(--card);box-shadow:0 0 0 .5px var(--line2),0 16px 40px -14px rgba(0,0,0,.45);flex-wrap:wrap}
+.lnkpop .li{width:16px;height:16px;color:var(--ink3);fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round}
+.lnkpop input{flex:1;min-width:0;height:34px;border:0;background:none;font:inherit;font-size:14px;color:var(--ink);outline:none}
+.lnkpop button{height:32px;padding:0 12px;border-radius:8px;font-size:13px;font-weight:600;color:var(--bg);background:var(--ink)}.lnkpop button.ghost{color:var(--ink2);background:var(--hover)}
+.lnk-err{flex-basis:100%;padding:0 4px 2px 22px;font-size:12px;color:var(--warn,#D9480F)}
+.lkhov{position:fixed;z-index:430;display:flex;align-items:center;gap:2px;max-width:min(420px,calc(100vw - 16px));padding:4px;border-radius:10px;background:var(--card);box-shadow:0 0 0 .5px var(--line2),0 12px 30px -12px rgba(0,0,0,.4);font-size:13px}
+.lkh-u{min-width:0;max-width:220px;padding:0 8px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lkhov button{height:28px;padding:0 9px;border-radius:7px;color:var(--ink);font-weight:500}.lkhov button:hover{background:var(--hover)}
+.page .txt a[href],.txt a[href]{cursor:pointer}
+@media (hover:none){.lkhov button{height:36px}}
 </style>
-<link rel="stylesheet" href="glass.css?v=20261117k">
+<link rel="stylesheet" href="glass.css?v=20261117l">
 </head>
 <body>
 <div class="app" id="app">
@@ -560,13 +572,13 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
   </div>
 </div>
 <div class="toasts" id="toasts"></div>
-<script src="kb.js?v=20261117k"></script>
-<script src="library.js?v=20261117k"></script>
-<script src="media.js?v=20261117k"></script>
-<script src="brain.js?v=20261117k"></script>
-<script src="time.js?v=20261117k"></script>
-<script src="tasks.js?v=20261117k"></script>
-<script src="ders.js?v=20261117k"></script>
+<script src="kb.js?v=20261117l"></script>
+<script src="library.js?v=20261117l"></script>
+<script src="media.js?v=20261117l"></script>
+<script src="brain.js?v=20261117l"></script>
+<script src="time.js?v=20261117l"></script>
+<script src="tasks.js?v=20261117l"></script>
+<script src="ders.js?v=20261117l"></script>
 
 <script>
 'use strict';
@@ -1478,6 +1490,40 @@ document.addEventListener('selectionchange',()=>{
   const el=host?.closest?.('.txt');if(!el||el.closest('.blk')?.dataset.t==='code'||!r.toString().trim())return hideFmt();
   showFmt(r);
 });
+/* ═ Bağlantılar (satır içi): ekle (biçim çubuğu 🔗 ya da seçiliyken Ctrl/Cmd+K) → küçük adres kutusu; tıkla → yeni sekmede aç;
+   üstüne gel → Aç · Düzenle · Kaldır. prompt() seçimi kaybettirdiği için kullanılmaz. ═ */
+const normUrl=u=>{u=String(u||'').trim();if(!u)return'';if(/^(https?:|mailto:)/i.test(u))return u;if(/^#p\//.test(u))return u;if(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(u))return'mailto:'+u;if(/^[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(u)||/^localhost/.test(u))return'https://'+u;return''};
+function linkAsk(range,cur){if(!range)return;const el=(range.commonAncestorContainer.nodeType===1?range.commonAncestorContainer:range.commonAncestorContainer.parentElement)?.closest('.txt');if(!el)return;
+  if(cur==null){const a=(range.startContainer.nodeType===1?range.startContainer:range.startContainer.parentElement)?.closest('a[href]');cur=a?a.getAttribute('href'):''}
+  document.querySelector('.lnkpop')?.remove();hideFmt?.();lkHide();const rc=range.getBoundingClientRect(),p=document.createElement('div');p.className='lnkpop';
+  p.innerHTML=`<svg class="li" viewBox="0 0 16 16" aria-hidden="true"><path d="M6.6 9.4a2.6 2.6 0 0 0 3.7 0l2.2-2.2a2.6 2.6 0 0 0-3.7-3.7l-.8.8M9.4 6.6a2.6 2.6 0 0 0-3.7 0L3.5 8.8a2.6 2.6 0 0 0 3.7 3.7l.8-.8"/></svg><input type="url" placeholder="Bağlantı yapıştır ya da yaz — ör. google.com" aria-label="Bağlantı adresi" value="${esc(cur||'')}"><button data-lok>Ekle</button>${cur?`<button data-lrm class="ghost">Kaldır</button>`:''}<small class="lnk-err" hidden>Geçerli bir adres değil</small>`;
+  document.body.appendChild(p);const w=p.offsetWidth;p.style.left=Math.max(8,Math.min(innerWidth-w-8,rc.left))+'px';p.style.top=Math.min(innerHeight-60,rc.bottom+8)+'px';
+  const inp=p.querySelector('input');inp.focus();inp.select();
+  const restore=()=>{el.focus();const s=getSelection();s.removeAllRanges();s.addRange(range)};
+  const done=()=>{p.remove();removeEventListener('pointerdown',out,true)};
+  const apply=()=>{const v=inp.value.trim();if(!v){restore();if(cur)document.execCommand('unlink');syncEl(el);done();return}const u=normUrl(v);if(!u){p.querySelector('.lnk-err').hidden=false;inp.focus();return}
+    restore();if(range.collapsed){document.execCommand('insertHTML',false,`<a href="${esc(u)}">${esc(v)}</a>`)}else document.execCommand('createLink',false,u);
+    el.querySelectorAll('a[href]').forEach(a=>{if(/^(https?:|mailto:)/i.test(a.getAttribute('href'))){a.target='_blank';a.rel='noopener'}});syncEl(el);done();const s=getSelection();if(s.rangeCount)s.collapseToEnd()};
+  const out=e=>{if(!p.contains(e.target)){done()}};setTimeout(()=>addEventListener('pointerdown',out,true),0);
+  p.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();apply()}else if(e.key==='Escape'){e.preventDefault();done();restore()}});
+  p.addEventListener('click',e=>{if(e.target.closest('[data-lok]'))apply();else if(e.target.closest('[data-lrm]')){inp.value='';apply()}})}
+let lkT=0,lkEl=null;
+function lkHide(){clearTimeout(lkT);lkEl?.remove();lkEl=null}
+function lkShow(a){lkHide();const href=a.getAttribute('href')||'',r=a.getBoundingClientRect(),p=document.createElement('div');p.className='lkhov';
+  const show=/^#p\//.test(href)?(pages.get(href.slice(3))?titleOf(pages.get(href.slice(3))):'Sayfa'):href.replace(/^https?:\/\/(www\.)?/,'').replace(/^mailto:/,'');
+  p.innerHTML=`<span class="lkh-u" title="${esc(href)}">${esc(show)}</span><button data-lka="open">Aç</button><button data-lka="edit">Düzenle</button><button data-lka="rm">Kaldır</button>`;document.body.appendChild(p);lkEl=p;
+  const w=p.offsetWidth;p.style.left=Math.max(8,Math.min(innerWidth-w-8,r.left))+'px';p.style.top=(r.bottom+6+p.offsetHeight>innerHeight?r.top-p.offsetHeight-6:r.bottom+6)+'px';
+  p.addEventListener('mouseenter',()=>clearTimeout(lkT));p.addEventListener('mouseleave',()=>{lkT=setTimeout(lkHide,250)});
+  p.addEventListener('click',e=>{const b=e.target.closest('[data-lka]');if(!b)return;const k=b.dataset.lka,el=a.closest('.txt');lkHide();
+    if(k==='open'){openHref(href);return}const rg=document.createRange();rg.selectNodeContents(a);
+    if(k==='edit'){linkAsk(rg,href);return}if(k==='rm'&&el){el.focus();const s=getSelection();s.removeAllRanges();s.addRange(rg);document.execCommand('unlink');syncEl(el);s.collapseToEnd()}})}
+const openHref=h=>{if(/^#p\//.test(h))go(h);else if(/^(https?:|mailto:)/i.test(h))window.open(h,'_blank','noopener')};
+$('#view').addEventListener('mouseover',e=>{const a=e.target.closest?.('.txt a[href]');if(!a||view!=='page'){return}clearTimeout(lkT);if(lkEl&&lkEl._a===a)return;lkT=setTimeout(()=>{lkShow(a);if(lkEl)lkEl._a=a},350)});
+$('#view').addEventListener('mouseout',e=>{const a=e.target.closest?.('.txt a[href]');if(a&&!a.contains(e.relatedTarget)){clearTimeout(lkT);lkT=setTimeout(()=>{if(lkEl&&!lkEl.matches(':hover'))lkHide()},250)}});
+// tıklayınca aç (yazı seçerken değil); Alt+tık → imleci link içine koy (düzenleme)
+$('#view').addEventListener('click',e=>{const a=e.target.closest?.('.txt a[href]');if(!a||view!=='page'||e.altKey)return;const s=getSelection();if(s&&!s.isCollapsed)return;e.preventDefault();lkHide();openHref(a.getAttribute('href'))},true);
+$('#view').addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&!e.shiftKey&&e.key.toLowerCase()==='k'&&view==='page'){const s=getSelection();if(s.rangeCount&&!s.isCollapsed&&s.anchorNode?.parentElement?.closest('.txt')){e.preventDefault();e.stopPropagation();linkAsk(s.getRangeAt(0).cloneRange())}}},true);
+$('#scroll').addEventListener('scroll',()=>{lkHide();document.querySelector('.lnkpop')?.remove()},{passive:true});
 function showFmt(r){
   const rect=r.getBoundingClientRect();if(!rect.width)return;
   const first=!fmtEl;
@@ -1486,7 +1532,7 @@ function showFmt(r){
     fmtEl.addEventListener('pointerdown',e=>e.preventDefault());
     fmtEl.addEventListener('click',e=>{const b=e.target.closest('[data-f]');if(!b)return;const s=getSelection();if(!s.rangeCount)return;const el=s.anchorNode?.parentElement?.closest('.txt');const f=b.dataset.f;
       if(f==='code'||f==='mark'){const txt=s.toString();document.execCommand('insertHTML',false,`<${f==='code'?'code':'mark'}>${esc(txt)}</${f==='code'?'code':'mark'}>`)}
-      else if(f==='link'){const url=prompt('Bağlantı adresi','https://');if(url&&/^(https?:|mailto:)/i.test(url))document.execCommand('createLink',false,url)}
+      else if(f==='link'){linkAsk(s.getRangeAt(0).cloneRange());return}
       else document.execCommand(f);
       if(el)syncEl(el);updFmt()});
     document.body.appendChild(fmtEl)}

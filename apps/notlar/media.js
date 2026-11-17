@@ -116,7 +116,7 @@ const Media=(()=>{
       const byProp=async(pr,val)=>{const j=await getJSON(`https://www.wikidata.org/w/api.php?action=query&list=search&srsearch=haswbstatement:${pr}=${encodeURIComponent(val)}&srlimit=1&format=json&origin=*`);return j?.query?.search?.[0]?.title||''};
       try{if(it.type==='movie'||it.type==='series'){const yr=parseInt(it.year)||0,k=it.type==='series'?'tv':'mv',en=(it.wiki&&!it.wiki.startsWith('tr:')?it.wiki:'').replace(/_/g,' ').replace(/\s*\([^)]*\)\s*$/,'');
           let u=await itPrev(it.title,yr,k,'tr');if(!u&&en&&norm(en)!==norm(it.title))u=await itPrev(en,yr,k,'us');if(!u)u=await itPrev(it.title,yr,k,'us');if(u)add('mp:'+u)}
-        if(it.type==='anime'&&it.mal){const d=await getJSON(`https://api.jikan.moe/v4/anime/${it.mal}`);add(d?.data?.trailer?.youtube_id)}
+        if(it.type==='anime'&&it.mal){const d=await jget(`https://api.jikan.moe/v4/anime/${it.mal}`);add(d?.data?.trailer?.youtube_id)}
         const key=tmdbKey();if(key&&it.imdb&&it.type!=='game'){const f=await getJSON(`https://api.themoviedb.org/3/find/${it.imdb}?api_key=${encodeURIComponent(key)}&external_source=imdb_id`);
           const m=(f?.movie_results||[])[0],t=(f?.tv_results||[])[0],id=(m||t)?.id;if(id){const vs=await getJSON(`https://api.themoviedb.org/3/${m?'movie':'tv'}/${id}/videos?api_key=${encodeURIComponent(key)}`);
             const V=(vs?.results||[]).filter(x=>x.site==='YouTube'),rk=x=>(x.type==='Trailer'?0:x.type==='Teaser'?2:4)+(x.official?0:1);V.sort((a,b)=>rk(a)-rk(b)).slice(0,5).forEach(x=>add(x.key))}}
@@ -675,7 +675,14 @@ const Media=(()=>{
  OPTIONAL{?item wdt:P136 ?g. ?g rdfs:label ?gl FILTER(LANG(?gl)="tr" || LANG(?gl)="en")} OPTIONAL{?item wdt:P400 ?p. ?p rdfs:label ?pl FILTER(LANG(?pl)="en")}
 } LIMIT 600`;
   class NetErr extends Error{}
-  async function getJSON(u,o){let r;try{r=await fetch(u,o)}catch(e){throw new NetErr(e.message)}if(r.status===429){await new Promise(z=>setTimeout(z,1600));r=await fetch(u,o).catch(e=>{throw new NetErr(e.message)})}
+  // Bir servis yanıt vermeyince (hız sınırı, geçici hata, engelleyici eklenti…) bu “internet yok” DEĞİLDİR: bir kez daha dene,
+  // olmazsa sitenin kendi adresine bak; bağlantı varsa sadece o kaynak hata verir (NetErr değil → eşleştirme durmaz).
+  let onlineAt=0;
+  async function reallyOffline(){if(navigator.onLine===false)return true;if(Date.now()-onlineAt<30000)return false;
+    try{await fetch(new URL('../../apps.json',location.href).href+'?ping='+Date.now(),{cache:'no-store'});onlineAt=Date.now();return false}catch{return true}}
+  async function fetchSafe(u,o){try{return await fetch(u,o)}catch(e){await new Promise(z=>setTimeout(z,1500));try{return await fetch(u,o)}catch(e2){
+      if(await reallyOffline())throw new NetErr(e2.message);let h='';try{h=new URL(u).hostname}catch{}throw new Error('Kaynak yanıt vermedi: '+h)}}}
+  async function getJSON(u,o){let r=await fetchSafe(u,o);if(r.status===429){await new Promise(z=>setTimeout(z,2500));r=await fetchSafe(u,o)}
     if(r.status===404)return null;if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}
   async function wd(s,lang,type){if(!s)return[];const j=await getJSON('https://query.wikidata.org/sparql?format=json&query='+encodeURIComponent(sparql(s,lang,type)),{headers:{Accept:'application/sparql-results+json'}});
     const m=new Map();for(const r of j?.results?.bindings||[]){const v=k=>r[k]?.value||'';const id=v('item').split('/').pop();if(!id)continue;let o=m.get(id);
@@ -714,8 +721,8 @@ const Media=(()=>{
     const fin=v=>{if(done)return;done=true;window[cb]=()=>{};s.remove();res(v)};
     window[cb]=d=>{const r=(d?.results||[]).find(x=>norm(x.trackName)===norm(term)&&(!year||Math.abs(parseInt(x.releaseDate)-year)<=1));fin(r?.artworkUrl100?r.artworkUrl100.replace(/\/\d+x\d+bb\.(jpg|png)$/,'/600x900bb.jpg'):'')};
     s.onerror=()=>fin('');setTimeout(()=>fin(''),9000);s.src=`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&media=movie&entity=movie&limit=10&callback=${cb}`;document.head.appendChild(s)})}
-  // Jikan (MyAnimeList): istekler sıraya girer (hız sınırı ~3/sn)
-  let jk=Promise.resolve();const jget=u=>{const p=jk.then(()=>getJSON(u));jk=p.catch(()=>{}).then(()=>new Promise(z=>setTimeout(z,420)));return p};
+  // Jikan (MyAnimeList): bütün istekler tek sırada (eşleştirme, kapak onarımı, yeni sezon, öneri)
+  let jk=Promise.resolve();const jget=u=>{const p=jk.then(()=>getJSON(u));jk=p.catch(()=>{}).then(()=>new Promise(z=>setTimeout(z,1100)));return p}; // Jikan sınırı: 3/sn ve 60/dk
   const jikan=id=>jget(`https://api.jikan.moe/v4/anime/${id}`);
   // MyAnimeList'te adıyla ara: başlık (orijinal/İngilizce/eş adlar) eşleşmeli, yıl biliniyorsa ±1
   async function malSearch(title,year){if(!title)return null;const j=await jget(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(title)}&limit=8`);const L=j?.data||[];const nt=norm(title);
@@ -812,14 +819,15 @@ const Media=(()=>{
       for(const el of qa(`#view>.mc [data-mi="${CSS.escape(id)}"]`)){if(el.classList.contains('ml-r')){el.outerHTML=lrow(it);continue}
         const v=(el.className.match(/\bv-(\w+)/)||[])[1]||'p',n=+(el.querySelector('.mc-n')?.textContent||0);el.outerHTML=card(it,v,n)}
       if(dId===id)detailRefresh()}}
-  async function queue(){if(R.busy||R.off)return;const l=all().filter(needs);if(!l.length)return;R.busy=true;R.total=l.length;R.done=0;R.stats={ok:0,un:0,no:0};pill();let i=0,stop=false,lastEmit=Date.now();const changed=new Set();
+  async function queue(){if(R.busy||R.off)return;const l=all().filter(needs);if(!l.length)return;R.busy=true;R.total=l.length;R.done=0;R.stats={ok:0,un:0,no:0,err:0};pill();let i=0,stop=false,lastEmit=Date.now();const changed=new Set();
     const work=async()=>{while(i<l.length&&!stop){const it=l[i++];if(!KB.items.has(it.id)||!needs(it)){R.done++;continue}
       try{const r=await resolve(it);const cur=KB.items.get(it.id);if(cur&&needs(cur)){applyRes(cur,r);KB.saveItem(cur,true);changed.add(cur.id);R.stats[r.none?'no':r.conf==='ok'?'ok':'un']++}}
-      catch(e){if(e instanceof NetErr){stop=true;R.off=true;setTimeout(()=>{R.off=false},60000)}else console.warn('eşleştirme',it.title,e)}
+      catch(e){if(e instanceof NetErr){stop=true;R.off=true;setTimeout(()=>{R.off=false},60000)}else{R.stats.err++;console.warn('eşleştirme',it.title,e)}}
       R.done++;pill();if(Date.now()-lastEmit>2500&&changed.size){lastEmit=Date.now();patchCards([...changed]);changed.clear()}}};
     await Promise.all([work(),work(),work()]);R.busy=false;pill();KB.emit('items');
     if(stop)say('İnternete ulaşılamadı — posterler bağlantı gelince eşleşecek');
-    else if(R.total>2)say(`Posterler eşleşti: ${R.stats.ok} kesin${R.stats.un?` · ${R.stats.un} kontrol bekliyor`:''}${R.stats.no?` · ${R.stats.no} bulunamadı`:''}`)}
+    else if(R.stats.err&&!R.stats.ok)say(`Poster servisleri şu an yanıt vermiyor — ${R.stats.err} kayıt sonra kendiliğinden yeniden denenecek`);
+    else if(R.total>2)say(`Posterler eşleşti: ${R.stats.ok} kesin${R.stats.un?` · ${R.stats.un} kontrol bekliyor`:''}${R.stats.no?` · ${R.stats.no} bulunamadı`:''}${R.stats.err?` · ${R.stats.err} sonra denenecek`:''}`)}
   function pill(){const p=q('.mc .mc-sync');if(!p)return;p.hidden=!R.busy;const s=q('span',p);if(s)s.textContent=R.busy?syncTxt():''}
   async function rematch(it){Object.assign(it,{metaAt:0,match:'',reviewed:false});KB.saveItem(it,true);say('Yeniden eşleştiriliyor…');
     try{const r=await resolve(it);const cur=KB.items.get(it.id);if(cur){applyRes(cur,r);KB.saveItem(cur);say(r.none?'Güvenilir bir eşleşme bulunamadı':r.conf==='ok'?'Eşleşti':'Eşleşti ama emin değilim — kontrol et')}}

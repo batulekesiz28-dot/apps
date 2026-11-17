@@ -3032,5 +3032,35 @@
     "fix": "Seçimi koruyan adres kutusu, Ctrl/Cmd+K, tıklayınca yeni sekmede açılma, üstüne gelince Aç/Düzenle/Kaldır"
    }
   ]
+ },
+ {
+  "at": "2026-11-17T09:00:53",
+  "change": "Medya: yanlış 'İnternete ulaşılamadı' uyarısı düzeltildi",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Tek bir servis (MyAnimeList, Wikidata…) yanıt vermeyince site 'İnternete ulaşılamadı' deyip bütün poster eşleştirmesini durduruyordu",
+    "fix": "Önce yeniden dener, sonra gerçek bağlantıyı kontrol eder; sadece gerçekten çevrimdışıyken uyarır, yoksa o kaydı sonraya bırakıp devam eder"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "MyAnimeList'e dakikada izin verilenden fazla istek gidiyordu",
+    "fix": "Bütün MyAnimeList istekleri tek sırada, dakikada ~55"
+   }
+  ]
  }
 ]

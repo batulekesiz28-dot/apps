@@ -3099,5 +3099,35 @@
     "fix": "Ayrı ad (data-arid)"
    }
   ]
+ },
+ {
+  "at": "2026-11-17T12:24:44",
+  "change": "Medya: spot ışığındaki otomatik fragman geri geldi",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Bağlantı bir an takılınca fragmanlar kalıcı olarak 'bozuk' sayılıyor ve bir daha hiç gösterilmiyordu",
+    "fix": "Sadece gerçekten silinmiş/gömme kapalı videolar bozuk sayılıyor (30 gün); eski kara liste sıfırlandı"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Fragman alanı video oynayana kadar gizli kalıyordu",
+    "fix": "Kapak karesi geçerliyse spotla birlikte hemen beliriyor, video gelince oynuyor"
+   }
+  ]
  }
 ]

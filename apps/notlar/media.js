@@ -103,10 +103,12 @@ const Media=(()=>{
   /* ═ Fragman (spot ışığında bilgi panelinin karşı tarafında, resmî YouTube oynatıcısı, youtube-nocookie).
      Kimlik sırası: önbellek mc:yt → anime: Jikan trailer → TMDB videos (anahtar varsa) → Wikidata P1651 (mid ya da IMDb/Steam ile bulunur).
      Kapağın üstüne gelir gelmez aranır (spot açılmadan önce), bulunan kimlik saklanır → ikinci seferde anında. Bulunamazsa 7 gün sonra yeniden denenir. ═ */
-  const YT=lsg('mc:yt4',{}),ytP=new Map(),okYT=v=>/^[\w-]{11}$/.test(v||'');
+  const YT=lsg('mc:yt5',{}),ytP=new Map(),okYT=v=>/^[\w-]{11}$/.test(v||'');
   const hasTrailer=it=>['movie','series','anime','game'].includes(it?.type);
-  // aday listesi (birden çok): bir video oynamazsa sıradaki denenir; bozuk olduğu anlaşılanlar mc:ytbad'de (bir daha denenmez)
-  const YTB=lsg('mc:ytbad',{});const badYT=v=>{YTB[v]=Date.now();lss('mc:ytbad',YTB)};
+  // aday listesi (birden çok): bir video oynamazsa sıradaki denenir; gerçekten bozuk olanlar mc:ytbad2'de (30 gün)
+  try{['mc:ytbad','mc:yt','mc:yt2','mc:yt3','mc:yt4','mc:arec'].forEach(k=>localStorage.removeItem(k))}catch{} // eski sürümlerin kalıntıları
+  // “bozuk” = sadece gerçekten silinmiş/gömme kapalı video (bağlantı hatası DEĞİL); 30 gün sonra unutulur
+  const YTB=(()=>{const o=lsg('mc:ytbad2',{}),n=Date.now();for(const k in o)if(n-o[k]>30*864e5)delete o[k];return o})();const badYT=v=>{YTB[v]=Date.now();lss('mc:ytbad2',YTB)};
   function ytIds(it){if(!hasTrailer(it))return Promise.resolve([]);const c=YT[it.id],l=c?(c.l||[]).filter(v=>!YTB[v]):null;
     if(c&&(l.length||Date.now()-c.at<7*864e5))return Promise.resolve(l);
     if(ytP.has(it.id))return ytP.get(it.id);
@@ -123,31 +125,31 @@ const Media=(()=>{
             const V=(vs?.results||[]).filter(x=>x.site==='YouTube'),rk=x=>(x.type==='Trailer'?0:x.type==='Teaser'?2:4)+(x.official?0:1);V.sort((a,b)=>rk(a)-rk(b)).slice(0,5).forEach(x=>add(x.key))}}
         let q=/^Q\d+$/.test(it.mid||'')?it.mid:'';if(!q&&it.imdb)q=await byProp('P345',it.imdb);if(!q&&it.steam)q=await byProp('P1733',it.steam);if(q)await wdq(q)}
       catch(e){done=false}
-      ytP.delete(it.id);if(done||out.length){YT[it.id]={l:out,at:Date.now()};lss('mc:yt4',YT)}return out})();
+      ytP.delete(it.id);if(done||out.length){YT[it.id]={l:out,at:Date.now()};lss('mc:yt5',YT)}return out})();
     ytP.set(it.id,p);return p}
   let ytWarm=false;function warmYT(){if(ytWarm)return;ytWarm=true;for(const h of['https://www.youtube-nocookie.com','https://i.ytimg.com','https://www.wikidata.org']){const l=document.createElement('link');l.rel='preconnect';l.href=h;l.crossOrigin='';document.head.appendChild(l)}}
   // silinmiş videonun kapak karesi 120×90 gri yer tutucudur → hiç denemeden ele
-  const thumbOK=v=>new Promise(res=>{const im=new Image();const t=setTimeout(()=>res(true),2500);im.onload=()=>{clearTimeout(t);res(im.naturalWidth>120)};im.onerror=()=>{clearTimeout(t);res(false)};im.src=`https://i.ytimg.com/vi/${v}/mqdefault.jpg`});
+  const thumbOK=v=>new Promise(res=>{const im=new Image();const t=setTimeout(()=>res('unk'),2500);im.onload=()=>{clearTimeout(t);res(im.naturalWidth>120?'ok':'bad')};im.onerror=()=>{clearTimeout(t);res('unk')};im.src=`https://i.ytimg.com/vi/${v}/mqdefault.jpg`});
   // fragman alanı: kapak karesi hemen görünür; video GİZLİ yüklenir, oynamaya başlayınca (IFrame API olayı) belirir.
   // Hata (silinmiş / gömme kapalı / bölge) gelirse sıradaki aday denenir; hiçbiri olmazsa onFail → alan kalkar. Kullanıcı hata ekranı görmez.
   function ytMount(slot,ids,onFail){const auto=true;let i=-1,fr=null,muted=true,box=null,alive=true,tm=0;
     const cleanup=()=>{removeEventListener('message',onMsg);clearInterval(tm)};
     const onMsg=e=>{if(!fr||e.source!==fr.contentWindow)return;let d;try{d=typeof e.data==='string'?JSON.parse(e.data):e.data}catch{return}if(!d)return;
-      if(d.event==='onError'){badYT(ids[i]);next();return}
+      if(d.event==='onError'){if([2,100,101,150,153].includes(+d.info))badYT(ids[i]);next();return}
       const ps=d.event==='onStateChange'?d.info:d.event==='infoDelivery'?d.info?.playerState:null;if(ps===1&&!box.classList.contains('ok'))playing()};
     addEventListener('message',onMsg);
     const cmd=(f,a=[])=>{try{fr?.contentWindow?.postMessage(JSON.stringify({event:'command',func:f,args:a}),'*')}catch{}};
     async function next(){if(!alive)return;fr?.remove();fr=null;clearInterval(tm);box?.classList.remove('ok');
-      while(++i<ids.length){const c=ids[i];if(c.startsWith('mp:')||await thumbOK(c.slice(3)))break;badYT(c)}if(!alive)return;
+      let th='';while(++i<ids.length){const c=ids[i];if(c.startsWith('mp:'))break;th=await thumbOK(c.slice(3));if(th!=='bad')break;badYT(c)}if(!alive)return;
       if(i>=ids.length){alive=false;cleanup();onFail?.();return}
       const c=ids[i],mp=c.startsWith('mp:'),v=c.slice(3);if(!box){slot.insertAdjacentHTML('afterbegin',`<div class="msp-yv"><i class="msp-yth"></i><button type="button" class="msp-ym" data-ym aria-label="${auto?'Sesi aç':'Fragmanı oynat'}" title="${auto?'Sesi aç':'Oynat'}">${auto?IC.vol0:IC.play}</button></div>`);box=slot.firstElementChild;
         box.addEventListener('click',e=>{if(e.target.closest('.msp-yr'))return;e.stopPropagation();if(!fr){load();return}muted=!muted;if(fr.tagName==='VIDEO'){fr.muted=muted;if(!muted)fr.volume=.7}else{cmd(muted?'mute':'unMute');if(!muted)cmd('setVolume',[70])}
           const b=box.querySelector('[data-ym]');b.innerHTML=muted?IC.vol0:IC.vol1;b.setAttribute('aria-label',muted?'Sesi aç':'Sesi kapat');b.title=muted?'Sesi aç':'Sesi kapat'})}
-      box.querySelector('.msp-yth').style.backgroundImage=mp?'none':`url(https://i.ytimg.com/vi/${v}/hqdefault.jpg)`;if(!auto)slot.classList.add('ready');if(auto)load()}
+      box.querySelector('.msp-yth').style.backgroundImage=mp?'none':`url(https://i.ytimg.com/vi/${v}/hqdefault.jpg)`;if(!auto||th==='ok')slot.classList.add('ready');if(auto)load()}
     const playing=()=>{clearInterval(tm);box.classList.add('ok');slot.classList.add('ready')};
     function load(){if(fr||!alive)return;const c=ids[i],v=c.slice(3);
       if(c.startsWith('mp:')){fr=document.createElement('video');fr.className='msp-yf';fr.muted=muted;fr.autoplay=true;fr.loop=true;fr.playsInline=true;fr.preload='auto';fr.src=v;
-        fr.addEventListener('playing',playing,{once:true});fr.addEventListener('canplay',()=>setTimeout(()=>{if(fr&&!fr.paused)playing()},300),{once:true});fr.addEventListener('error',()=>{badYT(c);next()},{once:true});box.insertBefore(fr,box.querySelector('[data-ym]'));fr.play?.().catch(()=>{});return}
+        fr.addEventListener('playing',playing,{once:true});fr.addEventListener('loadeddata',()=>slot.classList.add('ready'),{once:true});fr.addEventListener('canplay',()=>setTimeout(()=>{if(fr&&!fr.paused)playing()},300),{once:true});fr.addEventListener('error',()=>{if(fr?.error?.code===4&&navigator.onLine)badYT(c);next()},{once:true});box.insertBefore(fr,box.querySelector('[data-ym]'));fr.play?.().catch(()=>{});return}
       fr=document.createElement('iframe');fr.className='msp-yf';fr.title='Fragman';fr.allow='autoplay; encrypted-media; picture-in-picture';fr.referrerPolicy='strict-origin-when-cross-origin';
       fr.src=`https://www.youtube-nocookie.com/embed/${v}?autoplay=1&mute=1&controls=0&rel=0&playsinline=1&modestbranding=1&iv_load_policy=3&disablekb=1&loop=1&playlist=${v}&enablejsapi=1&origin=${encodeURIComponent(location.origin)}&widget_referrer=${encodeURIComponent(location.href)}`;
       // IFrame API el sıkışması: oynatıcı olay göndermeye “listening” ile başlar

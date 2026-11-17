@@ -106,7 +106,7 @@ const Media=(()=>{
   const YT=lsg('mc:yt5',{}),ytP=new Map(),okYT=v=>/^[\w-]{11}$/.test(v||'');
   const hasTrailer=it=>['movie','series','anime','game'].includes(it?.type);
   // aday listesi (birden çok): bir video oynamazsa sıradaki denenir; gerçekten bozuk olanlar mc:ytbad2'de (30 gün)
-  try{['mc:ytbad','mc:yt','mc:yt2','mc:yt3','mc:yt4','mc:arec'].forEach(k=>localStorage.removeItem(k))}catch{} // eski sürümlerin kalıntıları
+  try{['mc:ytbad','mc:yt','mc:yt2','mc:yt3','mc:yt4','mc:arec','mc:ytpos'].forEach(k=>localStorage.removeItem(k))}catch{} // eski sürümlerin kalıntıları
   // “bozuk” = sadece gerçekten silinmiş/gömme kapalı video (bağlantı hatası DEĞİL); 30 gün sonra unutulur
   const YTB=(()=>{const o=lsg('mc:ytbad2',{}),n=Date.now();for(const k in o)if(n-o[k]>30*864e5)delete o[k];return o})();const badYT=v=>{YTB[v]=Date.now();lss('mc:ytbad2',YTB)};
   /* Bütün kaynaklar AYNI ANDA sorulur (biri yavaşsa/yanıt vermiyorsa diğerleri beklemez). İlk aday gelince 450 ms daha
@@ -258,9 +258,10 @@ const Media=(()=>{
       requestAnimationFrame(()=>{const h=inf.offsetHeight;if(ft+h>innerHeight-16)inf.style.top=Math.max(16,innerHeight-16-h)+'px'})
       // fragman: bilginin KARŞI tarafında; orada yer yoksa bilgi panelinin en üstünde
       if(hasTrailer(it)&&!lsg('mc:ytoff',false)){const osp=side==='r'?spL:spR,slot=document.createElement('div');
-        /* yerleşim: kaydedilmiş serbest yer varsa (mc:ytpos, ekran oranı) orada 'f'; yoksa bilginin karşı yanında 'l'/'r'; o da sığmazsa bilgi panelinde 'in'.
-           Üstteki tutamaçtan ya da videoyu basılı tutup sürükleyerek taşınır (→ serbest), köşeden boyutlanır; yer ve boy hatırlanır. Tutamaca çift tık: eski yerine. */
-        let FP=lsg('mc:ytpos',null);const autoYs=osp>=290?(side==='r'?'l':'r'):null;let ys=FP?'f':autoYs||'in';
+        /* yerleşim: bilginin karşı yanında 'l'/'r'; sığmazsa bilgi panelinde 'in'. Üstteki tutamaçtan ya da videoyu basılı tutup sürükleyerek
+           taşınır (→ serbest 'f'), köşeden boyutlanır. Bu değişiklikler SADECE o anki fragman için: başka karta geçince her zamanki yer ve boy
+           (genişlik = Görünüm panelindeki kalıcı ayar mc:ytw). Tutamaca çift tık: bu fragmanı da her zamanki yerine al. */
+        let FP=null;const autoYs=osp>=290?(side==='r'?'l':'r'):null;let ys=autoYs||'in';
         {const edge=autoYs==='l'?fl:fr,cy=r.top+r.height/2;slot.className='msp-yt '+ys;if(ys==='in')inf.prepend(slot);else el.appendChild(slot);
           const max=()=>ys==='f'?innerWidth-16:Math.min(960,osp-50);
           const size=(w,keep)=>{if(ys==='in')return slot.offsetWidth;w=Math.max(240,Math.min(max(),w));const h=w*9/16;slot.style.width=w+'px';
@@ -271,9 +272,9 @@ const Media=(()=>{
           // sürükleme bitince imleç spot dışındaysa kapan (sürüklerken kapanmaz)
           const endDrag=()=>setTimeout(()=>{SPT.rs=false;document.addEventListener('pointermove',ev=>{const t=ev.target;if(SPT.el===el&&!(el.querySelector('.msp-f')?.contains(t)||el.querySelector('.msp-in')?.contains(t)||slot.contains(t)))leaveSoon()},{once:true})},0);
           hd.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();const x0=e.clientX,w0=slot.querySelector('.msp-yv')?.offsetWidth||parseFloat(slot.style.width);let w=w0;try{hd.setPointerCapture(e.pointerId)}catch{}slot.classList.add('rs');SPT.rs=true;
-            const mv=ev=>{w=size(w0+(ys==='l'?x0-ev.clientX:ev.clientX-x0),true)},up=()=>{hd.removeEventListener('pointermove',mv);hd.removeEventListener('pointerup',up);hd.removeEventListener('pointercancel',up);slot.classList.remove('rs');lss('mc:ytw',Math.round(w));endDrag()};
+            const mv=ev=>{w=size(w0+(ys==='l'?x0-ev.clientX:ev.clientX-x0),true)},up=()=>{hd.removeEventListener('pointermove',mv);hd.removeEventListener('pointerup',up);hd.removeEventListener('pointercancel',up);slot.classList.remove('rs');endDrag()};
             hd.addEventListener('pointermove',mv);hd.addEventListener('pointerup',up);hd.addEventListener('pointercancel',up)});
-          hd.addEventListener('dblclick',e=>{e.stopPropagation();lss('mc:ytw',480);size(480,true)});hd.addEventListener('click',e=>e.stopPropagation());
+          hd.addEventListener('dblclick',e=>{e.stopPropagation();size(lsg('mc:ytw',480),true)});hd.addEventListener('click',e=>e.stopPropagation());
           // taşıma: tutamaç hemen; video yüzeyi 5 px'ten fazla sürüklenince (kısa tık = ses aç/kapa olarak kalır)
           slot.addEventListener('pointerdown',e=>{if(e.button||e.target.closest('.msp-yr,button,.msp-sk,.msp-vs'))return;const grip=!!e.target.closest('.msp-ymv'),x0=e.clientX,y0=e.clientY;let on=false,l0=0,t0=0;
                         const start=()=>{on=true;SPT.rs=true;try{slot.setPointerCapture(e.pointerId)}catch{}const b=(slot.querySelector('.msp-yv')||slot).getBoundingClientRect();
@@ -281,11 +282,11 @@ const Media=(()=>{
             const mv=ev=>{if(!on){if(Math.hypot(ev.clientX-x0,ev.clientY-y0)<(grip?3:5))return;start()}const w=parseFloat(slot.style.width),h=w*9/16;
               slot.style.left=Math.max(8,Math.min(innerWidth-w-8,l0+ev.clientX-x0))+'px';slot.style.top=Math.max(8,Math.min(innerHeight-h-8,t0+ev.clientY-y0))+'px'};
             const up=()=>{slot.removeEventListener('pointermove',mv);slot.removeEventListener('pointerup',up);slot.removeEventListener('pointercancel',up);if(!on)return;slot.classList.remove('mv');slot._moved=true;
-              FP={x:+(parseFloat(slot.style.left)/innerWidth).toFixed(4),y:+(parseFloat(slot.style.top)/innerHeight).toFixed(4)};lss('mc:ytpos',FP);endDrag()};
+              FP={x:parseFloat(slot.style.left)/innerWidth,y:parseFloat(slot.style.top)/innerHeight};endDrag()};
             if(grip)e.preventDefault();slot.addEventListener('pointermove',mv);slot.addEventListener('pointerup',up);slot.addEventListener('pointercancel',up)});
           // taşımadan sonra gelen tık ses düğmesine dönüşmesin
           slot.addEventListener('click',e=>{if(slot._moved){slot._moved=false;e.stopPropagation();e.preventDefault()}},true);
-          mvh.addEventListener('dblclick',e=>{e.stopPropagation();lss('mc:ytpos',null);const c=SPT.card;spotOff(true);SPT.block=null;if(c?.isConnected)spotOn(c)})}
+          mvh.addEventListener('dblclick',e=>{e.stopPropagation();const c=SPT.card;spotOff(true);SPT.block=null;if(c?.isConnected)spotOn(c)})}
         const fail=()=>{if(SPT.el!==el)return;slot.remove();if(!inf.querySelector('[data-ytq]'))inf.querySelector('.msp-a')?.insertAdjacentHTML('beforeend',`<a data-ytq href="https://www.youtube.com/results?search_query=${encodeURIComponent(it.title+' '+(it.year||'')+' trailer')}" target="_blank" rel="noopener">Fragman${IC.r}</a>`)};
         ytIds(it).then(l=>{if(SPT.el!==el)return;if(l.length)ytMount(slot,l,fail,it.title);else fail()})}}
     document.body.appendChild(el);SPT.el=el;SPT.card=card;requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('on')));
@@ -643,7 +644,7 @@ const Media=(()=>{
       <h4>Kartlar</h4>${pvHTML()}<div class="mset-tgs">${tg('data-lt','title','Altında isim',L.title)}</div>${rng('cover','Kapak genişliği',60,szLim().cv,5)}${rng('ar','Kapak yüksekliği',40,170,5)}${rng('radius','Köşe yuvarlaklığı',0,24,1,'px')}${rng('gap','Kart aralığı',40,220,10)}
       <label>Izgara yoğunluğu</label>${seg('dens',[['r','Rahat'],['n','Normal'],['s','Sıkı']])}
       <div class="mset-tgs">${tg('data-lt','meta','Yıl, tür, yazar',L.meta)}${tg('data-lt','badge','Genel puan rozeti',L.badge)}</div>
-      <h4>Fragman</h4><div class="mset-tgs">${tg('data-lyt','on','Üstüne gelince fragman',!lsg('mc:ytoff',false))}</div><label for="mset-ytw">Fragman genişliği <output>${lsg('mc:ytw',480)}px</output></label><input id="mset-ytw" type="range" min="240" max="960" step="20" value="${lsg('mc:ytw',480)}" data-ytw>${lsg('mc:ytpos',null)?`<button class="mset-ytpos" data-ytpos>Fragmanı eski yerine al</button>`:''}
+      <h4>Fragman</h4><div class="mset-tgs">${tg('data-lyt','on','Üstüne gelince fragman',!lsg('mc:ytoff',false))}</div><label for="mset-ytw">Fragman genişliği <output>${lsg('mc:ytw',480)}px</output></label><input id="mset-ytw" type="range" min="240" max="960" step="20" value="${lsg('mc:ytw',480)}" data-ytw>
       <h4>Fragman kaynakları</h4>${keyRow('mc:tmdb','TMDB anahtarı','Film ve dizilerin neredeyse hepsi','https://www.themoviedb.org/settings/api')}${keyRow('mc:ytkey','YouTube anahtarı','Oyunlar ve bulunamayan her şey','https://console.cloud.google.com/apis/library/youtube.googleapis.com')}
       <p class="mset-kh">İkisi de ücretsiz, isteğe bağlı. Sadece bu tarayıcıda saklanır, kimseyle paylaşılmaz.</p>
       <h4>Liste</h4>${rng('rowh','Satır yüksekliği',70,170,5)}
@@ -670,7 +671,6 @@ const Media=(()=>{
     el.addEventListener('keydown',e=>{const h=e.target.closest('[data-pvh]');if(!h)return;const L=st.look,d=e.shiftKey?10:5,cl=(v,a,b)=>Math.max(a,Math.min(b,v));let cv=L.cover,ar=L.ar||100;
       if(e.key==='ArrowRight')cv+=d;else if(e.key==='ArrowLeft')cv-=d;else if(e.key==='ArrowDown')ar+=d;else if(e.key==='ArrowUp')ar-=d;else if(e.key==='Home'||e.key==='0'){cv=100;ar=100}else return;
       e.preventDefault();const Z=szLim();setSize(cl(cv,60,Math.max(Z.cv,L.cover)),cl(ar,Z.arMin,Z.arMax));saveLook()});
-    el.addEventListener('click',e=>{const b=e.target.closest('[data-ytpos]');if(!b)return;lss('mc:ytpos',null);b.remove()});
     el.addEventListener('change',async e=>{const t=e.target;if(!t.matches('[data-key]'))return;const k=t.dataset.key,v=t.value.trim(),ks=t.parentElement.querySelector('.mset-ks');lss(k,v);ytForgetEmpty();
       if(!v){ks.className='mset-ks';ks.textContent='Kaldırıldı';return}ks.className='mset-ks';ks.textContent='Deneniyor…';const r=await keyTest(k,v);if(!ks.isConnected)return;
       ks.className='mset-ks '+(r==='ok'?'ok':'bad');ks.textContent=r==='ok'?'✓ Çalışıyor':r==='bad'?'✕ Anahtar geçersiz':'Kaydedildi · şu an denenemedi'});

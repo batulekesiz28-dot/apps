@@ -3494,5 +3494,28 @@
     "text": "Gerçek YouTube'la denenemedi (internet yok); gömme yasağı koyan sahte sunucuyla iki adres de hub içinde açıldı"
    }
   ]
+ },
+ {
+  "at": "2026-11-17",
+  "change": "Fragmanı taşıma/boyutlama artık sadece o anki fragman için; başka karta geçince her zamanki yer ve boy",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Taşınan fragman sonraki bütün fragmanlarda da o yerde açılıyordu",
+    "fix": "Yer ve köşeden boy kaydedilmiyor; Görünüm panelindeki genişlik ayarı kalıcı tek ayar"
+   }
+  ]
  }
 ]

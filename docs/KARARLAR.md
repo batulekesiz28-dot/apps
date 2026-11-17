@@ -86,3 +86,4 @@ Son güncelleme: 2026-11-15
 2. **Takvim renkleri:** kategori renkleri (şu an, ince) mi, tamamen tek renk mi?
 3. **Yazı tipi:** Notlar gövdesi Geist + gezinme sistem yazısı (şu an) mı, her yerde tek yazı tipi mi?
 4. **Açık tema:** tutulsun mu (şu an seçilebilir), yoksa her şey koyu mu?
+| Dış uygulama penceresi | Kendini başka sitelere gömdürmeyen uygulamalar (YouTube Music) `apps.json`'da `"win":true`: hub içinde sekme değil, sağda kendi açılır penceresinde açılır (kendi hesabınla, olduğu gibi). Açıksa yenisi açılmaz, öne gelir; müzik kesilmez. Site pencere bağını keserse (YouTube'un güvenlik ayarı) hub pencereyi göremez → ikinci tıkta çift pencere açmak yerine “açık olabilir — görev çubuğundan geç · Yeni pencere aç” bildirimi. Kendi müzik çalarımızı yapmak YOK (kullanıcı istemedi). |

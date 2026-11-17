@@ -81,6 +81,15 @@
    "icon": "chart",
    "color": "blue",
    "desc": "Notlar, Study Log çalışma süreleri ve Kütüphane'den gerçek verilerle istatistik merkezi: aktivite grafikleri, ısı haritası, dağılımlar"
+  },
+  {
+   "slug": "ytmusic",
+   "name": "YouTube Music",
+   "icon": "music",
+   "color": "rose",
+   "desc": "Kendi YouTube Music hesabın · müzik, çalma listeleri · ayrı pencerede açılır",
+   "url": "https://music.youtube.com/",
+   "win": true
   }
  ]
 }

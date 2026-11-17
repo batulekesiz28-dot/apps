@@ -1057,7 +1057,7 @@ function applyRemoteGroups(g,m){if(JSON.stringify(g)===JSON.stringify(groups)&&J
   groups=g;members=m;store.set('appshell:groups',groups);store.set('appshell:members',members);wake();GX.poke=true;window.Worlds?.regroup?.()}
 const groupOf=k=>{const g=members[k];return g&&groups[g]?g:null};
 let linkDrag=null,hoverLink=-1,hoverNode=null;
-const toPub=a=>({key:'p:'+a.slug,kind:'pub',slug:a.slug,name:a.name||a.slug,icon:a.icon||'',color:a.color||'gray',desc:a.desc||'',group:a.group||'',groupColor:a.groupColor||'',ai:!!a.ai,url:a.url||a.file||`apps/${a.slug}/`});
+const toPub=a=>({key:'p:'+a.slug,kind:'pub',slug:a.slug,name:a.name||a.slug,icon:a.icon||'',color:a.color||'gray',desc:a.desc||'',group:a.group||'',groupColor:a.groupColor||'',ai:!!a.ai,win:!!a.win,url:a.url||a.file||`apps/${a.slug}/`});
 const toDraft=d=>({key:'d:'+d.id,kind:'draft',id:d.id,name:d.name,icon:d.icon||'',color:d.color||colorKeys[hash(d.id)%colorKeys.length],html:d.html,order:d.order??0});
 const rawDraft=d=>({id:d.id,name:d.name,icon:d.icon||'',color:d.color,html:d.html,order:d.order??0,ts:Date.now()});
 const find=k=>pub.find(a=>a.key===k)||drafts.find(a=>a.key===k);
@@ -1608,8 +1608,8 @@ function showPeek(n){
   $('#pkN').textContent=a.name;$('#pkD').textContent=a.desc||(a.kind==='draft'?'Bu tarayıcıdan eklenmiş taslak':'');$('#pkD').hidden=!$('#pkD').textContent;
   const g=groupOf(a.key),dg=degree(a.key);
   $('#pkM').innerHTML=`<i>${a.kind==='draft'?'taslak':'yayında'}</i>${dg?`<i>${dg} bağlantı</i>`:''}${g?`<i><em style="background:${GCOL[groups[g].color]||GCOL.gray}"></em>${esc(groups[g].name)}</i>`:''}`;
-  PK.el.querySelector('.pk-frame').style.display=TIER>=1?'none':''; // live preview loads a whole app: skip on lighter tiers
-  if(PK.key!==a.key&&TIER<1){PK.key=a.key;$('#pkL').classList.remove('done');
+  PK.el.querySelector('.pk-frame').style.display=TIER>=1||a.win?'none':''; // live preview loads a whole app: skip on lighter tiers
+  if(PK.key!==a.key&&TIER<1&&!a.win){PK.key=a.key;$('#pkL').classList.remove('done');
     if(a.kind==='draft'){PK.f.setAttribute('sandbox','allow-scripts');PK.f.removeAttribute('src');PK.f.srcdoc=a.html}
     else{PK.f.removeAttribute('srcdoc');PK.f.removeAttribute('sandbox');PK.f.src=bust(a.url)}}
   PK.n=n;PK.el.hidden=false;
@@ -2597,8 +2597,29 @@ function frameLoaded(t,f){if(t.fr!==f)return;t.loading=false;if(curTab()===t&&!W
 
 /* önbellek kırıcı: yayınlanan yeni sürüm, uygulama penceresinde de en geç 5 dk içinde görünsün */
 const bust=u=>{try{const x=new URL(u,location.href);if(x.origin!==location.origin)return u;x.searchParams.set('v',Math.floor(Date.now()/3e5).toString(36));return x.href}catch{return u}};
+/* Kendini başka sitelere gömdürmeyen uygulamalar (YouTube Music gibi; apps.json "win":true): hub içinde değil, kendi
+   penceresinde açılır. Pencere açıksa yenisi açılmaz, sadece öne gelir (çalan müzik durmaz). Hub yenilense bile aynı adlı pencere bulunur. */
+const WINS={};
+// YouTube gibi siteler güvenlik için açılan pencereyle bağı keser (COOP): hub o pencereyi göremez/öne getiremez.
+// Bunu açıldıktan hemen sonra "kapandı" görünmesinden anlarız; o zaman ikinci bir pencere açıp müziği çift çaldırmak yerine sorarız.
+// (Bu bilgi sekme yenilense de kalır: sessionStorage appshell:win:<slug>)
+function openWin(a){hidePeek(true);const name='appshell-'+a.slug,sk='appshell:win:'+a.slug,e=WINS[a.slug];
+  if(e?.w&&!e.w.closed){try{e.w.focus()}catch{}return}
+  let cut=!!e?.cut;try{cut=cut||!!sessionStorage.getItem(sk)}catch{}
+  if(cut){toast(`${a.name} kendi penceresinde açık olabilir — görev çubuğundan ona geç`,()=>launch(),'Yeni pencere aç');return}
+  launch();
+  function launch(){try{sessionStorage.removeItem(sk)}catch{}
+    const W0=Math.min(480,screen.availWidth-40),H0=Math.max(520,screen.availHeight-80),x=(screen.availLeft||0)+screen.availWidth-W0-20,y=(screen.availTop||0)+30;
+    const w=window.open('',name,`popup,width=${W0},height=${H0},left=${x},top=${y}`);
+    if(!w){toast('Tarayıcı açılır pencereyi engelledi — adres çubuğundaki simgeden izin ver');window.open(a.url,'_blank','noopener');return}
+    // boş (yeni) pencere → adrese git; zaten açıksa (başka site, okunamaz) dokunma, sadece öne getir → müzik kesilmez
+    let fresh=false;try{fresh=w.location.href==='about:blank'}catch{}
+    if(fresh)w.location.href=a.url;try{w.focus()}catch{}
+    const at=Date.now(),rec=WINS[a.slug]={w,cut:false};
+    const iv=setInterval(()=>{if(!w.closed)return;clearInterval(iv);if(WINS[a.slug]!==rec)return;
+      if(Date.now()-at<5000){rec.cut=true;try{sessionStorage.setItem(sk,String(at))}catch{}}else delete WINS[a.slug]},400)}}
 function openApp(a,el){
-  if(!a||justDragged||linkDrag)return;hidePeek(true);
+  if(!a||justDragged||linkDrag)return;if(a.win){openWin(a);return}hidePeek(true);
   let t=tabOf(a.key);
   if(!t){t={key:a.key,app:a,fr:null,blob:null,t:0,loading:false};TABS.push(t)}
   else if(a.url&&a.url!==t.app.url&&t.fr&&a.kind!=='draft'){t.app=a;try{t.fr.contentWindow.location.replace(bust(a.url))}catch{t.fr.src=bust(a.url)}}
@@ -2914,8 +2935,8 @@ async function removeDraft(a){
 const nameFrom=f=>{const n=f.replace(/\.html?$/i,'').replace(/[-_]+/g,' ').trim();return n.charAt(0).toLocaleUpperCase('tr')+n.slice(1)};
 function download(text,name){const u=URL.createObjectURL(new Blob([text],{type:'text/html'})),l=document.createElement('a');l.href=u;l.download=name;document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),1500)}
 async function copy(t,msg){try{await navigator.clipboard.writeText(t)}catch{const x=document.createElement('textarea');x.value=t;document.body.appendChild(x);x.select();document.execCommand('copy');x.remove()}toast(msg)}
-function toast(msg,undo){
-  const t=document.createElement('div');t.className='toast'+(undo?' has-undo':'');t.setAttribute('role','status');t.innerHTML=`<i></i><span>${esc(msg)}</span>${undo?'<button>Geri al</button>':''}`;$('#toasts').prepend(t);
+function toast(msg,undo,label){
+  const t=document.createElement('div');t.className='toast'+(undo?' has-undo':'');t.setAttribute('role','status');t.innerHTML=`<i></i><span>${esc(msg)}</span>${undo?`<button>${esc(label||'Geri al')}</button>`:''}`;$('#toasts').prepend(t);
   anim(t,[{opacity:0,transform:'translateY(10px) scale(.94)'},{opacity:1,transform:'none'}],{duration:420,easing:OUT});
   const kill=()=>anim(t,[{opacity:1},{opacity:0,transform:'translateY(4px) scale(.97)'}],{duration:220,easing:EASE,fill:'forwards'}).finished.then(()=>t.remove(),()=>t.remove());
   const timer=setTimeout(kill,undo?5500:2300);

@@ -3395,5 +3395,40 @@
     "fix": "Serbest fragmanda 700 ms ulaşma payı"
    }
   ]
+ },
+ {
+  "at": "2026-11-17",
+  "change": "Hub'a YouTube Music eklendi: gerçek uygulama, kendi penceresinde açılıyor; açıksa yenisi açılmadan öne geliyor",
+  "scores": {
+   "hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "hub masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "hub",
+    "sev": "bilgi",
+    "status": "open",
+    "text": "YouTube Music hub penceresinin içine gömülemiyor (site buna izin vermiyor); ayrı pencerede açılıyor"
+   },
+   {
+    "app": "hub",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "YouTube pencere bağını keserse hub her tıkta yeni pencere açıp müziği çift çaldırabilirdi",
+    "fix": "Bağ kesildiği anlaşılınca yeni pencere yerine ‘açık olabilir · Yeni pencere aç’ bildirimi"
+   },
+   {
+    "app": "hub",
+    "sev": "bilgi",
+    "status": "open",
+    "text": "Gerçek YouTube Music'le denenemedi (internet yok); bağı kesen ve kesmeyen sahte siteyle doğrulandı"
+   }
+  ]
  }
 ]

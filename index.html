@@ -2633,10 +2633,10 @@ const gomHosts=()=>{const d=document.documentElement.dataset;return d.appshellGo
 const gomOK=a=>{try{return gomHosts().includes(new URL(a.url).hostname)}catch{return false}};
 function gomSheet(a){if(matchMedia('(pointer:coarse)').matches){openWin(a);return}const n=esc(a.name),old=!!document.documentElement.dataset.appshellGom;
   sheet(`${n} · hub içinde`,`<div class="gom">${old?`<p><b>Eklentinin yeni sürümü gerekiyor</b> — kurulu sürüm ${n}'u tanımıyor.</p>`:''}<p>${n} başka sitelerin içinde açılmayı engelliyor. Tarayıcına <b>bir kerelik küçük bir eklenti</b> kurarsan hub'ın içinde, kendi sekmesinde açılır. Eklenti sadece bu hub'ın içinde ve sadece YouTube / YouTube Music için çalışır; başka hiçbir siteye dokunmaz.</p>
-    <ol><li><a href="extensions/appshell-gom.zip" download>Eklentiyi ${old?'yeniden ':''}indir</a>, zip'i bir klasöre çıkar.</li>
+    <ol><li><a href="extensions/appshell-gom.zip" download>Eklentiyi ${old?'yeniden ':''}indir</a>, zip'e sağ tık → <b>Tümünü ayıkla</b>.</li>
       <li>Adres çubuğuna <code>chrome://extensions</code> yaz <button class="btn ghost" data-gc>Kopyala</button></li>
       ${old?`<li>AppShell eklentisini kaldır (<b>Kaldır</b>), sonra <b>Paketlenmemiş öğe yükle</b> → yeni çıkardığın klasörü seç.</li>`:`<li>Sağ üstte <b>Geliştirici modu</b>nu aç.</li>
-      <li><b>Paketlenmemiş öğe yükle</b> → çıkardığın klasörü seç.</li>`}
+      <li><b>Paketlenmemiş öğe yükle</b> → çıkardığın klasörü seç (içinde <code>manifest.json</code> görünen klasör).</li>`}
       <li>Bu sayfayı yenile — ${n} artık burada açılır.</li></ol>
     <p class="gom-n">Hesabın görünmezse bir kez normal sekmede youtube.com'da oturum aç.</p></div>`,
     `<button class="btn ghost" data-gw>Ayrı pencerede aç</button><span class="grow"></span><button class="btn solid" data-gr>Kurdum, yenile</button>`,

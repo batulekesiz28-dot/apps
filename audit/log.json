@@ -3517,5 +3517,19 @@
     "fix": "Yer ve köşeden boy kaydedilmiyor; Görünüm panelindeki genişlik ayarı kalıcı tek ayar"
    }
   ]
+ },
+ {
+  "at": "2026-11-17",
+  "change": "Eklenti zip'i düzeltildi: dosyalar zip'in en üstünde (Windows 'Tümünü ayıkla' sonrası iç içe klasör yüzünden 'Manifest eksik' hatası)",
+  "scores": {},
+  "items": [
+   {
+    "app": "hub",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Zip açılınca manifest iç içe klasörde kalıyor, Chrome 'Manifest dosyası eksik' diyordu",
+    "fix": "Dosyalar zip'in köküne alındı; kurulum adımlarına 'içinde manifest.json görünen klasörü seç' eklendi"
+   }
+  ]
  }
 ]

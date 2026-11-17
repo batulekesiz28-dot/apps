@@ -5,10 +5,10 @@ YouTube ve YouTube Music, başka sitelerin içinde açılmayı yasaklayan bir g�
 Başka hiçbir siteye, sekmeye ya da YouTube Music'in kendi sekmesine dokunmaz; veri okumaz, hiçbir yere bir şey göndermez.
 
 Kurulum (Chrome / Edge / Brave):
-1. `appshell-gom.zip` dosyasını indir ve bir klasöre çıkar.
+1. `appshell-gom.zip` dosyasını indir, sağ tık → Tümünü ayıkla.
 2. Adres çubuğuna `chrome://extensions` yaz (Edge: `edge://extensions`).
 3. Sağ üstteki **Geliştirici modu**nu aç.
-4. **Paketlenmemiş öğe yükle** → çıkardığın klasörü seç.
+4. **Paketlenmemiş öğe yükle** → içinde `manifest.json` görünen klasörü seç.
 5. Hub'ı yenile (Ctrl+Shift+R). YouTube ve YouTube Music artık hub'ın içinde açılır.
 
 Güncellerken: eski AppShell eklentisini Kaldır, yeni klasörü Paketlenmemiş öğe yükle ile seç.

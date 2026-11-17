@@ -3062,5 +3062,42 @@
     "fix": "Bütün MyAnimeList istekleri tek sırada, dakikada ~55"
    }
   ]
+ },
+ {
+  "at": "2026-11-17T12:18:47",
+  "change": "Medya: AniList ana kaynak (öneri + anime fragmanı), bağlantı testi",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Öneriler ve fragmanlar tek bir kararsız servise (Jikan) bağlıydı; servis yanıt vermeyince hiçbir şey çıkmıyordu, raf sessizce kayboluyordu",
+    "fix": "AniList ana kaynak, Jikan yedek; alınamazsa açık uyarı + bağlantı testi"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "fixed",
+    "text": "Hangi servisin neden çalışmadığını görmenin yolu yoktu",
+    "fix": "Görünüm panelinde 'Bağlantıları test et': servis servis sonuç, kopyalanabilir rapor"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "status": "fixed",
+    "text": "Öneri kartlarının tıklama işareti puan kutusununkiyle aynı addı (karışabilirdi)",
+    "fix": "Ayrı ad (data-arid)"
+   }
+  ]
  }
 ]

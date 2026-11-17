@@ -5,15 +5,36 @@
     "action": {
       "type": "modifyHeaders",
       "responseHeaders": [
-        { "header": "x-frame-options", "operation": "remove" },
-        { "header": "content-security-policy", "operation": "remove" },
-        { "header": "content-security-policy-report-only", "operation": "remove" }
+        {
+          "header": "x-frame-options",
+          "operation": "remove"
+        },
+        {
+          "header": "content-security-policy",
+          "operation": "remove"
+        },
+        {
+          "header": "content-security-policy-report-only",
+          "operation": "remove"
+        }
       ]
     },
     "condition": {
-      "requestDomains": ["music.youtube.com"],
-      "initiatorDomains": ["batulekesiz28-dot.github.io", "localhost", "127.0.0.1", "music.youtube.com"],
-      "resourceTypes": ["sub_frame"]
+      "requestDomains": [
+        "music.youtube.com",
+        "www.youtube.com",
+        "youtube.com"
+      ],
+      "initiatorDomains": [
+        "batulekesiz28-dot.github.io",
+        "localhost",
+        "127.0.0.1",
+        "music.youtube.com",
+        "www.youtube.com"
+      ],
+      "resourceTypes": [
+        "sub_frame"
+      ]
     }
   }
 ]

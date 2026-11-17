@@ -3466,5 +3466,33 @@
     "text": "Gerçek YouTube Music'le denenemedi (internet yok); gömme yasağı koyan sahte sunucuyla: eklentisiz boş kaldı, eklentiyle açıldı. Oturum için 3. taraf çerezlerine izin gerekebilir"
    }
   ]
+ },
+ {
+  "at": "2026-11-17",
+  "change": "Hub'a YouTube eklendi (eklentiyle hub içinde); eklenti 1.1 YouTube'u da tanıyor, eski sürümde ‘güncelle’ adımları çıkıyor. Korsan yayın siteleri eklenmedi",
+  "scores": {
+   "hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "hub masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "hub",
+    "sev": "bilgi",
+    "status": "open",
+    "text": "hdfilmizlesene ve animecix eklenmedi: izinsiz yayın yapan siteler"
+   },
+   {
+    "app": "hub",
+    "sev": "bilgi",
+    "status": "open",
+    "text": "Gerçek YouTube'la denenemedi (internet yok); gömme yasağı koyan sahte sunucuyla iki adres de hub içinde açıldı"
+   }
+  ]
  }
 ]

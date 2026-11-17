@@ -981,6 +981,7 @@ const ICONS={
   book:'<path d="M5 5.5A2 2 0 0 1 7 3.5h12v14H7a2 2 0 0 0-2 2zM5 19.5a2 2 0 0 0 2 2h12"/>',
   note:'<path d="M6 3.5h8.5l4 4v13H6zM14.5 3.5v4h4M9 12h6.5M9 15.5h4.5"/>',
   music:'<path d="M9 17.5V5.5l10-2v12"/><circle cx="6.8" cy="17.5" r="2.2"/><circle cx="16.8" cy="15.5" r="2.2"/>',
+  play:'<rect x="3" y="5" width="18" height="14" rx="4"/><path d="M10.2 9.3v5.4l4.5-2.7z"/>',
   code:'<path d="M8 7.5L3.5 12 8 16.5M16 7.5l4.5 4.5-4.5 4.5M13.5 5l-3 14"/>',
   globe:'<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.3 2.5 3.5 5.3 3.5 8.5s-1.2 6-3.5 8.5c-2.3-2.5-3.5-5.3-3.5-8.5S9.7 6 12 3.5z"/>',
   cube:'<path d="M12 3.5l7.5 4.25v8.5L12 20.5l-7.5-4.25v-8.5zM4.5 7.75L12 12l7.5-4.25M12 12v8.5"/>',
@@ -2628,20 +2629,21 @@ function openWin(a){hidePeek(true);const name='appshell-'+a.slug,sk='appshell:wi
       if(Date.now()-at<5000){rec.cut=true;try{sessionStorage.setItem(sk,String(at))}catch{}}else delete WINS[a.slug]},400)}}
 /* Hub içinde açma: tarayıcıda AppShell eklentisi (extensions/appshell-gom) kuruluysa gömülemeyen site de normal sekme olur.
    Eklenti sayfaya data-appshell-gom="1" koyar. Yoksa kurulum penceresi (telefonda eklenti olmadığından doğrudan ayrı pencere). */
-const gomOK=()=>document.documentElement.dataset.appshellGom==='1';
-function gomSheet(a){if(matchMedia('(pointer:coarse)').matches){openWin(a);return}const n=esc(a.name);
-  sheet(`${n} · hub içinde`,`<div class="gom"><p>${n} başka sitelerin içinde açılmayı engelliyor. Tarayıcına <b>bir kerelik küçük bir eklenti</b> kurarsan hub'ın içinde, kendi sekmesinde açılır. Eklenti sadece bu hub'da ve sadece ${n} için çalışır; başka hiçbir siteye dokunmaz.</p>
-    <ol><li><a href="extensions/appshell-gom.zip" download>Eklentiyi indir</a>, zip'i bir klasöre çıkar.</li>
+const gomHosts=()=>{const d=document.documentElement.dataset;return d.appshellGom?(d.appshellGomHosts||'music.youtube.com').split(/\s+/):[]};
+const gomOK=a=>{try{return gomHosts().includes(new URL(a.url).hostname)}catch{return false}};
+function gomSheet(a){if(matchMedia('(pointer:coarse)').matches){openWin(a);return}const n=esc(a.name),old=!!document.documentElement.dataset.appshellGom;
+  sheet(`${n} · hub içinde`,`<div class="gom">${old?`<p><b>Eklentinin yeni sürümü gerekiyor</b> — kurulu sürüm ${n}'u tanımıyor.</p>`:''}<p>${n} başka sitelerin içinde açılmayı engelliyor. Tarayıcına <b>bir kerelik küçük bir eklenti</b> kurarsan hub'ın içinde, kendi sekmesinde açılır. Eklenti sadece bu hub'ın içinde ve sadece YouTube / YouTube Music için çalışır; başka hiçbir siteye dokunmaz.</p>
+    <ol><li><a href="extensions/appshell-gom.zip" download>Eklentiyi ${old?'yeniden ':''}indir</a>, zip'i bir klasöre çıkar.</li>
       <li>Adres çubuğuna <code>chrome://extensions</code> yaz <button class="btn ghost" data-gc>Kopyala</button></li>
-      <li>Sağ üstte <b>Geliştirici modu</b>nu aç.</li>
-      <li><b>Paketlenmemiş öğe yükle</b> → çıkardığın klasörü seç.</li>
+      ${old?`<li>AppShell eklentisini kaldır (<b>Kaldır</b>), sonra <b>Paketlenmemiş öğe yükle</b> → yeni çıkardığın klasörü seç.</li>`:`<li>Sağ üstte <b>Geliştirici modu</b>nu aç.</li>
+      <li><b>Paketlenmemiş öğe yükle</b> → çıkardığın klasörü seç.</li>`}
       <li>Bu sayfayı yenile — ${n} artık burada açılır.</li></ol>
-    <p class="gom-n">Hesabın görünmezse bir kez normal sekmede music.youtube.com'da oturum aç.</p></div>`,
+    <p class="gom-n">Hesabın görünmezse bir kez normal sekmede youtube.com'da oturum aç.</p></div>`,
     `<button class="btn ghost" data-gw>Ayrı pencerede aç</button><span class="grow"></span><button class="btn solid" data-gr>Kurdum, yenile</button>`,
     s=>s.addEventListener('click',e=>{if(e.target.closest('[data-gc]')){navigator.clipboard?.writeText('chrome://extensions').then(()=>toast('Kopyalandı — adres çubuğuna yapıştır'),()=>{});return}
       if(e.target.closest('[data-gw]')){closeSheet();openWin(a);return}if(e.target.closest('[data-gr]'))location.reload()}))}
 function openApp(a,el){
-  if(!a||justDragged||linkDrag)return;if(a.win&&!gomOK()){gomSheet(a);return}hidePeek(true);
+  if(!a||justDragged||linkDrag)return;if(a.win&&!gomOK(a)){gomSheet(a);return}hidePeek(true);
   let t=tabOf(a.key);
   if(!t){t={key:a.key,app:a,fr:null,blob:null,t:0,loading:false};TABS.push(t)}
   else if(a.url&&a.url!==t.app.url&&t.fr&&a.kind!=='draft'){t.app=a;try{t.fr.contentWindow.location.replace(bust(a.url))}catch{t.fr.src=bust(a.url)}}

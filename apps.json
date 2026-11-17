@@ -83,6 +83,15 @@
    "desc": "Notlar, Study Log çalışma süreleri ve Kütüphane'den gerçek verilerle istatistik merkezi: aktivite grafikleri, ısı haritası, dağılımlar"
   },
   {
+   "slug": "youtube",
+   "name": "YouTube",
+   "icon": "play",
+   "color": "rose",
+   "desc": "Kendi YouTube hesabın · videolar, abonelikler · hub içinde (eklentiyle)",
+   "url": "https://www.youtube.com/",
+   "win": true
+  },
+  {
    "slug": "ytmusic",
    "name": "YouTube Music",
    "icon": "music",

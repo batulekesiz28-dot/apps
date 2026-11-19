@@ -3929,5 +3929,106 @@
     "fix": "Bulut asıl kaynak; geri yazma buluttakini ezebilir"
    }
   ]
+ },
+ {
+  "at": "2026-11-19T21:30:30",
+  "change": "Kadran'da ortadaki yazının üstünden geçen ibre kenara alındı; yazı artık temiz. Bütün arayüzlere küme özelliği geldi: sağ tık (telefonda basılı tut) → kümeye taşı / yeni küme / kümeden çıkar, küme adına çift tık → yeniden adlandır. Her arayüz kümeyi kendi tarzında gösteriyor (raylar, petek adaları, balon demetleri, kadran dilimleri, yelpaze bölümleri, harita bölgeleri).",
+  "scores": {
+   "Kadran bilgisayar": {
+    "before": 85,
+    "after": 100
+   },
+   "Deste telefon": {
+    "before": 85,
+    "after": 100
+   },
+   "Mıknatıs bilgisayar": {
+    "before": 85,
+    "after": 100
+   },
+   "Rüzgâr/Petek/Kum/Harita": {
+    "before": 97,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Hub · Kadran",
+    "sev": "error",
+    "status": "fixed",
+    "text": "İbre ortadaki uygulama adının ve açıklamanın üstünden geçiyordu",
+    "fix": "İbre kenarda kısa gösterge; orta alan boş"
+   },
+   {
+    "app": "Hub · arayüzler",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Kümeler sadece Galaksi, Mekânsal ve Mıknatıs'taydı",
+    "fix": "10 arayüzün hepsinde kümeler + sağ tık/basılı tut menüsü"
+   },
+   {
+    "app": "Hub · Mıknatıs",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Küme adına çift tıklanamıyordu (uygulama katmanı örtüyordu)",
+    "fix": "Ad katmanı üste alındı"
+   },
+   {
+    "app": "Hub · Mıknatıs",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Uygulama adları dururken çok silikti",
+    "fix": "Hep okunur, yaklaşınca tam"
+   },
+   {
+    "app": "Hub · arayüzler",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Açık arayüzlerde tarih/ipucu yazısı siliktı",
+    "fix": "Kontrast ≥4.5:1"
+   },
+   {
+    "app": "Hub · Deste",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Yelpaze ekranın kenarlarından taşıyordu; telefonda açıklama 11px",
+    "fix": "Yelpaze ekrana sığar; 12px"
+   },
+   {
+    "app": "Hub · Balon",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Telefonda balonlar ekrandan taşabiliyordu",
+    "fix": "Kenar duvarı"
+   },
+   {
+    "app": "Hub",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Arayüz değişince/kümeler değişince saat bir an boş kalıyordu",
+    "fix": "Hemen yazılıyor"
+   },
+   {
+    "app": "Denetçi",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Koyu degrade zemini beyaz sanıp yanlış kontrast hatası veriyordu",
+    "fix": "Degrade renkleri hesaba katılıyor"
+   },
+   {
+    "app": "Hub · Deste",
+    "sev": "info",
+    "status": "open",
+    "text": "Kartlar üst üste duruyor (yelpaze tasarımı gereği)",
+    "fix": "İmlecin altındaki kart kalkıyor; bilerek böyle"
+   },
+   {
+    "app": "Hub · Balon",
+    "sev": "info",
+    "status": "open",
+    "text": "Bir balonun adı başka balonun üstüne gelebiliyor",
+    "fix": "Ada beyaz hale verildi; fizik gereği ara sıra olur"
+   }
+  ]
  }
 ]

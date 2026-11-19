@@ -25,7 +25,11 @@ function inViewish(el,win){const r=el.getBoundingClientRect();return r.bottom>-2
 
 function bgOf(el,win){let layers=[],p=el;
   while(p&&p.nodeType===1){const cs=win.getComputedStyle(p);if(cs.backgroundImage&&cs.backgroundImage!=='none'&&!/gradient/.test(cs.backgroundImage))return null;
-    const c=parseColor(cs.backgroundColor);if(c&&c.a>0){layers.push(c);if(c.a>=1)break}p=p.parentElement}
+    const c=parseColor(cs.backgroundColor);if(c&&c.a>0){layers.push(c);if(c.a>=1)break}
+    // degrade zemin: renk duraklarının ortalaması yaklaşık zemin sayılır (yoksa koyu degrade “beyaz” sanılır, yanlış hata çıkar)
+    const gs=/gradient/.test(cs.backgroundImage||'')?(cs.backgroundImage.match(/rgba?\([^)]+\)|color\(srgb[^)]+\)/g)||[]).map(parseColor).filter(Boolean):[];
+    if(gs.length){const av=gs.reduce((o,x)=>({r:o.r+x.r/gs.length,g:o.g+x.g/gs.length,b:o.b+x.b/gs.length,a:Math.min(o.a,x.a)}),{r:0,g:0,b:0,a:1});if(av.a>.9){layers.push({...av,a:1});break}}
+    p=p.parentElement}
   let base={r:255,g:255,b:255,a:1};if(!layers.length||layers[layers.length-1].a<1){const root=parseColor(win.getComputedStyle(el.ownerDocument.documentElement).backgroundColor);if(root&&root.a>0)base=root}
   for(let i=layers.length-1;i>=0;i--)base=mix(layers[i],base);return base}
 function opacityChain(el,win){let o=1,p=el;while(p&&p.nodeType===1){o*=+win.getComputedStyle(p).opacity;p=p.parentElement}return o}

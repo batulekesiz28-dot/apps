@@ -88,7 +88,7 @@ Kullanıcı, yaptığım her işin kendi gözünden denetlenmesini istiyor. Her 
    Metinler Türkçe, kısa ve kullanıcının anlayacağı dilde.
 5. Sonra commit + push (main dalına; GitHub Pages oradan yayınlar).
 
-Denetim motoru: `audit/engine.js` (hub'daki Denetçi uygulaması da aynısını kullanır).
+Denetim motoru: `audit/engine.js` (hub'daki Denetçi uygulaması da aynısını kullanır). Katı eleştirmen: kategori `insan` (Gerçek kullanıcı) + sert puan (18/8/3, a11y/insan hatası → toplam ≤85); kurallar `docs/STANDART.md` “Denetçi — katı eleştirmen”. Denetçi uygulaması kategorileri `Audit.CATS`'ten okur.
 Yazı/renk ölçüleri: metin için en az 12px (telefon), dokunma alanı ≥ 24px (telefonda ≥ 40px), kontrast ≥ 4.5:1.
 
 ## Galaksi düzeni

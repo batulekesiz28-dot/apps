@@ -34,6 +34,7 @@ header{display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap;margin-bottom:2
 .bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
 .chip{height:36px;padding:0 14px;border-radius:11px;font-size:13px;box-shadow:inset 0 0 0 .5px var(--line2);background:var(--card);transition:background .2s,color .2s}
 .chip:hover{background:var(--hover)}.chip.on{background:var(--ink);color:var(--bg);box-shadow:none}
+.asel{appearance:none;padding-right:14px;color:inherit;font:inherit;font-size:13px;cursor:pointer}.asel.on{background:var(--ink);color:var(--bg);box-shadow:none}
 .chip .n{font:500 11.5px var(--mono);opacity:.75;margin-left:4px}
 .sp{flex:1}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr));gap:14px}
@@ -106,7 +107,10 @@ async function load(){try{DATA=await(await fetch('../../audit/ideas.json',{cache
   $('#meta').textContent=`${DATA.ideas.length} öneri · araştırma ${DATA.updated?new Date(DATA.updated).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'}):''}`;paint()}
 function paint(){if(!DATA)return;const I=DATA.ideas,apps=[...new Set(I.map(i=>i.app))];
   const cnt=k=>k==='all'?I.length:k==='want'?I.filter(i=>state[i.id]==='want').length:k==='gap'?I.filter(i=>i.kind==='gap'&&i.status!=='done').length:k==='done'?I.filter(i=>i.status==='done').length:I.filter(i=>i.app===k).length;
-  $('#filters').innerHTML=[['all','Tümü'],['gap','Atladıklarımız'],['want','İstediklerim'],['done','Yapılanlar'],...apps.map(a=>[a,a])].map(([k,l])=>`<button class="chip${filter===k?' on':''}" data-f="${esc(k)}">${esc(l)}<span class="n">${cnt(k)}</span></button>`).join('');
+  $('#filters').innerHTML=[['all','Tümü'],['gap','Atladıklarımız'],['want','İstediklerim'],['done','Yapılanlar'],].map(([k,l])=>`<button class="chip${filter===k?' on':''}" data-f="${esc(k)}">${esc(l)}<span class="n">${cnt(k)}</span></button>`).join('')
+    // uygulamaya göre süzme tek bir seçicide: 4 ana süzgeç + 1 seçici (bir sırada 8'den fazla düğme olmasın)
+    +`<select class="chip asel${apps.includes(filter)?' on':''}" aria-label="Uygulamaya göre süz"><option value="">Uygulama…</option>${apps.map(a=>`<option value="${esc(a)}"${filter===a?' selected':''}>${esc(a)} (${cnt(a)})</option>`).join('')}</select>`;
+  $('#filters').querySelector('.asel').onchange=e=>{filter=e.target.value||'all';paint()};
   const list=I.filter(i=>filter==='all'||(filter==='want'?state[i.id]==='want':filter==='gap'?i.kind==='gap'&&i.status!=='done':filter==='done'?i.status==='done':i.app===filter))
     .sort((a,b)=>((a.status==='done')-(b.status==='done'))||((state[a.id]==='no')-(state[b.id]==='no'))||((b.kind==='gap')-(a.kind==='gap'))||(b.impact-a.impact));
   $('#list').innerHTML=list.length?list.map((i,n)=>{const dn=i.status==='done',s=dn?'done':state[i.id];return`<article class="card${s==='no'?' no':''}${dn?' dn':''}" style="animation-delay:${Math.min(n,8)*40}ms">
@@ -115,7 +119,7 @@ function paint(){if(!DATA)return;const I=DATA.ideas,apps=[...new Set(I.map(i=>i.
     ${i.best?`<div class="best"><b class="h">EN İYİ KİM YAPIYOR</b>${i.best.map(b=>`<div><strong>${esc(b.n)}</strong> — ${esc(b.how)}</div>`).join('')}</div>`:''}
     <div class="why">${esc(i.why)}</div><div class="what"><b>BİZDE NASIL OLUR</b>${esc(i.what)}</div>
     <div class="src">${i.sources.map(x=>`<a href="${esc(x.u)}" target="_blank" rel="noopener">${esc(x.t)}</a>`).join('')}</div>
-    ${dn?'<div class="done-l">✓ Yapıldı — hub’da kullanılabilir</div>':`<div class="acts">${['want','later','no'].map(k=>`<button data-id="${esc(i.id)}" data-s="${k}" class="${s===k?'on':''}">${k==='want'?'İstiyorum':k==='later'?'Sonra':'Hayır'}</button>`).join('')}</div>`}</article>`}).join('')
+    ${dn?'<div class="done-l">✓ Yapıldı — hub’da kullanılabilir</div>':`<div class="acts">${['want','later','no'].map(k=>`<button data-id="${esc(i.id)}" data-s="${k}" class="${s===k?'on':''}" aria-label="${k==='want'?'Bu öneriyi istiyorum':k==='later'?'Bu öneriye sonra bak':'Bu öneriyi istemiyorum'}">${k==='want'?'İstiyorum':k==='later'?'Sonra':'Hayır'}</button>`).join('')}</div>`}</article>`}).join('')
     :'<div class="empty">Bu filtrede öneri yok.</div>'}
 document.addEventListener('click',e=>{const f=e.target.closest('[data-f]'),b=e.target.closest('[data-s]');
   if(f){filter=f.dataset.f;paint()}

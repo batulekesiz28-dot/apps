@@ -631,7 +631,7 @@ function hudPaint(){if(!G)return;const p=G.phase;$('#phN').textContent={setup:'H
 let SC={},scAt=0;function scores(){const now=performance.now();if(now-scAt>400){SC=eng.score();scAt=now}return SC}
 function nationHTML(n){const sc=scores()[n.i]||{total:0},[k,l]=stOf(n),own=eng.own(n),avg=own.length?(own.reduce((a,r)=>a+r.def,0)/own.length).toFixed(1):'0';
   const model=n.conn==='demo'?'kural motoru (gerçek model değil)':n.conn==='off'?'sunucuda anahtar yok':(n.model||srv.info?.providers?.[n.prov]?.model||PROV[n.prov].n);
-  return`<div class="nh"><span class="nf">${FLAG}</span><div class="nn"><b>${E(n.name)} <span class="conn ${n.conn}">${n.conn==='demo'?'DEMO':n.conn==='live'?'CANLI':'BAĞLANTISIZ'}</span></b><small>${E(model)}</small></div>
+  return`<div class="nh"><span class="nf">${FLAG}</span><div class="nn"><b>${E(n.name)} <span class="conn ${n.conn}">${n.conn==='demo'?'DEMO':n.conn==='live'?'CANLI':'BAĞLANTISIZ'}</span></b><small title="${E(model)}">${E(model)}</small></div>
     <div class="nsc"><b>${(G.scores?.[n.i]||sc).total.toFixed(0)}</b><small>${G.phase==='over'?'final':'canlı puan'}</small></div></div>
     <div class="nst"><div>Kaynak<b>${Math.floor(n.res)}</b><div class="rb"><i style="width:${clamp(n.res/Math.max(1,G.cfg.res*1.5),0,1)*100}%"></i></div></div><div>Bölge<b>${own.length}/${MAPS[G.cfg.size].n+1}</b></div><div>Ort. savunma<b>${avg}</b></div><div>Durum<b><span class="st ${k}" style="padding:0 7px"><i></i>${l}</span></b></div></div>
     <div class="nstr" title="${E(n.strategy)}${n.reason?' — '+E(n.reason):''}">${k==='think'?`<span class="think"><i></i><i></i><i></i></span> Durumu analiz ediyor…`:n.strategy?`<b>Strateji:</b> ${E(n.strategy)}${n.reason?` · <b>Gerekçe:</b> ${E(n.reason)}`:''}`:'Henüz karar vermedi'}</div>

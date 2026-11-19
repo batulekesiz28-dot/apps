@@ -607,7 +607,7 @@ function vDays(){
   const day=list().filter(s=>s.date===selDay).sort((a,b)=>(a.start||0)-(b.start||0)),dm=minsOn(selDay)+(set.run&&set.run.date===selDay?liveMin():0);
   return`<div class="view dgrid" style="--heat:${acc.trim()||'#18181B'}">
    <div class="dleft"><section class="card cal"><div class="calh"><b>${MON[calM.m]} ${calM.y}</b><span class="num">${fm(mTot)}</span>
-     <button class="ib" data-cal="-1" aria-label="Önceki ay"><svg viewBox="0 0 16 16"><path d="M10 3.5L5.5 8l4.5 4.5"/></svg></button><button class="ib" data-cal="0" aria-label="Bu ay"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="2"/></svg></button><button class="ib" data-cal="1" aria-label="Sonraki ay"><svg viewBox="0 0 16 16"><path d="M6 3.5L10.5 8 6 12.5"/></svg></button></div>
+     <button class="ib" data-cal="-1" aria-label="Önceki ay" title="Önceki ay"><svg viewBox="0 0 16 16"><path d="M10 3.5L5.5 8l4.5 4.5"/></svg></button><button class="ib" data-cal="0" aria-label="Bu ay" title="Bu aya dön"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="2"/></svg></button><button class="ib" data-cal="1" aria-label="Sonraki ay" title="Sonraki ay"><svg viewBox="0 0 16 16"><path d="M6 3.5L10.5 8 6 12.5"/></svg></button></div>
      <div class="cg">${cells}</div>
      <div class="legend">az<i style="opacity:.14"></i><i style="opacity:.4"></i><i style="opacity:.7"></i><i></i>hedef ●</div></section>
      ${timerCard()}</div>

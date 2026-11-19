@@ -338,3 +338,12 @@ Kullanıcı Petek ve Mıknatıs'taki hareketi ölçü aldı. Her arayüz dünyas
 - Sadece `transform`/`opacity` (ve küçük alanlı süzgeç); 60 FPS. Döngü **yalnızca hareket varken** çalışır, durulunca kendiliğinden durur (ölç: imleç durunca 0 çizim/sn).
 - Hareket azaltılmışsa (sistem ya da `appshell:motion`) sahne durgun ama bütün işlevler çalışır. Dokunmatikte parmak da aynı etkiyi verir.
 - Yeni arayüz teslim edilmeden önce: imleç etkisi, durulunca durma, telefon yerleşimi ve tıklama/klavye ile açma test edilir.
+
+
+## Denetçi — katı eleştirmen (2026-11)
+Denetçi artık “bir insan burada nerede takılır?” diye bakar (`audit/engine.js`, kategori `insan`). Bulgular kullanıcının yaşadığı şeyle yazılır (“göremediği yere basar”, “parmak yanındakine basar”).
+- Simge düğmesi: `aria-label` YETMEZ, bilgisayarda `title` ipucu da olsun.
+- Bir sırada en çok 8 düğme; fazlası seçici ya da “Daha fazla” menüsü.
+- Kesilen metne `title`; uzun metin ~70 harf genişlik (`max-width:72ch`).
+- Telefonda küçük düğmeler arasında en az 4px boşluk.
+- Bilerek İngilizce bırakılan bölüm adlarına `translate="no"`.

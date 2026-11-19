@@ -3784,5 +3784,78 @@
     "text": "Gerçek AniList'le denenemedi (internet yok); sahte yanıtla doğrulandı. Sadece MyAnimeList kimliği (mal) eşleşmiş animeler takvime düşer"
    }
   ]
+ },
+ {
+  "at": "2026-11-19T19:27:08",
+  "change": "Denetçi artık katı bir eleştirmen: “Gerçek kullanıcı” diye yeni bir bölüm, bir insanın takılacağı yerleri arıyor (görünmez düğmeler, kesilen yazılar, üst üste binen düğmeler, ipucusuz simgeler, çok seçenekli sıralar…). Puanlama da sertleşti. Bulduklarını hemen düzelttim.",
+  "scores": {
+   "Öneriler bilgisayar": {
+    "before": 98,
+    "after": 100
+   },
+   "AI Warfront bilgisayar": {
+    "before": 98,
+    "after": 100
+   },
+   "Study Log telefon": {
+    "before": 98,
+    "after": 100
+   },
+   "Notlar bilgisayar": {
+    "before": 99,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Öneriler",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Süzgeç sırasında 14 düğme vardı",
+    "fix": "4 ana süzgeç + tek “Uygulama…” seçicisi"
+   },
+   {
+    "app": "Öneriler",
+    "sev": "info",
+    "status": "fixed",
+    "text": "“Hayır” düğmesi neye hayır dediğini söylemiyordu",
+    "fix": "Ekran okuyucuya “Bu öneriyi istemiyorum”"
+   },
+   {
+    "app": "AI Warfront",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Model adı kesiliyordu",
+    "fix": "Üstüne gelince tamamı görünüyor"
+   },
+   {
+    "app": "Study Log",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Ay okları ipucusuzdu",
+    "fix": "title eklendi"
+   },
+   {
+    "app": "Hub",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Telefonda yakınlaştırma düğmeleri küçük ve yapışıktı",
+    "fix": "40px ve aralıklı"
+   },
+   {
+    "app": "Notlar",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Workspace/Library İngilizce sayılıyordu",
+    "fix": "Bilerek seçilen bölüm adı olarak işaretlendi"
+   },
+   {
+    "app": "Denetçi",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Günlük satırları çok uzundu",
+    "fix": "72 harf genişlik"
+   }
+  ]
  }
 ]

@@ -6,10 +6,10 @@
    ════════════════════════════════════════════════════════════ */
 (function(){
 'use strict';
-const CATS={a11y:'Erişilebilirlik',ux:'Kullanılabilirlik',look:'Estetik',design:'Tasarım kararları',perf:'Hız'};
+const CATS={insan:'Gerçek kullanıcı',a11y:'Erişilebilirlik',ux:'Kullanılabilirlik',look:'Estetik',design:'Tasarım kararları',perf:'Hız'};
 /* tasarım kararı bulgularının önem düzeyi → puan ağırlığı */
 const LVL={kritik:'error',yuksek:'warn',orta:'info',dusuk:'info'};
-const W={error:14,warn:6,info:2};
+const W={error:18,warn:8,info:3}; // katı eleştirmen: eskisinden sert (14/6/2 idi)
 
 function parseColor(c){const sr=String(c).match(/color\(srgb\s+([^)]+)\)/);if(sr){const p=sr[1].split(/[\s\/]+/).filter(Boolean).map(Number);return{r:p[0]*255,g:p[1]*255,b:p[2]*255,a:p.length>3?p[3]:1}}const m=String(c).match(/rgba?\(([^)]+)\)/);if(!m)return null;const p=m[1].split(/[\s,\/]+/).filter(Boolean).map(Number);return{r:p[0],g:p[1],b:p[2],a:p.length>3?p[3]:1}}
 const lum=({r,g,b})=>{const f=v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)};return .2126*f(r)+.7152*f(g)+.0722*f(b)};
@@ -133,6 +133,58 @@ function run(doc,opt={}){
   const huge=heads.filter(h=>h.tagName==='H1'&&!h.closest('.mh,.hero,[class*=hero]')&&parseFloat(getComputedStyle(h).fontSize)>(mobile?32:42));
   if(huge.length)addD('dusuk','bigtitle','Başlık gereğinden büyük','Sayfa başlığı içerikten fazla dikkat çekiyor ve dikey alan harcıyor.',`Sayfa başlığını ${mobile?'22–28':'24–32'}px aralığına indir.`,huge);
 
+  /* ── Gerçek kullanıcı: katı bir eleştirmenin gözü — bir insan burada nerede takılır, neye ulaşamaz? ──
+     Her bulgu “kullanıcı ne yaşar” diye yazılır. Bilerek sert: şüpheli durum da bulgudur. */
+  const addH=(sev,id,title,detail,fix,els)=>add('insan',sev,id,title,detail,fix,els);
+  const allCtrls=all.filter(e=>e.matches('button,a[href],[role=button],input:not([type=hidden]),select,textarea,[tabindex]:not([tabindex="-1"])'));
+  // 1) görünmez ama tıklanabilir: opaklığı ~0 ama imleç/parmak yakalıyor (kullanıcı boşluğa basıp bir şey açar)
+  const ghost=allCtrls.filter(e=>{const r=R(e);if(r.width<4||r.height<4||!inViewish(e,win))return false;const cs=win.getComputedStyle(e);if(cs.display==='none'||cs.visibility==='hidden'||cs.pointerEvents==='none')return false;
+    let p=e;while(p&&p.nodeType===1){const s=win.getComputedStyle(p);if(s.pointerEvents==='none'||s.display==='none'||p.hidden)return false;p=p.parentElement}return opacityChain(e,win)<.08});
+  if(ghost.length)addH('warn','ghost','Görünmez ama tıklanabilir yerler','Göremediği bir yere basan kullanıcı beklemediği bir şeyi açar; ya da düğmeyi hiç bulamaz (fareyle üstüne gelmeden görünmüyor, telefonda hiç görünmez).','Gizliyken pointer-events:none ver; önemli düğmeyi hiç gizleme ya da telefonda hep göster.',ghost);
+  // 2) kesilen metin: adın sonu “…” ile kesilmiş, tamamı başka yerde okunamıyor
+  const cut=textEls.filter(e=>{const cs=getComputedStyle(e);return cs.textOverflow==='ellipsis'&&e.scrollWidth>e.clientWidth+1&&!e.title&&!e.closest('[title]')&&!e.getAttribute('aria-label')});
+  if(cut.length)addH(cut.length>4?'warn':'info','cut','Yazının sonu kesiliyor','Kullanıcı adın ya da başlığın tamamını göremiyor; benzer başlıkları ayırt edemez.','Metne title ekle, alanı genişlet ya da iki satıra izin ver.',cut);
+  // 3) Türkçe arayüzde İngilizce arayüz sözcüğü (ürün/özel adlar hariç)
+  const EN=/^(settings|home|library|workspace|search|open|close|save|cancel|delete|edit|add|more|back|next|done|loading|share|filter|sort|profile|menu|help|login|logout|submit|upload|download|explore|discover|view all|see all|learn more|play|pause|preview|dashboard|inbox|feed)$/i;
+  const eng=vis.filter(e=>e.matches('button,a,[role=tab],label,h1,h2,h3,summary')&&!e.closest('[translate=no]')&&EN.test(txt(e))); // translate="no" = bilerek seçilmiş ürün/bölüm adı
+  if(doc.documentElement.lang==='tr'&&eng.length)addH('info','lang','Türkçe arayüzde İngilizce kelime',`“${[...new Set(eng.map(e=>(e.textContent||'').trim()))].slice(0,5).join('”, “')}” — kullanıcı iki dil arasında gidip geliyor.`,'Arayüz sözcüklerini Türkçeleştir (Ayarlar, Ara, Kaydet…); ürün adları kalabilir.',eng);
+  // 4) seçim felci: bir araç satırında 8'den fazla düğme
+  const busy=[];for(const [p,l] of rows)if(l.length>8)busy.push(p);
+  if(busy.length)addH('warn','choice','Bir sırada çok fazla seçenek','8’den fazla düğme yan yana: kullanıcı aradığını tek tek okumak zorunda kalıyor (Hick yasası).','En sık kullanılan 3–5 işi bırak, gerisini bir “Daha fazla” menüsüne taşı.',busy);
+  // 5) üst üste binen tıklanabilirler: dokununca hangisine basıldığı belirsiz
+  // sadece ikisi de gerçekten basılabiliyorsa say: kendi ortasında en üstte olmayan (bir pencerenin ya da sabit çubuğun altında kalan) öğe atlanır
+  const onTop=c=>{const r=R(c),h=doc.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return!!h&&(h===c||c.contains(h))};
+  const ov=[],vc=ctrls.filter(c=>R(c).width>8&&R(c).bottom>0&&R(c).top<win.innerHeight&&onTop(c));for(let i=0;i<vc.length&&ov.length<20;i++){const a=R(vc[i]);for(let j=i+1;j<vc.length;j++){if(vc[i].contains(vc[j])||vc[j].contains(vc[i]))continue;const b=R(vc[j]),ix=Math.max(0,Math.min(a.right,b.right)-Math.max(a.left,b.left)),iy=Math.max(0,Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)),ar=Math.min(a.width*a.height,b.width*b.height);
+      if(ar>0&&ix*iy/ar>.3){ov.push(vc[j]);break}}}
+  if(ov.length)addH('warn','overlap','Üst üste binen düğmeler','İki tıklanabilir öğe aynı yerde; kullanıcı istediğine değil üsttekine basar.','Öğeleri ayır ya da alttakini o sırada devre dışı bırak.',ov);
+  // 6) belirsiz düğme adı: ne yapacağını söylemiyor
+  const vague=ctrls.filter(c=>/^(tıkla|buraya tıkla|tamam|ok|evet|hayır|git|devam|daha|\.\.\.|…|›|»|>)$/i.test((nameOf(c)||'').trim()));
+  if(vague.length)addH('info','vague','Ne yapacağını söylemeyen düğme','“Tamam/Devam/›” gibi adlar bağlamdan kopunca anlamsız; ekran okuyucu kullanıcısı da ne olacağını bilmez.','Fiille ve nesneyle adlandır: “Notu kaydet”, “Sonraki ay”.',vague);
+  // 7) klavye sırasını bozan tabindex>0
+  const tab=all.filter(e=>+e.getAttribute('tabindex')>0);
+  if(tab.length)addH('warn','tabindex','Klavye sırası elle bozulmuş','tabindex>0 olan öğeler Tab sırasını sayfa akışından kopartıyor; klavyeyle gezen kaybolur.','tabindex="0" kullan, sırayı DOM düzeniyle ver.',tab);
+  // 8) ekranın büyük kısmını kapatan sabit öğe (diyalog değil)
+  const vw=win.innerWidth*win.innerHeight,cover=vis.filter(e=>{const cs=getComputedStyle(e);if(cs.position!=='fixed'&&cs.position!=='sticky')return false;if(e.closest('[role=dialog],[aria-modal=true],.world,#world'))return false;const r=R(e);return r.width*r.height>vw*.3&&parseColor(cs.backgroundColor)?.a>.5});
+  if(cover.length)addH('warn','cover','Ekranın büyük kısmını kapatan sabit katman','Kaydırınca yerinde duran büyük bir katman içeriğin üçte birinden fazlasını örtüyor.','Sabit alanı incelt, kaydırınca gizle ya da yarı saydam yap.',cover);
+  // 9) sıkışık okuma: küçük yazı + dar satır aralığı
+  const cramp=textEls.filter(e=>{const cs=getComputedStyle(e),fs=parseFloat(cs.fontSize),lh=cs.lineHeight==='normal'?fs*1.2:parseFloat(cs.lineHeight);return(e.textContent||'').trim().length>90&&fs<14&&lh/fs<1.32});
+  if(cramp.length)addH('info','cramp','Sıkışık paragraf','Küçük yazı ve dar satır aralığı uzun metni yorucu yapıyor.','line-height en az 1.45 ver; uzun metinde 14px altına inme.',cramp);
+  // 10) silik yer tutucu: kullanıcı ne yazacağını göremiyor
+  const ph=vis.filter(e=>e.matches('input[placeholder],textarea[placeholder]')&&e.placeholder).filter(e=>{let c;try{c=parseColor(win.getComputedStyle(e,'::placeholder').color)}catch{}const b=bgOf(e,win);return c&&b&&ratio(mix(c,b),b)<3});
+  if(ph.length)addH('info','ph','Silik ipucu yazısı','Kutunun içindeki ipucu zor seçiliyor; kullanıcı ne yazacağını tahmin ediyor.','Yer tutucu rengini en az 3:1 kontrasta getir.',ph);
+
+  // 11) yalnızca simge olan düğmenin üstüne gelince hiçbir ipucu çıkmıyor (aria-label ekran okuyucuya yeter, göze görünmez)
+  const iconOnly=ctrls.filter(c=>!(c.innerText||'').replace(/[^\p{L}\p{N}]/gu,'').length&&!c.title&&!c.closest('[title]')&&!(c.closest('label')?.innerText||'').trim()&&c.tagName!=='INPUT'&&c.tagName!=='SELECT');
+  if(!mobile&&iconOnly.length)addH(iconOnly.length>6?'warn':'info','tip','Simge düğmesinin ne yaptığı yazmıyor','Sadece simgesi olan düğmenin üstüne gelince ipucu çıkmıyor; kullanıcı denemeden ne yapacağını bilemez.','Her simge düğmesine kısa bir title (ipucu) ver: “Ayarlar (,)”.',iconOnly);
+  // 12) telefonda birbirine yapışık dokunma alanları: parmak yanlış düğmeye basar
+  if(mobile){const tight=[];const tc=ctrls.filter(c=>{const r=R(c);return r.width>4&&r.top<win.innerHeight&&r.bottom>0});
+    for(let i=0;i<tc.length&&tight.length<15;i++){const a=R(tc[i]);if(a.width>=44&&a.height>=44)continue;for(let j=0;j<tc.length;j++){if(i===j||tc[i].contains(tc[j])||tc[j].contains(tc[i]))continue;const b=R(tc[j]);
+      const gx=Math.max(b.left-a.right,a.left-b.right),gy=Math.max(b.top-a.bottom,a.top-b.bottom);if(gx<2&&gy<2&&(gx>=0||gy>=0)&&Math.min(a.height,b.height)<40){tight.push(tc[i]);break}}}
+    if(tight.length>2)addH('info','tight','Telefonda düğmeler birbirine yapışık','Aralarında boşluk olmayan küçük düğmelerde parmak çoğu zaman yanındakine basar.','Düğmeler arasına en az 4–8px boşluk ver ya da dokunma alanını 40px yap.',tight)}
+  // 13) çok uzun satır: göz satır başını kaybeder
+  const longL=textEls.filter(e=>{const cs=win.getComputedStyle(e);if(!/block|list-item/.test(cs.display))return false;const fs=parseFloat(cs.fontSize),w=R(e).width;return(e.textContent||'').trim().length>160&&w/(fs*.5)>110});
+  if(longL.length)addH('info','measure','Satırlar çok uzun','Bir satıra 100’den fazla harf sığıyor; göz bir sonraki satırın başını kaybeder.','Metin genişliğini ~65–80 harfe sınırla (max-width: 68ch).',longL);
+
   /* ── Hız ── */
   const n=doc.getElementsByTagName('*').length;
   if(n>3000)add('perf','error','dom','Çok büyük sayfa',`${n} öğe; kaydırma ve açılış yavaşlar.`,'Görünmeyen listeleri sanallaştır, gereksiz sarmalayıcıları kaldır.');else if(n>1500)add('perf','warn','dom','Büyük sayfa',`${n} öğe.`,'Öğe sayısını azaltmayı düşün.');
@@ -142,8 +194,10 @@ function run(doc,opt={}){
   if(big.length)add('perf','warn','heavy','Ağır dosya',`400 KB üstü: ${big.slice(0,3).join(', ')}.`,'Görselleri sıkıştır (webp), büyük kütüphaneleri çıkar.');
 
   /* ── Puan ── */
-  const score={};for(const c of Object.keys(CATS)){let s=100;for(const f of out)if(f.cat===c)s-=W[f.sev]+(f.sev==='error'?Math.min(10,f.count-1):0);score[c]=Math.max(0,Math.round(s))}
-  score.total=Math.round((score.a11y*.3+score.ux*.25+score.look*.15+score.design*.15+score.perf*.15));
+  // katı puan: her bulgu tekrar sayısıyla da ağırlaşır; erişilebilirlikte ya da gerçek kullanıcıda “hata” varsa toplam 85'i geçemez
+  const score={};for(const c of Object.keys(CATS)){let s=100;for(const f of out)if(f.cat===c)s-=W[f.sev]+(f.sev==='error'?Math.min(12,(f.count-1)*2):f.sev==='warn'?Math.min(6,f.count-1):0);score[c]=Math.max(0,Math.round(s))}
+  score.total=Math.round(score.insan*.2+score.a11y*.25+score.ux*.2+score.look*.1+score.design*.1+score.perf*.15);
+  if(out.some(f=>(f.cat==='a11y'||f.cat==='insan')&&f.sev==='error'))score.total=Math.min(85,score.total);
   return{at:Date.now(),mobile,url:doc.location.pathname,findings:out.sort((a,b)=>W[b.sev]-W[a.sev]),score,stats:{nodes:n,fonts:[...fam],sizes:sizes.size,colors:cols.size,ms:Math.round(performance.now()-t0)}}
 }
 const api={run,CATS,LVL};

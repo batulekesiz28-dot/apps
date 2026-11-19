@@ -3670,5 +3670,41 @@
     "fix": "Işık, eğim ve simgeler yay fiziğiyle; durulunca döngü duruyor"
    }
   ]
+ },
+ {
+  "at": "2026-11-19",
+  "change": "5 yeni arayüz: Kum, Balon, Kadran, Deste, Harita (toplam 10); seçici 5 sütun, 0 tuşu 10. arayüz",
+  "scores": {
+   "hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "hub masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "hub",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Deste kartları alttaki şeridin altına giriyordu",
+    "fix": "Yelpaze yukarı alındı, açısı daraltıldı"
+   },
+   {
+    "app": "hub",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Telefonda Kum yazıları okunmuyor, Harita etiketleri ve Balonlar ekrandan taşıyordu",
+    "fix": "Telefonda sık tane/büyük yazı, 2 sütun harita, balonlar ekran içinde"
+   },
+   {
+    "app": "hub",
+    "sev": "bilgi",
+    "status": "open",
+    "text": "Deste'de yelpazenin uç kartlarının köşeleri döndükleri için ekran kenarına taşabiliyor (yelpaze görünümü)"
+   }
+  ]
  }
 ]

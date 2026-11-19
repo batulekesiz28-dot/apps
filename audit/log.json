@@ -3739,5 +3739,20 @@
     "text": "Gerçek haber siteleriyle denenemedi (internet yok); sahte RSS akışlarıyla doğrulandı. Bazı siteler tarayıcıdan doğrudan okunamıyor, aracı servisler (rss2json/allorigins) kullanılıyor"
    }
   ]
+ },
+ {
+  "at": "2026-11-19",
+  "change": "Hub'a “Son değişiklikler” düğmesi: yapılan bütün değişiklikler güne göre, yeni olanlar işaretli; komut paletinden de açılır",
+  "scores": {
+   "hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "hub masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": []
  }
 ]

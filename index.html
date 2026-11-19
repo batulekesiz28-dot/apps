@@ -427,6 +427,12 @@ body.linking,body.linking .node,body.linking #stage{cursor:crosshair}
 .sh-b::-webkit-scrollbar{display:none}
 .sh-f{display:flex;align-items:center;gap:8px;padding:12px 18px;border-top:.5px solid var(--line2)}
 .sh-f .grow{flex:1;font-size:11.5px;color:var(--ink3)}
+#logBtn{position:relative}#logBtn.dot::after{content:"";position:absolute;right:6px;top:6px;width:7px;height:7px;border-radius:50%;background:#E5484D;box-shadow:0 0 0 2px var(--bg)}
+.cl-d{margin:18px 0 6px;font-size:11.5px;font-weight:650;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3)}.cl-d:first-child{margin-top:0}
+.cl-i{padding:10px 0;border-bottom:.5px solid var(--line2)}.cl-i p{font-size:13.5px;line-height:1.5;color:var(--ink)}
+.cl-n{display:inline-block;margin-right:6px;padding:1px 7px;border-radius:999px;font-style:normal;font-size:10.5px;font-weight:700;color:#fff;background:#E5484D;vertical-align:1px}
+.cl-i details{margin-top:6px}.cl-i summary{font-size:12px;color:var(--ink3);cursor:pointer}.cl-i summary:hover{color:var(--ink)}
+.cl-i ul{margin:6px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px}.cl-i li{font-size:12.5px;line-height:1.45;color:var(--ink2)}.cl-i li b{color:#1D7447;font-weight:700}.cl-i li span{color:var(--ink3)}.cl-i li.op b{color:var(--ink3)}
 .gom p{margin:0 0 14px;font-size:13.5px;line-height:1.55;color:var(--ink2)}.gom p b{color:var(--ink)}
 .gom ol{margin:0 0 14px;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:13.5px;line-height:1.5}
 .gom li::marker{color:var(--ink3);font-variant-numeric:tabular-nums}.gom a{color:var(--ink);font-weight:600;text-underline-offset:3px}
@@ -810,6 +816,7 @@ body,.btn,.mi,.pal-in,input,textarea,button{font-family:var(--font)}
     <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="5.6" cy="5.6" r="4.1" stroke="currentColor" stroke-width="1.1"/><path d="M8.8 8.8l2.7 2.7" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
     <span>Ara veya komut</span><span class="kbd">⌘K</span>
   </button>
+  <button class="ib" id="logBtn" title="Son değişiklikler" aria-label="Son değişiklikler"><svg viewBox="0 0 16 16"><path d="M2.6 8a5.4 5.4 0 1 0 1.6-3.8M2.5 2.8v2.6h2.6M8 5v3.2l2.1 1.3"/></svg></button>
   <button class="ib" id="themeBtn" title="Tema (⇧⌘L)" aria-label="Temayı değiştir"><svg viewBox="0 0 16 16"><path id="themeIcon" d="M13.5 9.5A5.5 5.5 0 0 1 6.5 2.5a5.5 5.5 0 1 0 7 7z"/></svg></button>
   <button class="ib" id="layoutBtn" title="Galaksiyi göster (G)" aria-label="Galaksiyi göster"><svg viewBox="0 0 16 16"><circle cx="4" cy="4" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="7" cy="12.5" r="2"/><path d="M5.9 4.3l4.2.5M5 5.7l1.4 4.9M10.9 6.7l-2.7 4.3"/></svg></button>
   <button class="ib solid" id="addBtn" title="Yeni taslak (⌘N)" aria-label="Yeni taslak"><svg viewBox="0 0 12 12"><path d="M6 1.5v9M1.5 6h9"/></svg></button>
@@ -2853,7 +2860,8 @@ function palette(){
     {ic:UI.group,l:'Akıllı kümeleme · oto senkron',k:'K',run:smartSheet},
     ...THEME_KEYS.map(k=>({ic:UI.moon,l:'Tema: '+THEMES[k].n,k:k===document.documentElement.dataset.theme?'✓':'',run:()=>setTheme(k)})),
     {ic:UI.fit,l:'Tema stüdyosu',run:()=>themeStudio()},
-    {ic:UI.fit,l:'Arayüz değiştir (6 dünya)',k:'⇧⌘U',run:()=>window.Worlds?.picker()},
+    {ic:UI.fit,l:'Arayüz değiştir (10 dünya)',k:'⇧⌘U',run:()=>window.Worlds?.picker()},
+    {ic:UI.graph,l:'Son değişiklikler',sub:'Uygulamada neler yenilendi',run:()=>changelog()},
     {ic:UI.fit,l:'Sakin mod',run:()=>calm(true)},
     ...(TABS.length?[{ic:UI.fit,l:'Açık uygulamalar (değiştirici)',k:'⌥Q',run:()=>switcher(false,0)}]:[]),
     {ic:UI.zoom,l:'Görüntü: otomatik akıcılık'+(PERF.auto?' ✓':''),run:()=>{PERF.auto=true;localStorage.removeItem('appshell:perf');setTier(0);toast('Akıcılık otomatik — gerekirse kaliteyi kendim düşürürüm')}},
@@ -2894,6 +2902,22 @@ function closePal(){if(!palEl)return;const bg=palEl;palEl=null;query='';applyFil
   anim(bg.firstChild,[{opacity:1},{opacity:0,transform:'scale(.98)'}],{duration:140,easing:EASE});
   anim(bg,[{opacity:1},{opacity:0}],{duration:160,easing:EASE}).finished.then(()=>bg.remove(),()=>bg.remove())}
 $('#searchBtn').onclick=palette;
+
+/* ── Son değişiklikler: audit/log.json (her değişiklikte yazılan Türkçe kayıt) — en yeni üstte, güne göre.
+   Görülmemiş kayıt varsa düğmede nokta (appshell:logseen = görülen kayıt sayısı). ── */
+let LOG=null;
+async function loadLog(){try{const r=await fetch('audit/log.json?v='+Math.floor(Date.now()/6e4),{cache:'no-store'});LOG=await r.json();if(localStorage.getItem('appshell:logseen')==null)store.set('appshell:logseen',Math.max(0,LOG.length-10))}catch{LOG=LOG||[]}return LOG} // ilk kez: son 10 kayıt “yeni”
+function logDot(){const b=$('#logBtn');if(!b||!LOG)return;const seen=+store.get('appshell:logseen',0)||0,n=LOG.length-seen;b.classList.toggle('dot',n>0);b.title=n>0?`Son değişiklikler · ${n} yeni`:'Son değişiklikler'}
+async function changelog(){await loadLog();const L=(LOG||[]).map((x,i)=>({...x,i})).reverse(),seen=+store.get('appshell:logseen',0)||0,days=new Map();
+  L.slice(0,60).forEach(x=>{const k=x.at||'';if(!days.has(k))days.set(k,[]);days.get(k).push(x)});
+  const dname=k=>{const d=new Date(k+'T12:00');if(isNaN(d))return k;const t=new Date(),y=new Date(t);y.setDate(t.getDate()-1);const same=(a,b)=>a.toDateString()===b.toDateString();
+    return same(d,t)?'Bugün':same(d,y)?'Dün':d.toLocaleDateString('tr-TR',{day:'numeric',month:'long',weekday:'long'})};
+  const body=!L.length?'<p class="note">Henüz kayıt yok.</p>':[...days].map(([k,xs])=>`<h4 class="cl-d">${esc(dname(k))}</h4>${xs.map(x=>{const fx=(x.items||[]).filter(it=>it.status==='fixed'),op=(x.items||[]).filter(it=>it.status==='open');
+      return`<div class="cl-i${x.i>=seen?' new':''}"><p>${x.i>=seen?'<i class="cl-n">Yeni</i>':''}${esc(x.change||'')}</p>${fx.length||op.length?`<details><summary>${fx.length?fx.length+' düzeltme':''}${fx.length&&op.length?' · ':''}${op.length?op.length+' açık konu':''}</summary><ul>${fx.map(it=>`<li><b>✓</b> ${esc(it.text)}${it.fix?` — <span>${esc(it.fix)}</span>`:''}</li>`).join('')}${op.map(it=>`<li class="op"><b>•</b> ${esc(it.text)}</li>`).join('')}</ul></details>`:''}</div>`}).join('')}`).join('');
+  sheet('Son değişiklikler',`<div class="cl">${body}</div>`,`<span class="grow">${L.length} kayıt · her değişiklikten sonra eklenir</span>`);
+  store.set('appshell:logseen',LOG.length);logDot()}
+$('#logBtn').onclick=e=>{e.stopPropagation();changelog()};
+setTimeout(()=>loadLog().then(logDot),2500);setInterval(()=>{if(!document.hidden)loadLog().then(logDot)},10*6e4);
 
 /* ── Sheets ───────────────────────────────────────────────── */
 let sheetEl=null;

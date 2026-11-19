@@ -8,8 +8,8 @@ const H=()=>window.HUB, KEY='appshell:world';
 const WORLDS=[
   ['galaksi','Galaksi','Uzayda yüzen uygulamalar; kara delik imleci içine çeker'],
   ['mekansal','Mekânsal','Derinlikte yüzen cam pencereler; imleç ışık saçar'],
-  ['miknatis','Mıknatıs','Sıvı metal damlalar; imleç mıknatıs gibi çeker, karıştırır'],
-  ['golet','Gölet','Gece göleti; imleç suda halkalar açar, yapraklar salınır'],
+  ['miknatis','Mıknatıs','Sıvı metal damlalar; imleç çeker · sürükle, grupla, widget ekle'],
+  ['ruzgar','Rüzgâr','Sarkan rüzgâr çanları; imleç rüzgâr estirir, sallanırlar'],
   ['petek','Petek','Bal peteği; imleç büyüteç gibi yaklaştığını büyütür']];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const strip=h=>String(h||'').replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/\s+/g,' ').trim();
@@ -279,7 +279,7 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
     document.addEventListener('mouseleave',SP.lml=()=>{L.ta=0;go()});SP.lightGo=go},
   unmount(){removeEventListener('pointermove',SP.pm);removeEventListener('pointerup',SP.pu);removeEventListener('pointermove',SP.dm);removeEventListener('pointerup',SP.du);removeEventListener('pointermove',SP.lm);removeEventListener('pointerup',SP.lu);removeEventListener('pointercancel',SP.lc);removeEventListener('pointermove',SP.lpm);removeEventListener('pointerdown',SP.lpd);removeEventListener('pointerup',SP.lpu);document.removeEventListener('mouseleave',SP.lml);if(SP.L?.raf)cancelAnimationFrame(SP.L.raf);SP.lift=false;SP.closeMenu()}};
 
-/* ═════════════ Ortak: imleçle canlanan dünyalar (Mıknatıs, Gölet, Petek) ═════════════
+/* ═════════════ Ortak: imleçle canlanan dünyalar (Mıknatıs, Rüzgâr, Petek) ═════════════
    Tam ekran, kaydırmasız. Her birinde imleç sahneyi fizikle etkiler (galaksideki çekim, mekânsaldaki ışık gibi).
    Döngü SADECE bir şey hareket ederken çalışır, durulunca kendiliğinden durur (işlemci/pil dostu).
    Hareket azaltılmışsa (sistem ya da Ayarlar → hareket) sahne durgun çizilir; tıklama ve klavye aynen çalışır. */
@@ -301,88 +301,161 @@ const prand=i=>{const x=Math.sin(i*127.1+311.7)*43758.5453;return x-Math.floor(x
 
 /* ═════════════ MIKNATIS ═════════════
    Açık zemin üstünde sıvı metal (ferrofluid) damlaları. İmleç bir mıknatıs: yaklaştıkça damlalar ona doğru uzar,
-   birbirine ve imleçteki damlaya karışır (SVG “goo” süzgeci), mıknatısın çevresinde dikenler çıkar. Bırakınca yaylanarak yerine döner. */
-const MG={
-  html:d=>`<div class="mg">${wxTop(d)}
+   birbirine ve imleçteki damlaya karışır (SVG “goo” süzgeci), mıknatısın çevresinde dikenler çıkar. Bırakınca yaylanarak yerine döner.
+   · Gruplar: her grup ayrı damla kümesi, altında adı (galaksiyle aynı gruplar). Ada çift tık: yeniden adlandır.
+   · Taşıma: damlayı basılı tutup sürükle → bıraktığın yerde kalır (appshell:mg.pos, ekran oranı). Başka kümenin yanına bırakırsan o gruba geçer.
+     Sağ tık: gruba taşı / yeni grup / gruptan çıkar.
+   · Widget'lar (büyük damlalar): Çalışma, Bugün, Son not — Düzen menüsünden aç/kapat; onlar da taşınır. */
+const MGK='appshell:mg';
+const MG={WD:[['study','Çalışma'],['todo','Bugün'],['note','Son not']],
+  cfg:(()=>{const d={pos:{},w:{study:1,todo:1,note:1}};try{return Object.assign(d,JSON.parse(localStorage.getItem(MGK))||{})}catch{return d}})(),
+  save(){try{localStorage.setItem(MGK,JSON.stringify(MG.cfg))}catch{}},
+  groups(d){const by=new Map(d.apps.map(a=>[a.key,a])),gs=d.groups.map(g=>({id:g.id,name:g.name,color:g.color,apps:g.keys.map(k=>by.get(k)).filter(Boolean)})).filter(g=>g.apps.length),
+      seen=new Set(gs.flatMap(g=>g.apps.map(a=>a.key))),rest=d.apps.filter(a=>!seen.has(a.key));
+    if(rest.length){const o=gs.find(g=>g.id==='_other');o?o.apps.push(...rest):gs.push({id:'_other',name:gs.length?'Diğer':'Uygulamalar',color:'#8E8E99',apps:rest})}return gs},
+  html:d=>{const G=MG.G=MG.groups(d);MG.sig=JSON.stringify(d.groups);
+    MG.items=[...G.flatMap((g,gi)=>g.apps.map(a=>({k:a.key,a,gi}))),...MG.WD.filter(([k])=>MG.cfg.w[k]).map(([k,n])=>({k:'w:'+k,w:k,n}))];
+    return`<div class="mg">${wxTop(d)}
     <svg class="mg-svg" aria-hidden="true" focusable="false"><filter id="mgGoo" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur in="SourceGraphic" stdDeviation="10"/><feColorMatrix values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 26 -12"/></filter></svg>
-    <div class="mg-goo" aria-hidden="true">${d.apps.map(()=>'<i class="mg-b"></i>').join('')}<i class="mg-c"></i>${'<i class="mg-s"></i>'.repeat(9)}</div>
-    <div class="mg-apps" role="list" aria-label="Uygulamalar">${d.apps.map(a=>`<button class="mg-a" role="listitem" data-app="${esc(a.key)}" aria-label="${esc(a.name)}" title="${esc(a.desc)}"><i class="mg-hl" aria-hidden="true"></i>${appIcon(a)}<b>${esc(a.name)}</b></button>`).join('')}</div>
-    ${wxNav('Mıknatıs')}<p class="wx-hint">${mobile()?'Parmağını damlaların üstünde gezdir':'İmleci damlalara yaklaştır — mıknatıs gibi çeker'}</p></div>`,
-  lay(root){const S=MG.S,n=S.n,m=mobile(),W=innerWidth,Hh=innerHeight;let D=m?58:74,c=D*.98;
-    const room=Math.min(W-40,Hh-200)/2,rmax=c*Math.sqrt(n);if(rmax+D/2>room){const k=room/(rmax+D/2);c*=k;D=Math.max(44,D*k)}
-    S.D=D;S.R=Math.min(280,Math.max(170,c*3.2));const cx=W/2,cy=Hh/2+(m?10:16);
-    for(let i=0;i<n;i++){const a=i*2.39996323,r=c*Math.sqrt(i+.35);S.h[i]={x:cx+Math.cos(a)*r,y:cy+Math.sin(a)*r};if(!S.p[i]){S.p[i]={...S.h[i]};S.v[i]={x:0,y:0}}}
-    // süzgeç yalnızca damlaların dolaştığı alanı kaplar (tam ekran bulanıklaştırmak pahalı)
-    const ext=c*Math.sqrt(n)+S.R*.7+D,g=root.querySelector('.mg-goo');S.o={x:Math.max(0,cx-ext),y:Math.max(0,cy-ext)};
-    g.style.cssText=`left:${S.o.x}px;top:${S.o.y}px;width:${Math.min(W,cx+ext)-S.o.x}px;height:${Math.min(Hh,cy+ext)-S.o.y}px;--D:${D}px`;root.style.setProperty('--D',D+'px')},
-  mount(root){const as=[...root.querySelectorAll('.mg-a')],S=MG.S={n:as.length,a:as,b:[...root.querySelectorAll('.mg-b')],c:root.querySelector('.mg-c'),sp:[...root.querySelectorAll('.mg-s')],h:[],p:[],v:[],cp:{x:innerWidth/2,y:innerHeight/2},cv:{x:0,y:0},cs:0,near:0};
+    <div class="mg-goo" aria-hidden="true">${MG.items.map(()=>'<i class="mg-b"></i>').join('')}<i class="mg-c"></i>${'<i class="mg-s"></i>'.repeat(9)}</div>
+    <div class="mg-gls">${G.length>1?G.map((g,gi)=>`<p class="mg-gl${g.id[0]==='_'?'':' ed'}" data-g="${gi}" style="--gc:${esc(g.color)}" title="${g.id[0]==='_'?'Otomatik grup':'Çift tık: yeniden adlandır'}"><i></i><span>${esc(g.name)}</span></p>`).join(''):''}</div>
+    <div class="mg-apps" role="list" aria-label="Uygulamalar">${MG.items.map((it,i)=>it.w?`<div class="mg-a mg-w" role="listitem" data-i="${i}" title="Sürükleyerek taşı"><div class="mg-wi" data-live="mg_${it.w}"></div></div>`
+      :`<button class="mg-a" role="listitem" data-i="${i}" data-app="${esc(it.k)}" aria-label="${esc(it.a.name)}${G.length>1?' — '+esc(G[it.gi].name):''}" title="${esc(it.a.desc)}"><i class="mg-hl" aria-hidden="true"></i>${appIcon(it.a)}<b>${esc(it.a.name)}</b></button>`).join('')}</div>
+    <div class="mg-menu" role="dialog" aria-label="Düzen" hidden><p class="mg-mk">Widget'lar</p>${MG.WD.map(([k,n])=>`<button class="mg-tg" role="switch" data-mw="${k}" aria-checked="${!!MG.cfg.w[k]}"><span>${n}</span><i aria-hidden="true"></i></button>`).join('')}
+      <button class="mg-rs" data-mg="reset">Yerleri sıfırla</button><p class="mg-mh">Damlaları sürükleyerek taşı · başka kümenin yanına bırak: o gruba geçer · sağ tık: grup seçenekleri</p></div>
+    <nav class="wx-nav" aria-label="Mıknatıs"><button data-act="ara">Ara</button><button data-act="today">Bugün</button><button data-mg="menu" aria-expanded="false">Düzen</button><button data-act="world">Arayüz</button></nav>
+    <p class="wx-hint">${mobile()?'Damlaları sürükle · parmağını gezdir':'İmleci yaklaştır — mıknatıs gibi çeker · sürükleyerek taşı'}</p></div>`},
+  live:{
+    mg_study:d=>{const p=d.goal?Math.min(1,d.today/d.goal):0;return`<button class="mg-wb" data-app="p:studylog" aria-label="Çalışma: bugün ${fmt(d.today)}"><i class="mg-ring" style="--p:${Math.round(p*100)}" aria-hidden="true"></i><small>Çalışma</small><b>${fmt(d.today)}</b><span>${d.goal?'hedef '+fmt(d.goal):'bugün'}</span></button>`},
+    mg_todo:d=>{const f=d.todos.find(t=>!t.done);return`<button class="mg-wb" data-act="today" aria-label="Bugün: ${d.open} açık görev"><small>Bugün</small><b>${d.open}</b><span>${d.open?'açık görev':'her şey tamam'}</span>${f?`<em>${esc(f.t)}</em>`:''}</button>`},
+    mg_note:d=>{const n=d.notes[0];return n?`<button class="mg-wb" data-note="${esc(n.id)}" aria-label="Son not: ${esc(n.title)}"><small>Son not</small><b class="t">${esc(n.icon)} ${esc(n.title)}</b><span>${ago(n.up)}</span></button>`:`<button class="mg-wb" data-act="ara"><small>Son not</small><b class="t">Henüz not yok</b></button>`}},
+  // varsayılan yerleşim: widget'lar sağda sütun (telefonda üstte satır); gruplar kendi kümeleri, raflar gibi soldan sağa dizilir
+  lay(root){const S=MG.S,m=mobile(),W=innerWidth,Hh=innerHeight,its=MG.items,nw=its.filter(x=>x.w).length;let D=m?58:74;const Dw=m?Math.round(D*1.95):Math.round(D*2.05);
+    let ax=m?14:40,ay=m?112:116,aw=W-(m?28:80),ah=Hh-ay-(m?118:128);
+    const wpos=[];if(nw){if(m){const y=ay+Dw/2,st=Math.min(Dw+12,(W-24)/nw);for(let j=0;j<nw;j++)wpos.push({x:W/2+(j-(nw-1)/2)*st,y});ay+=Dw+20;ah-=Dw+20}
+      else{const st=Math.min(Dw+22,(ah)/nw);for(let j=0;j<nw;j++)wpos.push({x:W-40-Dw/2,y:ay+st*(j+.5)});aw-=Dw+60}}
+    const G=MG.G,ns=G.map(g=>g.apps.length);let c=D*1.32,place=null;
+    // küme içi yerleşim: altıgen halkalar (ortada bir, çevresinde altı…) — küçük gruplar sıkı ama isimler çakışmaz
+    const hx=[[0,0]],dirs=[[1,0],[1,-1],[0,-1],[-1,0],[-1,1],[0,1]];for(let k=1;hx.length<40;k++){let q=-k,r=k;for(const[dq,dr]of dirs)for(let s=0;s<k;s++){hx.push([q,r]);q+=dq;r+=dr}}
+    const off=j=>{const[q,r]=hx[j];return{x:q+r/2,y:r*1.04}},ext=n=>{let m=0;for(let j=0;j<n;j++){const o=off(j);m=Math.max(m,Math.hypot(o.x,o.y))}return m};
+    for(let tries=0;tries<8;tries++){const rc=ns.map(n=>c*ext(n)+D*.62),rows=[[]];let rw=0;const gap=m?18:44;
+      ns.forEach((n,gi)=>{const w=rc[gi]*2;if(rows[rows.length-1].length&&rw+gap+w>aw){rows.push([]);rw=0}rows[rows.length-1].push(gi);rw+=(rw?gap:0)+w});
+      const rh=rows.map(r=>Math.max(...r.map(gi=>rc[gi]*2))+(G.length>1?30:0)),tot=rh.reduce((a,b)=>a+b,0)+(rows.length-1)*(m?14:24);
+      if(tot<=ah||tries===7){place={rows,rc,rh,tot,gap};break}c*=.9;D=Math.max(40,Math.min(D,c/1.32))}
+    S.D=D;S.R=Math.min(280,Math.max(170,c*3.2));const ctr=[];let y=ay+(ah-place.tot)/2;
+    place.rows.forEach((r,ri)=>{const w=r.reduce((a,gi)=>a+place.rc[gi]*2,0)+(r.length-1)*place.gap;let x=ax+(aw-w)/2;r.forEach(gi=>{ctr[gi]={x:x+place.rc[gi],y:y+place.rh[ri]/2-(G.length>1?12:0)};x+=place.rc[gi]*2+place.gap});y+=place.rh[ri]+(m?14:24)});
+    const k=new Array(G.length).fill(0);let wj=0;
+    its.forEach((it,i)=>{let h;if(it.w){h=wpos[wj++];S.d[i]=Dw}else{const g=ctr[it.gi],o=off(k[it.gi]++);h={x:g.x+o.x*c,y:g.y+o.y*c};S.d[i]=D}
+      const sp=MG.cfg.pos[it.k];if(sp)h={x:sp.x*W,y:sp.y*Hh};S.h[i]=MG.clamp(h,S.d[i]);if(!S.p[i]){S.p[i]={...S.h[i]};S.v[i]={x:0,y:0}}
+      S.b[i].style.setProperty('--d',S.d[i]+'px');S.a[i].style.setProperty('--d',S.d[i]+'px')});
+    root.style.setProperty('--D',D+'px');MG.labels(root)},
+  clamp(h,d){const m=mobile();return{x:Math.max(d/2+6,Math.min(innerWidth-d/2-6,h.x)),y:Math.max((m?100:104)+d/2,Math.min(innerHeight-(m?104:112)-d/2,h.y))}},
+  // grup adları: kümenin altında, üyelerin bulunduğu yere göre
+  labels(root){const S=MG.S;root.querySelectorAll('.mg-gl').forEach(el=>{const gi=+el.dataset.g,ix=MG.items.map((it,i)=>it.gi===gi&&!it.w?i:-1).filter(i=>i>=0);if(!ix.length){el.hidden=true;return}
+    const x=ix.reduce((a,i)=>a+S.h[i].x,0)/ix.length,y=Math.max(...ix.map(i=>S.h[i].y))+S.D/2+22;el.style.transform=`translate(${x.toFixed(0)}px,${y.toFixed(0)}px)`})},
+  // bırakınca: yer kaydedilir, üst üste binen damlalar itilir, başka kümenin yanındaysa o gruba geçer
+  drop(root,i){const S=MG.S,it=MG.items[i],W=innerWidth,Hh=innerHeight,moved=new Set([i]);
+    for(let r=0;r<24;r++){let any=false;for(let j=0;j<S.h.length;j++){if(j===i)continue;for(const a of [i,...moved]){if(a===j)continue;const A=S.h[a],B=S.h[j],dx=B.x-A.x,dy=B.y-A.y,dd=Math.hypot(dx,dy)||1,mn=(S.d[a]+S.d[j])/2+6;
+        if(dd<mn){const f=(mn-dd);S.h[j]=MG.clamp({x:B.x+dx/dd*f,y:B.y+dy/dd*f},S.d[j]);moved.add(j);any=true}}}if(!any)break}
+    for(const j of moved)MG.cfg.pos[MG.items[j].k]={x:+(S.h[j].x/W).toFixed(4),y:+(S.h[j].y/Hh).toFixed(4)};MG.save();MG.labels(root);MG.L?.go();
+    if(it.w||MG.G.length<2)return;let best=-1,bd=1e9;MG.items.forEach((o,j)=>{if(j===i||o.w)return;const dd=Math.hypot(S.h[j].x-S.h[i].x,S.h[j].y-S.h[i].y);if(dd<bd){bd=dd;best=j}});
+    if(best<0||bd>S.D*2.1)return;const tg=MG.G[MG.items[best].gi];MG.toGroup(it,tg)},
+  toGroup(it,tg,name){const h=H(),src=MG.G[it.gi];if(tg&&tg===src)return;
+    if(it.k===h.bh){h.toast('Denetçi galaksinin merkezi; gruba girmez');return}
+    if(tg&&tg.id==='_ai'&&!it.a.ai){h.toast('Yapay zekâ grubuna sadece AI uygulamaları girer');return}
+    if(tg&&tg.id==='_other'&&it.a.ai){h.toast('“Diğer” otomatik grup; AI uygulamaları orada durmaz');return}
+    const prev=src.id[0]==='_'?null:src.id;
+    if(!tg)h.setGroup(it.k,'_new',name||'Yeni grup');else h.setGroup(it.k,tg.id[0]==='_'?null:tg.id);
+    h.toast(`${it.a.name} → ${tg?tg.name:(name||'Yeni grup')}`,()=>{h.setGroup(it.k,prev);setTimeout(rebuild,0)});setTimeout(rebuild,0)},
+  // sağ tık menüsü: gruba taşı / yeni grup / gruptan çıkar
+  ctx(root,i,x,y){root.querySelector('.mg-cm')?.remove();const it=MG.items[i],src=MG.G[it.gi],m=document.createElement('div');m.className='mg-cm';m.setAttribute('role','menu');
+    m.innerHTML=`<p class="mg-mk">${esc(it.a.name)}</p><button role="menuitem" data-cm="open">Aç</button>${MG.G.filter(g=>g!==src).map(g=>`<button role="menuitem" data-cm="g:${esc(g.id)}"><i style="--gc:${esc(g.color)}"></i>${esc(g.name)} grubuna taşı</button>`).join('')}
+      <button role="menuitem" data-cm="new">Yeni grup…</button>${src.id[0]==='_'?'':'<button role="menuitem" data-cm="out">Gruptan çıkar</button>'}`;
+    root.appendChild(m);const r=m.getBoundingClientRect();m.style.left=Math.min(innerWidth-r.width-8,x)+'px';m.style.top=Math.min(innerHeight-r.height-8,y)+'px';
+    const close=()=>{m.remove();removeEventListener('pointerdown',out,true)},out=e=>{if(!m.contains(e.target))close()};setTimeout(()=>addEventListener('pointerdown',out,true),0);
+    m.addEventListener('keydown',e=>{if(e.key==='Escape'){e.stopPropagation();close()}});
+    m.addEventListener('click',e=>{e.stopPropagation();const b=e.target.closest('[data-cm]');if(!b)return;const k=b.dataset.cm;
+      if(k==='open'){close();H().open(it.k);return}if(k==='out'){close();H().setGroup(it.k,null);H().toast(`${it.a.name} gruptan çıktı`);setTimeout(rebuild,0);return}
+      if(k==='new'){m.innerHTML=`<p class="mg-mk">Yeni grup adı</p><input class="mg-in" maxlength="40" placeholder="ör. Oyunlar" aria-label="Yeni grup adı">`;const inp=m.querySelector('input');inp.focus();
+        inp.addEventListener('keydown',ev=>{if(ev.key==='Enter'){const n=inp.value.trim();close();MG.toGroup(it,null,n||'Yeni grup')}});return}
+      close();MG.toGroup(it,MG.G.find(g=>'g:'+g.id===k))});
+    m.querySelector('button')?.focus()},
+  mount(root){const S=MG.S={n:MG.items.length,a:[...root.querySelectorAll('.mg-a')],b:[...root.querySelectorAll('.mg-b')],c:root.querySelector('.mg-c'),sp:[...root.querySelectorAll('.mg-s')],goo:root.querySelector('.mg-goo'),
+      h:[],p:[],v:[],d:[],pl:[],o:{x:0,y:0},ob:'',cp:{x:innerWidth/2,y:innerHeight/2},cv:{x:0,y:0},cs:0,near:0,pd:null};
     MG.lay(root);const calm=calmMotion();
-    const draw=(t)=>{const o=S.o;for(let i=0;i<S.n;i++){const p=S.p[i],pl=S.pl?.[i]||0,sc=1+pl*.22;
+    // süzgeç sadece damlaların kapladığı alanda (tam ekran bulanıklaştırmak pahalı); alan 64 px adımlarla büyür/küçülür
+    const box=()=>{let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(let i=0;i<S.n;i++){const p=S.p[i],r=S.d[i]*.75;x0=Math.min(x0,p.x-r);y0=Math.min(y0,p.y-r);x1=Math.max(x1,p.x+r);y1=Math.max(y1,p.y+r)}
+      if(S.cs>1){const r=S.cs*2.4;x0=Math.min(x0,S.cp.x-r);y0=Math.min(y0,S.cp.y-r);x1=Math.max(x1,S.cp.x+r);y1=Math.max(y1,S.cp.y+r)}
+      const q=64,X0=Math.max(0,Math.floor((x0-30)/q)*q),Y0=Math.max(0,Math.floor((y0-30)/q)*q),X1=Math.min(innerWidth,Math.ceil((x1+30)/q)*q),Y1=Math.min(innerHeight,Math.ceil((y1+30)/q)*q),k=X0+','+Y0+','+X1+','+Y1;
+      if(k!==S.ob){S.ob=k;S.o={x:X0,y:Y0};S.goo.style.cssText=`left:${X0}px;top:${Y0}px;width:${X1-X0}px;height:${Y1-Y0}px`}};
+    const draw=t=>{box();const o=S.o;for(let i=0;i<S.n;i++){const p=S.p[i],pl=S.pl[i]||0,sc=MG.items[i].w?1+pl*.08:1+pl*.22;
         S.b[i].style.transform=`translate(${(p.x-o.x).toFixed(1)}px,${(p.y-o.y).toFixed(1)}px) scale(${sc.toFixed(3)})`;
         S.a[i].style.transform=`translate(${p.x.toFixed(1)}px,${p.y.toFixed(1)}px) scale(${sc.toFixed(3)})`;S.a[i].style.setProperty('--n',pl.toFixed(2))}
       const cs=S.cs;S.c.style.transform=`translate(${(S.cp.x-o.x).toFixed(1)}px,${(S.cp.y-o.y).toFixed(1)}px) scale(${(cs/40).toFixed(3)})`;
-      // mıknatısın dikenleri: çekim arttıkça uzar, hafifçe döner ve titreşir
       const k=S.sp.length;for(let j=0;j<k;j++){const an=j/k*Math.PI*2+t*.00045,len=cs*(.55+.55*S.near+.12*Math.sin(t*.004+j*1.7)),sz=cs*(.22+.3*S.near)/40;
         S.sp[j].style.transform=`translate(${(S.cp.x-o.x+Math.cos(an)*len).toFixed(1)}px,${(S.cp.y-o.y+Math.sin(an)*len).toFixed(1)}px) scale(${Math.max(0,sz).toFixed(3)})`}};
-    if(calm){S.pl=[];draw(0);return}
-    const L=MG.L=wxLoop((dt,t)=>{const P=MG.P,R=S.R,on=P.in;let busy=false,near=0;S.pl=S.pl||[];
-      for(let i=0;i<S.n;i++){const h=S.h[i],p=S.p[i],v=S.v[i],d=Math.hypot(P.x-h.x,P.y-h.y);let pl=on?Math.max(0,1-d/R):0;pl*=pl;S.pl[i]=pl;near=Math.max(near,pl);
-        const tx=h.x+(P.x-h.x)*pl*.62,ty=h.y+(P.y-h.y)*pl*.62,ax=(tx-p.x)*130-v.x*15,ay=(ty-p.y)*130-v.y*15;
+    const L=MG.L=wxLoop((dt,t)=>{const P=MG.P,R=S.R,drag=S.pd?.on?S.pd.i:-1,on=P.in&&drag<0&&!calm;let busy=drag>=0,near=0;
+      for(let i=0;i<S.n;i++){const h=S.h[i],p=S.p[i],v=S.v[i];if(calm){p.x=h.x;p.y=h.y;S.pl[i]=0;continue}
+        const d=Math.hypot(P.x-h.x,P.y-h.y);let pl=on&&!MG.items[i].w?Math.max(0,1-d/R):0;pl*=pl;S.pl[i]=pl;near=Math.max(near,pl);
+        const tx=h.x+(P.x-h.x)*pl*.62,ty=h.y+(P.y-h.y)*pl*.62,K=i===drag?520:130,C=i===drag?40:15,ax=(tx-p.x)*K-v.x*C,ay=(ty-p.y)*K-v.y*C;
         v.x+=ax*dt;v.y+=ay*dt;p.x+=v.x*dt;p.y+=v.y*dt;if(Math.abs(v.x)+Math.abs(v.y)>3||Math.abs(tx-p.x)+Math.abs(ty-p.y)>.4)busy=true}
-      S.near+=(near-S.near)*Math.min(1,dt*8);
-      // imleçteki damla: yayla takip eder, boyu yakındaki çekime göre
-      const ts=on?24+46*S.near:0;S.cs+=(ts-S.cs)*Math.min(1,dt*(on?10:6));
+      S.near+=(near-S.near)*Math.min(1,dt*8);const ts=on?24+46*S.near:0;S.cs+=(ts-S.cs)*Math.min(1,dt*(on?10:6));
       const ax=(P.x-S.cp.x)*320-S.cv.x*26,ay=(P.y-S.cp.y)*320-S.cv.y*26;S.cv.x+=ax*dt;S.cv.y+=ay*dt;S.cp.x+=S.cv.x*dt;S.cp.y+=S.cv.y*dt;
-      if(Math.abs(ts-S.cs)>.3||Math.abs(S.cv.x)+Math.abs(S.cv.y)>4||(on&&S.near>.02))busy=true;
-      draw(t);return busy});
-    MG.P=wxPtr(root,L);draw(0);L.go()},
+      if(!calm&&(Math.abs(ts-S.cs)>.3||Math.abs(S.cv.x)+Math.abs(S.cv.y)>4||(on&&S.near>.02)))busy=true;draw(t);return busy});
+    MG.P=wxPtr(root,L);
+    // sürükle-bırak (7 px'ten fazla hareket = taşıma; kısa tık = aç)
+    root.addEventListener('pointerdown',e=>{const el=e.target.closest('.mg-a');if(!el||e.button)return;S.pd={i:+el.dataset.i,x:e.clientX,y:e.clientY,el,id:e.pointerId,on:false}});
+    root.addEventListener('pointermove',e=>{const d=S.pd;if(!d)return;if(!d.on){if(Math.hypot(e.clientX-d.x,e.clientY-d.y)<7)return;d.on=true;d.ox=S.h[d.i].x-d.x;d.oy=S.h[d.i].y-d.y;
+        try{d.el.setPointerCapture(d.id)}catch{}root.classList.add('mg-drag');d.el.classList.add('drag')}
+      S.h[d.i]=MG.clamp({x:e.clientX+d.ox,y:e.clientY+d.oy},S.d[d.i]);L.go()});
+    const end=()=>{const d=S.pd;S.pd=null;if(!d||!d.on)return;MG.jd=Date.now();root.classList.remove('mg-drag');d.el.classList.remove('drag');MG.drop(root,d.i)};
+    root.addEventListener('pointerup',end);root.addEventListener('pointercancel',end);
+    root.addEventListener('click',e=>{if(MG.jd&&Date.now()-MG.jd<350){e.stopPropagation();e.preventDefault();return}
+      const mb=e.target.closest('[data-mg]');if(mb){e.stopPropagation();const menu=root.querySelector('.mg-menu');if(mb.dataset.mg==='menu'){menu.hidden=!menu.hidden;mb.setAttribute('aria-expanded',!menu.hidden)}
+        else if(mb.dataset.mg==='reset'){MG.cfg.pos={};MG.save();rebuild()}return}
+      const tw=e.target.closest('[data-mw]');if(tw){e.stopPropagation();const k=tw.dataset.mw;MG.cfg.w[k]=MG.cfg.w[k]?0:1;MG.save();MG.keepMenu=true;rebuild()}},true);
+    root.addEventListener('pointerdown',e=>{const menu=root.querySelector('.mg-menu');if(!menu.hidden&&!e.target.closest('.mg-menu,[data-mg=menu]')){menu.hidden=true;root.querySelector('[data-mg=menu]').setAttribute('aria-expanded','false')}},true);
+    root.addEventListener('contextmenu',e=>{const el=e.target.closest('.mg-a:not(.mg-w)');if(!el)return;e.preventDefault();MG.ctx(root,+el.dataset.i,e.clientX,e.clientY)});
+    // grup adına çift tık: yeniden adlandır
+    root.addEventListener('dblclick',e=>{const l=e.target.closest('.mg-gl.ed');if(!l)return;const g=MG.G[+l.dataset.g],sp=l.querySelector('span'),old=sp.textContent;sp.contentEditable='true';sp.focus();document.getSelection().selectAllChildren(sp);
+      const fin=ok=>{sp.contentEditable='false';const n=sp.textContent.trim();if(ok&&n&&n!==old){H().renameGroup(g.id,n);g.name=n}else sp.textContent=old};
+      sp.addEventListener('keydown',ev=>{if(ev.key==='Enter'){ev.preventDefault();sp.blur()}else if(ev.key==='Escape'){ev.preventDefault();fin(false);sp.onblur=null;sp.blur()}});sp.onblur=()=>fin(true)});
+    if(MG.keepMenu){MG.keepMenu=false;const mn=root.querySelector('.mg-menu');mn.hidden=false;root.querySelector('[data-mg=menu]').setAttribute('aria-expanded','true')}
+    draw(0);L.go()},
   unmount(){MG.L?.stop();MG.L=null},
-  resize(root){MG.lay(root);if(MG.L)MG.L.go();else MG.mount(root)}};
+  resize(root){MG.lay(root);MG.L?.go()}};
 
-/* ═════════════ GÖLET ═════════════
-   Gece göleti. Su gerçek bir dalga denklemiyle çözülür (düşük çözünürlüklü ızgara, büyütülerek yumuşar):
-   imleç suda iz bırakır, tıklayınca halka halka yayılır, ara sıra damla düşer. Uygulamalar nilüfer yaprağı gibi dalgayla salınır. */
-const GL={
-  html:d=>`<div class="gl">${wxTop(d)}<canvas class="gl-cv" aria-hidden="true"></canvas><i class="gl-moon" aria-hidden="true"></i>
-    <div class="gl-pads" role="list" aria-label="Uygulamalar">${d.apps.map(a=>`<button class="gl-p" role="listitem" style="--na:${Math.round(prand(a.i+7)*360)}deg" data-app="${esc(a.key)}" aria-label="${esc(a.name)}" title="${esc(a.desc)}"><span class="gl-leaf" aria-hidden="true"></span>${appIcon(a)}<b>${esc(a.name)}</b></button>`).join('')}</div>
-    ${wxNav('Gölet')}<p class="wx-hint">${mobile()?'Suya dokun — halkalar yayılır':'İmleci suda gezdir · tıkla, halka halka yayılsın'}</p></div>`,
-  lay(root){const G=GL.G,m=mobile(),W=innerWidth,Hh=innerHeight,n=G.n,P=m?66:84;G.P=P;root.style.setProperty('--pd',P+'px');
-    const top=m?150:170,bot=m?110:120,aw=W-(m?40:160),ah=Hh-top-bot,cols=Math.max(2,Math.min(n,Math.round(Math.sqrt(n*aw/Math.max(1,ah))))),rows=Math.ceil(n/cols),
-      cw=aw/cols,ch=ah/Math.max(1,rows);
-    for(let i=0;i<n;i++){const r=Math.floor(i/cols),c=i%cols,inRow=r===rows-1?n-r*cols:cols,off=(cols-inRow)*cw/2;
-      G.h[i]={x:(W-aw)/2+off+cw*(c+.5)+(prand(i)-.5)*cw*.32,y:top+ch*(r+.5)+(prand(i+50)-.5)*ch*.3}}
-    // su ızgarası
-    const cell=G.cell=(m||tier()>=2)?10:tier()===1?9:7,gw=G.gw=Math.ceil(W/cell)+2,gh=G.gh=Math.ceil(Hh/cell)+2;G.a=new Float32Array(gw*gh);G.b=new Float32Array(gw*gh);
-    const cv=G.cv;cv.width=W;cv.height=Hh;G.ctx=cv.getContext('2d');G.off=document.createElement('canvas');G.off.width=gw;G.off.height=gh;G.octx=G.off.getContext('2d');
-    G.img=G.octx.createImageData(gw,gh);G.u32=new Uint32Array(G.img.data.buffer);
-    G.base=[];for(let y=0;y<gh;y++){const k=y/gh;G.base.push([8+10*(1-k),24+22*(1-k),36+30*(1-k)])} // üst açık camgöbeği → alt koyu lacivert
-    GL.render();GL.pads()},
-  drop(px,py,str,rad){const G=GL.G,cx=Math.round(px/G.cell)+1,cy=Math.round(py/G.cell)+1;for(let y=-rad;y<=rad;y++)for(let x=-rad;x<=rad;x++){const d=Math.hypot(x,y);if(d>rad)continue;
-      const X=cx+x,Y=cy+y;if(X<1||Y<1||X>=G.gw-1||Y>=G.gh-1)continue;G.a[Y*G.gw+X]+=str*(1-d/(rad+1))}},
-  step(){const G=GL.G,w=G.gw,h=G.gh,a=G.a,b=G.b;let e=0;for(let y=1;y<h-1;y++){let i=y*w+1;for(let x=1;x<w-1;x++,i++){const v=((a[i-1]+a[i+1]+a[i-w]+a[i+w])*.5-b[i])*.968;b[i]=v;e+=v<0?-v:v}}
-    G.a=b;G.b=a;return e/(w*h)},
-  render(){const G=GL.G,w=G.gw,h=G.gh,a=G.a,u=G.u32;for(let y=0;y<h;y++){const B=G.base[y];for(let x=0;x<w;x++){const i=y*w+x,
-        s=(x>0&&x<w-1?a[i-1]-a[i+1]:0)+(y>0&&y<h-1?(a[i-w]-a[i+w])*.7:0),l=s*.55,hl=l>0?l*l*.012:0;
-        const r=Math.max(0,Math.min(255,B[0]+l*.55+hl*.9)),g=Math.max(0,Math.min(255,B[1]+l*.75+hl)),bl=Math.max(0,Math.min(255,B[2]+l+hl*1.1));u[i]=(255<<24)|(bl<<16)|(g<<8)|r}}
-    G.octx.putImageData(G.img,0,0);G.ctx.imageSmoothingEnabled=true;G.ctx.imageSmoothingQuality='high';G.ctx.drawImage(G.off,0,0,w,h,-G.cell,-G.cell,w*G.cell,h*G.cell)},
-  // yapraklar suyun altındaki yüksekliğe göre kalkar/iner ve eğimle hafifçe döner
-  pads(){const G=GL.G;for(let i=0;i<G.n;i++){const h=G.h[i],x=Math.round(h.x/G.cell)+1,y=Math.round(h.y/G.cell)+1,w=G.gw,j=y*w+x,ok=x>1&&y>1&&x<w-2&&y<G.gh-2,
-      z=ok?(G.a[j]+G.a[j-1]+G.a[j+1]+G.a[j-w]+G.a[j+w])/5:0,sx=ok?G.a[j-1]-G.a[j+1]:0,sy=ok?G.a[j-w]-G.a[j+w]:0;
-      G.el[i].style.transform=`translate(${h.x.toFixed(1)}px,${(h.y-z*.06).toFixed(1)}px) rotate(${Math.max(-8,Math.min(8,sx*.05)).toFixed(2)}deg) scale(${(1+Math.max(-.05,Math.min(.08,z*.0007))).toFixed(3)})`;
-      G.el[i].style.setProperty('--tl',Math.max(-1,Math.min(1,sy*.01)).toFixed(2))}},
-  mount(root){const el=[...root.querySelectorAll('.gl-p')],G=GL.G={n:el.length,el,h:[],cv:root.querySelector('.gl-cv')};GL.lay(root);
-    if(calmMotion())return;
-    let quiet=0;const L=GL.L=wxLoop(()=>{const P=GL.P;if(P.in&&P.v>1&&performance.now()-P.t<50){GL.drop(P.x,P.y,Math.min(85,14+P.v*2.2),1);P.v*=.4}
-      const e=GL.step();GL.render();GL.pads();quiet=e<.3?quiet+1:0;return quiet<10}); // gözle görülmeyecek kadar küçülünce durur
-    GL.P=wxPtr(root,L);
-    // tıklama: güçlü halka; yaprağa basınca yaprağın altında
-    root.addEventListener('pointerdown',e=>{const p=e.target.closest('.gl-p');if(p){const r=p.getBoundingClientRect();GL.drop(r.left+r.width/2,r.top+r.height/2,420,4)}else if(!e.target.closest('button,nav'))GL.drop(e.clientX,e.clientY,520,4);L.go()});
-    root.addEventListener('pointerover',e=>{const p=e.target.closest('.gl-p');if(p&&!p.contains(e.relatedTarget)){const r=p.getBoundingClientRect();GL.drop(r.left+r.width/2,r.top+r.height/2,160,3);L.go()}});
-    // ara sıra tek damla (sahne canlı kalsın; sekme gizliyken düşmez)
-    const rain=()=>{if(!GL.L||GL.L!==L)return;if(!document.hidden&&root.isConnected){GL.drop(innerWidth*(.15+prand(Date.now()%997)*.7),innerHeight*(.25+prand(Date.now()%991)*.55),200,2);L.go()}GL.rt=setTimeout(rain,9000+Math.random()*6000)};
-    GL.rt=setTimeout(rain,1400);GL.drop(innerWidth/2,innerHeight*.55,380,3);L.go()},
-  unmount(){GL.L?.stop();GL.L=null;clearTimeout(GL.rt)},
-  resize(root){GL.lay(root);GL.L?.go()}};
+/* ═════════════ RÜZGÂR ═════════════
+   Uygulamalar ince iplerle raylardan sarkan rüzgâr çanları (Calder’ın hareketli heykellerinden esinlenme).
+   İmleç geçtiği yerde rüzgâr estirir: çanlar imlecin hızı ve yönüyle sallanır, sarkaç gibi yavaşça durulur; ara sıra hafif esinti. */
+const RZ={
+  html:d=>`<div class="rz">${wxTop(d)}<div class="rz-rails" aria-hidden="true"></div>
+    <div class="rz-hs" role="list" aria-label="Uygulamalar">${d.apps.map((a,i)=>`<div class="rz-h" data-i="${i}"><i class="rz-str" aria-hidden="true"></i><button class="rz-b" role="listitem" data-app="${esc(a.key)}" aria-label="${esc(a.name)}" title="${esc(a.desc)}">${appIcon(a)}<b>${esc(a.name)}</b></button></div>`).join('')}</div>
+    ${wxNav('Rüzgâr')}<p class="wx-hint">${mobile()?'Parmağını çanların arasından geçir':'İmleci çanların arasından geçir — rüzgâr eser'}</p></div>`,
+  lay(root){const T=RZ.T,m=mobile(),W=innerWidth,Hh=innerHeight,n=T.n,B=m?54:68,gap=m?12:30;root.style.setProperty('--bz',B+'px');
+    let per=Math.max(3,Math.floor((W-(m?20:140))/(B+gap)));const rows=Math.ceil(n/per);per=Math.ceil(n/rows);
+    const top=m?112:122,avail=Hh-top-(m?118:126),rowH=avail/rows,st=Math.min(B+gap*2.2,(W-(m?20:140))/per);
+    const rails=[];T.e=[];
+    for(let i=0;i<n;i++){const r=Math.floor(i/per),c=i%per,inRow=Math.min(per,n-r*per),x=W/2+(c-(inRow-1)/2)*st,y=top+r*rowH,
+        L=Math.max(28,Math.min(rowH-B-34,rowH*(c%2?.34:.58)*(.82+.36*prand(i+5))));T.e[i]={x,y,L,lp:L+B/2,th:T.e?.[i]?.th||0,w:0};
+      const h=T.el[i];h.style.left=x+'px';h.style.top=y+'px';h.style.setProperty('--L',L+'px');if(!rails[r])rails[r]={y,x0:x,x1:x};rails[r].x0=Math.min(rails[r].x0,x);rails[r].x1=Math.max(rails[r].x1,x)}
+    root.querySelector('.rz-rails').innerHTML=rails.map(r=>`<i style="left:${r.x0-st*.45}px;top:${r.y}px;width:${r.x1-r.x0+st*.9}px"></i>`).join('')},
+  mount(root){const T=RZ.T={n:0,el:[...root.querySelectorAll('.rz-h')]};T.n=T.el.length;RZ.lay(root);if(calmMotion())return;
+    const draw=()=>{for(let i=0;i<T.n;i++)T.el[i].style.transform=`rotate(${T.e[i].th.toFixed(4)}rad)`};
+    const L=RZ.L=wxLoop(dt=>{const P=RZ.P,fresh=P.in&&performance.now()-P.t<60;let busy=false;
+      for(let i=0;i<T.n;i++){const e=T.e[i];
+        // imlecin ip/çan çizgisine uzaklığı → yakınsa imlecin yatay hızı kadar itme
+        if(fresh&&(P.vx||P.vy)){const s=Math.sin(e.th),c=Math.cos(e.th),bx=e.x+s*e.lp,by=e.y+c*e.lp,vx=bx-e.x,vy=by-e.y,t=Math.max(0,Math.min(1,((P.x-e.x)*vx+(P.y-e.y)*vy)/(vx*vx+vy*vy))),
+            dd=Math.hypot(P.x-(e.x+vx*t),P.y-(e.y+vy*t)),R=46;if(dd<R){const f=(1-dd/R)*(.4+t*.6);e.w+=(P.vx*c-P.vy*s*.3)*f*.9/e.lp*60*dt*4}}
+        const a=-(2600/e.lp)*Math.sin(e.th)-2.3*e.w;e.w+=a*dt;e.th+=e.w*dt;e.th=Math.max(-1.1,Math.min(1.1,e.th));if(Math.abs(e.th)>.004||Math.abs(e.w)>.012)busy=true}
+      P.vx*=.5;P.vy*=.5;draw();return busy||fresh});
+    const P=RZ.P=wxPtr(root,L);P.vx=0;P.vy=0;let lx=P.x,ly=P.y;
+    root.addEventListener('pointermove',e=>{P.vx=Math.max(-60,Math.min(60,e.clientX-lx));P.vy=Math.max(-60,Math.min(60,e.clientY-ly));lx=e.clientX;ly=e.clientY},{passive:true});
+    // ara sıra hafif esinti (sekme gizliyken esmez)
+    const breeze=()=>{if(RZ.L!==L)return;if(!document.hidden&&root.isConnected){const dir=Math.random()<.5?-1:1;T.e.forEach((e,i)=>{e.w+=dir*(.12+.18*prand(i+Date.now()%97))*(70/e.lp)});L.go()}RZ.bt=setTimeout(breeze,11000+Math.random()*9000)};
+    RZ.bt=setTimeout(breeze,2500)},
+  unmount(){RZ.L?.stop();RZ.L=null;clearTimeout(RZ.bt)},
+  resize(root){RZ.lay(root);RZ.L?.go()}};
 
 /* ═════════════ PETEK ═════════════
    Bal peteği gibi dizilmiş yuvarlak uygulamalar (Apple Watch’un petek ekranından esinlenme). İmleç bir büyüteç:
@@ -426,7 +499,7 @@ const PT={sel:0,
   unmount(){PT.L?.stop();PT.L=null;PT.T=null},
   resize(root){const T=PT.T;if(!T)return;T.p=[];T.lp=null;PT.lay(root);PT.L?.go()}};
 
-const R={mekansal:SP,miknatis:MG,golet:GL,petek:PT};
+const R={mekansal:SP,miknatis:MG,ruzgar:RZ,petek:PT};
 
 /* ── Çekirdek: dünyayı kur / yenile / değiştir ── */
 let cur='galaksi',root=null,clockT=0,rq=0,started=false;
@@ -449,7 +522,8 @@ addEventListener('keydown',e=>{if(!root||!R[cur].key||e.metaKey||e.ctrlKey||e.al
   if(document.querySelector('.wp-bg,.pal-bg,.menu,.radial')||[...document.querySelectorAll('.win')].some(w=>!w.hidden))return;R[cur].key(root,e);if(e.defaultPrevented)e.stopPropagation()},true);
 function rebuild(){if(!root||cur==='galaksi')return;const sc=root.scrollTop;apply(cur);if(root)root.scrollTop=sc}
 SP.rebuild=rebuild;
-function regroup(){if(cur!=='mekansal'||!root||!H()?.groups)return;let g;try{g=JSON.stringify(H().groups())}catch{return}if(g===SP.sig)return;
+function regroup(){if(cur==='miknatis'&&root&&H()?.groups){let g;try{g=JSON.stringify(H().groups())}catch{return}if(g!==MG.sig&&!MG.S?.pd?.on&&!root.querySelector('.mg-gl [contenteditable=true],.mg-cm'))rebuild();return}
+  if(cur!=='mekansal'||!root||!H()?.groups)return;let g;try{g=JSON.stringify(H().groups())}catch{return}if(g===SP.sig)return;
   if(document.querySelector('.world .sp-ren')||document.querySelector('.world .sp-hi.drag'))return;SP.keep=SP.keep||SP.list[SP.sel]?.key;rebuild()}
 let rt=0;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(root)R[cur].resize?.(root)},150)});
 addEventListener('storage',e=>{if(e.key===KEY&&started){const w=read();if(w!==cur)apply(w)}});
@@ -460,7 +534,7 @@ const MINI={
   galaksi:'<i class="m-sun"></i><i class="m-orb o1"></i><i class="m-orb o2"></i><i class="m-pl p1"></i><i class="m-pl p2"></i><i class="m-pl p3"></i>',
   mekansal:'<i class="m-card c1"></i><i class="m-card c2"></i><i class="m-card c3"></i><i class="m-flr"></i>',
   miknatis:'<i class="m-fe"><i class="f1"></i><i class="f2"></i><i class="f3"></i><i class="f4"></i><i class="fc"></i></i>',
-  golet:'<i class="m-rp r1"></i><i class="m-rp r2"></i><i class="m-rp r3"></i><i class="m-lp l1"></i><i class="m-lp l2"></i><i class="m-lp l3"></i>',
+  ruzgar:'<i class="m-rl"></i><i class="m-ch c1"></i><i class="m-ch c2"></i><i class="m-ch c3"></i><i class="m-ch c4"></i><i class="m-ch c5"></i>',
   petek:'<i class="m-hx h0"></i><i class="m-hx h1"></i><i class="m-hx h2"></i><i class="m-hx h3"></i><i class="m-hx h4"></i><i class="m-hx h5"></i><i class="m-hx h6"></i>'};
 let pk=null;
 function picker(){if(pk)return;const el=document.createElement('div');el.className='wp-bg';el.innerHTML=`<div class="wp" role="dialog" aria-modal="true" aria-labelledby="wpT">

@@ -3603,5 +3603,42 @@
     "text": "Mıknatıs'taki sıvı karışma efekti (SVG süzgeci) zayıf bilgisayarlarda yorabilir; sadece damlaların alanında çalışıyor"
    }
   ]
+ },
+ {
+  "at": "2026-11-19",
+  "change": "Mıknatıs: damlaları sürükleyip taşıma, gruplar (küme + ad, bırakınca gruba geçme, sağ tık), widget damlaları (Çalışma/Bugün/Son not), Düzen menüsü. Gölet kaldırıldı, yerine Rüzgâr (sallanan çanlar)",
+  "scores": {
+   "hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "hub masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "hub",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Widget damlalarındaki büyük sayılar damlanın altına gri yazıyla taşıyordu",
+    "fix": "Uygulama adı stili sadece uygulama damlalarına uygulanıyor"
+   },
+   {
+    "app": "hub",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Küme içinde damlalar birbirine yapışıyor, isimlerin üstüne biniyordu",
+    "fix": "Kümeler altıgen düzende, aralıklı"
+   },
+   {
+    "app": "hub",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Rüzgâr'da çanlar 6 sn sonra hâlâ hafifçe sallanıp işlemci kullanıyordu",
+    "fix": "Sönüm artırıldı, durulunca döngü duruyor"
+   }
+  ]
  }
 ]

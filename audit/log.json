@@ -3560,5 +3560,48 @@
     "text": "YouTube'un hub içinde ilk açılışı yavaş: tarayıcı başka site içindeki sitelere ayrı önbellek kullanıyor; ikinci açılışta hızlanır"
    }
   ]
+ },
+ {
+  "at": "2026-11-19",
+  "change": "Arayüz dünyaları yenilendi: Defter/Terminal/Organik/İsviçre silindi; imleçle canlanan Mıknatıs, Gölet ve Petek eklendi",
+  "scores": {
+   "hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "hub masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "hub",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Gölet'te su gözle görülmeyecek kadar küçük dalgalarla saniyelerce çizmeye devam ediyordu",
+    "fix": "Sönüm artırıldı, görünmez olunca duruyor (imleç durunca 0 çizim/sn)"
+   },
+   {
+    "app": "hub",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Petek'te alttaki açıklama baloncuklarla çakışıyor, ad iki kez yazılıyordu",
+    "fix": "Küme açıklamanın üstüne sığdırıldı; ad tek yerde"
+   },
+   {
+    "app": "hub",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Telefonda Petek isimleri üst üste biniyordu",
+    "fix": "Telefonda isim sadece altta, en büyük baloncuk için"
+   },
+   {
+    "app": "hub",
+    "sev": "bilgi",
+    "status": "open",
+    "text": "Mıknatıs'taki sıvı karışma efekti (SVG süzgeci) zayıf bilgisayarlarda yorabilir; sadece damlaların alanında çalışıyor"
+   }
+  ]
  }
 ]

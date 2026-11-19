@@ -3062,7 +3062,7 @@ buildMesh();introStart=performance.now();wake();
 /* ── Arayüz dünyaları için köprü (ui/worlds.js bunu kullanır) ── */
 window.HUB={apps:()=>pub,open:k=>{const a=find(k);if(a)openApp(a,nodes.get(k)?.el)},openNotes:h=>openNotes(h),palette:()=>palette(),
   items:()=>{try{return islandItems()}catch{return[]}},notes:()=>NOTES,study:()=>STUDY,studyToday:()=>{try{return studyToday()}catch{return 0}},dayKey,
-  icon:a=>miniIcon(a),themeMenu:()=>themeMenu(),tabs:()=>TABS.length,booted:()=>booted,
+  icon:a=>miniIcon(a),themeMenu:()=>themeMenu(),tabs:()=>TABS.length,booted:()=>booted,tier:()=>TIER,
   pause:on=>{if(on)setPaused(true);else setPaused(document.hidden||(!!W.app&&!W.min))},esc,
   /* galaksideki kümeler: [{id,name,color,keys}] — sıra: yapay zekâ yörüngesi, adlı kümeler, Diğer */
   groups:()=>{try{GX.poke=true;galaxyModel()}catch{}const col=c=>GCOL[c]||c||GCOL.violet;
@@ -3078,7 +3078,7 @@ window.HUB={apps:()=>pub,open:k=>{const a=find(k);if(a)openApp(a,nodes.get(k)?.e
   toast:(t,undo)=>toast(t,undo),bh:BH_KEY};
 addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.shiftKey&&(e.key==='u'||e.key==='U')){e.preventDefault();window.Worlds?.picker()}});
 </script>
-<link rel="stylesheet" href="ui/worlds.css">
-<script src="ui/worlds.js"></script>
+<link rel="stylesheet" href="ui/worlds.css?v=20261119a">
+<script src="ui/worlds.js?v=20261119a"></script>
 </body>
 </html>

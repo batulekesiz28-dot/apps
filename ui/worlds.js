@@ -1,21 +1,16 @@
 /* AppShell — Arayüz dünyaları.
-   Aynı veri (uygulamalar, bugün, notlar, çalışma), altı bambaşka arayüz sistemi.
-   Galaksi = hub'ın kendisi; diğer beşi #world katmanında çizilir, galaksi döngüsü durur.
+   Aynı veri (uygulamalar, bugün, notlar, çalışma), bambaşka arayüz sistemleri; her birinde imleç sahneyi canlandırır.
+   Galaksi = hub'ın kendisi; diğerleri #world katmanında çizilir, galaksi döngüsü durur.
    Hub köprüsü: window.HUB (index.html sonunda). Seçim: localStorage 'appshell:world'. */
 (function(){
 'use strict';
 const H=()=>window.HUB, KEY='appshell:world';
 const WORLDS=[
-  ['galaksi','Galaksi','Uzayda yüzen uygulamalar, yörüngeler, serbest kamera'],
-  ['defter','Defter','Çizgili kâğıt, el yazısı, içindekiler, yapışkan notlar'],
-  ['terminal','Terminal','Komut satırı, sistem panelleri, holografik radar'],
-  ['organik','Organik','Gölet, büyüyen bitki, kıvrılan patika'],
-  ['isvicre','İsviçre','Gazete ızgarası, dev tipografi, tek kırmızı'],
-  ['mekansal','Mekânsal','Derinlikte yüzen cam pencereler, dönen halka']];
-const FONTS={defter:'Caveat:wght@400..700&family=Newsreader:opsz,wght@6..72,400..600',terminal:'Share+Tech+Mono&family=Rajdhani:wght@500;600;700',
-  organik:'Fraunces:opsz,wght@9..144,300..650&family=Nunito:wght@400..800',isvicre:'Inter+Tight:wght@400..800'};
-const fl=new Set();
-function loadFont(w){if(!FONTS[w]||fl.has(w))return;fl.add(w);const l=document.createElement('link');l.rel='stylesheet';l.href='https://fonts.googleapis.com/css2?family='+FONTS[w]+'&display=swap';document.head.appendChild(l)}
+  ['galaksi','Galaksi','Uzayda yüzen uygulamalar; kara delik imleci içine çeker'],
+  ['mekansal','Mekânsal','Derinlikte yüzen cam pencereler; imleç ışık saçar'],
+  ['miknatis','Mıknatıs','Sıvı metal damlalar; imleç mıknatıs gibi çeker, karıştırır'],
+  ['golet','Gölet','Gece göleti; imleç suda halkalar açar, yapraklar salınır'],
+  ['petek','Petek','Bal peteği; imleç büyüteç gibi yaklaştığını büyütür']];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const strip=h=>String(h||'').replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/\s+/g,' ').trim();
 const motion=()=>document.documentElement.dataset.motion||'full';
@@ -45,170 +40,7 @@ function D(){const h=H(),now=new Date(),k=h.dayKey(now);
 const ago=t=>{if(!t)return'';const m=Math.round((Date.now()-t)/6e4);return m<1?'az önce':m<60?m+' dk önce':m<1440?Math.round(m/60)+' sa önce':Math.round(m/1440)+' gün önce'};
 const appIcon=(a,cls='')=>`<span class="w-ic ${cls}" style="${a.ic.style}">${a.ic.html}</span>`;
 
-/* ═════════════ 1 · DEFTER ═════════════ */
-const ROM=['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV'];
-const NB={pg:0,
-  pages:[
-    d=>`<header class="nb-h"><span class="nb-greet">${greet(d.now)},</span><span class="nb-date">${esc(trDate(d.now,{weekday:'long',day:'numeric',month:'long'}))}</span></header>
-      <p class="nb-lab">Günün odağı</p>
-      ${d.focus?`<p class="nb-hand${d.focus.done?' done':''}">${esc(d.focus.t)}</p>`:`<p class="nb-hand dim">— henüz seçilmedi</p>`}
-      <p class="nb-lab">Yapılacaklar</p>
-      ${d.todos.length?`<ul class="nb-todo">${d.todos.slice(0,7).map(t=>`<li class="${t.done?'done':''}"><i aria-hidden="true"></i><span>${esc(t.t)}</span></li>`).join('')}</ul>`
-        :`<p class="nb-hand dim">Bugüne yazılmış iş yok.</p>`}
-      <p><button class="nb-link" data-act="today">Bugünün sayfasını aç →</button></p>
-      <p class="nb-lab">Çalıştım</p>
-      <p class="nb-hand">${fmt(d.today)}${d.goal?` <small>/ ${fmt(d.goal)}</small>`:''}<svg class="nb-bar" viewBox="0 0 160 14" aria-hidden="true"><path d="M2 8 Q40 4 80 8 T158 7" class="tr"/><path d="M2 8 Q40 4 80 8 T158 7" class="fi" style="stroke-dasharray:${Math.round(160*Math.min(1,d.goal?d.today/d.goal:0))} 400"/></svg></p>
-      <p class="nb-lab">Kenar notu</p>
-      <textarea class="nb-scr" rows="4" aria-label="Kenar notu" placeholder="Aklına geleni karala…"></textarea>`,
-    d=>`<header class="nb-h"><h2 class="nb-ser">İçindekiler</h2></header>
-      <ol class="nb-toc">${d.apps.map((a,i)=>`<li><button data-app="${esc(a.key)}" title="${esc(a.desc)}"><span class="n">${ROM[i]||i+1}.</span><span class="t">${esc(a.name)}</span><span class="dots"></span><span class="p">${i*4+3}</span></button></li>`).join('')}</ol>
-      <p class="nb-lab">Sayfa ara</p><p><button class="nb-link" data-act="ara">Defterde ara (⌘K) →</button></p>`,
-    d=>`<header class="nb-h"><h2 class="nb-ser">Son sayfalar</h2></header>
-      ${d.notes.length?`<div class="nb-stk">${d.notes.map((n,i)=>`<button class="stk" data-note="${esc(n.id)}" style="--r:${[-2.5,1.8,-1,2.6,-1.8,1][i]}deg;--c:${['#FFF0A8','#FFD6C9','#D7F0C8','#D6E4FF','#F6D9F2','#FFE6B8'][i]}"><i class="tape" aria-hidden="true"></i><b>${esc(n.icon)} ${esc(n.title)}</b><span>${esc(n.ex.slice(0,70))||'boş sayfa'}</span><small>${ago(n.up)}</small></button>`).join('')}</div>`
-        :`<p class="nb-hand dim">Henüz sayfa yok.</p><p><button class="nb-link" data-app="p:notlar">Notlar'da ilk sayfayı aç →</button></p>`}`,
-    d=>{const mx=Math.max(30,...d.days.map(x=>x.m)),best=d.days.reduce((a,x)=>x.m>a.m?x:a,d.days[0]);
-      const bars=d.days.map((x,i)=>{const h=Math.round(x.m/mx*120),X=10+i*22;return`<path class="bx${i===13?' now':''}" d="M${X} 150 L${X+1} ${150-h} L${X+15} ${150-h+1} L${X+14} 150"/><text x="${X+7}" y="168">${'PSÇPCCP'[x.d.getDay()]}</text>`}).join('');
-      return`<header class="nb-h"><h2 class="nb-ser">Çalışma günlüğü</h2></header>
-      <p class="nb-lab">Son 14 gün</p>
-      <svg class="nb-chart" viewBox="0 0 320 176" role="img" aria-label="Son 14 günün çalışma süreleri">${bars}</svg>
-      <p class="nb-hand">Bu hafta ${fmt(d.week)}</p>
-      <p class="nb-hand">${best.m?`En iyi gün: ${esc(trDate(best.d,{day:'numeric',month:'long'}))} · ${fmt(best.m)}`:'Henüz kayıt yok.'}</p>
-      <p><button class="nb-link" data-app="p:studylog">Study Log'u aç →</button></p>`}],
-  html:()=>`<div class="nb-desk"><nav class="nb-tabs" aria-label="Defter sekmeleri">
-      ${['Bugün','İçindekiler','Sayfalar','Günlük'].map((t,i)=>`<button data-pg="${i}" style="--t:${['#F4C95D','#9CC5A1','#F2A07B','#A8B8E8'][i]}">${t}</button>`).join('')}
-      <button data-act="world" style="--t:#D9C2E9">Arayüz</button></nav>
-    <div class="nb-book"><section class="nb-page nb-l" aria-live="polite"></section><div class="nb-spine" aria-hidden="true"></div><section class="nb-page nb-r"></section>
-      <button class="nb-corner nb-prev" data-turn="-1" aria-label="Önceki sayfa">‹</button><button class="nb-corner nb-next" data-turn="1" aria-label="Sonraki sayfa">›</button></div></div>`,
-  span:()=>mobile()?1:2,
-  paint(root,d){const s=NB.span(),a=Math.floor(NB.pg/s)*s,L=root.querySelector('.nb-l'),R=root.querySelector('.nb-r');
-    const keep=L.querySelector('.nb-scr')?.value;
-    L.innerHTML=NB.pages[a](d);R.innerHTML=s===2&&NB.pages[a+1]?NB.pages[a+1](d):'';
-    const ta=root.querySelector('.nb-scr');if(ta){ta.value=keep??(localStorage.getItem('appshell:defter-not')||'');ta.oninput=()=>{try{localStorage.setItem('appshell:defter-not',ta.value)}catch{}}}
-    root.querySelectorAll('.nb-tabs [data-pg]').forEach(b=>{const on=+b.dataset.pg>=a&&+b.dataset.pg<a+s;b.classList.toggle('on',on);b.setAttribute('aria-current',on?'page':'false')});
-    root.querySelector('.nb-prev').disabled=a===0;root.querySelector('.nb-next').disabled=a+s>=NB.pages.length},
-  go(root,p){const s=NB.span(),from=Math.floor(NB.pg/s)*s,to=Math.max(0,Math.min(NB.pages.length-1,Math.floor(p/s)*s));if(to===from)return;
-    const fwd=to>from,book=root.querySelector('.nb-book');
-    if(calmMotion()){NB.pg=to;NB.paint(root,D());return}
-    const src=root.querySelector(fwd&&s===2?'.nb-r':'.nb-l'),leaf=src.cloneNode(true);leaf.classList.add('nb-leaf');leaf.removeAttribute('aria-live');
-    leaf.style.left=src.offsetLeft+'px';leaf.style.top=src.offsetTop+'px';leaf.style.width=src.offsetWidth+'px';leaf.style.height=src.offsetHeight+'px';
-    leaf.style.transformOrigin=fwd?'left center':'right center';book.appendChild(leaf);
-    NB.pg=to;NB.paint(root,D());
-    const tgt=root.querySelector(s===2?(fwd?'.nb-l':'.nb-r'):'.nb-l');tgt.style.visibility='hidden';
-    leaf.animate([{transform:'rotateY(0)',filter:'brightness(1)'},{transform:`rotateY(${fwd?-90:90}deg)`,filter:'brightness(.8)'}],{duration:320,easing:'cubic-bezier(.5,0,.75,0)'}).finished.then(()=>{
-      leaf.remove();tgt.style.visibility='';tgt.animate([{transform:`rotateY(${fwd?90:-90}deg)`,filter:'brightness(.8)'},{transform:'rotateY(0)',filter:'brightness(1)'}],{duration:340,easing:'cubic-bezier(.2,.8,.3,1)'}).finished.catch(()=>{})},()=>{leaf.remove();tgt.style.visibility=''})},
-  mount(root){root.addEventListener('click',e=>{const p=e.target.closest('[data-pg]'),t=e.target.closest('[data-turn]');
-      if(p)NB.go(root,+p.dataset.pg);if(t){const s=NB.span();NB.go(root,Math.floor(NB.pg/s)*s+(+t.dataset.turn)*s)}});
-
-    let sx=null;root.addEventListener('pointerdown',e=>{if(e.pointerType==='touch'&&!e.target.closest('textarea'))sx=e.clientX});
-    root.addEventListener('pointerup',e=>{if(sx==null)return;const dx=e.clientX-sx;sx=null;if(Math.abs(dx)>60)NB.go(root,NB.pg+(dx<0?1:-1)*NB.span())});
-    NB.paint(root,D())},
-  key(root,e){if(e.key==='ArrowRight'){e.preventDefault();NB.go(root,NB.pg+NB.span())}else if(e.key==='ArrowLeft'){e.preventDefault();NB.go(root,NB.pg-NB.span())}},
-  refresh(root){if(root.querySelector('.nb-scr')===document.activeElement)return;NB.paint(root,D())},
-  resize(root){NB.paint(root,D())}};
-
-/* ═════════════ 2 · TERMİNAL ═════════════ */
-const TM={hist:[],hi:0,
-  html:()=>`<div class="tm"><div class="tm-scan" aria-hidden="true"></div>
-    <aside class="tm-col tm-l">
-      <section class="tm-p"><h3>SYS.CLOCK</h3><div class="tm-clock" data-clock="hms"></div><div class="tm-sub" data-live="date"></div></section>
-      <section class="tm-p" data-live="study"></section>
-      <section class="tm-p" data-live="queue"></section></aside>
-    <main class="tm-term"><div class="tm-bar"><span>appshell://tty1</span><span>OTURUM ${String(new Date().getHours()).padStart(2,'0')}:${String(new Date().getMinutes()).padStart(2,'0')}</span></div>
-      <div class="tm-out" role="log" aria-live="polite"></div>
-      <label class="tm-in"><span class="tm-ps">batu@appshell:~$</span><input spellcheck="false" autocomplete="off" autocapitalize="off" aria-label="Komut yaz"></label>
-      <div class="tm-chips">${['yardim','ls','bugun','notlar','calisma','ara','arayuz'].map(c=>`<button data-cmd="${c}">${c}</button>`).join('')}</div></main>
-    <aside class="tm-col tm-r"><section class="tm-p"><h3>RADAR // MODÜLLER</h3><div class="tm-radar" data-live="radar"></div></section>
-      <section class="tm-p" data-live="mods"></section></aside></div>`,
-  live:{
-    date:d=>esc(trDate(d.now,{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'}).toUpperCase()),
-    study:d=>{const n=20,f=Math.round(n*Math.min(1,d.goal?d.today/d.goal:0)),mx=Math.max(30,...d.days.map(x=>x.m));
-      const pts=d.days.map((x,i)=>`${(i*(200/13)).toFixed(1)},${(52-x.m/mx*46).toFixed(1)}`).join(' ');
-      return`<h3>ÇALIŞMA.LOG</h3><div class="tm-big">${fmt(d.today)}</div><div class="tm-sub">${d.goal?`HEDEF ${fmt(d.goal).toUpperCase()} · %${Math.round(d.today/d.goal*100)}`:'HEDEF TANIMSIZ'}</div>
-        <div class="tm-seg" aria-hidden="true">${Array.from({length:n},(_,i)=>`<i class="${i<f?'on':''}"></i>`).join('')}</div>
-        <svg class="tm-spark" viewBox="0 0 200 56" preserveAspectRatio="none" role="img" aria-label="14 günlük çalışma grafiği"><polygon points="0,56 ${pts} 200,56"/><polyline points="${pts}"/></svg><div class="tm-sub">14 GÜN · HAFTA ${fmt(d.week).toUpperCase()}</div>`},
-    queue:d=>{const rows=[...d.items.map(x=>({t:x.t,s:x.sub})),...d.todos.map(t=>({t:t.t,s:t.done?'TAMAM':'AÇIK',done:t.done}))].slice(0,7);
-      return`<h3>KUYRUK // BUGÜN</h3>${rows.length?`<ul class="tm-q">${rows.map(r=>`<li class="${r.done?'done':''}"><span>› ${esc(r.t)}</span><em>${esc(String(r.s||'').toUpperCase())}</em></li>`).join('')}</ul>`:'<p class="tm-sub">KUYRUK BOŞ. <button class="tm-a" data-act="today">BUGÜN SAYFASI</button></p>'}`},
-    radar:d=>{const n=d.apps.length||1;return`<div class="tm-sweep" aria-hidden="true"></div><svg viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="96"/><circle cx="100" cy="100" r="64"/><circle cx="100" cy="100" r="32"/><path d="M100 4V196M4 100H196"/></svg>
-      ${d.apps.map((a,i)=>{const t=-Math.PI/2+i/n*Math.PI*2,r=i%2?52:80;return`<button class="tm-blip" data-app="${esc(a.key)}" style="left:${(50+Math.cos(t)*r/2).toFixed(1)}%;top:${(50+Math.sin(t)*r/2).toFixed(1)}%;--d:${(i/n*4).toFixed(2)}s" aria-label="${esc(a.name)} aç"><i></i><span>${esc(a.name)}</span></button>`}).join('')}`},
-    mods:d=>`<h3>MODÜLLER</h3><ul class="tm-mods">${d.apps.map((a,i)=>`<li><button data-app="${esc(a.key)}" title="${esc(a.desc)}"><b>[${String(i+1).padStart(2,'0')}]</b><span>${esc(a.name.toLocaleUpperCase('tr-TR'))}</span><em>${a.ai?'AI':'HAZIR'}</em></button></li>`).join('')}</ul>`},
-  out(root,html,cls=''){const o=root.querySelector('.tm-out'),l=document.createElement('div');l.className='tl '+cls;l.innerHTML=html;o.appendChild(l);while(o.children.length>200)o.firstChild.remove();o.scrollTop=o.scrollHeight},
-  match(d,q){q=q.toLocaleLowerCase('tr-TR');const n=+q;if(n&&d.apps[n-1])return d.apps[n-1];return d.apps.find(a=>a.name.toLocaleLowerCase('tr-TR')===q)||d.apps.find(a=>a.name.toLocaleLowerCase('tr-TR').startsWith(q))||d.apps.find(a=>a.key.slice(2).startsWith(q))},
-  run(root,raw){const d=D(),[c,...rest]=raw.trim().split(/\s+/),arg=rest.join(' '),cmd=(c||'').toLocaleLowerCase('tr-TR');
-    TM.out(root,`<span class="tm-ps">batu@appshell:~$</span> ${esc(raw)}`,'cmd');if(!cmd)return;
-    const A={
-      yardim:()=>TM.out(root,`KOMUTLAR<br>${[['ls','modülleri listele'],['ac &lt;ad|no&gt;','uygulama aç'],['bugun','bugünün kuyruğu'],['notlar','son sayfalar'],['calisma','çalışma raporu'],['ara','komut paleti'],['arayuz [ad]','arayüz değiştir'],['saat','zaman'],['temizle','ekranı temizle']].map(([k,v])=>`<span class="hi">${k.padEnd(12,' ')}</span> ${v}`).join('<br>')}`),
-      ls:()=>TM.out(root,d.apps.map((a,i)=>`<button class="tm-a" data-app="${esc(a.key)}">[${String(i+1).padStart(2,'0')}] ${esc(a.name)}</button> <span class="dim">${esc(a.desc.slice(0,64))}</span>`).join('<br>')||'modül yok'),
-      ac:()=>{const a=TM.match(d,arg);if(!a)return TM.out(root,`HATA: "${esc(arg)}" bulunamadı. <span class="dim">ls ile bak.</span>`,'err');TM.out(root,`${esc(a.name)} başlatılıyor… <span class="ok">OK</span>`);setTimeout(()=>H().open(a.key),180)},
-      bugun:()=>{const r=[...d.items.map(x=>'› '+esc(x.t)+' <span class="dim">'+esc(x.sub)+'</span>'),...d.todos.map(t=>(t.done?'<span class="ok">✓</span> ':'› ')+esc(t.t))];TM.out(root,r.length?r.join('<br>'):'Bugün kuyruk boş. <button class="tm-a" data-act="today">bugünün sayfası</button>')},
-      notlar:()=>TM.out(root,d.notes.length?d.notes.map(n=>`<button class="tm-a" data-note="${esc(n.id)}">${esc(n.title)}</button> <span class="dim">${ago(n.up)}</span>`).join('<br>'):'Sayfa yok.'),
-      calisma:()=>TM.out(root,`BUGÜN ${fmt(d.today)}${d.goal?' / '+fmt(d.goal):''} · HAFTA ${fmt(d.week)}<br>${d.days.map(x=>`<span class="bar" style="--h:${Math.min(1,x.m/Math.max(30,...d.days.map(y=>y.m)))}"></span>`).join('')}`),
-      ara:()=>H().palette(), saat:()=>TM.out(root,esc(new Date().toLocaleString('tr-TR'))),
-      temizle:()=>{root.querySelector('.tm-out').innerHTML=''},
-      arayuz:()=>{if(!arg)return picker();const w=WORLDS.find(x=>x[0].startsWith(arg.toLocaleLowerCase('tr-TR'))||x[1].toLocaleLowerCase('tr-TR').startsWith(arg.toLocaleLowerCase('tr-TR')));w?set(w[0]):TM.out(root,'Arayüzler: '+WORLDS.map(x=>x[0]).join(', '),'err')}};
-    const al={help:'yardim',yardım:'yardim',apps:'ls',open:'ac',aç:'ac',today:'bugun',bugün:'bugun',notes:'notlar',study:'calisma',çalışma:'calisma',search:'ara',world:'arayuz',arayüz:'arayuz',clear:'temizle',date:'saat'};
-    const f=A[cmd]||A[al[cmd]];if(f)return f();
-    const a=TM.match(d,raw.trim());if(a){TM.out(root,`${esc(a.name)} başlatılıyor… <span class="ok">OK</span>`);setTimeout(()=>H().open(a.key),180);return}
-    TM.out(root,`komut bulunamadı: ${esc(cmd)} — <span class="hi">yardim</span> yaz`,'err')},
-  mount(root){const inp=root.querySelector('.tm-in input');
-    inp.addEventListener('keydown',e=>{if(e.key==='Enter'){const v=inp.value;inp.value='';if(v.trim()){TM.hist.push(v);TM.hi=TM.hist.length}TM.run(root,v)}
-      else if(e.key==='ArrowUp'){e.preventDefault();if(TM.hi>0)inp.value=TM.hist[--TM.hi]}else if(e.key==='ArrowDown'){e.preventDefault();TM.hi=Math.min(TM.hist.length,TM.hi+1);inp.value=TM.hist[TM.hi]||''}
-      else if(e.key==='Tab'){e.preventDefault();const[c,...r]=inp.value.split(' ');if(r.length){const a=TM.match(D(),r.join(' '));if(a)inp.value=c+' '+a.name}}});
-    root.addEventListener('click',e=>{const c=e.target.closest('[data-cmd]');if(c){TM.run(root,c.dataset.cmd);return}
-      if(!e.target.closest('button,a,input')&&e.target.closest('.tm-term')&&!getSelection().toString())inp.focus({preventScroll:true})});
-    const d=D(),boot=['APPSHELL OS // ÇEKİRDEK YÜKLENİYOR',`modüller ........ ${d.apps.length} bulundu`,`notlar ......... ${d.notes.length} sayfa`,`çalışma ........ bugün ${fmt(d.today)}`,'bağlantı ....... <span class="ok">GÜVENLİ</span>',`${greet(d.now).toUpperCase()}. <span class="hi">yardim</span> yazarak başla.`];
-    if(calmMotion())boot.forEach(l=>TM.out(root,l,'dim'));else boot.forEach((l,i)=>setTimeout(()=>root.isConnected&&TM.out(root,l,i===boot.length-1?'':'dim'),90*i));
-    if(!mobile())setTimeout(()=>inp.focus({preventScroll:true}),60)}};
-
-/* ═════════════ 3 · ORGANİK ═════════════ */
-const OG={
-  html:d=>{const h=d.now.getHours()+d.now.getMinutes()/60,p=Math.max(0,Math.min(1,(h-6)/14));
-    return`<div class="og"><div class="og-sky" aria-hidden="true"><div class="og-sun" style="--p:${p.toFixed(3)}"></div></div>
-    <svg class="og-hills" viewBox="0 0 1440 320" preserveAspectRatio="none" aria-hidden="true"><path class="h1" d="M0 190 C220 110 420 170 640 140 C900 100 1100 190 1440 120 V320 H0Z"/><path class="h2" d="M0 240 C260 190 520 260 760 220 C1000 180 1200 250 1440 210 V320 H0Z"/><path class="h3" d="M0 285 C300 255 640 300 940 270 C1180 248 1320 280 1440 268 V320 H0Z"/></svg>
-    <div class="og-pollen" aria-hidden="true">${Array.from({length:14},(_,i)=>`<i style="--x:${(i*71)%100}%;--s:${8+(i*7)%9}s;--dl:-${i*1.3}s"></i>`).join('')}</div>
-    <div class="og-flow">
-      <header class="og-h"><p class="og-greet">${greet(d.now)}</p><h1><span data-clock="hm"></span><em>${esc(trDate(d.now,{weekday:'long',day:'numeric',month:'long'}))}</em></h1></header>
-      <div class="og-meet">
-        <section class="og-pond" data-live="pond" aria-label="Bugün"></section>
-        <section class="og-plant" data-live="plant" aria-label="Çalışma bitkisi"></section></div>
-      <section class="og-path" aria-label="Uygulamalar"><h2>Patika</h2><svg class="og-trail" viewBox="0 0 1000 220" preserveAspectRatio="none" aria-hidden="true"><path d="M0 120 C120 40 220 200 340 120 S560 40 680 120 S880 200 1000 110"/></svg>
-        <div class="og-seeds" data-live="seeds"></div></section>
-      <section class="og-leaves" data-live="leaves" aria-label="Son sayfalar"></section>
-      <nav class="og-nav"><button data-act="ara">Ara</button><button data-act="today">Bugün</button><button data-act="world">Arayüz</button></nav></div></div>`},
-  live:{
-    pond:d=>{const pads=[...d.items.map(x=>({t:x.t,s:x.sub})),...d.todos.map(t=>({t:t.t,s:t.done?'oldu':'bekliyor',done:t.done}))].slice(0,6);
-      return`<h2>Gölet</h2><p class="og-sub">${pads.length?'bugün suyun üstünde olanlar':'su durgun — bugün için bir şey yok'}</p>
-      <div class="og-pads">${pads.map((x,i)=>`<button class="og-pad${x.done?' done':''}" data-act="today" style="--i:${i}"><b>${esc(x.t)}</b><small>${esc(x.s||'')}</small></button>`).join('')||'<button class="og-pad" data-act="today"><b>Bugünü yaz</b><small>Notlar</small></button>'}</div>`},
-    plant:d=>{const g=d.goal||120,p=Math.min(1,d.today/g),H=60+170*p,n=Math.max(1,Math.round(p*7));
-      const leaves=Array.from({length:n},(_,i)=>{const y=250-(i+1)*(H/(n+1)),s=i%2?1:-1;return`<path class="lf" style="--i:${i}" d="M100 ${y.toFixed(0)} q${22*s} -26 ${48*s} -8 q${-24*s} 16 ${-48*s} 8z"/>`}).join('');
-      return`<svg viewBox="0 0 200 270" role="img" aria-label="Bugünkü çalışma: ${fmt(d.today)}"><ellipse cx="100" cy="256" rx="60" ry="9" class="soil"/><path class="stem" d="M100 252 C96 ${252-H*.4} 106 ${252-H*.7} 100 ${252-H}"/>${leaves}${p>=1?`<circle cx="100" cy="${252-H}" r="12" class="bloom"/>`:''}</svg>
-      <p class="og-num">${fmt(d.today)}</p><p class="og-sub">${d.goal?`hedefin %${Math.round(p*100)}'i · ${p>=1?'çiçek açtı':'büyüyor'}`:'çalıştıkça büyür'}</p>`},
-    seeds:d=>d.apps.map((a,i)=>{const n=Math.max(1,d.apps.length-1),x=4+i/n*88,y=50+Math.sin(i*1.25)*28;
-      return`<button class="og-seed" data-app="${esc(a.key)}" style="--x:${x.toFixed(1)}%;--y:${y.toFixed(0)}%;--r:${['62% 38% 55% 45% / 48% 60% 40% 52%','45% 55% 40% 60% / 60% 42% 58% 40%','55% 45% 62% 38% / 42% 55% 45% 58%'][i%3]};--dl:-${i*.7}s" title="${esc(a.desc)}">${appIcon(a)}<span>${esc(a.name)}</span></button>`}).join(''),
-    leaves:d=>`<h2>Yapraklar</h2><p class="og-sub">son dokunduğun sayfalar</p>${d.notes.length?`<div class="og-lv">${d.notes.map((n,i)=>`<button class="og-leaf" data-note="${esc(n.id)}" style="--r:${[-4,3,-2,5,-3,2][i]}deg"><b>${esc(n.icon)} ${esc(n.title)}</b><small>${ago(n.up)}</small></button>`).join('')}</div>`:'<p class="og-sub">henüz yaprak yok</p>'}`}};
-
-/* ═════════════ 4 · İSVİÇRE ═════════════ */
-const SW={
-  html:d=>{const doy=Math.floor((d.now-new Date(d.now.getFullYear(),0,0))/864e5);
-    return`<div class="swz"><div class="sw-grid" aria-hidden="true">${'<i></i>'.repeat(12)}</div>
-    <header class="sw-mast"><div class="sw-logo">AppShell</div><div class="sw-meta"><span>No. ${doy}</span><span>${esc(trDate(d.now,{weekday:'long',day:'numeric',month:'long',year:'numeric'}))}</span><span data-clock="hm"></span></div></header>
-    <section class="sw-hero" data-live="hero"></section>
-    <section class="sw-sec"><h2><b>01</b>Uygulamalar</h2><ol class="sw-apps">${d.apps.map((a,i)=>`<li><button data-app="${esc(a.key)}"><b>${String(i+1).padStart(2,'0')}</b><span class="n">${esc(a.name)}</span><span class="d">${esc(a.desc)}</span><span class="ar" aria-hidden="true">→</span></button></li>`).join('')}</ol></section>
-    <section class="sw-sec sw-two"><div data-live="agenda"></div><div data-live="chart"></div></section>
-    <section class="sw-sec" data-live="notes"></section>
-    <footer class="sw-foot"><button data-act="world">Arayüz değiştir →</button><button data-act="ara">Ara ⌘K</button><button data-act="grid">Izgarayı göster</button><span>AppShell · ${d.now.getFullYear()}</span></footer></div>`},
-  live:{
-    hero:d=>{const head=d.focus?d.focus.t:d.open?`Bugün ${d.open} açık iş seni bekliyor`:`${greet(d.now)}. Masa temiz.`;
-      return`<div class="sw-num">${d.now.getDate()}</div><div class="sw-head"><p class="sw-kick">${d.focus?'Günün odağı':'Manşet'}</p><h1>${esc(head)}</h1>
-        <p class="sw-deck">${fmt(d.today)} çalışıldı${d.goal?` (hedef ${fmt(d.goal)})`:''} · ${d.apps.length} uygulama · ${d.notes.length} güncel yazı</p></div>`},
-    agenda:d=>{const r=[...d.items.map(x=>[x.t,x.sub]),...d.todos.map(t=>[t.t,t.done?'Tamam':'Açık'])].slice(0,6);
-      return`<h2><b>02</b>Gündem</h2>${r.length?`<ol class="sw-ag">${r.map(([t,s],i)=>`<li><b>${i+1}</b><span>${esc(t)}</span><em>${esc(s||'')}</em></li>`).join('')}</ol>`:'<p class="sw-mute">Gündemde madde yok.</p>'}<button class="sw-link" data-act="today">Bugünün sayfası →</button>`},
-    chart:d=>{const mx=Math.max(30,...d.days.map(x=>x.m));
-      return`<h2><b>03</b>Çalışma</h2><p class="sw-big">${Math.round(d.today)}<small>dk bugün</small></p>
-        <div class="sw-bars" role="img" aria-label="Son 14 gün">${d.days.map((x,i)=>`<i class="${i===13?'now':''}" style="--h:${(x.m/mx).toFixed(3)}"></i>`).join('')}</div><p class="sw-mute">Son 14 gün · bu hafta ${fmt(d.week)}</p>`},
-    notes:d=>`<h2><b>04</b>Son yazılar</h2>${d.notes.length?`<div class="sw-cols">${d.notes.slice(0,3).map(n=>`<article><button data-note="${esc(n.id)}"><small>${ago(n.up)}</small><h3>${esc(n.title)}</h3><p>${esc(n.ex.slice(0,140))||'—'}</p></button></article>`).join('')}</div>`:'<p class="sw-mute">Henüz yazı yok.</p>'}`},
-  mount(root){root.addEventListener('click',e=>{if(e.target.closest('[data-act=grid]')){const s=root.querySelector('.swz');s.classList.toggle('show-grid');e.target.closest('button').textContent=s.classList.contains('show-grid')?'Izgarayı gizle':'Izgarayı göster'}})}};
-
-/* ═════════════ 5 · MEKÂNSAL ═════════════
+/* ═════════════ MEKÂNSAL ═════════════
    visionOS/Horizon'dan: dalma kadranı (Digital Crown), ortamlar, ana görünüm, taşınabilir pencereler, ortala. */
 const SPK='appshell:sp',SPD={env:'studyo',imm:.8,last:.8,mode:'halka',off:{}};
 const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
@@ -447,7 +279,154 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
     document.addEventListener('mouseleave',SP.lml=()=>{L.ta=0;go()});SP.lightGo=go},
   unmount(){removeEventListener('pointermove',SP.pm);removeEventListener('pointerup',SP.pu);removeEventListener('pointermove',SP.dm);removeEventListener('pointerup',SP.du);removeEventListener('pointermove',SP.lm);removeEventListener('pointerup',SP.lu);removeEventListener('pointercancel',SP.lc);removeEventListener('pointermove',SP.lpm);removeEventListener('pointerdown',SP.lpd);removeEventListener('pointerup',SP.lpu);document.removeEventListener('mouseleave',SP.lml);if(SP.L?.raf)cancelAnimationFrame(SP.L.raf);SP.lift=false;SP.closeMenu()}};
 
-const R={defter:NB,terminal:TM,organik:OG,isvicre:SW,mekansal:SP};
+/* ═════════════ Ortak: imleçle canlanan dünyalar (Mıknatıs, Gölet, Petek) ═════════════
+   Tam ekran, kaydırmasız. Her birinde imleç sahneyi fizikle etkiler (galaksideki çekim, mekânsaldaki ışık gibi).
+   Döngü SADECE bir şey hareket ederken çalışır, durulunca kendiliğinden durur (işlemci/pil dostu).
+   Hareket azaltılmışsa (sistem ya da Ayarlar → hareket) sahne durgun çizilir; tıklama ve klavye aynen çalışır. */
+const tier=()=>{try{return H()?.tier?.()||0}catch{return 0}};
+const wxTop=d=>`<header class="wx-hd"><p class="wx-t" data-clock="hm"></p><p class="wx-d">${esc(greet(d.now))} · ${esc(trDate(d.now,{weekday:'long',day:'numeric',month:'long'}))}</p></header>`;
+const wxNav=n=>`<nav class="wx-nav" aria-label="${n}"><button data-act="ara">Ara</button><button data-act="today">Bugün</button><button data-act="world">Arayüz</button></nav>`;
+// rAF döngüsü: fn(dt,t) false dönerse durur; go() yeniden başlatır
+function wxLoop(fn){const L={raf:0,last:0,on:true};const f=t=>{L.raf=0;if(!L.on)return;const dt=L.last?Math.min(.04,(t-L.last)/1000):1/60;L.last=t;
+    if(fn(dt,t)!==false&&!document.hidden)L.raf=requestAnimationFrame(f);else L.last=0};
+  L.go=()=>{if(L.on&&!L.raf)L.raf=requestAnimationFrame(f)};L.stop=()=>{L.on=false;cancelAnimationFrame(L.raf);L.raf=0};return L}
+// imleç: konum, hız, içeride mi (dokunmatikte sadece parmak değerken)
+function wxPtr(root,L){const P={x:innerWidth/2,y:innerHeight/2,v:0,in:false,t:0};
+  root.addEventListener('pointermove',e=>{P.v=Math.min(80,Math.hypot(e.clientX-P.x,e.clientY-P.y));P.x=e.clientX;P.y=e.clientY;P.in=e.pointerType==='mouse'||e.buttons>0;P.t=performance.now();L.go()},{passive:true});
+  root.addEventListener('pointerdown',e=>{P.x=e.clientX;P.y=e.clientY;P.in=true;P.t=performance.now();L.go()},{passive:true});
+  root.addEventListener('pointerup',e=>{if(e.pointerType!=='mouse'){P.in=false;L.go()}});
+  root.addEventListener('pointerleave',()=>{P.in=false;L.go()});
+  return P}
+const prand=i=>{const x=Math.sin(i*127.1+311.7)*43758.5453;return x-Math.floor(x)};
+
+/* ═════════════ MIKNATIS ═════════════
+   Açık zemin üstünde sıvı metal (ferrofluid) damlaları. İmleç bir mıknatıs: yaklaştıkça damlalar ona doğru uzar,
+   birbirine ve imleçteki damlaya karışır (SVG “goo” süzgeci), mıknatısın çevresinde dikenler çıkar. Bırakınca yaylanarak yerine döner. */
+const MG={
+  html:d=>`<div class="mg">${wxTop(d)}
+    <svg class="mg-svg" aria-hidden="true" focusable="false"><filter id="mgGoo" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur in="SourceGraphic" stdDeviation="10"/><feColorMatrix values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 26 -12"/></filter></svg>
+    <div class="mg-goo" aria-hidden="true">${d.apps.map(()=>'<i class="mg-b"></i>').join('')}<i class="mg-c"></i>${'<i class="mg-s"></i>'.repeat(9)}</div>
+    <div class="mg-apps" role="list" aria-label="Uygulamalar">${d.apps.map(a=>`<button class="mg-a" role="listitem" data-app="${esc(a.key)}" aria-label="${esc(a.name)}" title="${esc(a.desc)}"><i class="mg-hl" aria-hidden="true"></i>${appIcon(a)}<b>${esc(a.name)}</b></button>`).join('')}</div>
+    ${wxNav('Mıknatıs')}<p class="wx-hint">${mobile()?'Parmağını damlaların üstünde gezdir':'İmleci damlalara yaklaştır — mıknatıs gibi çeker'}</p></div>`,
+  lay(root){const S=MG.S,n=S.n,m=mobile(),W=innerWidth,Hh=innerHeight;let D=m?58:74,c=D*.98;
+    const room=Math.min(W-40,Hh-200)/2,rmax=c*Math.sqrt(n);if(rmax+D/2>room){const k=room/(rmax+D/2);c*=k;D=Math.max(44,D*k)}
+    S.D=D;S.R=Math.min(280,Math.max(170,c*3.2));const cx=W/2,cy=Hh/2+(m?10:16);
+    for(let i=0;i<n;i++){const a=i*2.39996323,r=c*Math.sqrt(i+.35);S.h[i]={x:cx+Math.cos(a)*r,y:cy+Math.sin(a)*r};if(!S.p[i]){S.p[i]={...S.h[i]};S.v[i]={x:0,y:0}}}
+    // süzgeç yalnızca damlaların dolaştığı alanı kaplar (tam ekran bulanıklaştırmak pahalı)
+    const ext=c*Math.sqrt(n)+S.R*.7+D,g=root.querySelector('.mg-goo');S.o={x:Math.max(0,cx-ext),y:Math.max(0,cy-ext)};
+    g.style.cssText=`left:${S.o.x}px;top:${S.o.y}px;width:${Math.min(W,cx+ext)-S.o.x}px;height:${Math.min(Hh,cy+ext)-S.o.y}px;--D:${D}px`;root.style.setProperty('--D',D+'px')},
+  mount(root){const as=[...root.querySelectorAll('.mg-a')],S=MG.S={n:as.length,a:as,b:[...root.querySelectorAll('.mg-b')],c:root.querySelector('.mg-c'),sp:[...root.querySelectorAll('.mg-s')],h:[],p:[],v:[],cp:{x:innerWidth/2,y:innerHeight/2},cv:{x:0,y:0},cs:0,near:0};
+    MG.lay(root);const calm=calmMotion();
+    const draw=(t)=>{const o=S.o;for(let i=0;i<S.n;i++){const p=S.p[i],pl=S.pl?.[i]||0,sc=1+pl*.22;
+        S.b[i].style.transform=`translate(${(p.x-o.x).toFixed(1)}px,${(p.y-o.y).toFixed(1)}px) scale(${sc.toFixed(3)})`;
+        S.a[i].style.transform=`translate(${p.x.toFixed(1)}px,${p.y.toFixed(1)}px) scale(${sc.toFixed(3)})`;S.a[i].style.setProperty('--n',pl.toFixed(2))}
+      const cs=S.cs;S.c.style.transform=`translate(${(S.cp.x-o.x).toFixed(1)}px,${(S.cp.y-o.y).toFixed(1)}px) scale(${(cs/40).toFixed(3)})`;
+      // mıknatısın dikenleri: çekim arttıkça uzar, hafifçe döner ve titreşir
+      const k=S.sp.length;for(let j=0;j<k;j++){const an=j/k*Math.PI*2+t*.00045,len=cs*(.55+.55*S.near+.12*Math.sin(t*.004+j*1.7)),sz=cs*(.22+.3*S.near)/40;
+        S.sp[j].style.transform=`translate(${(S.cp.x-o.x+Math.cos(an)*len).toFixed(1)}px,${(S.cp.y-o.y+Math.sin(an)*len).toFixed(1)}px) scale(${Math.max(0,sz).toFixed(3)})`}};
+    if(calm){S.pl=[];draw(0);return}
+    const L=MG.L=wxLoop((dt,t)=>{const P=MG.P,R=S.R,on=P.in;let busy=false,near=0;S.pl=S.pl||[];
+      for(let i=0;i<S.n;i++){const h=S.h[i],p=S.p[i],v=S.v[i],d=Math.hypot(P.x-h.x,P.y-h.y);let pl=on?Math.max(0,1-d/R):0;pl*=pl;S.pl[i]=pl;near=Math.max(near,pl);
+        const tx=h.x+(P.x-h.x)*pl*.62,ty=h.y+(P.y-h.y)*pl*.62,ax=(tx-p.x)*130-v.x*15,ay=(ty-p.y)*130-v.y*15;
+        v.x+=ax*dt;v.y+=ay*dt;p.x+=v.x*dt;p.y+=v.y*dt;if(Math.abs(v.x)+Math.abs(v.y)>3||Math.abs(tx-p.x)+Math.abs(ty-p.y)>.4)busy=true}
+      S.near+=(near-S.near)*Math.min(1,dt*8);
+      // imleçteki damla: yayla takip eder, boyu yakındaki çekime göre
+      const ts=on?24+46*S.near:0;S.cs+=(ts-S.cs)*Math.min(1,dt*(on?10:6));
+      const ax=(P.x-S.cp.x)*320-S.cv.x*26,ay=(P.y-S.cp.y)*320-S.cv.y*26;S.cv.x+=ax*dt;S.cv.y+=ay*dt;S.cp.x+=S.cv.x*dt;S.cp.y+=S.cv.y*dt;
+      if(Math.abs(ts-S.cs)>.3||Math.abs(S.cv.x)+Math.abs(S.cv.y)>4||(on&&S.near>.02))busy=true;
+      draw(t);return busy});
+    MG.P=wxPtr(root,L);draw(0);L.go()},
+  unmount(){MG.L?.stop();MG.L=null},
+  resize(root){MG.lay(root);if(MG.L)MG.L.go();else MG.mount(root)}};
+
+/* ═════════════ GÖLET ═════════════
+   Gece göleti. Su gerçek bir dalga denklemiyle çözülür (düşük çözünürlüklü ızgara, büyütülerek yumuşar):
+   imleç suda iz bırakır, tıklayınca halka halka yayılır, ara sıra damla düşer. Uygulamalar nilüfer yaprağı gibi dalgayla salınır. */
+const GL={
+  html:d=>`<div class="gl">${wxTop(d)}<canvas class="gl-cv" aria-hidden="true"></canvas><i class="gl-moon" aria-hidden="true"></i>
+    <div class="gl-pads" role="list" aria-label="Uygulamalar">${d.apps.map(a=>`<button class="gl-p" role="listitem" style="--na:${Math.round(prand(a.i+7)*360)}deg" data-app="${esc(a.key)}" aria-label="${esc(a.name)}" title="${esc(a.desc)}"><span class="gl-leaf" aria-hidden="true"></span>${appIcon(a)}<b>${esc(a.name)}</b></button>`).join('')}</div>
+    ${wxNav('Gölet')}<p class="wx-hint">${mobile()?'Suya dokun — halkalar yayılır':'İmleci suda gezdir · tıkla, halka halka yayılsın'}</p></div>`,
+  lay(root){const G=GL.G,m=mobile(),W=innerWidth,Hh=innerHeight,n=G.n,P=m?66:84;G.P=P;root.style.setProperty('--pd',P+'px');
+    const top=m?150:170,bot=m?110:120,aw=W-(m?40:160),ah=Hh-top-bot,cols=Math.max(2,Math.min(n,Math.round(Math.sqrt(n*aw/Math.max(1,ah))))),rows=Math.ceil(n/cols),
+      cw=aw/cols,ch=ah/Math.max(1,rows);
+    for(let i=0;i<n;i++){const r=Math.floor(i/cols),c=i%cols,inRow=r===rows-1?n-r*cols:cols,off=(cols-inRow)*cw/2;
+      G.h[i]={x:(W-aw)/2+off+cw*(c+.5)+(prand(i)-.5)*cw*.32,y:top+ch*(r+.5)+(prand(i+50)-.5)*ch*.3}}
+    // su ızgarası
+    const cell=G.cell=(m||tier()>=2)?10:tier()===1?9:7,gw=G.gw=Math.ceil(W/cell)+2,gh=G.gh=Math.ceil(Hh/cell)+2;G.a=new Float32Array(gw*gh);G.b=new Float32Array(gw*gh);
+    const cv=G.cv;cv.width=W;cv.height=Hh;G.ctx=cv.getContext('2d');G.off=document.createElement('canvas');G.off.width=gw;G.off.height=gh;G.octx=G.off.getContext('2d');
+    G.img=G.octx.createImageData(gw,gh);G.u32=new Uint32Array(G.img.data.buffer);
+    G.base=[];for(let y=0;y<gh;y++){const k=y/gh;G.base.push([8+10*(1-k),24+22*(1-k),36+30*(1-k)])} // üst açık camgöbeği → alt koyu lacivert
+    GL.render();GL.pads()},
+  drop(px,py,str,rad){const G=GL.G,cx=Math.round(px/G.cell)+1,cy=Math.round(py/G.cell)+1;for(let y=-rad;y<=rad;y++)for(let x=-rad;x<=rad;x++){const d=Math.hypot(x,y);if(d>rad)continue;
+      const X=cx+x,Y=cy+y;if(X<1||Y<1||X>=G.gw-1||Y>=G.gh-1)continue;G.a[Y*G.gw+X]+=str*(1-d/(rad+1))}},
+  step(){const G=GL.G,w=G.gw,h=G.gh,a=G.a,b=G.b;let e=0;for(let y=1;y<h-1;y++){let i=y*w+1;for(let x=1;x<w-1;x++,i++){const v=((a[i-1]+a[i+1]+a[i-w]+a[i+w])*.5-b[i])*.968;b[i]=v;e+=v<0?-v:v}}
+    G.a=b;G.b=a;return e/(w*h)},
+  render(){const G=GL.G,w=G.gw,h=G.gh,a=G.a,u=G.u32;for(let y=0;y<h;y++){const B=G.base[y];for(let x=0;x<w;x++){const i=y*w+x,
+        s=(x>0&&x<w-1?a[i-1]-a[i+1]:0)+(y>0&&y<h-1?(a[i-w]-a[i+w])*.7:0),l=s*.55,hl=l>0?l*l*.012:0;
+        const r=Math.max(0,Math.min(255,B[0]+l*.55+hl*.9)),g=Math.max(0,Math.min(255,B[1]+l*.75+hl)),bl=Math.max(0,Math.min(255,B[2]+l+hl*1.1));u[i]=(255<<24)|(bl<<16)|(g<<8)|r}}
+    G.octx.putImageData(G.img,0,0);G.ctx.imageSmoothingEnabled=true;G.ctx.imageSmoothingQuality='high';G.ctx.drawImage(G.off,0,0,w,h,-G.cell,-G.cell,w*G.cell,h*G.cell)},
+  // yapraklar suyun altındaki yüksekliğe göre kalkar/iner ve eğimle hafifçe döner
+  pads(){const G=GL.G;for(let i=0;i<G.n;i++){const h=G.h[i],x=Math.round(h.x/G.cell)+1,y=Math.round(h.y/G.cell)+1,w=G.gw,j=y*w+x,ok=x>1&&y>1&&x<w-2&&y<G.gh-2,
+      z=ok?(G.a[j]+G.a[j-1]+G.a[j+1]+G.a[j-w]+G.a[j+w])/5:0,sx=ok?G.a[j-1]-G.a[j+1]:0,sy=ok?G.a[j-w]-G.a[j+w]:0;
+      G.el[i].style.transform=`translate(${h.x.toFixed(1)}px,${(h.y-z*.06).toFixed(1)}px) rotate(${Math.max(-8,Math.min(8,sx*.05)).toFixed(2)}deg) scale(${(1+Math.max(-.05,Math.min(.08,z*.0007))).toFixed(3)})`;
+      G.el[i].style.setProperty('--tl',Math.max(-1,Math.min(1,sy*.01)).toFixed(2))}},
+  mount(root){const el=[...root.querySelectorAll('.gl-p')],G=GL.G={n:el.length,el,h:[],cv:root.querySelector('.gl-cv')};GL.lay(root);
+    if(calmMotion())return;
+    let quiet=0;const L=GL.L=wxLoop(()=>{const P=GL.P;if(P.in&&P.v>1&&performance.now()-P.t<50){GL.drop(P.x,P.y,Math.min(85,14+P.v*2.2),1);P.v*=.4}
+      const e=GL.step();GL.render();GL.pads();quiet=e<.3?quiet+1:0;return quiet<10}); // gözle görülmeyecek kadar küçülünce durur
+    GL.P=wxPtr(root,L);
+    // tıklama: güçlü halka; yaprağa basınca yaprağın altında
+    root.addEventListener('pointerdown',e=>{const p=e.target.closest('.gl-p');if(p){const r=p.getBoundingClientRect();GL.drop(r.left+r.width/2,r.top+r.height/2,420,4)}else if(!e.target.closest('button,nav'))GL.drop(e.clientX,e.clientY,520,4);L.go()});
+    root.addEventListener('pointerover',e=>{const p=e.target.closest('.gl-p');if(p&&!p.contains(e.relatedTarget)){const r=p.getBoundingClientRect();GL.drop(r.left+r.width/2,r.top+r.height/2,160,3);L.go()}});
+    // ara sıra tek damla (sahne canlı kalsın; sekme gizliyken düşmez)
+    const rain=()=>{if(!GL.L||GL.L!==L)return;if(!document.hidden&&root.isConnected){GL.drop(innerWidth*(.15+prand(Date.now()%997)*.7),innerHeight*(.25+prand(Date.now()%991)*.55),200,2);L.go()}GL.rt=setTimeout(rain,9000+Math.random()*6000)};
+    GL.rt=setTimeout(rain,1400);GL.drop(innerWidth/2,innerHeight*.55,380,3);L.go()},
+  unmount(){GL.L?.stop();GL.L=null;clearTimeout(GL.rt)},
+  resize(root){GL.lay(root);GL.L?.go()}};
+
+/* ═════════════ PETEK ═════════════
+   Bal peteği gibi dizilmiş yuvarlak uygulamalar (Apple Watch’un petek ekranından esinlenme). İmleç bir büyüteç:
+   yaklaştığı uygulamalar büyür ve komşularını iter, uzaktakiler küçülür. Klavyede oklar büyüteci gezdirir, Enter açar. */
+const PT={sel:0,
+  html:d=>`<div class="pt">${wxTop(d)}<i class="pt-lens" aria-hidden="true"></i>
+    <div class="pt-bs" role="list" aria-label="Uygulamalar">${d.apps.map((a,i)=>`<button class="pt-b" role="listitem" data-i="${i}" data-app="${esc(a.key)}" aria-label="${esc(a.name)}" title="${esc(a.desc)}">${appIcon(a)}<b>${esc(a.name)}</b></button>`).join('')}</div>
+    <p class="pt-cap" aria-live="polite"><b></b><span></span></p>
+    ${wxNav('Petek')}<p class="wx-hint">${mobile()?'Parmağını gezdir — büyüteç gibi':'İmleç büyüteç gibi · oklar ve Enter da çalışır'}</p></div>`,
+  lay(root){const T=PT.T,m=mobile(),W=innerWidth,Hh=innerHeight,n=T.n;
+    // altıgen halkalar: ortadan dışa (ilk uygulamalar ortada)
+    const ax=[[0,0]],dirs=[[1,0],[1,-1],[0,-1],[-1,0],[-1,1],[0,1]];for(let k=1;ax.length<n;k++){let q=-k,r=k;for(const[dq,dr]of dirs)for(let s=0;s<k&&ax.length<n;s++){ax.push([q,r]);q+=dq;r+=dr}}
+    let S=m?78:104;const ext=ax.reduce((o,[q,r])=>({x:Math.max(o.x,Math.abs(q+r/2)),y:Math.max(o.y,Math.abs(r*.866))}),{x:0,y:0}),
+      top=m?120:130,bot=m?210:200,fx=(W-(m?24:60))/(2*ext.x*S+S*(m?1.4:2.2)),fy=(Hh-top-bot)/(2*ext.y*S+S*2.2),f=Math.min(1,fx,fy);S*=f;T.S=S;root.style.setProperty('--bz',(S*.78).toFixed(1)+'px');
+    const cx=W/2,cy=top+(Hh-top-bot)/2;T.c={x:cx,y:cy};T.h=ax.slice(0,n).map(([q,r])=>({x:cx+S*(q+r/2),y:cy+S*r*.866}));
+    if(!T.p.length){T.p=T.h.map(h=>({...h}));T.s=T.h.map(()=>1)}
+    if(!T.lp)T.lp={...T.c}},
+  mount(root){const el=[...root.querySelectorAll('.pt-b')],T=PT.T={n:el.length,el,h:[],p:[],s:[],lens:root.querySelector('.pt-lens'),cap:root.querySelector('.pt-cap'),kb:false,lp:null,shown:-1};
+    PT.sel=0;PT.lay(root);const calm=calmMotion(),m=mobile();
+    const frame=(snap)=>{const P=PT.P,S=T.S,useP=P&&P.in&&!T.kb,tgt=useP?{x:P.x,y:P.y}:T.kb?T.h[PT.sel]:T.c;
+      const k=snap?1:.2;T.lp.x+=(tgt.x-T.lp.x)*k;T.lp.y+=(tgt.y-T.lp.y)*k;const R=S*2.15,smin=m?.8:.62,smax=m?1.25:1.4;let busy=Math.abs(tgt.x-T.lp.x)+Math.abs(tgt.y-T.lp.y)>.4,best=-1,bs=0;
+      for(let i=0;i<T.n;i++){const h=T.h[i],dx=h.x-T.lp.x,dy=h.y-T.lp.y,d=Math.hypot(dx,dy)||1,g=Math.exp(-(d*d)/(R*R)),s=smin+(smax-smin)*g,
+          push=S*.5*g*Math.min(1,d/(S*.7)),tx=h.x+dx/d*push,ty=h.y+dy/d*push,p=T.p[i],kk=snap?1:.22;
+        p.x+=(tx-p.x)*kk;p.y+=(ty-p.y)*kk;T.s[i]+=(s-T.s[i])*kk;if(Math.abs(tx-p.x)+Math.abs(ty-p.y)+Math.abs(s-T.s[i])*40>.3)busy=true;
+        if(T.s[i]>bs){bs=T.s[i];best=i}
+        T.el[i].style.transform=`translate(${p.x.toFixed(1)}px,${p.y.toFixed(1)}px) scale(${T.s[i].toFixed(3)})`;T.el[i].style.setProperty('--o',m||i===T.shown?0:Math.max(0,Math.min(1,(T.s[i]-1.05)*4)).toFixed(2));T.el[i].style.zIndex=Math.round(T.s[i]*100)}
+      T.lens.style.transform=`translate(${T.lp.x.toFixed(1)}px,${T.lp.y.toFixed(1)}px)`;T.lens.style.opacity=useP||T.kb?1:.55;
+      // en büyük (büyütecin altındaki) uygulamanın adı ve açıklaması altta
+      const show=(useP||T.kb||m)&&bs>(m?1.1:1.15)?best:-1;if(show!==T.shown){T.shown=show;const a=show<0?null:H().apps()[show];T.cap.classList.toggle('on',!!a);
+        if(a){T.cap.querySelector('b').textContent=a.name;T.cap.querySelector('span').textContent=a.desc||''}}
+      return busy};
+    if(calm){T.c={...T.c};frame(true);root.addEventListener('focusin',e=>{const b=e.target.closest('.pt-b');if(b){PT.sel=+b.dataset.i;T.kb=true;frame(true)}});return}
+    const L=PT.L=wxLoop(()=>frame(false));PT.P=wxPtr(root,L);
+    root.addEventListener('pointermove',()=>{if(T.kb){T.kb=false}},{passive:true});
+    root.addEventListener('focusin',e=>{const b=e.target.closest('.pt-b');if(b&&b.matches(':focus-visible')){PT.sel=+b.dataset.i;T.kb=true;L.go()}});
+    frame(true);L.go()},
+  key(root,e){const T=PT.T;if(!T)return;const k=e.key;if(k==='Enter'&&T.kb){e.preventDefault();T.el[PT.sel]?.click();return}
+    const dv={ArrowRight:[1,0],ArrowLeft:[-1,0],ArrowDown:[0,1],ArrowUp:[0,-1]}[k];if(!dv)return;e.preventDefault();
+    const c=T.h[PT.sel];let best=-1,bd=1e9;T.h.forEach((h,i)=>{if(i===PT.sel)return;const dx=h.x-c.x,dy=h.y-c.y,along=dx*dv[0]+dy*dv[1];if(along<=1)return;const side=Math.abs(dx*dv[1]-dy*dv[0]),sc=along+side*2.2;if(sc<bd){bd=sc;best=i}});
+    if(best>=0)PT.sel=best;T.kb=true;T.el[PT.sel].focus({preventScroll:true});PT.L?.go()},
+  unmount(){PT.L?.stop();PT.L=null;PT.T=null},
+  resize(root){const T=PT.T;if(!T)return;T.p=[];T.lp=null;PT.lay(root);PT.L?.go()}};
+
+const R={mekansal:SP,miknatis:MG,golet:GL,petek:PT};
 
 /* ── Çekirdek: dünyayı kur / yenile / değiştir ── */
 let cur='galaksi',root=null,clockT=0,rq=0,started=false;
@@ -455,13 +434,13 @@ function fillLive(){if(!root)return;const w=R[cur];if(!w.live)return;const d=D()
 function tick(){if(!root)return;const d=new Date();root.querySelectorAll('[data-clock]').forEach(el=>{const v=el.dataset.clock==='hms'?d.toLocaleTimeString('tr-TR'):hm(d);if(el.textContent!==v)el.textContent=v})}
 function apply(w){R[cur]?.unmount?.();cur=w;document.documentElement.dataset.world=w;if(root){root.remove();root=null}clearInterval(clockT);
   if(w==='galaksi'){document.body.classList.remove('inworld');H().pause(false);return}
-  document.body.classList.add('inworld');H().pause(true);loadFont(w);
+  document.body.classList.add('inworld');H().pause(true);
   root=document.createElement('div');root.id='world';root.className='world w-'+w;root.tabIndex=-1;root.innerHTML=(typeof R[w].html==='function'?R[w].html(D()):'');
   document.body.appendChild(root);
   root.addEventListener('click',e=>{const a=e.target.closest('[data-app]');if(a&&!a.closest('.sp-win')){H().open(a.dataset.app);return}
     const n=e.target.closest('[data-note]');if(n){H().openNotes('#p/'+n.dataset.note);return}
     const x=e.target.closest('[data-act]');if(!x)return;const k=x.dataset.act;if(k==='ara')H().palette();else if(k==='world')picker();else if(k==='today')H().openNotes('#today')});
-  R[w].mount?.(root);fillLive();clockT=setInterval(tick,1000);if(w!=='terminal')root.focus({preventScroll:true})}
+  R[w].mount?.(root);fillLive();clockT=setInterval(tick,1000);root.focus({preventScroll:true})}
 function set(w,instant){try{localStorage.setItem(KEY,JSON.stringify(w))}catch{}
   if(instant||calmMotion()||!document.startViewTransition){apply(w);return}
   document.documentElement.classList.add('w-vt');const t=document.startViewTransition(()=>apply(w));t.finished.finally(()=>document.documentElement.classList.remove('w-vt'))}
@@ -479,20 +458,19 @@ setInterval(()=>{if(root&&!document.hidden)refresh()},60000);
 /* ── Arayüz seçici: canlı küçük önizlemeler ── */
 const MINI={
   galaksi:'<i class="m-sun"></i><i class="m-orb o1"></i><i class="m-orb o2"></i><i class="m-pl p1"></i><i class="m-pl p2"></i><i class="m-pl p3"></i>',
-  defter:'<i class="m-margin"></i><b class="m-hand">Günaydın,</b><i class="m-line l1"></i><i class="m-line l2"></i><i class="m-stk"></i>',
-  terminal:'<b class="m-tx">&gt; ls<br>[01] NOTLAR<br>[02] STUDY<span class="m-car"></span></b><i class="m-rad"></i>',
-  organik:'<i class="m-sunO"></i><i class="m-pond"></i><i class="m-stem"></i><i class="m-hill"></i>',
-  isvicre:'<b class="m-num">14</b><i class="m-rule"></i><i class="m-bar b1"></i><i class="m-bar b2"></i><i class="m-bar b3"></i>',
-  mekansal:'<i class="m-card c1"></i><i class="m-card c2"></i><i class="m-card c3"></i><i class="m-flr"></i>'};
+  mekansal:'<i class="m-card c1"></i><i class="m-card c2"></i><i class="m-card c3"></i><i class="m-flr"></i>',
+  miknatis:'<i class="m-fe"><i class="f1"></i><i class="f2"></i><i class="f3"></i><i class="f4"></i><i class="fc"></i></i>',
+  golet:'<i class="m-rp r1"></i><i class="m-rp r2"></i><i class="m-rp r3"></i><i class="m-lp l1"></i><i class="m-lp l2"></i><i class="m-lp l3"></i>',
+  petek:'<i class="m-hx h0"></i><i class="m-hx h1"></i><i class="m-hx h2"></i><i class="m-hx h3"></i><i class="m-hx h4"></i><i class="m-hx h5"></i><i class="m-hx h6"></i>'};
 let pk=null;
 function picker(){if(pk)return;const el=document.createElement('div');el.className='wp-bg';el.innerHTML=`<div class="wp" role="dialog" aria-modal="true" aria-labelledby="wpT">
-  <header><div><h2 id="wpT">Arayüz</h2><p>Aynı uygulamalar ve veriler, altı ayrı dünya. Renk teması Galaksi'de ve uygulamalarda geçerli.</p></div><button class="wp-x" aria-label="Kapat">✕</button></header>
+  <header><div><h2 id="wpT">Arayüz</h2><p>Aynı uygulamalar ve veriler, ${WORLDS.length} ayrı dünya; her birinde imleç sahneyi canlandırır. Renk teması Galaksi'de ve uygulamalarda geçerli.</p></div><button class="wp-x" aria-label="Kapat">✕</button></header>
   <div class="wp-g">${WORLDS.map(([k,n,ds],i)=>`<button class="wpc${k===cur?' on':''}" data-w="${k}" aria-pressed="${k===cur}"><div class="wpv pv-${k}" aria-hidden="true">${MINI[k]}</div><span class="wpn"><b>${n}</b><kbd>${i+1}</kbd></span><span class="wpd">${ds}</span></button>`).join('')}</div>
-  <footer>1–6 tuşları ile seç · Esc kapatır</footer></div>`;
-  document.body.appendChild(el);pk=el;Object.keys(FONTS).forEach(loadFont);
+  <footer>1–${WORLDS.length} tuşları ile seç · Esc kapatır</footer></div>`;
+  document.body.appendChild(el);pk=el;
   const close=()=>{if(!pk)return;pk=null;removeEventListener('keydown',key,true);if(calmMotion())return el.remove();el.classList.add('out');setTimeout(()=>el.remove(),220)};
   const pick=w=>{close();if(w!==cur)set(w)};
-  const key=e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation();close()}else if(/^[1-6]$/.test(e.key)&&!e.metaKey&&!e.ctrlKey){e.preventDefault();e.stopPropagation();pick(WORLDS[+e.key-1][0])}};
+  const key=e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation();close()}else if(/^[1-9]$/.test(e.key)&&+e.key<=WORLDS.length&&!e.metaKey&&!e.ctrlKey){e.preventDefault();e.stopPropagation();pick(WORLDS[+e.key-1][0])}};
   addEventListener('keydown',key,true);
   el.addEventListener('click',e=>{const c=e.target.closest('[data-w]');if(c)return pick(c.dataset.w);if(e.target===el||e.target.closest('.wp-x'))close()});
   requestAnimationFrame(()=>el.classList.add('on'));setTimeout(()=>el.querySelector('.wpc.on,.wpc')?.focus({preventScroll:true}),40)}

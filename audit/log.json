@@ -3762,5 +3762,27 @@
     "fix": "Düğmeler küçülmüyor; dar telefonda “Galaksiyi göster” düğmesi gizli (palet ve G tuşu)"
    }
   ]
+ },
+ {
+  "at": "2026-11-19",
+  "change": "Takvim'de anime yayın takvimi: izlediğin ve izleyeceğin animelerin yeni bölüm günleri ve saatleri otomatik görünür; tıklayınca animenin sayfası açılır",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "open",
+    "text": "Gerçek AniList'le denenemedi (internet yok); sahte yanıtla doğrulandı. Sadece MyAnimeList kimliği (mal) eşleşmiş animeler takvime düşer"
+   }
+  ]
  }
 ]

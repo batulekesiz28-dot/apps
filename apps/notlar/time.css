@@ -303,3 +303,10 @@
 .mj-g{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
 .mj-g button{height:38px;border-radius:9px;font-size:13.5px;color:var(--ink2);transition:background .15s}.mj-g button:hover{background:var(--hover);color:var(--ink)}
 .mj-g button.now{color:var(--accent);font-weight:600}.mj-g button.on{background:var(--ink);color:var(--bg)}
+
+/* anime yayın takvimi (Medya) — sadece gösterim */
+.tm-mc.is-air,.tm-chip.is-air{--c:#7C5CFF;display:flex;align-items:center;gap:5px;width:100%;text-align:left;font:inherit;cursor:pointer}
+.tm-mc.is-air i{border-radius:2px;transform:rotate(45deg) scale(.85)}
+.tm-air{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;width:100%;min-height:40px;padding:6px 10px;border-radius:10px;text-align:left;font:inherit;color:var(--ink)}
+.tm-air:hover{background:var(--hover)}.tm-air em{font-style:normal;font-size:12.5px;font-variant-numeric:tabular-nums;color:var(--ink3)}
+.tm-air b{font-size:14px;font-weight:600;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tm-air small{font-size:12px;color:#6E56E0}

@@ -1050,4 +1050,19 @@ const Media=(()=>{
   addEventListener('scroll',()=>{SPT.quiet=Date.now()+700;if(SPT.el)spotOff()},true);addEventListener('blur',()=>spotOff(true));addEventListener('resize',()=>spotOff(true));addEventListener('keydown',e=>{if(e.key==='Escape'&&SPT.el)spotOff();
     // spot açıkken ← → fragmanı 5 sn sarar (puan hapı / yazı alanı odaktaysa onlar kullanır)
     if((e.key==='ArrowLeft'||e.key==='ArrowRight')&&SPT.el&&!e.defaultPrevented&&!e.target.closest?.('input,textarea,select,[contenteditable="true"],.sr,.msp-bar')){const sl=SPT.el.querySelector('.msp-yt'),c=sl?._ctl;if(c?.d){e.preventDefault();c.seek(e.key==='ArrowLeft'?-5:5);sl._kb?.()}}});
-  return{netTest,render,refresh,detail,close,imgErr,imgOk,queue,addSheet,rateHTML,dismiss,patchCards,isMedia:t=>MT.includes(t),get st(){return st},get R(){return R},_rank:rank,_cleanG:cleanG,_yt:ytIds}})();
+  /* ═ Yayın takvimi: İzliyorum/İzlenecek listesindeki animelerin yeni bölüm zamanları (AniList airingSchedule) → Takvim.
+     Takvime etkinlik olarak YAZILMAZ (saat değişir, bırakılan dizi takvimde kalmasın); önbellek mc:air {at,list:[{iid,t,ep}]} okunarak gösterilir.
+     6 saatte bir yenilenir (Takvim açılınca); geçmiş 7 gün korunur. ═ */
+  const AIR=()=>lsg('mc:air',{at:0,list:[]});
+  function airing(day){const L=AIR().list,out=[];for(const x of L){const d=new Date(x.t*1000),k=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      if(k!==day)continue;const it=KB.items.get(x.iid);if(!it||it.status==='done'||it.status==='dropped')continue;out.push({iid:x.iid,title:it.title,ep:x.ep,hm:d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})})}
+    return out.sort((a,b)=>a.hm.localeCompare(b.hm))}
+  let airBusy=false;
+  async function airRefresh(force){const c=AIR();if(airBusy||(!force&&Date.now()-c.at<6*36e5))return false;
+    const its=[...KB.items.values()].filter(i=>i.type==='anime'&&i.mal&&(i.status==='doing'||i.status==='todo'));if(!its.length){lss('mc:air',{at:Date.now(),list:[]});return false}
+    airBusy=true;const byMal=new Map(its.map(i=>[+i.mal,i.id])),ids=[...byMal.keys()],now=Date.now()/1000,keep=c.list.filter(x=>x.t>now-7*86400&&x.t<now&&byMal.size&&[...byMal.values()].includes(x.iid)),got=[];
+    try{for(let k=0;k<ids.length;k+=50){const d=await alGQL(`query($ids:[Int]){Page(perPage:50){media(idMal_in:$ids,type:ANIME){idMal status airingSchedule(notYetAired:true,perPage:12){nodes{airingAt episode}}}}}`,{ids:ids.slice(k,k+50)});
+        (d?.Page?.media||[]).forEach(m=>{const iid=byMal.get(m.idMal);(m.airingSchedule?.nodes||[]).forEach(n=>got.push({iid,t:n.airingAt,ep:n.episode}))})}
+      const seen=new Set(),list=[...keep,...got].filter(x=>{const q=x.iid+':'+x.ep;if(seen.has(q))return false;seen.add(q);return true});lss('mc:air',{at:Date.now(),list});return true}
+    catch(e){return false}finally{airBusy=false}}
+  return{airing,airRefresh,netTest,render,refresh,detail,close,imgErr,imgOk,queue,addSheet,rateHTML,dismiss,patchCards,isMedia:t=>MT.includes(t),get st(){return st},get R(){return R},_rank:rank,_cleanG:cleanG,_yt:ytIds}})();

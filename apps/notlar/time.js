@@ -167,7 +167,7 @@ const Time=(()=>{
   function renderGrid(){const sd=selDayOr(),days=calMode==='day'?[sd]:[...Array(7)].map((_,i)=>addDays(weekStart(sd),i)),t=today();
     const y=pd(days[days.length-1]).getFullYear(),same=pd(days[0]).getMonth()===pd(days[days.length-1]).getMonth();
     const title=calMode==='day'?`${fmtShort(sd)} <em>${E(fmtWd(sd))}</em>`:`${same?pd(days[0]).getDate():fmtShort(days[0])} – ${fmtShort(days[6])} <em>${y}</em>`;
-    const allday=d=>{const ta=Tasks.forDay(d),un=TM.onDay(d).filter(a=>!a.start);return`${un.map(a=>`<button class="tm-chip${a.kind?' is-bd':''}" data-act-open="${a.id}" style="--c:${colOf(a)}">${a.kind==='bday'?'':E(TM.cat(a.cat).icon)+' '}${E(TM.label(a,d))}</button>`).join('')}${Tasks.monthChips(d)}`};
+    const allday=d=>{const ta=Tasks.forDay(d),un=TM.onDay(d).filter(a=>!a.start);return`${air(d).map(x=>airChip(x,'tm-chip')).join('')}${un.map(a=>`<button class="tm-chip${a.kind?' is-bd':''}" data-act-open="${a.id}" style="--c:${colOf(a)}">${a.kind==='bday'?'':E(TM.cat(a.cat).icon)+' '}${E(TM.label(a,d))}</button>`).join('')}${Tasks.monthChips(d)}`};
     let cols='';for(const d of days){const ev=TM.onDay(d).filter(a=>a.start);
       cols+=`<div class="tm-col${d===t?' today':''}${d===sd&&calMode==='week'?' sel':''}" data-gday="${d}">${ev.map(a=>{const s=TM.hm(a.start),du=Math.max(20,a.dur||60),c=TM.cat(a.cat);
         return`<div class="tm-ev st-${a.status}" data-ev="${a.id}" style="--c:${c.color};top:${s*PX}px;height:${du*PX-2}px" tabindex="0" title="${E(a.title)} · ${a.start}${a.end?'–'+a.end:''}"><b>${E(a.title)}</b><small>${a.start}${a.end?'–'+a.end:''} · ${E(c.name)}</small><i class="tm-rs" data-rs></i></div>`}).join('')}
@@ -208,6 +208,7 @@ const Time=(()=>{
   function dayPanelExtra(d){const L=TM.onDay(d).sort((a,b)=>(a.start||'').localeCompare(b.start||'')),tk=tasks().filter(o=>o.date===d),tot=L.reduce((s,a)=>s+(a.status==='done'?a.dur:0),0);
     return`<div class="ag-sec"><div class="ag-h">Etkinlikler${tot?`<span>${fm(tot)} tamamlandı</span>`:''}</div>
       <div class="ag-l">${L.length?L.map(agRow).join(''):'<div class="ag-none">Etkinlik yok — ızgarada boş bir saate tıkla ya da yukarıya yaz.</div>'}</div></div>
+      ${air(d).length?`<div class="ag-sec"><div class="ag-h">Yeni bölümler<span>yayın takvimi</span></div><div class="tm-dl">${air(d).map(x=>`<button class="tm-air" data-go="#lib/i/${E(x.iid)}"><em>${x.hm}</em><b>${E(x.title)}</b><small>${x.ep}. bölüm</small></button>`).join('')}</div></div>`:''}
       <div class="ag-sec"><div class="ag-h">Görevler</div><div class="tm-dl tk-list" data-drop-day="${d}">${Tasks.dayList(d)}</div></div>${tk.length?`<div class="ag-sec"><div class="ag-h">Notlardaki yapılacaklar</div><div class="tm-dl">${tk.map(taskRow).join('')}</div></div>`:''}`}
 
   /* ═════ GÖREVLER ═════ */
@@ -268,6 +269,10 @@ const Time=(()=>{
     TM.on(()=>{if(!busy&&['cal','tasks','stats'].includes(cur()))rerender()})}
   function rerender(soft){if(typeof renderView==='function'&&['cal','tasks','stats'].includes(cur()))renderView(!soft)}
   /* ay görünümü hücrelerine aktivite şeritleri */
-  function monthChips(d){const L=TM.onDay(d);if(!L.length)return'';return L.slice(0,3).map(a=>{return`<div class="tm-mc st-${a.status}${a.kind?' is-bd':''}" draggable="${!a.rep}" ${a.rep?'':`data-mact="${a.id}" `}data-act-open="${a.id}" style="--c:${colOf(a)}" title="${E(TM.label(a,d))}${a.start?' · '+a.start:''}${a.rep?' · her yıl':''}"><i></i><span>${a.start?`<em>${a.start}</em> `:''}${E(TM.label(a,d))}</span></div>`}).join('')+(L.length>3?`<div class="more">+${L.length-3} aktivite</div>`:'')}
+  // anime yeni bölümleri (Medya → yayın takvimi): sadece gösterim, tıklayınca animenin ayrıntısı
+  const air=d=>{try{return Media.airing(d)||[]}catch{return[]}};
+  const airChip=(x,cls)=>`<button class="${cls} is-air" data-go="#lib/i/${E(x.iid)}" title="${E(x.title)} · ${x.ep}. bölüm · ${x.hm}"><i></i><span><em>${x.hm}</em> ${E(x.title)} · ${x.ep}. bölüm</span></button>`;
+  function monthChips(d){const L=TM.onDay(d),A=air(d);if(!L.length&&!A.length)return'';if(!L.length)return A.slice(0,3).map(x=>airChip(x,'tm-mc')).join('')+(A.length>3?`<div class="more">+${A.length-3} bölüm</div>`:'');
+    const room=Math.max(0,3-L.length);return L.slice(0,3).map(a=>{return`<div class="tm-mc st-${a.status}${a.kind?' is-bd':''}" draggable="${!a.rep}" ${a.rep?'':`data-mact="${a.id}" `}data-act-open="${a.id}" style="--c:${colOf(a)}" title="${E(TM.label(a,d))}${a.start?' · '+a.start:''}${a.rep?' · her yıl':''}"><i></i><span>${a.start?`<em>${a.start}</em> `:''}${E(TM.label(a,d))}</span></div>`}).join('')+A.slice(0,room).map(x=>airChip(x,'tm-mc')).join('')+(L.length+A.length>3?`<div class="more">+${L.length+A.length-Math.min(3,L.length)-Math.min(room,A.length)} daha</div>`:'')}
   function dismiss(){const e=document.querySelector('.tm-ed-bg');if(e){e.remove();busy=false}}
   return{newBday,dismiss,get calMode(){return calMode},renderGrid,dayPanelExtra,monthChips,miniCal,navGrp,qaHTML,renderTasks,renderStats,bind,newAct,quickAdd,parse,tasks,modeSeg}})();

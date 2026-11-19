@@ -99,6 +99,13 @@
    "desc": "Kendi YouTube Music hesabın · müzik, çalma listeleri · ayrı pencerede açılır",
    "url": "https://music.youtube.com/",
    "win": true
+  },
+  {
+   "slug": "haberler",
+   "name": "Haberler",
+   "icon": "globe",
+   "color": "blue",
+   "desc": "Bugünkü haberler: Türkiye gündemi, oyun, ABD siyaseti, teknoloji, anime · kendi konuların"
   }
  ]
 }

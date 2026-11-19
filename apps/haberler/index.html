@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bugünkü Haberler</title>
+<style>
+  :root{--bg:#FAFAF8;--card:#FFFFFF;--ink:#17171A;--ink2:#5E5E66;--ink3:#6E6E77;--line:rgba(0,0,0,.08);--hover:rgba(0,0,0,.045);--acc:#2453C4;
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;--serif:"Iowan Old Style","Charter",Georgia,serif}
+  [data-theme=dark]{--bg:#0F0F11;--card:#17171A;--ink:#EDEDEF;--ink2:#A6A6AF;--ink3:#8E8E97;--line:rgba(255,255,255,.08);--hover:rgba(255,255,255,.06);--acc:#8FB0FF;color-scheme:dark}
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:var(--bg);color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased}
+  button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:980px;margin:0 auto;padding:28px 24px 80px}
+  header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px}
+  h1{font-family:var(--serif);font-size:38px;font-weight:700;letter-spacing:-.02em;line-height:1.05}
+  .dt{margin-top:6px;font-size:14px;color:var(--ink2)}
+  .tools{display:flex;gap:6px;align-items:center}
+  .ib{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:999px;font-size:13.5px;font-weight:600;background:var(--hover)}
+  .ib:hover{background:color-mix(in srgb,var(--ink) 10%,transparent)}.ib svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  .ib.spin svg{animation:sp 1s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
+  .st{font-size:12.5px;color:var(--ink3)}
+  nav.cats{position:sticky;top:0;z-index:5;display:flex;gap:4px;overflow-x:auto;padding:10px 0 12px;margin:0 -4px 8px;background:color-mix(in srgb,var(--bg) 88%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);scrollbar-width:none}
+  nav.cats::-webkit-scrollbar{display:none}
+  .cat{flex-shrink:0;height:34px;padding:0 14px;border-radius:999px;font-size:13.5px;font-weight:600;color:var(--ink2);transition:background .15s,color .15s}
+  .cat:hover{background:var(--hover);color:var(--ink)}.cat[aria-selected=true]{background:var(--ink);color:var(--bg)}
+  .cat .x{margin-left:6px;opacity:.6}.cat .x:hover{opacity:1}
+  .lead{display:grid;grid-template-columns:1.25fr 1fr;gap:24px;align-items:center;padding:8px 0 26px;border-bottom:1px solid var(--line)}
+  .lead .im{aspect-ratio:16/10;border-radius:16px;background:var(--hover) center/cover no-repeat}
+  .lead h2{font-family:var(--serif);font-size:28px;line-height:1.18;font-weight:700;letter-spacing:-.01em}
+  .lead p{margin-top:10px;font-size:15px;line-height:1.55;color:var(--ink2);display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+  .meta{display:flex;align-items:center;gap:6px;margin-top:10px;font-size:12.5px;color:var(--ink3)}.meta b{font-weight:650;color:var(--ink2)}
+  .tag{padding:2px 8px;border-radius:999px;font-size:11.5px;font-weight:650;background:var(--hover);color:var(--ink2)}
+  .list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 28px}
+  .it{display:flex;gap:14px;padding:16px 0;border-bottom:1px solid var(--line);align-items:flex-start}
+  .it:hover h3{text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--ink3)}
+  .it .th{flex-shrink:0;width:92px;height:68px;border-radius:10px;background:var(--hover) center/cover no-repeat}
+  .it h3{font-size:15.5px;line-height:1.35;font-weight:650;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .read h2,.read h3,.read p{color:var(--ink3)}
+  a:focus-visible{outline:2.5px solid var(--acc);outline-offset:3px;border-radius:8px}
+  .empty{padding:60px 0;text-align:center;color:var(--ink2)}.empty b{display:block;font-size:17px;color:var(--ink);margin-bottom:6px}
+  .empty .ib{margin-top:14px}
+  .sk{border-radius:10px;background:linear-gradient(90deg,var(--hover),color-mix(in srgb,var(--ink) 9%,transparent),var(--hover));background-size:200% 100%;animation:sh 1.2s linear infinite}
+  @keyframes sh{to{background-position:-200% 0}}
+  .add{display:flex;gap:8px;margin:4px 0 14px}.add[hidden]{display:none}
+  .add input{flex:1;min-width:0;height:38px;padding:0 14px;border:0;border-radius:999px;background:var(--hover);font:inherit;font-size:14px;color:var(--ink);outline:none}
+  .add input:focus{box-shadow:0 0 0 2px var(--acc)}
+  .src{max-width:68ch;margin-top:34px;font-size:12px;color:var(--ink3);line-height:1.6}
+  @media (max-width:720px){.wrap{padding:20px 16px 70px}h1{font-size:30px}.lead{grid-template-columns:1fr;gap:14px}.lead h2{font-size:23px}.list{grid-template-columns:1fr}.it .th{width:84px;height:62px}.cat,.ib{height:40px}}
+  @media (prefers-reduced-motion:reduce){.sk,.ib.spin svg{animation:none}}
+</style>
+<script>try{var f=JSON.parse(localStorage.getItem('notlar:theme'));if(f)document.documentElement.dataset.theme=f}catch(e){}</script>
+<script src="../../shared/skin.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header><div><h1>Bugünkü Haberler</h1><p class="dt" id="dt"></p></div>
+    <div class="tools"><span class="st" id="st" aria-live="polite"></span>
+      <button class="ib" id="ref" title="Yenile (R)"><svg viewBox="0 0 16 16"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2.5v3h-3"/></svg>Yenile</button></div></header>
+  <nav class="cats" id="cats" role="tablist" aria-label="Konular"></nav>
+  <form class="add" id="add" hidden><input id="q" placeholder="Konu yaz — ör. Galatasaray, Nintendo, seçim" maxlength="60" aria-label="Yeni konu"><button class="ib" type="submit">Ekle</button></form>
+  <main id="main" aria-live="polite"></main>
+  <p class="src">Başlıklar haber sitelerinin herkese açık RSS akışlarından ve Google Haberler'den gelir; habere tıklayınca kaynağında açılır. Okudukların soluk görünür.</p>
+</div>
+<script>
+/* Bugünkü Haberler — konu başlıklarına göre güncel haberler (RSS).
+   Çekme sırası: kaynağın kendisi → rss2json → allorigins (CORS izin vermeyen siteler için). Önbellek haberler:cache (15 dk), okunanlar haberler:read,
+   kendi konuların haberler:topics (Google Haberler araması). Hub'daki “Bugünkü Haberler” widget'ı aynı önbelleği okur. */
+const GN=(q,lang='tr')=>lang==='tr'?`https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=tr&gl=TR&ceid=TR:tr`:`https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=en-US&gl=US&ceid=US:en`;
+const CATS=[
+  {id:'gundem',n:'Gündem',f:['https://feeds.bbci.co.uk/turkce/rss.xml','https://news.google.com/rss?hl=tr&gl=TR&ceid=TR:tr']},
+  {id:'oyun',n:'Oyun',f:[GN('oyun OR PlayStation OR Xbox OR Nintendo OR Steam when:2d'),'https://feeds.feedburner.com/ign/games-all','https://www.pcgamer.com/rss/']},
+  {id:'abd',n:'ABD Siyaseti',f:['https://news.google.com/rss/headlines/section/topic/POLITICS?hl=en-US&gl=US&ceid=US:en','https://feeds.npr.org/1014/rss.xml',GN('ABD Beyaz Saray OR Kongre OR Trump when:2d')]},
+  {id:'tekno',n:'Teknoloji',f:[GN('teknoloji OR yapay zeka OR Apple OR Google when:2d'),'https://www.theverge.com/rss/index.xml']},
+  {id:'anime',n:'Anime',f:['https://www.animenewsnetwork.com/all/rss.xml?ann-edition=w',GN('anime when:3d')]}];
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const lsg=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k));return v??d}catch{return d}},lss=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
+const TOP=()=>lsg('haberler:topics',[]),READ=new Set(lsg('haberler:read',[]).slice(-600));
+let cur=lsg('haberler:cat','hepsi'),C=lsg('haberler:cache',{}),busy=false;
+const allCats=()=>[{id:'hepsi',n:'Hepsi'},...CATS,...TOP().map(t=>({id:'t:'+t,n:t,f:[GN(t+' when:3d')],user:true}))];
+const ago=t=>{if(!t)return'';const m=Math.round((Date.now()-t)/6e4);return m<1?'az önce':m<60?m+' dk önce':m<1440?Math.round(m/60)+' sa önce':Math.round(m/1440)+' gün önce'};
+const host=u=>{try{return new URL(u).hostname.replace(/^www\./,'')}catch{return''}};
+const clean=s=>String(s||'').replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/\s+/g,' ').trim();
+
+/* ── RSS okuma ── */
+function parse(txt,url){const x=new DOMParser().parseFromString(txt,'text/xml'),src0=x.querySelector('channel>title,feed>title')?.textContent.trim()||host(url);
+  return [...x.querySelectorAll('item,entry')].slice(0,25).map(n=>{const g=s=>n.querySelector(s)?.textContent?.trim()||'',l=n.querySelector('link'),link=l?.getAttribute('href')||l?.textContent?.trim()||'';
+    let title=clean(g('title')),src=clean(n.querySelector('source')?.textContent)||src0;const d=g('description')||g('summary')||g('content');
+    if(src&&title.endsWith(' - '+src))title=title.slice(0,-(src.length+3)); // Google Haberler (ve bazıları) başlığın sonuna kaynağı ekler
+    const mc=n.getElementsByTagName('media:content')[0]||n.getElementsByTagName('media:thumbnail')[0],enc=n.querySelector('enclosure[type^=image]'),im=(d.match(/<img[^>]+src="([^"]+)"/)||[])[1];
+    return{title,link,t:Date.parse(g('pubDate')||g('updated')||g('published'))||0,src:src.slice(0,40),desc:/news\.google\./.test(url)?'':clean(d).slice(0,300),img:mc?.getAttribute('url')||enc?.getAttribute('url')||im||''}})
+    .filter(i=>i.title&&/^https?:/.test(i.link))}
+async function one(url){const tm=ms=>({signal:AbortSignal.timeout?AbortSignal.timeout(ms):undefined});
+  try{const r=await fetch(url,{cache:'no-store',...tm(6000)});if(r.ok)return parse(await r.text(),url)}catch{}
+  try{const r=await fetch('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(url),tm(8000));const j=await r.json();
+    if(j.status==='ok')return j.items.slice(0,25).map(i=>{let title=clean(i.title);const src=(j.feed?.title||host(url)).slice(0,40);return{title,link:i.link,t:Date.parse((i.pubDate||'').replace(' ','T')+'Z')||0,src,desc:clean(i.description).slice(0,300),img:i.thumbnail||i.enclosure?.link||''}}).filter(i=>i.title)}catch{}
+  const r=await fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(url),tm(9000));if(!r.ok)throw new Error('rss');return parse(await r.text(),url)}
+const norm=s=>s.toLocaleLowerCase('tr').replace(/[^\p{L}\p{N} ]/gu,'').slice(0,70);
+async function load(cat,force){const c=allCats().find(x=>x.id===cat);if(!c)return;const ids=cat==='hepsi'?CATS.map(x=>x.id):[cat];
+  const need=ids.filter(id=>force||!C[id]||Date.now()-C[id].at>15*6e4);if(!need.length)return;busy=true;paint();
+  await Promise.all(need.map(async id=>{const cc=allCats().find(x=>x.id===id);const res=await Promise.allSettled(cc.f.map(one));const seen=new Set(),items=[];
+    res.forEach(r=>{if(r.status==='fulfilled')r.value.forEach(i=>{const k=norm(i.title);if(!seen.has(k)){seen.add(k);items.push({...i,cat:id})}})});
+    const ok=res.some(r=>r.status==='fulfilled'&&r.value.length);if(ok||!C[id])C[id]={at:Date.now(),items:items.sort((a,b)=>b.t-a.t).slice(0,60),err:!ok}}));
+  lss('haberler:cache',C);busy=false;paint()}
+
+/* ── çizim ── */
+function list(cat){if(cat==='hepsi'){const per=CATS.map(c=>(C[c.id]?.items||[]).slice(0,12)),out=[];for(let i=0;i<12;i++)per.forEach(l=>{if(l[i])out.push(l[i])});return out.filter(i=>Date.now()-i.t<3*864e5||!i.t)}
+  return C[cat]?.items||[]}
+function paint(){const cats=allCats();if(!cats.some(c=>c.id===cur))cur='hepsi';
+  $('#cats').innerHTML=cats.map(c=>`<button class="cat" role="tab" data-c="${esc(c.id)}" aria-selected="${c.id===cur}">${esc(c.n)}${c.user?`<span class="x" data-del="${esc(c.n)}" title="Konuyu kaldır" aria-label="${esc(c.n)} konusunu kaldır">×</span>`:''}</button>`).join('')+`<button class="cat" data-c="+" aria-label="Konu ekle">+ Konu</button>`;
+  const L=list(cur),cn=id=>(CATS.find(c=>c.id===id)||{n:''}).n,m=$('#main');
+  $('#ref').classList.toggle('spin',busy);const at=cur==='hepsi'?Math.max(0,...CATS.map(c=>C[c.id]?.at||0)):C[cur]?.at;$('#st').textContent=busy?'Yükleniyor…':at?'Güncellendi '+ago(at):'';
+  if(!L.length){m.innerHTML=busy?`<div class="lead"><div class="im sk"></div><div><div class="sk" style="height:28px;width:90%"></div><div class="sk" style="height:28px;width:70%;margin-top:10px"></div><div class="sk" style="height:14px;width:60%;margin-top:16px"></div></div></div>
+      <div class="list">${'<div class="it"><div class="th sk"></div><div style="flex:1"><div class="sk" style="height:16px"></div><div class="sk" style="height:16px;width:70%;margin-top:8px"></div></div></div>'.repeat(6)}</div>`
+    :`<div class="empty"><b>${(C[cur]?.err||(cur==='hepsi'&&CATS.some(c=>C[c.id]?.err)))?'Haberler alınamadı':'Henüz haber yok'}</b>${(C[cur]?.err||cur==='hepsi')?'İnternet bağlantını kontrol et; bazı haber siteleri ara sıra yanıt vermeyebilir.':'Bu konuda son günlerde haber bulunamadı.'}<br><button class="ib" id="retry">Tekrar dene</button></div>`;
+    $('#retry')?.addEventListener('click',()=>load(cur,true));return}
+  const lead=L.find(i=>i.img)||L[0],rest=L.filter(i=>i!==lead).slice(0,40),rd=i=>READ.has(i.link)?' read':'',tg=i=>cur==='hepsi'&&cn(i.cat)?`<span class="tag">${esc(cn(i.cat))}</span>`:'';
+  m.innerHTML=`<a class="lead${rd(lead)}" href="${esc(lead.link)}" target="_blank" rel="noopener">${lead.img?`<div class="im" style="background-image:url('${esc(lead.img)}')"></div>`:'<div class="im"></div>'}
+      <div><h2>${esc(lead.title)}</h2>${lead.desc?`<p>${esc(lead.desc)}</p>`:''}<div class="meta">${tg(lead)}<b>${esc(lead.src)}</b>· ${ago(lead.t)}</div></div></a>
+    <div class="list">${rest.map(i=>`<a class="it${rd(i)}" href="${esc(i.link)}" target="_blank" rel="noopener">${i.img?`<div class="th" style="background-image:url('${esc(i.img)}')"></div>`:''}<div><h3>${esc(i.title)}</h3><div class="meta">${tg(i)}<b>${esc(i.src)}</b>· ${ago(i.t)}</div></div></a>`).join('')}</div>`}
+
+/* ── etkileşim ── */
+$('#cats').addEventListener('click',e=>{const d=e.target.closest('[data-del]');if(d){e.stopPropagation();lss('haberler:topics',TOP().filter(t=>t!==d.dataset.del));if(cur==='t:'+d.dataset.del)cur='hepsi';paint();return}
+  const b=e.target.closest('[data-c]');if(!b)return;if(b.dataset.c==='+'){const f=$('#add');f.hidden=!f.hidden;if(!f.hidden)$('#q').focus();return}
+  cur=b.dataset.c;lss('haberler:cat',cur);paint();load(cur);scrollTo({top:0,behavior:'smooth'})});
+$('#cats').addEventListener('keydown',e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;const bs=[...document.querySelectorAll('.cat')],i=bs.indexOf(document.activeElement);if(i<0)return;e.preventDefault();bs[(i+(e.key==='ArrowRight'?1:-1)+bs.length)%bs.length].focus()});
+$('#add').addEventListener('submit',e=>{e.preventDefault();const v=$('#q').value.trim();if(!v)return;const t=TOP();if(!t.includes(v))lss('haberler:topics',[...t,v]);$('#q').value='';$('#add').hidden=true;cur='t:'+v;lss('haberler:cat',cur);paint();load(cur,true)});
+$('#main').addEventListener('click',e=>{const a=e.target.closest('a[href]');if(!a)return;READ.add(a.getAttribute('href'));lss('haberler:read',[...READ].slice(-600));setTimeout(()=>a.classList.add('read'),300)});
+$('#ref').addEventListener('click',()=>load(cur,true));
+addEventListener('keydown',e=>{if(e.target.closest('input'))return;if(e.key==='r'||e.key==='R')load(cur,true)});
+$('#dt').textContent=new Date().toLocaleDateString('tr-TR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+paint();load(cur);setInterval(()=>{if(!document.hidden)load(cur)},15*6e4);
+</script>
+</body>
+</html>

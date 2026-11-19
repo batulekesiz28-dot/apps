@@ -3706,5 +3706,38 @@
     "text": "Deste'de yelpazenin uç kartlarının köşeleri döndükleri için ekran kenarına taşabiliyor (yelpaze görünümü)"
    }
   ]
+ },
+ {
+  "at": "2026-11-19",
+  "change": "Yeni uygulama: Bugünkü Haberler (Gündem, Oyun, ABD Siyaseti, Teknoloji, Anime, kendi konuların) + hub widget'ı",
+  "scores": {
+   "haberler telefon": {
+    "before": null,
+    "after": 100
+   },
+   "haberler masaüstü": {
+    "before": null,
+    "after": 100
+   },
+   "hub telefon": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "haberler",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Alttaki kaynak açıklaması çok uzun satırdı",
+    "fix": "Satır genişliği sınırlandı"
+   },
+   {
+    "app": "haberler",
+    "sev": "bilgi",
+    "status": "open",
+    "text": "Gerçek haber siteleriyle denenemedi (internet yok); sahte RSS akışlarıyla doğrulandı. Bazı siteler tarayıcıdan doğrudan okunamıyor, aracı servisler (rss2json/allorigins) kullanılıyor"
+   }
+  ]
  }
 ]

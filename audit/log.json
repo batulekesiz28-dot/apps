@@ -3857,5 +3857,77 @@
     "fix": "72 harf genişlik"
    }
   ]
+ },
+ {
+  "at": "2026-11-19T19:41:22",
+  "change": "Ayrıntılı analiz: 10 uygulama, Notlar'ın bütün ekranları ve 10 arayüz katı Denetçi'yle tarandı. Telefonda görünmeyen düğmeler, küçük dokunma alanları, zor okunan “bugün” dairesi, ipucusuz simgeler düzeltildi. Yeni: Ctrl+K → “Verilerimi yedekle” (tek dosya, anahtarlar hariç). Rapor: docs/ANALIZ.md",
+  "scores": {
+   "Notlar telefon (sayfa)": {
+    "before": 96,
+    "after": 100
+   },
+   "Notlar telefon (Medya ayarları)": {
+    "before": 84,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Notlar",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Telefonda İkon ekle/Tarih ekle görünmüyordu",
+    "fix": "Hep görünür, 40px"
+   },
+   {
+    "app": "Notlar",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Takvimde bugünün dairesi zor okunuyordu",
+    "fix": "Kırmızı koyulaştı"
+   },
+   {
+    "app": "Notlar",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Medya ayarlarında “Nasıl alınır” bağlantısı çok küçüktü",
+    "fix": "≥40px"
+   },
+   {
+    "app": "Notlar",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Simge düğmelerinde ipucu yoktu",
+    "fix": "Üstüne gelince adı görünür (bütün uygulamalar)"
+   },
+   {
+    "app": "Notlar",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Medya ayrıntısı ekran okuyucuya pencere olarak bildirilmiyordu",
+    "fix": "role=dialog"
+   },
+   {
+    "app": "Hub",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Verilerin tamamını yedeklemenin yolu yoktu",
+    "fix": "Ctrl+K → Verilerimi yedekle"
+   },
+   {
+    "app": "Hub",
+    "sev": "info",
+    "status": "open",
+    "text": "Çevrimdışı çalışma yok",
+    "fix": "Eski dosya gösterme riski yüzünden bilerek eklenmedi"
+   },
+   {
+    "app": "Hub",
+    "sev": "info",
+    "status": "open",
+    "text": "Yedekten geri yükleme yok",
+    "fix": "Bulut asıl kaynak; geri yazma buluttakini ezebilir"
+   }
+  ]
  }
 ]

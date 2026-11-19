@@ -95,9 +95,10 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
 .pg-ic{display:inline-grid;place-items:center;font-size:56px;line-height:1;width:72px;height:72px;margin:0 0 6px -8px;border-radius:12px;transition:background .15s,transform .45s var(--spring);user-select:none;cursor:pointer}
 .pg-ic:hover{background:var(--hover)}.pg-ic:active{transform:scale(.92)}
 .pg-tools{display:flex;gap:2px;height:28px;margin:0 0 4px -8px;opacity:0;transition:opacity .2s}
-.pg-head:hover .pg-tools{opacity:1}
+.pg-head:hover .pg-tools,.pg-head:focus-within .pg-tools{opacity:1}
 .pg-tools button{height:28px;padding:0 8px;border-radius:6px;display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink3)}
 .pg-tools button:hover{background:var(--hover);color:var(--ink2)}
+@media (hover:none),(max-width:760px){.pg-tools{opacity:1;height:40px}.pg-tools button{height:40px}}
 .pg-title{font-family:var(--serif);font-size:42px;line-height:1.15;font-weight:500;letter-spacing:-.015em;outline:0;word-break:break-word;padding:2px 0;font-optical-sizing:auto}
 .pg-title:empty::before{content:attr(data-ph);color:var(--ink4)}
 .pg-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:14px 0 22px;padding-bottom:18px;border-bottom:.5px solid var(--line)}
@@ -438,14 +439,14 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
 @media (max-width:760px){.pgb{min-height:58px}.tw,.tw0{width:36px;height:40px}.ni.tr{padding-left:calc(2px + var(--dp,0)*14px)}.sub-add{height:44px}.crumb .cr{height:40px;max-width:120px}.pgn{display:none}.mv-q{height:40px}}
 </style>
 <script>/* mat cam tasarımı: bir kereliğine koyu temaya geç (sonra tema düğmesi serbest) */try{if(!localStorage.getItem('notlar:glass1')){localStorage.setItem('notlar:glass1','1');localStorage.setItem('notlar:theme','"dark"')}}catch(e){}</script>
-<script src="../../shared/skin.js?v=20261119a"></script>
-<link rel="stylesheet" href="player.css?v=20261119a">
-<link rel="stylesheet" href="library.css?v=20261119a">
-<link rel="stylesheet" href="brain.css?v=20261119a">
-<link rel="stylesheet" href="media.css?v=20261119a">
-<link rel="stylesheet" href="time.css?v=20261119a">
-<link rel="stylesheet" href="tasks.css?v=20261119a">
-<link rel="stylesheet" href="ders.css?v=20261119a">
+<script src="../../shared/skin.js?v=20261119b"></script>
+<link rel="stylesheet" href="player.css?v=20261119b">
+<link rel="stylesheet" href="library.css?v=20261119b">
+<link rel="stylesheet" href="brain.css?v=20261119b">
+<link rel="stylesheet" href="media.css?v=20261119b">
+<link rel="stylesheet" href="time.css?v=20261119b">
+<link rel="stylesheet" href="tasks.css?v=20261119b">
+<link rel="stylesheet" href="ders.css?v=20261119b">
 <style id="tnavCss">
 /* ── Üst gezinme (sol menü yerine) — ince cam şerit, kayan seçili vurgu ── */
 .app,.app[data-mode=lib],.app[data-mode=brain]{grid-template-columns:1fr}
@@ -560,7 +561,7 @@ kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radiu
 @media (prefers-reduced-motion:reduce){.txt a[href^="http"]::after{transition:none}.lkpv-ld i{animation:none}}
 html[data-motion=off] .txt a[href^="http"]::after{transition:none}
 </style>
-<link rel="stylesheet" href="glass.css?v=20261119a">
+<link rel="stylesheet" href="glass.css?v=20261119b">
 </head>
 <body>
 <div class="app" id="app">
@@ -605,14 +606,14 @@ html[data-motion=off] .txt a[href^="http"]::after{transition:none}
   </div>
 </div>
 <div class="toasts" id="toasts"></div>
-<script src="player.js?v=20261119a"></script>
-<script src="kb.js?v=20261119a"></script>
-<script src="library.js?v=20261119a"></script>
-<script src="media.js?v=20261119a"></script>
-<script src="brain.js?v=20261119a"></script>
-<script src="time.js?v=20261119a"></script>
-<script src="tasks.js?v=20261119a"></script>
-<script src="ders.js?v=20261119a"></script>
+<script src="player.js?v=20261119b"></script>
+<script src="kb.js?v=20261119b"></script>
+<script src="library.js?v=20261119b"></script>
+<script src="media.js?v=20261119b"></script>
+<script src="brain.js?v=20261119b"></script>
+<script src="time.js?v=20261119b"></script>
+<script src="tasks.js?v=20261119b"></script>
+<script src="ders.js?v=20261119b"></script>
 
 <script>
 'use strict';
@@ -1163,7 +1164,7 @@ function renderTimeline(){
       <button class="tld" data-day="${d}" title="${esc(fmtLong(d))} notunu aç"><b>${pd(d).getDate()}</b><span>${esc(d===t?'Bugün':d===addDays(t,1)?'Yarın':DOW[dowOf(d)])}</span>${pd(d).getDate()===1||d===days[0]?`<small>${MONTHS[pd(d).getMonth()].slice(0,3)}</small>`:''}</button>
       <div class="tli">${items.join('')||'<span class="tle">—</span>'}</div></div>`}).join('');
   $('#view').innerHTML=`<div class="wide tl"><div class="tl-h"><h1>Zaman çizelgesi</h1><p>Önümüzdeki günler tek ekranda. Bir satırı bir güne sürükle; günün notuna tıkla, o gün açılsın.</p>
-      <div class="tl-m">${months.map((m,i)=>`<button class="pill${(i===0&&tlStart===t)||(i>0&&tlStart===m)?' on':''}" data-tlm="${i?m:t}">${i===0?'30 gün':MONTHS[pd(m).getMonth()]+(pd(m).getFullYear()!==pd(t).getFullYear()?' '+pd(m).getFullYear():'')}</button>`).join('')}</div></div>
+      <div class="tl-m" role="radiogroup" aria-label="Gösterilen aralık">${months.map((m,i)=>{const on=(i===0&&tlStart===t)||(i>0&&tlStart===m);return`<button class="pill${on?' on':''}" role="radio" aria-checked="${on}" data-tlm="${i?m:t}">${i===0?'30 gün':MONTHS[pd(m).getMonth()]+(pd(m).getFullYear()!==pd(t).getFullYear()?' '+pd(m).getFullYear():'')}</button>`}).join('')}</div></div>
     <div class="tl-b"><aside class="tl-side">
       <div class="sh"><span>Tarihsiz yapılacaklar</span><span class="rule"></span><span>${loose.length}</span></div><div class="tl-pool" data-pool>${loose.slice(0,40).map(o=>chipHTML(o)).join('')||'<p class="tle">Hepsi planlanmış ✓</p>'}</div>
       ${late.length?`<div class="sh" style="margin-top:18px"><span>Geride kalanlar</span><span class="rule"></span><span>${late.length}</span></div><div class="tl-pool">${late.slice(0,30).map(o=>chipHTML(o,'late')).join('')}</div>`:''}

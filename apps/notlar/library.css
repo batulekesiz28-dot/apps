@@ -330,3 +330,6 @@
 .lr-dot.st-doing{background:conic-gradient(#2563EB 0 50%,transparent 0);box-shadow:inset 0 0 0 2px #2563EB}
 .lr-dot.st-done{background:#16A34A}
 .lm-st.st-done{color:color-mix(in srgb,#16A34A 75%,var(--lib-ink))}
+
+/* dokunmatikte üstüne gelme yok: favori düğmesi hep görünsün */
+@media (hover:none){.lc-fav{opacity:1;transform:none}}

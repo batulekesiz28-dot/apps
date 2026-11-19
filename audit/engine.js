@@ -139,8 +139,11 @@ function run(doc,opt={}){
   const allCtrls=all.filter(e=>e.matches('button,a[href],[role=button],input:not([type=hidden]),select,textarea,[tabindex]:not([tabindex="-1"])'));
   // 1) görünmez ama tıklanabilir: opaklığı ~0 ama imleç/parmak yakalıyor (kullanıcı boşluğa basıp bir şey açar)
   const ghost=allCtrls.filter(e=>{const r=R(e);if(r.width<4||r.height<4||!inViewish(e,win))return false;const cs=win.getComputedStyle(e);if(cs.display==='none'||cs.visibility==='hidden'||cs.pointerEvents==='none')return false;
-    let p=e;while(p&&p.nodeType===1){const s=win.getComputedStyle(p);if(s.pointerEvents==='none'||s.display==='none'||p.hidden)return false;p=p.parentElement}return opacityChain(e,win)<.08});
-  if(ghost.length)addH('warn','ghost','Görünmez ama tıklanabilir yerler','Göremediği bir yere basan kullanıcı beklemediği bir şeyi açar; ya da düğmeyi hiç bulamaz (fareyle üstüne gelmeden görünmüyor, telefonda hiç görünmez).','Gizliyken pointer-events:none ver; önemli düğmeyi hiç gizleme ya da telefonda hep göster.',ghost);
+    let p=e;while(p&&p.nodeType===1){const s=win.getComputedStyle(p);if(s.pointerEvents==='none'||s.display==='none'||p.hidden)return false;p=p.parentElement}// saydam yerel seçici/dosya kutusu görünür bir hapın üstüne serilmişse (bilinen desen) sorun değil
+    if(e.matches('select,input')&&e.parentElement&&opacityChain(e.parentElement,win)>.5)return false;
+    return opacityChain(e,win)<.08});
+  // bilgisayarda “üstüne gelince görünen ikincil iş” kabul edilir (not), telefonda parmak üstüne gelemez → uyarı
+  if(ghost.length)addH(mobile?'warn':'info','ghost','Görünmez ama tıklanabilir yerler','Göremediği bir yere basan kullanıcı beklemediği bir şeyi açar; ya da düğmeyi hiç bulamaz (fareyle üstüne gelmeden görünmüyor, telefonda hiç görünmez).','Gizliyken pointer-events:none ver; önemli düğmeyi hiç gizleme ya da telefonda hep göster.',ghost);
   // 2) kesilen metin: adın sonu “…” ile kesilmiş, tamamı başka yerde okunamıyor
   const cut=textEls.filter(e=>{const cs=getComputedStyle(e);return cs.textOverflow==='ellipsis'&&e.scrollWidth>e.clientWidth+1&&!e.title&&!e.closest('[title]')&&!e.getAttribute('aria-label')});
   if(cut.length)addH(cut.length>4?'warn':'info','cut','Yazının sonu kesiliyor','Kullanıcı adın ya da başlığın tamamını göremiyor; benzer başlıkları ayırt edemez.','Metne title ekle, alanı genişlet ya da iki satıra izin ver.',cut);
@@ -149,7 +152,9 @@ function run(doc,opt={}){
   const eng=vis.filter(e=>e.matches('button,a,[role=tab],label,h1,h2,h3,summary')&&!e.closest('[translate=no]')&&EN.test(txt(e))); // translate="no" = bilerek seçilmiş ürün/bölüm adı
   if(doc.documentElement.lang==='tr'&&eng.length)addH('info','lang','Türkçe arayüzde İngilizce kelime',`“${[...new Set(eng.map(e=>(e.textContent||'').trim()))].slice(0,5).join('”, “')}” — kullanıcı iki dil arasında gidip geliyor.`,'Arayüz sözcüklerini Türkçeleştir (Ayarlar, Ara, Kaydet…); ürün adları kalabilir.',eng);
   // 4) seçim felci: bir araç satırında 8'den fazla düğme
-  const busy=[];for(const [p,l] of rows)if(l.length>8)busy.push(p);
+  const busy=[];for(const [p,l] of rows){if(l.length<=8)continue;
+    // sayı ölçeği (1–10 puan), sekme/gezinme listesi ve yatay kayan şerit bir “araç sırası” değildir
+    if(l.every(c=>/^\d+$/.test(txt(c))))continue;if(p.closest('nav,[role=tablist],[role=listbox],[role=radiogroup]'))continue;if(/auto|scroll/.test(win.getComputedStyle(p).overflowX))continue;busy.push(p)}
   if(busy.length)addH('warn','choice','Bir sırada çok fazla seçenek','8’den fazla düğme yan yana: kullanıcı aradığını tek tek okumak zorunda kalıyor (Hick yasası).','En sık kullanılan 3–5 işi bırak, gerisini bir “Daha fazla” menüsüne taşı.',busy);
   // 5) üst üste binen tıklanabilirler: dokununca hangisine basıldığı belirsiz
   // sadece ikisi de gerçekten basılabiliyorsa say: kendi ortasında en üstte olmayan (bir pencerenin ya da sabit çubuğun altında kalan) öğe atlanır
@@ -174,7 +179,8 @@ function run(doc,opt={}){
   if(ph.length)addH('info','ph','Silik ipucu yazısı','Kutunun içindeki ipucu zor seçiliyor; kullanıcı ne yazacağını tahmin ediyor.','Yer tutucu rengini en az 3:1 kontrasta getir.',ph);
 
   // 11) yalnızca simge olan düğmenin üstüne gelince hiçbir ipucu çıkmıyor (aria-label ekran okuyucuya yeter, göze görünmez)
-  const iconOnly=ctrls.filter(c=>!(c.innerText||'').replace(/[^\p{L}\p{N}]/gu,'').length&&!c.title&&!c.closest('[title]')&&!(c.closest('label')?.innerText||'').trim()&&c.tagName!=='INPUT'&&c.tagName!=='SELECT');
+  const autotip=doc.documentElement.hasAttribute('data-autotip'); // sayfa aria-label'ı üstüne gelince ipucu yapıyorsa
+  const iconOnly=ctrls.filter(c=>!(autotip&&c.getAttribute('aria-label'))&&!(c.innerText||'').replace(/[^\p{L}\p{N}]/gu,'').length&&!c.title&&!c.closest('[title]')&&!(c.closest('label')?.innerText||'').trim()&&c.tagName!=='INPUT'&&c.tagName!=='SELECT');
   if(!mobile&&iconOnly.length)addH(iconOnly.length>6?'warn':'info','tip','Simge düğmesinin ne yaptığı yazmıyor','Sadece simgesi olan düğmenin üstüne gelince ipucu çıkmıyor; kullanıcı denemeden ne yapacağını bilemez.','Her simge düğmesine kısa bir title (ipucu) ver: “Ayarlar (,)”.',iconOnly);
   // 12) telefonda birbirine yapışık dokunma alanları: parmak yanlış düğmeye basar
   if(mobile){const tight=[];const tc=ctrls.filter(c=>{const r=R(c);return r.width>4&&r.top<win.innerHeight&&r.bottom>0});

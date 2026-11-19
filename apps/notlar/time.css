@@ -216,7 +216,7 @@
    tek vurgu rengi (bugün + şimdi = kırmızı), yan panel = yaz-ekle + mini ay + günün ajandası. */
 .app:has(.view .cal) .crumbbar{display:none}
 .view:has(.cal){padding-bottom:24px}
-.cal{--today:#E5372C;padding-top:18px;gap:32px;grid-template-columns:minmax(0,1fr) 272px}
+.cal{--today:#D02E24;padding-top:18px;gap:32px;grid-template-columns:minmax(0,1fr) 272px}
 .cal.tm-cal{grid-template-columns:minmax(0,1fr) 272px}
 .cal .cal-h{display:flex;align-items:center;gap:12px;height:40px;margin:0 0 14px}
 .cal .cal-h h1{flex:1;min-width:0;font-size:24px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -310,3 +310,6 @@
 .tm-air{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;width:100%;min-height:40px;padding:6px 10px;border-radius:10px;text-align:left;font:inherit;color:var(--ink)}
 .tm-air:hover{background:var(--hover)}.tm-air em{font-style:normal;font-size:12.5px;font-variant-numeric:tabular-nums;color:var(--ink3)}
 .tm-air b{font-size:14px;font-weight:600;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tm-air small{font-size:12px;color:#6E56E0}
+
+/* telefonda ay başlığı (ay/yıl seçici) parmakla rahat basılsın */
+@media (max-width:760px){.cal-mj{min-height:40px;padding:6px 10px;margin:-6px -10px}}

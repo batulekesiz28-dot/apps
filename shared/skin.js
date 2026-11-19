@@ -17,5 +17,9 @@
     if(f){if(!document.querySelector('link[data-look="'+l.font+'"]')){var k=document.createElement('link');k.rel='stylesheet';k.setAttribute('data-look',l.font);k.href='https://fonts.googleapis.com/css2?family='+f[1]+'&display=swap';document.head.appendChild(k)}
       css+="html{--font:'"+f[0]+"',system-ui,sans-serif!important;--serif:'"+f[0]+"',Georgia,serif!important}body{font-family:var(--font)}"}st.textContent=css}
   apply();
+  // ipucu: yalnızca simgesi olan düğmenin aria-label'ı fareyle üstüne gelince title olur (tek dinleyici, bütün uygulamalar)
+  document.documentElement.setAttribute('data-autotip','');
+  document.addEventListener('pointerover',function(e){var b=e.target&&e.target.closest&&e.target.closest('button[aria-label],a[aria-label],[role=button][aria-label]');
+    if(b&&!b.title&&!b.closest('[title]')&&!(b.innerText||'').replace(/[^\p{L}\p{N}]/gu,''))b.title=b.getAttribute('aria-label')},{passive:true});
   addEventListener('storage',function(e){if(e.key==='appshell:theme'||e.key==='appshell:motion'||e.key==='notlar:theme'||e.key==='appshell:look')apply()});
 })();

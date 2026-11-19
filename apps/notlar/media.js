@@ -719,7 +719,7 @@ const Media=(()=>{
   /* ── detay ── */
   let dId=null;
   function detail(id){const it=KB.items.get(id);if(!it)return;close(true);dId=id;try{it.opened=Date.now();KB.saveItem(it,true)}catch{}
-    const bg=document.createElement('div');bg.className='mx-bg';bg.dataset.sec=secOf(it.type);bg.innerHTML=detailHTML(it);document.body.appendChild(bg);wireDetail(bg);
+    const bg=document.createElement('div');bg.className='mx-bg';bg.setAttribute('role','dialog');bg.setAttribute('aria-modal','true');bg.setAttribute('aria-label',it.title||'Ayrıntı');bg.dataset.sec=secOf(it.type);bg.innerHTML=detailHTML(it);document.body.appendChild(bg);wireDetail(bg);
     if(motion()){bg.animate([{opacity:0},{opacity:1}],{duration:220,easing:'ease-out'});q('.mx',bg).animate([{opacity:0,transform:'translateY(28px) scale(.985)'},{opacity:1,transform:'none'}],{duration:560,easing:'cubic-bezier(.16,1,.3,1)'})}
     setTimeout(()=>q('[data-mx]',bg)?.focus({preventScroll:true}),60)}
   function detailRefresh(soft){const bg=q('.mx-bg');if(!bg||!dId)return;const it=KB.items.get(dId);if(!it)return close();if(soft)return;const a=document.activeElement;if(a&&bg.contains(a)&&a.matches('textarea,input,[contenteditable],select'))return;

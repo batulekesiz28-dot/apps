@@ -768,3 +768,7 @@ html[data-motion=off] :is(.msp-yv .msp-sk,.msp-yv .msp-ym,.msp-bar i,.msp-bar::a
 .mpip-r::after{content:"";position:absolute;right:5px;bottom:5px;width:9px;height:9px;border-right:2px solid rgba(255,255,255,.7);border-bottom:2px solid rgba(255,255,255,.7);border-radius:0 0 3px 0;opacity:0;transition:opacity .2s}
 .mpip:hover .mpip-r::after{opacity:1}
 @media (hover:none){.mpip-r::after{opacity:1}.mpip-h button{width:36px;height:36px}}
+
+/* katı denetçi: telefonda dokunma alanları ≥40px, “Nasıl alınır” bağlantısı rahat basılsın */
+.mset-key label a{display:inline-flex;align-items:center;min-height:28px;padding:0 6px;margin:-4px 0}
+@media (max-width:760px){.mc-tabs .mc-ns{height:40px}.mset-key label a{min-height:40px}.mset-hx{width:40px;right:-20px}.mset-hy{height:40px;bottom:-20px}.mset-hx::after{left:18px}.mset-hy::after{top:18px}}

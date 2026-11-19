@@ -10,7 +10,7 @@ await p.goto(U+'tasks');await p.waitForTimeout(500);const ti=p.locator('[data-tk
 const R=['home','p/'+pid,'cal','tasks','stats','timeline','tpl','lib','lib/m/movies','lib/m/movies/done','lib/m/series/dropped','lib/m/books','lib/docs','brain'];
 const cases=R.map(r=>[r,null]).concat([['lib/m/movies/done','list'],['lib/m/movies/done','nf'],['lib/m/movies/done','compact'],['lib/m/movies','detail'],['lib','settings'],['tasks','taskdp'],['cal','week']]);
 for(const [r,x] of cases){await p.goto(U+r);await p.waitForTimeout(1000);
-  try{if(x&&['list','nf','compact'].includes(x)){await p.locator(`[data-lv=${x}]`).first().click({timeout:3000}).catch(async()=>{await p.locator('[data-mset]').click();await p.locator(`.mset [data-lk=view][data-lval=${x}]`).click()});await p.waitForTimeout(500)}
+  try{if(x&&['list','nf','compact'].includes(x)){await p.locator(`[data-lv=${x}]`).first().click({timeout:3000}).catch(async()=>{if(!await p.locator('.mset').count())await p.locator('[data-mset]').click();await p.locator(`.mset [data-lk=view][data-lval=${x}]`).click()});await p.waitForTimeout(500)}
   if(x==='detail'){await p.locator('.mc-main [data-mi]').first().click();await p.waitForTimeout(900)}
   if(x==='settings'){await p.locator('[data-mset]').click();await p.waitForTimeout(400)}
   if(x==='taskdp'){await p.locator('.tk-row .tk-t').first().click();await p.waitForTimeout(500)}

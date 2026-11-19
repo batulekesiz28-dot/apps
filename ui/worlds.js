@@ -170,7 +170,8 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
       if(cr&&cr.id===e.pointerId){const dy=cr.y-e.clientY;if(Math.abs(dy)>3)cr.moved=true;if(cr.moved)SP.imm(root,cr.v+dy/220);return}
       if(st&&st.id===e.pointerId&&SP.cfg.mode==='halka'&&!SP.lift){const dx=e.clientX-st.x;if(Math.abs(dx)>6){SP.dragged=true;ring.style.transition='none';SP.deg=st.d-dx/(mobile()?160:260)*SP.step;SP.apply(root)}}
       if(e.pointerType!=='mouse'||calmMotion()||SP.raf)return;
-      SP.raf=requestAnimationFrame(()=>{SP.raf=0;scene.style.setProperty('--ry',((e.clientX/innerWidth-.5)*7).toFixed(2)+'deg');scene.style.setProperty('--rx',((.5-e.clientY/innerHeight)*5).toFixed(2)+'deg');
+      if(SP.L){SP.L.tr2=(e.clientX/innerWidth-.5)*7;SP.L.trx=(.5-e.clientY/innerHeight)*5;SP.lightGo?.()}
+      SP.raf=requestAnimationFrame(()=>{SP.raf=0;
         const fw=root.querySelector('.sp-win.front');if(!fw||st)return;const b=fw.getBoundingClientRect(),u=(e.clientX-b.left)/b.width,v=(e.clientY-b.top)/b.height,inside=u>=0&&u<=1&&v>=0&&v<=1;
         if(inside){fw.style.setProperty('--ty',((u-.5)*10).toFixed(1)+'deg');fw.style.setProperty('--tx',((.5-v)*8).toFixed(1)+'deg');fw.classList.add('lit')}
         else if(fw.classList.contains('lit')){fw.classList.remove('lit');fw.style.removeProperty('--tx');fw.style.removeProperty('--ty')}})},{passive:true});
@@ -265,18 +266,27 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
     s.style.setProperty('--sry',ry.toFixed(1)+'deg');s.style.setProperty('--srx',rx.toFixed(1)+'deg')})},
   resize(root){SP.layout(root);SP.orient(root)},
   /* imleç ışığı: galaksideki çekim gibi yumuşak takip, ama sadece ışık */
-  light(root){const Ls=root.querySelector('.sp-light'),L=SP.L={x:innerWidth/2,y:innerHeight/2,tx:innerWidth/2,ty:innerHeight/2,a:0,ta:0,raf:0};
+  /* imleç ışığı + sahne eğimi + ızgarada simgelerin imlece çekilmesi: hepsi yay fiziğiyle (kütle-yay-sönüm), durulunca döngü durur */
+  light(root){const Ls=root.querySelector('.sp-light'),scene=root.querySelector('.sp-scene'),L=SP.L={x:innerWidth/2,y:innerHeight/2,tx:innerWidth/2,ty:innerHeight/2,vx:0,vy:0,a:0,ta:0,raf:0,t:0,rx:0,ry:0,vrx:0,vry:0,trx:0,tr2:0,hb:new Map()};
     const els=()=>[...root.querySelectorAll('.sp-win,.sp-glass,.sp-hb,.sp-gt,.sp-orn,.sp-crown,.sp-cap')].filter(e=>e.offsetParent&&getComputedStyle(e).visibility!=='hidden');
-    const step=()=>{const k=calmMotion()?1:.2;L.x+=(L.tx-L.x)*k;L.y+=(L.ty-L.y)*k;L.a+=(L.ta-L.a)*(calmMotion()?1:.08);
+    const step=now=>{const calm=calmMotion(),dt=L.t?Math.min(.04,(now-L.t)/1000):1/60;L.t=now;let busy=false;
+      if(calm){L.x=L.tx;L.y=L.ty;L.vx=L.vy=0}else{L.vx+=((L.tx-L.x)*170-L.vx*19)*dt;L.vy+=((L.ty-L.y)*170-L.vy*19)*dt;L.x+=L.vx*dt;L.y+=L.vy*dt}
+      L.a+=(L.ta-L.a)*(calm?1:Math.min(1,dt*5));
+      if(!calm){L.vrx+=((L.trx-L.rx)*90-L.vrx*14)*dt;L.vry+=((L.tr2-L.ry)*90-L.vry*14)*dt;L.rx+=L.vrx*dt;L.ry+=L.vry*dt;scene.style.setProperty('--rx',L.rx.toFixed(2)+'deg');scene.style.setProperty('--ry',L.ry.toFixed(2)+'deg')
+        if(Math.abs(L.trx-L.rx)+Math.abs(L.tr2-L.ry)>.02||Math.abs(L.vrx)+Math.abs(L.vry)>.05)busy=true}
+      if(SP.cfg.mode==='izgara'&&!calm)for(const hb of root.querySelectorAll('.sp-hb')){let q=L.hb.get(hb);if(!q){q={x:0,y:0,vx:0,vy:0};L.hb.set(hb,q)}
+        const b=hb.getBoundingClientRect(),cx=b.left+b.width/2-q.x,cy=b.top+b.height/2-q.y,d=Math.hypot(L.tx-cx,L.ty-cy);let pl=L.ta>.5&&!SP.lift&&!hb.closest('.drag')?Math.max(0,1-d/170):0;pl*=pl;
+        const gx=(L.tx-cx)*pl*.28,gy=(L.ty-cy)*pl*.28;q.vx+=((gx-q.x)*150-q.vx*16)*dt;q.vy+=((gy-q.y)*150-q.vy*16)*dt;q.x+=q.vx*dt;q.y+=q.vy*dt;
+        hb.style.translate=`${q.x.toFixed(1)}px ${q.y.toFixed(1)}px`;if(Math.abs(q.vx)+Math.abs(q.vy)>2||Math.abs(gx-q.x)+Math.abs(gy-q.y)>.3)busy=true}
       Ls.style.transform=`translate(${L.x.toFixed(1)}px,${L.y.toFixed(1)}px)`;Ls.style.opacity=L.a.toFixed(3);
       for(const el of els()){const b=el.getBoundingClientRect();if(!b.width)continue;const nx=Math.max(b.left,Math.min(L.x,b.right)),ny=Math.max(b.top,Math.min(L.y,b.bottom)),dd=Math.hypot(L.x-nx,L.y-ny),li=L.a*Math.max(0,1-dd/260);
         el.style.setProperty('--lx',((L.x-b.left)/b.width*100).toFixed(1)+'%');el.style.setProperty('--ly',((L.y-b.top)/b.height*100).toFixed(1)+'%');el.style.setProperty('--li',li.toFixed(3))}
-      if(Math.abs(L.tx-L.x)+Math.abs(L.ty-L.y)>.3||Math.abs(L.ta-L.a)>.004)L.raf=requestAnimationFrame(step);else L.raf=0};
+      if(busy||Math.abs(L.tx-L.x)+Math.abs(L.ty-L.y)>.3||Math.abs(L.vx)+Math.abs(L.vy)>3||Math.abs(L.ta-L.a)>.004)L.raf=requestAnimationFrame(step);else{L.raf=0;L.t=0}};
     const go=()=>{if(!L.raf)L.raf=requestAnimationFrame(step)};
     addEventListener('pointermove',SP.lpm=e=>{L.tx=e.clientX;L.ty=e.clientY;if(e.pointerType==='mouse'||e.buttons)L.ta=1;go()},{passive:true});
     addEventListener('pointerdown',SP.lpd=e=>{L.tx=e.clientX;L.ty=e.clientY;if(e.pointerType!=='mouse'){L.x=L.tx;L.y=L.ty}L.ta=1;go()},{passive:true});
     addEventListener('pointerup',SP.lpu=e=>{if(e.pointerType!=='mouse'){L.ta=0;go()}},{passive:true});
-    document.addEventListener('mouseleave',SP.lml=()=>{L.ta=0;go()});SP.lightGo=go},
+    document.addEventListener('mouseleave',SP.lml=()=>{L.ta=0;L.trx=L.tr2=0;go()});SP.lightGo=go},
   unmount(){removeEventListener('pointermove',SP.pm);removeEventListener('pointerup',SP.pu);removeEventListener('pointermove',SP.dm);removeEventListener('pointerup',SP.du);removeEventListener('pointermove',SP.lm);removeEventListener('pointerup',SP.lu);removeEventListener('pointercancel',SP.lc);removeEventListener('pointermove',SP.lpm);removeEventListener('pointerdown',SP.lpd);removeEventListener('pointerup',SP.lpu);document.removeEventListener('mouseleave',SP.lml);if(SP.L?.raf)cancelAnimationFrame(SP.L.raf);SP.lift=false;SP.closeMenu()}};
 
 /* ═════════════ Ortak: imleçle canlanan dünyalar (Mıknatıs, Rüzgâr, Petek) ═════════════

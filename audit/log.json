@@ -3640,5 +3640,35 @@
     "fix": "Sönüm artırıldı, durulunca döngü duruyor"
    }
   ]
+ },
+ {
+  "at": "2026-11-19",
+  "change": "Galaksi ve Mekânsal'a Petek/Mıknatıs kalitesinde yay fizikli imleç animasyonu; kalıcı kural STANDART.md'de",
+  "scores": {
+   "hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "hub masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "hub",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Galaksi'de gezegenler imlece tepki vermiyordu, ızgara imleci doğrusal izliyordu",
+    "fix": "Gezegenler imlece yayla çekiliyor (kara delik hariç), izleyici yaylı"
+   },
+   {
+    "app": "hub",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Mekânsal'da ışık ve sahne eğimi doğrusal izliyordu; ızgarada simgeler imlece tepkisizdi",
+    "fix": "Işık, eğim ve simgeler yay fiziğiyle; durulunca döngü duruyor"
+   }
+  ]
  }
 ]

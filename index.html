@@ -1864,13 +1864,16 @@ function frame(t){
   }
   for(const n of list){
     if(n.drag){const dp=Math.pow(.7,k);n.vx=(n.vx+(n.tx-n.x)*.32*k)*dp;n.vy=(n.vy+(n.ty-n.y)*.32*k)*dp;n.x+=n.vx*k;n.y+=n.vy*k}
-    else{const f=1-Math.pow(1-.14,k),ox=n.x,oy=n.y;n.x+=(n.tx-n.x)*f;n.y+=(n.ty-n.y)*f;n.vx=(n.x-ox)/k;n.vy=(n.y-oy)/k}
+    else{// yay fiziği (Mıknatıs/Petek kalitesi): hedefe hafif esneyerek oturur; imleç yakınsa gezegen ona doğru çekilir
+      let gx=n.tx,gy=n.ty;if(FINE&&ptr.amp>.02&&n.key!==BH_KEY&&!cam.pan&&!linkDrag&&!(W.app&&!W.min)){const dx=ptr.sx-n.tx,dy=ptr.sy-n.ty,d=Math.hypot(dx,dy),R=175*Math.max(.7,Math.min(1.3,cam.z));if(d<R){const pl=Math.pow(1-d/R,1.5)*ptr.amp;gx+=dx*pl*.42;gy+=dy*pl*.42}}
+      const dp=Math.pow(.74,k);n.vx=(n.vx+(gx-n.x)*.11*k)*dp;n.vy=(n.vy+(gy-n.y)*.11*k)*dp;n.x+=n.vx*k;n.y+=n.vy*k}
     n.rot+=(clamp(n.drag?n.vx*1.4:0,-16,16)-n.rot)*(1-Math.pow(.8,k));place(n);
   }
   highlight();
   // preview card: shows after ~450ms of hovering (frame-driven, survives the buoy's motion)
   const hn=hoverNode;if(hn&&!hn.drag&&FINE&&!linkDrag&&!cam.pan&&!cam.go&&!(W.app&&!W.min)){if(!hn.hs)hn.hs=t;else if(!PK.shown&&t-hn.hs>450)showPeek(hn)}
-  ptr.sx+=(ptr.x-ptr.sx)*(1-Math.pow(1-.22,k));ptr.sy+=(ptr.y-ptr.sy)*(1-Math.pow(1-.22,k));ptr.amp+=(ptr.tAmp-ptr.amp)*(1-Math.pow(1-.07,k));
+  {const dp=Math.pow(.7,k);ptr.vx=((ptr.vx||0)+(ptr.x-ptr.sx)*.1*k)*dp;ptr.vy=((ptr.vy||0)+(ptr.y-ptr.sy)*.1*k)*dp;ptr.sx+=ptr.vx*k;ptr.sy+=ptr.vy*k} // yaylı imleç izleyici (ızgara kuyusu ve gezegen çekimi bunu kullanır)
+  ptr.amp+=(ptr.tAmp-ptr.amp)*(1-Math.pow(1-.07,k));
   if(meshAwake||introT<1){const settled=stepMesh(k,t);drawMesh(t);if(settled&&introT>=1)meshAwake=false}
   else if(meshDirty)drawMesh(t);
   // glow layer: skip entirely when neither the galaxy nor the widget star is on screen
@@ -3078,7 +3081,7 @@ window.HUB={apps:()=>pub,open:k=>{const a=find(k);if(a)openApp(a,nodes.get(k)?.e
   toast:(t,undo)=>toast(t,undo),bh:BH_KEY};
 addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.shiftKey&&(e.key==='u'||e.key==='U')){e.preventDefault();window.Worlds?.picker()}});
 </script>
-<link rel="stylesheet" href="ui/worlds.css?v=20261119b">
-<script src="ui/worlds.js?v=20261119b"></script>
+<link rel="stylesheet" href="ui/worlds.css?v=20261119c">
+<script src="ui/worlds.js?v=20261119c"></script>
 </body>
 </html>

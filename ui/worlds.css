@@ -56,7 +56,7 @@ body.locked .world{display:none}
 /* sahne */
 .sp-stage{position:absolute;inset:0;perspective:1500px;perspective-origin:50% 40%;touch-action:pan-y;cursor:grab}
 .sp-stage:active{cursor:grabbing}
-.sp-scene{position:absolute;inset:0;pointer-events:none;transform-style:preserve-3d;transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .5s cubic-bezier(.16,1,.3,1)}
+.sp-scene{position:absolute;inset:0;pointer-events:none;transform-style:preserve-3d;transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))} /* eğim JS'te yay fiziğiyle */
 .sp-ringw{transform:translateZ(calc(var(--fz,0px) * -1))}
 .sp-ringw,.sp-home{position:absolute;inset:0;transform-style:preserve-3d;pointer-events:none;transition:opacity .45s,transform .6s cubic-bezier(.16,1,.3,1)}
 .sp[data-mode=izgara] .sp-ringw{opacity:0;transform:translateZ(calc(-300px - var(--fz,0px)));pointer-events:none;visibility:hidden;transition:opacity .35s,transform .6s cubic-bezier(.16,1,.3,1),visibility 0s .35s}

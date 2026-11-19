@@ -330,3 +330,11 @@ Referans Apple'ın sadeliği (kopya değil). Amaç daha çok özellik göstermek
 **Akıllı başlık:** uzun listelerde sayfa kontrol alanı (`.sbar`) aşağı kaydırınca saklanır (28px eşik), yukarı doğru tek küçük hareketle geri gelir (4px), en üstte ve odak içindeyken hep görünür; sadece transform/opacity, `prefers-reduced-motion` ve `data-motion=off`'a uyar.
 
 **Nasıl denetlenir:** `python3 audit/run.py` (açılış ekranları) + `node audit/screens.js` (Notlar'ın her ekranı, görünümleri ve panelleri; telefon + masaüstü). Bulguları önem sırasıyla düzelt, ilgili ekranı yeniden tara, düzeltmenin başka yeri bozmadığını kontrol et.
+
+## Arayüz animasyon kalitesi — kesin kural (2026-11-19, kullanıcı belirledi; geçmiş ve gelecek bütün arayüzler)
+Kullanıcı Petek ve Mıknatıs'taki hareketi ölçü aldı. Her arayüz dünyası (ve bundan sonra eklenecek her biri):
+- İmleç sahneyi **fiziksel** etkiler: hedefe doğrusal kaymak (lerp) yerine **kütle–yay–sönüm** (hafif esneyerek oturur); sarkaç, dalga gibi doğal modeller de olur.
+- İmlecin bir **anlamı** vardır: çeker (mıknatıs/kara delik), büyütür (büyüteç), aydınlatır (ışık), estirir (rüzgâr)… Süs değil, keşfi kolaylaştırır.
+- Sadece `transform`/`opacity` (ve küçük alanlı süzgeç); 60 FPS. Döngü **yalnızca hareket varken** çalışır, durulunca kendiliğinden durur (ölç: imleç durunca 0 çizim/sn).
+- Hareket azaltılmışsa (sistem ya da `appshell:motion`) sahne durgun ama bütün işlevler çalışır. Dokunmatikte parmak da aynı etkiyi verir.
+- Yeni arayüz teslim edilmeden önce: imleç etkisi, durulunca durma, telefon yerleşimi ve tıklama/klavye ile açma test edilir.

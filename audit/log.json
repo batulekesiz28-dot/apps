@@ -3753,6 +3753,14 @@
     "after": 100
    }
   },
-  "items": []
+  "items": [
+   {
+    "app": "hub",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Telefonda üst çubuğa yeni düğme gelince düğmeler sıkışıp dokunma alanı küçülüyordu",
+    "fix": "Düğmeler küçülmüyor; dar telefonda “Galaksiyi göster” düğmesi gizli (palet ve G tuşu)"
+   }
+  ]
  }
 ]

@@ -84,4 +84,6 @@ function onSubmit(e){e.preventDefault();const f=e.target.closest('[data-add]'),i
   TK.add({title:v,date:f.dataset.add==='tomorrow'?TM():T(),status:'todo'});i.value='';if(f.dataset.add==='tomorrow')H()?.toast?.(`Yarın: ${v}`);i.focus()}
 
 window.DayCard={start,open,close,get isOpen(){return!!el}};
+// hub bu dosya yüklenmeden açıldıysa kendin başla (bulut deposu yoksa yerel)
+if(window.HUB?.booted?.())try{start(window.firebase?.apps?.length?firebase.firestore():null)}catch{start(null)}
 })();

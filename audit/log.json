@@ -4344,5 +4344,41 @@
     "fix": "“Test bildirimi gönder” ile canlıda dene"
    }
   ]
+ },
+ {
+  "at": "2026-11-20T19:41:52",
+  "change": "Bildirimler düzeldi ve artık iki yönlü: telefonda da çalışır, “Dene” düğmesi sorun varsa sebebini söyler. Yeni: telefondan bilgisayara mesaj — telefonda ntfy.sh/<konun> sayfasına (ya da Android’de Paylaş → ntfy) yazdığın şey, site bilgisayarda açıkken bildirim olarak çıkar; link gönderirsen tıklayınca açılır, metinse “Kopyala” düğmesi gelir.",
+  "scores": {
+   "Hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Hub masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "hub",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Telefon tarayıcısında bildirim çıkmıyordu",
+    "fix": "Bildirimler artık service worker ile gösteriliyor"
+   },
+   {
+    "app": "hub",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Telefondan bilgisayara bildirim gönderilemiyordu",
+    "fix": "Site açıkken ntfy konusu dinleniyor; kendi gönderdiklerin tekrar gösterilmiyor, site kapalıyken gelenler (12 saat içinde) açılışta gösteriliyor"
+   },
+   {
+    "app": "hub",
+    "sev": "bilgi",
+    "status": "open",
+    "text": "Site bilgisayarda hiç açık değilken telefondan gelen mesaj anında çıkmaz — açınca gösterilir (12 saate kadar)"
+   }
+  ]
  }
 ]

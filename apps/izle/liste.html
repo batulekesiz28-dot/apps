@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ortak izleme listesi</title>
+<meta name="robots" content="noindex">
+<!--
+  Ortak izleme listesi — Medya'daki zar penceresinden “Listeni paylaş” ile gelen bağlantı burada açılır. Giriş İSTEMEZ.
+  Veri bağlantının # kısmında (sunucuya gitmez): #d=z<deflate-raw base64url> ya da j<json base64url>; {v,n:ad,o:kimlik,l:[[ad,m|s|a,yıl]],r:yanıt mı}
+  · Bu cihazda kendi listen varsa (localStorage 'mc:wl', Medya yazar) → ikinizin de listesinde olanlar en üstte.
+  · Yoksa (arkadaşın) → beğendiklerini “Ben de” ile seçer, “Seçtiklerimi gönder” yanıt bağlantısı üretir.
+-->
+<style>
+  :root{--bg:#FAFAF8;--card:#FFFFFF;--ink:#17171A;--ink2:#56565E;--ink3:#6B6B74;--line:rgba(0,0,0,.08);--hover:rgba(0,0,0,.045);--acc:#0F766E;--both:#B45309;
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;--serif:"Iowan Old Style","Charter",Georgia,serif}
+  [data-theme=dark]{--bg:#0F0F11;--card:#17171A;--ink:#EDEDEF;--ink2:#A6A6AF;--ink3:#9393A0;--line:rgba(255,255,255,.08);--hover:rgba(255,255,255,.06);--acc:#5EC8BC;--both:#FCD34D;color-scheme:dark}
+  @media (prefers-color-scheme:dark){html:not([data-theme]){--bg:#0F0F11;--card:#17171A;--ink:#EDEDEF;--ink2:#A6A6AF;--ink3:#9393A0;--line:rgba(255,255,255,.08);--hover:rgba(255,255,255,.06);--acc:#5EC8BC;--both:#FCD34D;color-scheme:dark}}
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:var(--bg);color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased}
+  button,input{font:inherit;color:inherit}button{background:none;border:0;cursor:pointer}
+  .wrap{max-width:760px;margin:0 auto;padding:40px 24px 120px}
+  h1{font-family:var(--serif);font-size:34px;font-weight:700;letter-spacing:-.02em;line-height:1.1}
+  .sub{margin-top:8px;font-size:15px;line-height:1.5;color:var(--ink2);max-width:62ch}
+  h2{display:flex;align-items:baseline;gap:8px;margin:32px 0 10px;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3)}
+  h2.both{color:var(--both)}h2 em{font-style:normal;font-weight:500;letter-spacing:0;text-transform:none}
+  ul{list-style:none}
+  li{display:flex;align-items:center;gap:12px;min-height:52px;padding:6px 4px;border-bottom:1px solid var(--line)}
+  .k{flex-shrink:0;width:52px;font-size:12px;font-weight:650;color:var(--ink3)}
+  .t{flex:1;min-width:0;font-size:15.5px;font-weight:550;line-height:1.35;overflow-wrap:anywhere}.t small{margin-left:6px;font-weight:400;color:var(--ink3)}
+  li.both .t::before{content:"★ ";color:var(--both)}
+  .me{flex-shrink:0;display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 12px;border-radius:999px;background:var(--hover);font-size:13.5px;font-weight:600;color:var(--ink2)}
+  .me[aria-pressed=true]{background:var(--ink);color:var(--bg)}.me:hover{color:var(--ink)}.me[aria-pressed=true]:hover{color:var(--bg)}
+  .w{display:inline-flex;align-items:center;min-height:40px;font-size:13px;font-weight:600;color:var(--acc);flex-shrink:0}.w:hover{text-decoration:underline;text-underline-offset:3px}
+  details>summary{display:flex;align-items:center;min-height:40px;margin-top:24px;cursor:pointer;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);list-style:none}
+  details>summary::-webkit-details-marker{display:none}details>summary::before{content:"▸";margin-right:8px;transition:transform .2s}details[open]>summary::before{transform:rotate(90deg)}
+  .bar{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:color-mix(in srgb,var(--bg) 86%,transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-top:1px solid var(--line)}
+  .bar>div{display:flex;flex-wrap:wrap;gap:8px;align-items:center;width:min(760px,100%)}
+  .bar input{flex:1 1 160px;min-width:0;height:44px;padding:0 14px;border:0;border-radius:12px;background:var(--card);box-shadow:0 0 0 1px var(--line);font-size:15px;outline:none}
+  .bar input:focus{box-shadow:0 0 0 2px var(--acc)}
+  .go{height:44px;padding:0 18px;border-radius:12px;background:var(--ink);color:var(--bg);font-weight:650;font-size:14.5px}.go:disabled{opacity:.4;cursor:default}
+  .empty{margin-top:40px;font-size:15px;line-height:1.6;color:var(--ink2);max-width:60ch}
+  .note{margin-top:28px;max-width:62ch;font-size:13px;line-height:1.55;color:var(--ink3)}
+  :focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+  @media (max-width:640px){.wrap{padding:24px 16px 150px}h1{font-size:28px}.k{width:44px}}
+  @media (prefers-reduced-motion:reduce){details>summary::before{transition:none}}
+</style>
+<script>try{var f=JSON.parse(localStorage.getItem('notlar:theme'));if(f)document.documentElement.dataset.theme=f}catch(e){}</script>
+</head>
+<body>
+<main class="wrap" id="app"><h1>Ortak izleme listesi</h1><p class="sub">Yükleniyor…</p></main>
+<script>
+'use strict';
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ls={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+const TN={m:'Film',s:'Dizi',a:'Anime'};
+const norm=s=>String(s||'').toLocaleLowerCase('tr').normalize('NFKD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9ğüşıöç]+/g,' ').trim();
+const key=x=>norm(x[0])+'|'+x[1];
+const unb64=s=>{s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';return Uint8Array.from(atob(s),c=>c.charCodeAt(0))};
+const b64=u=>{let bin='';for(let i=0;i<u.length;i+=8192)bin+=String.fromCharCode(...u.subarray(i,i+8192));return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')};
+async function unpack(d){if(d[0]==='z'){const st=new Blob([unb64(d.slice(1))]).stream().pipeThrough(new DecompressionStream('deflate-raw'));return JSON.parse(await new Response(st).text())}
+  if(d[0]==='j')return JSON.parse(new TextDecoder().decode(unb64(d.slice(1))));throw new Error('biçim')}
+async function pack(o){const js=JSON.stringify(o);try{if(!window.CompressionStream)throw 0;const st=new Blob([js]).stream().pipeThrough(new CompressionStream('deflate-raw'));return'z'+b64(new Uint8Array(await new Response(st).arrayBuffer()))}catch{return'j'+b64(new TextEncoder().encode(js))}}
+
+const row=(x,both,pick)=>`<li class="${both?'both':''}"><span class="k">${TN[x[1]]||''}</span><span class="t">${esc(x[0])}${x[2]?`<small>${esc(x[2])}</small>`:''}</span>
+  <a class="w" href="./?q=${encodeURIComponent(x[0])}" target="_blank" rel="noopener" title="Türkiye'de nerede izlenir?">Nerede?</a>${pick?`<button class="me" data-k="${esc(key(x))}" aria-pressed="false">Ben de</button>`:''}</li>`;
+
+async function main(){const h=new URLSearchParams(location.hash.slice(1)).get('d'),app=$('#app');
+  if(!h){app.innerHTML=`<h1>Ortak izleme listesi</h1><p class="empty">Bu sayfa, bir arkadaşının Medya'dan paylaştığı izleme listesini gösterir. Bağlantının tamamını açtığından emin ol.</p>`;return}
+  let D;try{D=await unpack(h)}catch{app.innerHTML=`<h1>Ortak izleme listesi</h1><p class="empty">Bağlantı bozuk görünüyor — kopyalanırken kesilmiş olabilir. Arkadaşından yeniden göndermesini iste.</p>`;return}
+  const L=(Array.isArray(D.l)?D.l:[]).filter(x=>Array.isArray(x)&&x[0]).slice(0,2000),who=String(D.n||'').slice(0,30)||'Arkadaşın';
+  const mine=ls.get('mc:wl',null),myId=ls.get('mc:shareid',''),own=!!(mine&&D.o&&D.o===myId&&!D.r);
+  const cnt=t=>L.filter(x=>x[1]===t).length,sum=['m','s','a'].map(t=>cnt(t)?`${cnt(t)} ${TN[t].toLocaleLowerCase('tr')}`:'').filter(Boolean).join(' · ');
+  document.title=`${who} · izleme listesi`;
+  let html=`<h1>${esc(who)} · izleme listesi</h1><p class="sub">${D.r?`${esc(who)} senin listenden bunları seçti.`:own?'Bu senin listen — bağlantıyı arkadaşına gönder.':`${esc(who)} bunları izlemek istiyor.`} ${esc(sum)}</p>`;
+  if(mine&&!own){const my=new Map((mine.l||[]).map(x=>[key(x),x]));const both=L.filter(x=>my.has(key(x))),only=L.filter(x=>!my.has(key(x))),mineOnly=(mine.l||[]).filter(x=>!L.some(y=>key(y)===key(x)));
+    html+=`<h2 class="both">İkinizin de listesinde <em>${both.length}</em></h2>${both.length?`<ul>${both.map(x=>row(x,true)).join('')}</ul>`:'<p class="empty" style="margin-top:6px">Ortak bir yapım yok — aşağıdakilerden birini birlikte keşfedin.</p>'}`
+      +(only.length?`<h2>Sadece ${esc(who)} istiyor <em>${only.length}</em></h2><ul>${only.map(x=>row(x)).join('')}</ul>`:'')
+      +(mineOnly.length?`<details><summary>Sadece sen istiyorsun · ${mineOnly.length}</summary><ul>${mineOnly.map(x=>row(x)).join('')}</ul></details>`:'');
+    app.innerHTML=html+`<p class="note">Karşılaştırma bu cihazdaki Medya listenle yapıldı. Liste bağlantıda saklı; hiçbir sunucuya gönderilmedi.</p>`;return}
+  // arkadaş görünümü: “Ben de” seç → yanıt bağlantısı
+  const pick=!own;
+  html+=['m','s','a'].map(t=>{const g=L.filter(x=>x[1]===t);return g.length?`<h2>${TN[t]} <em>${g.length}</em></h2><ul>${g.map(x=>row(x,false,pick)).join('')}</ul>`:''}).join('');
+  html+=`<p class="note">${pick?'İzlemek istediklerine “Ben de” de, adını yaz ve gönder; ikinizin de istediği yapımlar onun ekranında en üstte çıkar.':'Bu bağlantıyı açan arkadaşın, izlemek istediklerini işaretleyip sana geri gönderebilir.'} Liste bağlantıda saklı; hiçbir sunucuya gönderilmedi.</p>`;
+  app.innerHTML=html;if(!pick)return;
+  const bar=document.createElement('div');bar.className='bar';bar.innerHTML=`<div><input id="nm" maxlength="30" placeholder="Adın" aria-label="Adın"><button class="go" id="send" disabled>Seçtiklerimi gönder</button></div>`;document.body.appendChild(bar);
+  const sel=new Set(),upd=()=>{const b=$('#send');b.disabled=!sel.size;b.textContent=sel.size?`Seçtiklerimi gönder (${sel.size})`:'Seçtiklerimi gönder'};
+  app.addEventListener('click',e=>{const b=e.target.closest('.me');if(!b)return;const k=b.dataset.k,on=!sel.has(k);on?sel.add(k):sel.delete(k);b.setAttribute('aria-pressed',on);b.textContent=on?'✓ Ben de':'Ben de';upd()});
+  $('#send').addEventListener('click',async e=>{const btn=e.currentTarget,picked=L.filter(x=>sel.has(key(x)));
+    const url=location.href.split('#')[0]+'#d='+await pack({v:1,n:($('#nm').value.trim()||'Arkadaşın').slice(0,30),r:1,l:picked});
+    try{if(navigator.share&&matchMedia('(pointer:coarse)').matches){await navigator.share({title:'Ben de bunları izlemek istiyorum',url});return}}catch{}
+    try{await navigator.clipboard.writeText(url);btn.textContent='Bağlantı kopyalandı ✓ — ona gönder';setTimeout(upd,2600)}catch{prompt('Bağlantıyı kopyala ve gönder:',url)}})}
+main();addEventListener('hashchange',()=>{document.querySelector('.bar')?.remove();main()});
+</script>
+</body>
+</html>

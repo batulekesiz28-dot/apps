@@ -40,7 +40,7 @@ const Media=(()=>{
   const stName=it=>stMap(it)[stOf(it)]||'';
   const inPage=(it,k)=>k==='fav'?it.fav:k==='played'?['played','done'].includes(it.status):k==='all'?true:stOf(it)===k;
   const S=p=>`<svg class="mvi" viewBox="0 0 16 16" aria-hidden="true">${p}</svg>`;
-  const IC={rw:S('<path d="M8 4 4 8l4 4M12.5 4l-4 4 4 4"/>'),ff:S('<path d="M8 4l4 4-4 4M3.5 4l4 4-4 4"/>'),pop:S('<rect x="2.5" y="3.5" width="11" height="9" rx="2"/><rect x="8" y="8" width="4" height="3" rx=".8" fill="currentColor" stroke="none"/>'),bell:S('<path d="M4.2 11.5V7.4a3.8 3.8 0 0 1 7.6 0v4.1l1.2 1.3H3z"/><path d="M6.6 14.2a1.5 1.5 0 0 0 2.8 0"/>'),vol0:S('<path d="M3 6.2h2.4L8.8 3.5v9L5.4 9.8H3z"/><path d="m11 6.3 3.2 3.4M14.2 6.3 11 9.7"/>'),vol1:S('<path d="M3 6.2h2.4L8.8 3.5v9L5.4 9.8H3z"/><path d="M11.2 5.6a3.4 3.4 0 0 1 0 4.8M12.9 3.9a5.8 5.8 0 0 1 0 8.2"/>'),play:S('<path d="M5 3.5v9l7.5-4.5z" fill="currentColor" stroke="none"/>'),plus:S('<path d="M8 3v10M3 8h10"/>'),check:S('<path d="M3.5 8.5l3 3 6-7"/>'),
+  const IC={dice:S('<rect x="2.5" y="2.5" width="11" height="11" rx="3"/><circle cx="5.75" cy="5.75" r=".9" fill="currentColor" stroke="none"/><circle cx="10.25" cy="5.75" r=".9" fill="currentColor" stroke="none"/><circle cx="8" cy="8" r=".9" fill="currentColor" stroke="none"/><circle cx="5.75" cy="10.25" r=".9" fill="currentColor" stroke="none"/><circle cx="10.25" cy="10.25" r=".9" fill="currentColor" stroke="none"/>'),rw:S('<path d="M8 4 4 8l4 4M12.5 4l-4 4 4 4"/>'),ff:S('<path d="M8 4l4 4-4 4M3.5 4l4 4-4 4"/>'),pop:S('<rect x="2.5" y="3.5" width="11" height="9" rx="2"/><rect x="8" y="8" width="4" height="3" rx=".8" fill="currentColor" stroke="none"/>'),bell:S('<path d="M4.2 11.5V7.4a3.8 3.8 0 0 1 7.6 0v4.1l1.2 1.3H3z"/><path d="M6.6 14.2a1.5 1.5 0 0 0 2.8 0"/>'),vol0:S('<path d="M3 6.2h2.4L8.8 3.5v9L5.4 9.8H3z"/><path d="m11 6.3 3.2 3.4M14.2 6.3 11 9.7"/>'),vol1:S('<path d="M3 6.2h2.4L8.8 3.5v9L5.4 9.8H3z"/><path d="M11.2 5.6a3.4 3.4 0 0 1 0 4.8M12.9 3.9a5.8 5.8 0 0 1 0 8.2"/>'),play:S('<path d="M5 3.5v9l7.5-4.5z" fill="currentColor" stroke="none"/>'),plus:S('<path d="M8 3v10M3 8h10"/>'),check:S('<path d="M3.5 8.5l3 3 6-7"/>'),
     heart:S('<path d="M8 13.5S2.5 10.2 2.5 6.3A2.8 2.8 0 0 1 8 5a2.8 2.8 0 0 1 5.5 1.3C13.5 10.2 8 13.5 8 13.5z"/>'),more:S('<circle cx="3.5" cy="8" r="1.1" fill="currentColor" stroke="none"/><circle cx="8" cy="8" r="1.1" fill="currentColor" stroke="none"/><circle cx="12.5" cy="8" r="1.1" fill="currentColor" stroke="none"/>'),
     x:S('<path d="M4 4l8 8M12 4l-8 8"/>'),search:S('<circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/>'),l:S('<path d="M10 3.5L5.5 8l4.5 4.5"/>'),r:S('<path d="M6 3.5L10.5 8 6 12.5"/>'),
     clock:S('<circle cx="8" cy="8" r="5.5"/><path d="M8 5v3.2l2 1.3"/>'),edit:S('<path d="M10.5 2.5l3 3-8 8H2.5v-3z"/>'),trash:S('<path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.6 9h5.8l.6-9"/>'),
@@ -548,7 +548,7 @@ const Media=(()=>{
       filters=(g.length?sel('data-mgs','Tür',[['','Tüm türler'],...g.map(x=>[x,x])],st.genre):'')+sel('data-mmin','En düşük puan',[[0,'Tüm puanlar'],[7,'7 ve üstü'],[8,'8 ve üstü'],[9,'9 ve üstü']],+st.min)
         +sel('data-msort','Sıralama',[['added','Eklenme sırası'],['title','Ada göre'],['year','Yıla göre'],['score','Genel puana göre'],['rating','Puanıma göre']],st.sort)}
     const tools=`<div class="mc-tb"><label class="mc-s" title="Ara (/)">${IC.search}<input data-ms value="${E(st.qs)}" placeholder="Ara" aria-label="Film, dizi, anime, oyun ve kitap ara" autocomplete="off"></label>
-      ${filters}${viewSeg()}<button class="mc-gear" data-mset aria-label="Görünüm ayarları" title="Görünüm ayarları" aria-haspopup="dialog">${IC.gear}</button>
+      ${filters}${viewSeg()}<button class="mc-gear mc-dice" data-mpick aria-label="Bu akşam ne izlesem?" title="Bu akşam ne izlesem? (zar)">${IC.dice}</button><button class="mc-gear" data-mset aria-label="Görünüm ayarları" title="Görünüm ayarları" aria-haspopup="dialog">${IC.gear}</button>
       <button class="mc-add" data-madd title="Ekle (A)" aria-label="İçerik ekle">${IC.plus}<span>Ekle</span></button></div>`;
     if(home)return`<div class="mc-pbar sbar home">${tools}</div>`;
     const n=all().filter(i=>inSec(i,st.sec)).length;
@@ -558,7 +558,7 @@ const Media=(()=>{
   function body(){if(st.qs)return searchHTML();if(st.sec==='home')return homeHTML();if(st.page==='home')return secHome(st.sec);return pageHTML(st.sec,st.page)}
   function parse(parts){const p=parts||[];let sec='home',page='home',gq='';if(p[0]==='m'){const k=p[1]==='tv'?'movies':p[1];sec=SEC[k]?k:'home';let pg=p[2]||'home';const i=pg.indexOf('?');if(i>=0){gq=decodeURIComponent((pg.slice(i+1).match(/g=([^&]*)/)||[])[1]||'');pg=pg.slice(0,i)}page=pg}
     return{sec,page,gq}}
-  function render(parts,o={}){const p=parse(parts);const changed=p.sec!==st.sec||p.page!==st.page;st.base=parts||[];
+  function render(parts,o={}){clearTimeout(wlT);wlT=setTimeout(saveWL,2000);const p=parse(parts);const changed=p.sec!==st.sec||p.page!==st.page;st.base=parts||[];
     if(changed){st.kind='';st.genre='';st.min=0;st.hero=0}if(p.sec!==st.sec)st.look=loadLook(p.sec);st.sec=p.sec;st.page=p.page;if(p.gq){st.genre=p.gq;st.page='all'}if(changed||!o.keepQ)st.qs='';
     const v=q('#view');let root=q('#view>.mc');if(!root){v.innerHTML='<div class="mc"></div>';root=q('#view>.mc');wire(root)}
     root.dataset.sec=st.sec;applyLook(root);const b=body();root.innerHTML=nav()+`<main class="mc-main">${b}</main>`;root.classList.toggle('has-hero',!!q('.mh',root));if(changed)enter(q('.mc-main',root));
@@ -586,6 +586,7 @@ const Media=(()=>{
       const rc=t.closest('[data-arid]');if(rc){arecOpen(rc.dataset.arid);return}
       if(t.closest('[data-nettest]')){netTest();return}
       const nb=t.closest('[data-ns]');if(nb){nsPanel(nb);if(!nsBusy)nsRun();return}
+      if(t.closest('[data-mpick]')){pickSheet();return}
       const ms=t.closest('[data-mset]');if(ms){q('.mset')?q('.mset').remove():settings(ms);return}
       const mg=t.closest('[data-mg]');if(mg){st.genre=mg.dataset.mg;swap();return}
       const ad=t.closest('[data-madd]');if(ad){addSheet(ad.dataset.madd||'');return}
@@ -1045,7 +1046,55 @@ const Media=(()=>{
       const it=KB.addItem({type:t,title,year:y,status:f.s.value,tags:[TN[t].toLocaleLowerCase('tr')]});if(y)HINT.set(hk(it),{en:title,y:+y});close();say(`“${title}” eklendi — posteri aranıyor`);queue();open(it.id)})}
 
   /* sayfa değişince geçici arayüz kalmasın (Notlar route() çağırır) */
-  function dismiss(){spotOff(true);qa('.mset,.mrp,.mq,.ma-bg,.mnp,.mnsp,.mrcp-bg,.mnt-bg').forEach(e=>e.remove())}
+  function dismiss(){spotOff(true);qa('.mset,.mrp,.mq,.ma-bg,.mnp,.mnsp,.mrcp-bg,.mnt-bg,.mpk-bg').forEach(e=>e.remove())}
+  /* ── “Bu akşam ne izlesem?” zarı: vakit + tür seç → listenden TEK öneri, “Başka” ile değişir ──
+     Havuz: izlenecekler (film/dizi/anime) + yarım kalan dizi/anime. Vakit: ~30 dk = anime bölümü, ~1 sa = dizi bölümü, film akşamı = film. */
+  const PKT=[['any','Fark etmez'],['30','~30 dk','anime bölümü'],['60','~1 saat','dizi bölümü'],['film','Film akşamı','2 saat']];
+  function pickPool(tm,g){const ok=i=>tm==='30'?i.type==='anime':tm==='60'?i.type==='series':tm==='film'?i.type==='movie':['movie','series','anime'].includes(i.type);
+    return[...KB.items.values()].filter(i=>ok(i)&&(i.status==='todo'||(i.status==='doing'&&i.type!=='movie'))&&(!g||(i.genres||[]).some(x=>x.toLocaleLowerCase('tr')===g)))}
+  /* ── Listeni paylaş: izlenecekler (film/dizi/anime) sıkıştırılmış olarak bağlantının # kısmına yazılır (sunucuya gitmez).
+     Bağlantı apps/izle/liste.html'de giriş istemeden açılır; arkadaşın “Ben de” deyip geri gönderebilir.
+     Bu cihazdaki kendi listen 'mc:wl' önbelleğinde (karşılaştırma için), kimliğin 'mc:shareid'. ── */
+  let wlT=0;const WLT={movie:'m',series:'s',anime:'a'};
+  const wlList=()=>[...KB.items.values()].filter(i=>WLT[i.type]&&(i.status==='todo'||i.status==='doing')).map(i=>[i.title,WLT[i.type],String(i.year||'').slice(0,4)]);
+  function saveWL(){try{lss('mc:wl',{at:Date.now(),l:wlList()})}catch{}}
+  const sid=()=>{let s=lsg('mc:shareid','');if(!s){s=Math.random().toString(36).slice(2,10);lss('mc:shareid',s)}return s};
+  async function packWL(o){const js=JSON.stringify(o),b64=u=>btoa(String.fromCharCode(...u)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+    try{if(!window.CompressionStream)throw 0;const cs=new Blob([js]).stream().pipeThrough(new CompressionStream('deflate-raw'));const u=new Uint8Array(await new Response(cs).arrayBuffer());
+      let bin='';for(let i=0;i<u.length;i+=8192)bin+=String.fromCharCode(...u.subarray(i,i+8192));return'z'+btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+    catch{return'j'+b64(new TextEncoder().encode(js))}}
+  async function shareWL(btn){const name=(q('.mpk [data-wln]')?.value||'').trim().slice(0,30);lss('mc:sharename',name);saveWL();const l=wlList();
+    if(!l.length){toast?.('Paylaşılacak izleme listesi boş');return}
+    const url=new URL('../izle/liste.html',location.href).href+'#d='+await packWL({v:1,n:name,o:sid(),l});
+    try{if(navigator.share&&matchMedia('(pointer:coarse)').matches){await navigator.share({title:'İzleme listem',url});return}}catch{}
+    try{await navigator.clipboard.writeText(url);if(btn){btn.textContent='Bağlantı kopyalandı ✓';setTimeout(()=>{if(btn.isConnected)btn.textContent='Bağlantıyı kopyala'},2200)}}
+    catch{prompt('Bağlantıyı kopyala:',url)}}
+  function pickSheet(){q('.mpk-bg')?.remove();const s={tm:lsg('mc:pick',{}).tm||'any',g:'',seen:new Set(),cur:null};
+    const bg=document.createElement('div');bg.className='mpk-bg';bg.innerHTML=`<div class="mpk" role="dialog" aria-modal="true" aria-labelledby="mpkT"></div>`;document.body.appendChild(bg);
+    const pick=()=>{const l=pickPool(s.tm,s.g);let r=l.filter(i=>!s.seen.has(i.id));if(!r.length&&l.length){s.seen.clear();r=l.filter(i=>i.id!==s.cur?.id);if(!r.length)r=l}
+      s.cur=r.length?r[Math.floor(Math.random()*r.length)]:null;if(s.cur)s.seen.add(s.cur.id)};
+    const paint=fresh=>{const base=pickPool(s.tm,''),gs=topGenres(base).slice(0,8),it=s.cur,ep=it&&it.status==='doing'&&(it.season||it.ep)?`Kaldığın yer: ${it.season?'S'+it.season+' · ':''}${it.ep?'B'+it.ep:''}`:'';
+      bg.firstChild.innerHTML=`<header><h3 id="mpkT">${IC.dice}Bu akşam ne izlesem?</h3><button class="mpk-x" data-pkx aria-label="Kapat" title="Kapat (Esc)">${IC.x||'×'}</button></header>
+        <p class="mpk-k">Ne kadar vaktin var?</p><div class="mpk-ch">${PKT.map(([k,n,d])=>`<button data-pkt="${k}" aria-pressed="${s.tm===k}">${n}${d?`<small>${d}</small>`:''}</button>`).join('')}</div>
+        ${gs.length?`<p class="mpk-k">Ne tür?</p><div class="mpk-ch">${['',...gs].map(g=>`<button data-pkg="${E(g.toLocaleLowerCase('tr'))}" aria-pressed="${s.g===g.toLocaleLowerCase('tr')}">${E(g||'Hepsi')}</button>`).join('')}</div>`:''}
+        <div class="mpk-r${fresh?' in':''}">${it?`<a class="mpk-c" href="#lib/i/${E(it.id)}" data-pko>${poster(it,'mpk-p')}<div><span class="mpk-t">${E(TN[it.type]||'')}${it.year?' · '+E(it.year):''}${it.score?' · ★ '+E(it.score):''}</span>
+            <b>${E(it.title)}</b>${ep?`<span class="mpk-ep">${E(ep)}</span>`:''}${(it.genres||[]).length?`<span class="mpk-g">${E(it.genres.slice(0,3).join(' · '))}</span>`:''}</div></a>`
+          :`<p class="mpk-none">${base.length?'Bu türde listende bir şey yok — “Hepsi”ni dene.':'Bu seçime uyan, izlemek istediğin bir şey yok. Listene ekledikçe zar daha iyi atar.'}</p>`}</div>
+        <footer>${it&&it.type!=='game'?`<a class="mpk-w" href="../izle/?q=${encodeURIComponent(it.title)}" target="_blank" rel="noopener">Nerede izlenir?</a>`:'<span></span>'}
+          <div><button class="mb" data-pka ${pickPool(s.tm,s.g).length>1?'':'disabled'}>${IC.dice}Başka</button>${it?`<button class="mb pri" data-pko>Aç</button>`:''}</div></footer>
+        <details class="mpk-sh"${s.sh?' open':''}><summary>Arkadaşınla mı izleyeceksin? Listeni paylaş</summary>
+          <p>Bağlantıyı gönder; arkadaşın izlemek istediklerini işaretleyip sana geri yollasın. İkinizin de listesinde olanlar en üstte çıkar. Bağlantı giriş istemez, sadece izleme listeni gösterir.</p>
+          <div class="mpk-shr"><input data-wln maxlength="30" placeholder="Adın (ör. Batu)" aria-label="Adın — arkadaşın görsün" value="${E(lsg('mc:sharename',''))}"><button class="mb pri" data-wls>Bağlantıyı kopyala</button></div></details>`};
+    pick();paint(true);
+    const close=()=>{bg.remove();removeEventListener('keydown',key,true)},key=e=>{if(e.key==='Escape'){e.stopPropagation();close()}};addEventListener('keydown',key,true);
+    bg.addEventListener('click',e=>{const t=e.target;if(t===bg||t.closest('[data-pkx]'))return close();
+      const tb=t.closest('[data-pkt]');if(tb){s.tm=tb.dataset.pkt;s.g='';s.seen.clear();lss('mc:pick',{tm:s.tm});pick();return paint(true)}
+      const gb=t.closest('[data-pkg]');if(gb){s.g=gb.dataset.pkg;s.seen.clear();pick();return paint(true)}
+      if(t.closest('[data-pka]')){pick();return paint(true)}
+      const ws=t.closest('[data-wls]');if(ws){s.sh=true;shareWL(ws);return}
+      if(t.closest('.mpk-sh summary'))s.sh=!bg.querySelector('.mpk-sh')?.open;
+      if(t.closest('[data-pko]')&&s.cur){e.preventDefault();const id=s.cur.id;close();open(id)}});
+    bg.querySelector('[data-pka]')?.focus()}
   // kaydırma, pencere değişimi, Esc → spot ışığı kapanır
   addEventListener('scroll',()=>{SPT.quiet=Date.now()+700;if(SPT.el)spotOff()},true);addEventListener('blur',()=>spotOff(true));addEventListener('resize',()=>spotOff(true));addEventListener('keydown',e=>{if(e.key==='Escape'&&SPT.el)spotOff();
     // spot açıkken ← → fragmanı 5 sn sarar (puan hapı / yazı alanı odaktaysa onlar kullanır)

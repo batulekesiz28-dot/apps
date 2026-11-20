@@ -24,7 +24,7 @@ const TK=(()=>{
       prio:Math.max(0,Math.min(3,o.prio==null?1:+o.prio)),status:['todo','doing','done','later'].includes(o.status)?o.status:'todo',cat:String(o.cat||''),
       tags:[...new Set((Array.isArray(o.tags)?o.tags:[]).map(x=>String(x).toLocaleLowerCase('tr').replace(/^#/,'').trim()).filter(Boolean))].slice(0,12),
       subs:(Array.isArray(o.subs)?o.subs:[]).slice(0,60).map(s=>({id:String(s.id||nid('s')),t:String(s.t||'').slice(0,200),done:!!s.done})),
-      proj:String(o.proj||''),note:String(o.note||'').slice(0,8000),order:Number.isFinite(+o.order)?+o.order:now(),doneAt:+o.doneAt||0,moved:+o.moved||0,
+      proj:String(o.proj||''),note:String(o.note||'').slice(0,8000),est:Math.max(0,Math.min(600,Math.round(+o.est||0))),order:Number.isFinite(+o.order)?+o.order:now(),doneAt:+o.doneAt||0,moved:+o.moved||0,
       series:String(o.series||''),occ:D(o.occ),isSeries:!!o.isSeries,rep:o.isSeries?normRep(o.rep):null,created:+o.created||now(),updated:+o.updated||now()};return t}
   const normProj=p=>({id:String(p.id),name:String(p.name||'Proje').slice(0,60),color:/^#[0-9a-f]{6}$/i.test(p.color||'')?p.color:'#3E63DD',icon:String(p.icon||'📁').slice(0,4),desc:String(p.desc||'').slice(0,400),archived:!!p.archived});
   const say=m=>{try{toast(m)}catch{}};

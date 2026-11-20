@@ -1012,7 +1012,7 @@ const slugify=s=>(s||'app').toLocaleLowerCase('tr').replace(/ı/g,'i').replace(/
   .normalize('NFKD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'app';
 const miniIcon=a=>{const[bg,fg]=COLORS[a.color]||COLORS.gray;const ic=ICONS[a.icon];
   return{style:`background:${bg};color:${fg}`,html:ic?`<svg viewBox="0 0 24 24">${ic}</svg>`:`<span style="font-size:9px;font-weight:600">${esc(mono(a.name))}</span>`}};
-const UI={open:'<path d="M3 8h10M9 4l4 4-4 4"/>',dl:'<path d="M8 2.5v8M4.5 7L8 10.5 11.5 7M3 13.5h10"/>',tab:'<path d="M9.5 2.5h4v4M13.5 2.5L7.5 8.5M12 9.5v3.5H3V4h3.5"/>',link:'<path d="M6.5 9.5l3-3M7 4.5l1-1a2.5 2.5 0 0 1 3.5 3.5l-1 1M9 11.5l-1 1A2.5 2.5 0 0 1 4.5 9l1-1"/>',
+const UI={open:'<path d="M3 8h10M9 4l4 4-4 4"/>',dl:'<path d="M8 2.5v8M4.5 7L8 10.5 11.5 7M3 13.5h10"/>',chk:'<circle cx="8" cy="8" r="5.5"/><path d="M5.6 8.2l1.7 1.7 3.2-3.6"/>',tab:'<path d="M9.5 2.5h4v4M13.5 2.5L7.5 8.5M12 9.5v3.5H3V4h3.5"/>',link:'<path d="M6.5 9.5l3-3M7 4.5l1-1a2.5 2.5 0 0 1 3.5 3.5l-1 1M9 11.5l-1 1A2.5 2.5 0 0 1 4.5 9l1-1"/>',
   edit:'<path d="M10.5 2.5l3 3L6 13H3v-3z"/>',ship:'<path d="M8 2.5v8M4.5 6L8 2.5 11.5 6M3 13.5h10"/>',dl:'<path d="M8 2.5v8M4.5 7L8 10.5 11.5 7M3 13.5h10"/>',del:'<path d="M3 4.5h10M6.5 4.5v-2h3v2M4.5 4.5l.6 9h5.8l.6-9"/>',
   out:'<path d="M6 2.5H3v11h3M10 5l3 3-3 3M13 8H6"/>',group:'<rect x="2" y="3" width="12" height="10" rx="5" stroke-dasharray="2 2"/><circle cx="6" cy="8" r="1.3"/><circle cx="10" cy="8" r="1.3"/>',home:'<path d="M8 3v4M8 9v4M3 8h4M9 8h4"/>',connect:'<circle cx="4" cy="8" r="2"/><circle cx="12" cy="8" r="2"/><path d="M6 8h4"/>',
   unlinkall:'<circle cx="4" cy="8" r="2"/><circle cx="12" cy="8" r="2"/><path d="M6.5 6.5l3 3M9.5 6.5l-3 3"/>',plus:'<path d="M8 3v10M3 8h10"/>',graph:'<circle cx="4" cy="4" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="7" cy="12.5" r="2"/><path d="M5.9 4.3l4.2.5M5 5.7l1.4 4.9M10.9 6.7l-2.7 4.3"/>',
@@ -2870,6 +2870,8 @@ function palette(){
     {ic:UI.zoom,l:'Görüntü: hafif mod (eski cihazlar)'+(!PERF.auto&&TIER===2?' ✓':''),run:()=>{PERF.auto=false;localStorage.setItem('appshell:perf','fixed');setTier(2)}},
     {ic:UI.fs,l:document.fullscreenElement?'Tam ekrandan çık':'Tarayıcı tam ekranı',k:'F',run:toggleFS},
     {ic:UI.key,l:'Klavye kısayolları',k:'?',run:shortcuts},
+    {ic:UI.chk,l:'Bugünün görevleri',sub:'Sabah planı · tahmini süreler',run:()=>window.DayCard?.open('plan')},
+    {ic:UI.chk,l:'Günü kapat',sub:'Bitenler, kalanları yarına taşı',run:()=>window.DayCard?.open('close')},
     {ic:UI.dl,l:'Verilerimi yedekle (indir)',sub:'Notlar, görevler, takvim, kütüphane, Study Log — tek dosya',run:backupAll},
     ...(S.kind==='cloud'?[{ic:UI.out,l:'Çıkış yap',run:()=>firebase.auth().signOut()}]:[]),
   ];
@@ -3099,7 +3101,7 @@ applyTheme(document.documentElement.dataset.theme);applyLook();
 buildMesh();introStart=performance.now();wake();
 (async()=>{
   const mp=loadManifest();
-  if(!CLOUD){S=Local;drafts=await Local.load();await mp;mountWidgets();syncNodes();booted=true;GX.key='';seedWidgets();seedMore();autoClusters();ensureNotes();window.Worlds?.boot();return}
+  if(!CLOUD){S=Local;drafts=await Local.load();await mp;mountWidgets();syncNodes();booted=true;GX.key='';seedWidgets();seedMore();autoClusters();ensureNotes();window.Worlds?.boot();window.DayCard?.start(null);return}
   gate('loading');
   try{await loadFirebase()}catch{return gate('error','Firebase yüklenemedi. İnternet bağlantını kontrol et.')}
   if(!firebase.apps.length)firebase.initializeApp(FB);
@@ -3111,7 +3113,7 @@ buildMesh();introStart=performance.now();wake();
     gate('loading','Yükleniyor…');await mp;S=Cloud;await Cloud.start(fs);
     const me=$('#me');me.hidden=false;me.innerHTML=u.photoURL?`<img src="${esc(u.photoURL)}" alt="" referrerpolicy="no-referrer">`:esc(mono(u.displayName||u.email));
     await ungate();introStart=performance.now();introT=0;wakeMesh();
-    mountWidgets();syncNodes();booted=true;GX.key='';seedWidgets();seedMore();migrateLocal();autoClusters();ensureNotes();window.Worlds?.boot();
+    mountWidgets();syncNodes();booted=true;GX.key='';seedWidgets();seedMore();migrateLocal();autoClusters();ensureNotes();window.Worlds?.boot();window.DayCard?.start(fs);
   });
 })();
 
@@ -3136,5 +3138,8 @@ addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.shiftKey&&(e.key==='
 </script>
 <link rel="stylesheet" href="ui/worlds.css?v=20261120c">
 <script src="ui/worlds.js?v=20261120c"></script>
+<link rel="stylesheet" href="ui/day.css?v=20261120a">
+<script src="apps/notlar/tasks.js?v=20261120a"></script>
+<script src="ui/day.js?v=20261120a"></script>
 </body>
 </html>

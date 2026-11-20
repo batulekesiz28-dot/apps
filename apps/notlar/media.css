@@ -772,3 +772,44 @@ html[data-motion=off] :is(.msp-yv .msp-sk,.msp-yv .msp-ym,.msp-bar i,.msp-bar::a
 /* katı denetçi: telefonda dokunma alanları ≥40px, “Nasıl alınır” bağlantısı rahat basılsın */
 .mset-key label a{display:inline-flex;align-items:center;min-height:28px;padding:0 6px;margin:-4px 0}
 @media (max-width:760px){.mc-tabs .mc-ns{height:40px}.mset-key label a{min-height:40px}.mset-hx{width:40px;right:-20px}.mset-hy{height:40px;bottom:-20px}.mset-hx::after{left:18px}.mset-hy::after{top:18px}}
+
+/* ── “Bu akşam ne izlesem?” zarı (.mpk) — Medya gibi hep koyu ── */
+.mpk-bg{position:fixed;inset:0;z-index:120;display:grid;place-items:center;padding:16px;background:rgba(6,6,8,.62);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);animation:mpkIn .25s ease}
+@keyframes mpkIn{from{opacity:0}}
+.mpk{width:min(520px,100%);max-height:calc(100vh - 32px);overflow:auto;padding:20px 20px 16px;border-radius:24px;background:#141417;color:#F4F4F6;box-shadow:0 0 0 1px rgba(255,255,255,.08),0 40px 90px -30px rgba(0,0,0,.9);font-family:var(--sys,inherit)}
+.mpk header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.mpk h3{display:flex;align-items:center;gap:10px;font-size:19px;font-weight:650;letter-spacing:-.01em}.mpk h3 .mvi{width:20px;height:20px}
+.mpk-x{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;color:rgba(255,255,255,.7)}.mpk-x:hover{background:rgba(255,255,255,.08);color:#fff}.mpk-x .mvi{width:14px;height:14px}
+.mpk-k{margin:14px 0 8px;font-size:11.5px;font-weight:650;letter-spacing:.07em;text-transform:uppercase;color:rgba(255,255,255,.62)}
+.mpk-ch{display:flex;flex-wrap:wrap;gap:6px}
+.mpk-ch button{display:inline-flex;flex-direction:column;align-items:flex-start;justify-content:center;min-height:36px;padding:4px 13px;border-radius:12px;background:rgba(255,255,255,.07);color:rgba(255,255,255,.85);font-size:13.5px;font-weight:600;line-height:1.2;transition:background .15s}
+.mpk-ch button small{font-size:11.5px;font-weight:500;color:rgba(255,255,255,.6)}
+.mpk-ch button:hover{background:rgba(255,255,255,.12)}
+.mpk-ch button[aria-pressed=true]{background:#F4F4F6;color:#141417}.mpk-ch button[aria-pressed=true] small{color:rgba(20,20,23,.62)}
+.mpk-r{margin-top:18px}.mpk-r.in .mpk-c{animation:mpkCard .45s cubic-bezier(.16,1,.3,1)}
+@keyframes mpkCard{from{opacity:0;transform:translateY(8px) scale(.98)}}
+.mpk-c{display:grid;grid-template-columns:110px minmax(0,1fr);gap:16px;align-items:center;padding:10px;border-radius:18px;background:rgba(255,255,255,.05);color:inherit;text-decoration:none;transition:background .15s}
+.mpk-c:hover{background:rgba(255,255,255,.09)}
+.mpk-c .mpk-p{width:110px;aspect-ratio:2/3;border-radius:12px;overflow:hidden}
+.mpk-c b{display:block;margin:4px 0 2px;font-size:20px;font-weight:650;line-height:1.2;letter-spacing:-.01em}
+.mpk-t,.mpk-g{display:block;font-size:12.5px;color:rgba(255,255,255,.66)}.mpk-ep{display:inline-block;margin:4px 0;padding:3px 9px;border-radius:999px;background:rgba(245,196,81,.16);color:#F5C451;font-size:12px;font-weight:650}
+.mpk-none{padding:18px 6px;font-size:14px;line-height:1.55;color:rgba(255,255,255,.7)}
+.mpk footer{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px}
+.mpk footer>div{display:flex;gap:8px}
+.mpk .mb{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:12px;background:rgba(255,255,255,.08);color:#fff;font-size:14px;font-weight:600}
+.mpk .mb:hover{background:rgba(255,255,255,.14)}.mpk .mb.pri{background:#F4F4F6;color:#141417}.mpk .mb:disabled{opacity:.4;cursor:default}.mpk .mb .mvi{width:16px;height:16px}
+.mpk-w{display:inline-flex;align-items:center;min-height:36px;font-size:13.5px;font-weight:600;color:rgba(255,255,255,.75)}.mpk-w:hover{color:#fff;text-decoration:underline;text-underline-offset:3px}
+.mpk :focus-visible{outline:2px solid #F4F4F6;outline-offset:2px}
+@media (max-width:640px){.mpk{padding:16px 14px 14px;border-radius:20px}.mpk-c{grid-template-columns:84px minmax(0,1fr);gap:12px}.mpk-c .mpk-p{width:84px}.mpk-c b{font-size:17px}
+  .mpk-ch button{min-height:40px}.mpk .mb{height:44px}.mpk-x{width:40px;height:40px}.mpk footer{flex-wrap:wrap}}
+@media (prefers-reduced-motion:reduce){.mpk-bg,.mpk-r.in .mpk-c{animation:none}}
+html[data-motion=off] .mpk-bg,html[data-motion=off] .mpk-r.in .mpk-c{animation:none}
+/* zar penceresi: listeni paylaş */
+.mpk-sh{margin-top:16px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08)}
+.mpk-sh summary{display:flex;align-items:center;min-height:36px;cursor:pointer;font-size:13.5px;font-weight:600;color:rgba(255,255,255,.8);list-style:none}
+.mpk-sh summary::-webkit-details-marker{display:none}.mpk-sh summary::before{content:"▸";margin-right:8px;transition:transform .2s}.mpk-sh[open] summary::before{transform:rotate(90deg)}
+.mpk-sh summary:hover{color:#fff}
+.mpk-sh p{margin:6px 0 10px;max-width:60ch;font-size:13px;line-height:1.5;color:rgba(255,255,255,.66)}
+.mpk-shr{display:flex;gap:8px}.mpk-shr input{flex:1;min-width:0;height:40px;padding:0 12px;border:0;border-radius:12px;background:rgba(255,255,255,.07);color:#fff;font:inherit;font-size:14px;outline:none}
+.mpk-shr input::placeholder{color:rgba(255,255,255,.5)}.mpk-shr input:focus{box-shadow:0 0 0 2px #F4F4F6}
+@media (max-width:640px){.mpk-shr{flex-wrap:wrap}.mpk-shr input,.mpk-shr .mb{height:44px;flex:1 1 100%}.mpk-sh summary{min-height:44px}}

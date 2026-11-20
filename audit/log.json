@@ -4139,5 +4139,53 @@
     "fix": "Canlıda bir film arayıp kontrol et"
    }
   ]
+ },
+ {
+  "at": "2026-11-20T13:11:52",
+  "change": "Üç yenilik: (1) Hub her açıldığında önüne “Bugün” kartı geliyor — bugünün görevleri, tahmini süreler ve “bugüne sığıyor mu” uyarısı; akşam “Günü kapat” ile kalanları tek dokunuşla yarına taşı. Sağ üstteki × ile kapanır. (2) Medya'da zar: “Bu akşam ne izlesem?” — vakit ve tür seç, listenden tek öneri. (3) Zar penceresinden listeni arkadaşınla paylaş; o “Ben de” deyip geri gönderir, ikinizin de istediği en üstte çıkar.",
+  "scores": {
+   "Hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Ortak liste sayfası": {
+    "before": null,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Hub",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Güne başlarken görevleri görmek için Notlar'ı açmak gerekiyordu",
+    "fix": "Açılışta Bugün kartı"
+   },
+   {
+    "app": "Notlar · Medya",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Uzun izleme listesinde seçim zordu",
+    "fix": "Ne izlesem zarı"
+   },
+   {
+    "app": "Notlar · Medya",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Listeyi arkadaşla paylaşmanın yolu yoktu",
+    "fix": "Giriş istemeyen paylaşım bağlantısı"
+   },
+   {
+    "app": "Hub",
+    "sev": "info",
+    "status": "open",
+    "text": "Bulut modunda kart, Firestore görevleri gelene kadar kısa bir an “yükleniyor” gösterir",
+    "fix": "Bilerek; boş görünmesin diye iskelet var"
+   }
+  ]
  }
 ]

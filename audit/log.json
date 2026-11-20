@@ -4300,5 +4300,49 @@
     "fix": "Canlıda bir münazara başlat"
    }
   ]
+ },
+ {
+  "at": "2026-11-20T19:29:39",
+  "change": "Kendine bildirim gönderme geldi: Ctrl+K → “Hatırlatıcı kur” (ya da Bugün kartındaki zil). Ne hatırlatılacağını yaz, ne zaman olacağını seç (şimdi, 10 dk, 1 saat, bu akşam, yarın sabah ya da istediğin saat). Bildirim bu tarayıcıya ve istersen telefonuna gelir — telefon için ücretsiz ntfy uygulamasını bir kez bağlaman yeterli; site kapalı olsa da gelir. İstersen saatli görevlerin saati gelince de hatırlatır.",
+  "scores": {
+   "Hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Hatırlatıcı penceresi telefon": {
+    "before": 98,
+    "after": 99
+   }
+  },
+  "items": [
+   {
+    "app": "Hub",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Telefon kurulumundaki indirme bağlantıları küçüktü",
+    "fix": "40px"
+   },
+   {
+    "app": "Hub",
+    "sev": "info",
+    "status": "open",
+    "text": "Tarayıcı bildirimleri site açıkken çalışır; site kapalıyken bildirim için telefon (ntfy) gerekir",
+    "fix": "Bilerek: kendi sunucumuz yok"
+   },
+   {
+    "app": "Hub",
+    "sev": "info",
+    "status": "open",
+    "text": "Telefona zamanlanmış bir hatırlatıcıyı silmek ntfy'deki bekleyen bildirimi iptal etmeyebilir",
+    "fix": "Penceredeki ipucunda yazıyor"
+   },
+   {
+    "app": "Hub",
+    "sev": "info",
+    "status": "open",
+    "text": "ntfy.sh'ye gerçek gönderim test ortamında denenemedi (internet yok)",
+    "fix": "“Test bildirimi gönder” ile canlıda dene"
+   }
+  ]
  }
 ]

@@ -41,6 +41,7 @@ function row(x,close){const late=TK.dayOf(x)<T(),meta=[x.time,late?'gecikti':'']
 function paint(){if(!el)return;const c=cfg(),d=new Date(),{open,done}=TK.ready?data():{open:[],done:[]};mode=mode||autoMode();
   const head=`<header class="dc-h"><div><h2 id="dcT">${mode==='close'?'Günü kapat':'Bugün'}</h2><p>${esc(d.toLocaleDateString('tr-TR',{weekday:'long',day:'numeric',month:'long'}))}</p></div>
     <div class="dc-seg" role="tablist" aria-label="Görünüm"><button role="tab" data-mode="plan" aria-selected="${mode==='plan'}">Plan</button><button role="tab" data-mode="close" aria-selected="${mode==='close'}">Kapanış</button></div>
+    <button class="dc-x" data-bell aria-label="Hatırlatıcı kur" title="Hatırlatıcı kur — kendine bildirim"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 11.5V7.5a4 4 0 0 1 8 0v4l1 1.5H3zM6.5 14a1.5 1.5 0 0 0 3 0"/></svg></button>
     <button class="dc-x" data-x aria-label="Kapat" title="Kapat (Esc)"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></header>`;
   let body;
   if(!TK.ready)body=`<div class="dc-sk"><i></i><i></i><i></i></div>`;
@@ -69,6 +70,7 @@ function onKey(e){if(e.key==='Escape'&&el&&!document.querySelector('.pal-bg,.she
 const task=b=>TK.tasks.get(b.closest('[data-id]')?.dataset.id);
 function onClick(e){const b=e.target.closest('button');if(!b)return;
   if(b.matches('[data-x]'))return close();
+  if(b.matches('[data-bell]')){window.Notify?.open();return}
   if(b.dataset.mode){mode=b.dataset.mode;return paint()}
   if(b.matches('[data-done]')){const t=task(b);if(!t)return;const li=b.closest('li');li.classList.add('going');setTimeout(()=>{TK.setStatus(t,'done');H()?.toast?.(`✓ ${t.title}`,()=>TK.setStatus(TK.tasks.get(t.id)||t,'todo'))},calm()?0:260);return}
   if(b.matches('[data-tmr]')){const t=task(b);if(!t)return;const prev=t.date;TK.setDate(t,TM());H()?.toast?.(`${t.title} → yarın`,()=>{const r=TK.tasks.get(t.id);if(r){r.date=prev;TK.save(r)}});return}

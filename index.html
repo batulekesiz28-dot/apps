@@ -385,6 +385,32 @@ body.linking,body.linking .node,body.linking #stage{cursor:crosshair}
 .grab::after{content:'';width:36px;height:4px;border-radius:2px;background:var(--ink3);opacity:.5}
 .mini{width:20px;height:20px;border-radius:6px;display:grid;place-items:center;flex-shrink:0}
 .mini svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+/* ── Mini pencere (FL): Samsung açılır görünüm + iOS PiP ── */
+.flo{position:fixed;left:0;top:0;z-index:70;display:flex;flex-direction:column;border-radius:16px;overflow:hidden;background:var(--menu);box-shadow:0 0 0 .5px var(--line3),0 26px 60px -20px rgba(0,0,0,.55),0 8px 20px -8px rgba(0,0,0,.28);will-change:transform;-webkit-backdrop-filter:blur(24px) saturate(1.5);backdrop-filter:blur(24px) saturate(1.5);transition:opacity .2s,filter .2s}
+.flo-bar{position:relative;height:30px;flex-shrink:0;display:flex;align-items:center;gap:7px;padding:0 3px 0 8px;cursor:grab;user-select:none;-webkit-user-select:none;touch-action:none;font-size:12px}
+.flo-bar b{min-width:0;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.flo-bar .mini{width:18px;height:18px;border-radius:5px}.flo-bar .grow{flex:1}
+.flo-bar button{position:relative;width:26px;height:24px;border-radius:7px;display:grid;place-items:center;flex-shrink:0;color:var(--ink3);opacity:0;transition:opacity .15s,background .15s,color .15s}
+.flo:hover .flo-bar button,.flo-bar button:focus-visible{opacity:1}.flo-bar button:hover{background:var(--hover);color:var(--ink)}.flo-bar [data-fl=x]:hover{color:#DC2626}
+.flo-bar svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.flo-body{position:relative;flex:1;min-height:0;background:var(--surface)}
+.flo.drag{box-shadow:0 0 0 .5px var(--line3),0 36px 80px -20px rgba(0,0,0,.6)}.flo.drag .flo-bar{cursor:grabbing}.flo.bin{opacity:.55;filter:saturate(.4)}
+body.flo-drag{user-select:none;-webkit-user-select:none}body.flo-drag iframe{pointer-events:none}
+.flo-rs{position:absolute;right:0;bottom:0;z-index:2;width:22px;height:22px;cursor:nwse-resize;touch-action:none;opacity:0;transition:opacity .15s}
+.flo-rs::after{content:"";position:absolute;right:5px;bottom:5px;width:8px;height:8px;border:solid var(--ink3);border-width:0 2px 2px 0;border-bottom-right-radius:4px}
+.flo.flrl .flo-rs{right:auto;left:0;cursor:nesw-resize}.flo.flrl .flo-rs::after{right:auto;left:5px;border-width:0 0 2px 2px;border-radius:0 0 0 4px}
+.flo:hover .flo-rs{opacity:1}
+.flo-tab{display:none}
+.flo.st .flo-tab{position:absolute;top:0;bottom:0;z-index:3;width:30px;display:grid;place-items:center;background:var(--menu);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+.flo.st[data-side=l] .flo-tab{right:0}.flo.st[data-side=r] .flo-tab{left:0}.flo.st iframe{pointer-events:none}.flo.st .flo-rs{display:none}
+.flo-card{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:6px;padding:12px;text-align:center;cursor:pointer;font-size:13px}
+.flo-card .mini{width:44px;height:44px;border-radius:14px}.flo-card .mini svg{width:22px;height:22px}.flo-card small{font-size:12px;color:var(--ink3)}
+.flo-bin{position:fixed;left:50%;top:auto;bottom:calc(26px + env(safe-area-inset-bottom));z-index:69;width:56px;height:56px;margin-left:-28px;border-radius:50%;display:grid;place-items:center;background:var(--menu);color:var(--ink2);box-shadow:var(--shadow);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);opacity:0;transform:translateY(18px) scale(.8);transition:opacity .2s,transform .35s var(--spring),background .2s,color .2s;pointer-events:none}
+.flo-bin.on{opacity:1;transform:none}.flo-bin.hot{background:#DC2626;color:#fff;transform:scale(1.18)}
+.flo-bin svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round}
+@media (hover:none){.flo-bar button,.flo-rs{opacity:1}}
+@media (max-width:700px){.flo-bar button::before{content:"";position:absolute;inset:-8px -4px}.flo-rs{width:30px;height:30px}}
+@media (prefers-reduced-motion:reduce){.flo,.flo-bin{transition:none}}
 .dock{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:8px;height:38px;padding:0 6px 0 8px;border-radius:13px;background:var(--menu);box-shadow:var(--shadow);backdrop-filter:blur(24px) saturate(1.5);-webkit-backdrop-filter:blur(24px) saturate(1.5)}
 .dock .t{font-size:12px;font-weight:500;padding-right:4px}
 .dock button{height:26px;padding:0 9px;border-radius:8px;font-size:11.5px;color:var(--ink2)}
@@ -849,6 +875,7 @@ body,.btn,.mi,.pal-in,input,textarea,button{font-family:var(--font)}
   <button data-w="reload" title="Yenile"><svg viewBox="0 0 16 16"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2.5v3h-3"/></svg></button>
   <button data-w="tab" id="wTab" title="Yeni sekmede aç"><svg viewBox="0 0 16 16"><path d="M9.5 2.5h4v4M13.5 2.5L7.5 8.5M12 9.5v3.5H3V4h3.5"/></svg></button>
   <button data-w="fs" id="wFs" title="Tarayıcı tam ekranı (F)"><svg viewBox="0 0 16 16"><path id="fsIcon" d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg></button>
+  <button data-w="mini" title="Mini pencere · Alt+M (ya da bu şeridi aşağı çek)" aria-label="Mini pencere yap"><svg viewBox="0 0 16 16"><rect x="2.5" y="3.5" width="11" height="9" rx="1.5"/><rect x="8" y="8" width="3.5" height="2.5" rx=".6" fill="currentColor" stroke="none"/></svg></button>
   <button data-w="close" title="Bu uygulamayı kapat · ⇧Esc" aria-label="Bu uygulamayı kapat"><svg viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
 </div>
 
@@ -2621,9 +2648,9 @@ function mountFrame(t){const f=document.createElement('iframe'),a=t.app;f.classN
   if(a.kind==='draft'){f.setAttribute('sandbox','allow-scripts allow-forms allow-modals allow-popups allow-downloads allow-pointer-lock');t.blob=URL.createObjectURL(new Blob([a.html],{type:'text/html'}));f.src=t.blob}
   else f.src=bust(a.url);
   t.loading=true;f.addEventListener('load',()=>frameLoaded(t,f));W.el.appendChild(f);t.fr=f}
-function dropFrame(t){if(t.fr){t.fr.remove();t.fr=null}if(t.blob){URL.revokeObjectURL(t.blob);t.blob=null}t.loading=false}
+function dropFrame(t){if(FL?.t===t)floKill();if(t.fr){t.fr.remove();t.fr=null}if(t.blob){URL.revokeObjectURL(t.blob);t.blob=null}t.loading=false}
 // keep memory in check: the least recently used background apps go to sleep (reloaded when you come back)
-function sleepExtra(){const live=mru().filter(t=>t.fr&&!t.app.win);for(const t of live.slice(MAXLIVE))if(t!==curTab())dropFrame(t)} // müzik (win) sekmeleri uyumaz: arkada çalmaya devam eder
+function sleepExtra(){const live=mru().filter(t=>t.fr&&!t.app.win&&t!==FL?.t);for(const t of live.slice(MAXLIVE))if(t!==curTab())dropFrame(t)} // müzik (win) sekmeleri uyumaz: arkada çalmaya devam eder
 let progA=null;
 function progress(){const p=$('#prog');progA?.cancel();p.style.opacity=1;
   progA=anim(p,[{transform:'scaleX(0)'},{transform:'scaleX(.35)',offset:.2},{transform:'scaleX(.85)'}],{duration:2600,easing:'cubic-bezier(.1,.6,.2,1)',fill:'forwards'})}
@@ -2680,19 +2707,22 @@ function openApp(a,el){
   switchTo(a.key,el);
 }
 function switchTo(key,el){
-  const t=tabOf(key);if(!t)return;const prev=curTab(),fromHub=!W.app||W.min||W.el.hidden;
+  const t=tabOf(key);if(!t)return;const prev=curTab(),fromFlo=FL?.t===t?floRect():null,fromHub=!W.app||W.min||W.el.hidden;
+  if(fromFlo)floBack(); // mini pencereden tam ekrana: iframe geri gelir, pencerenin yerinden büyür
   t.t=performance.now();if(!t.fr)mountFrame(t);
   W.app=t.app;W.min=false;closeSwitcher();slPinPaint();
-  for(const o of TABS)if(o.fr)o.fr.hidden=o!==t;
+  for(const o of TABS)if(o.fr&&o.fr.parentNode===W.el)o.fr.hidden=o!==t;
   sleepExtra();renderTabs();$('#dock').hidden=true;
   if(t.loading)progress();else{progA?.cancel();$('#prog').style.opacity=0}
   const n=nodes.get(key);
-  if(fromHub){
-    W.el.getAnimations().forEach(x=>x.cancel());$('#scrim').getAnimations().forEach(x=>x.cancel());
-    W.el.hidden=false;W.el.style.visibility='';$('#scrim').hidden=false;chrome(true);showPill(2600);if(n)ripple(n.ax,n.ay,1.4);
-    anim($('#scrim'),[{opacity:0},{opacity:1}],{duration:380,easing:EASE});
-    const r=iconRect(el||n?.el),vw=innerWidth,vh=innerHeight;
-    if(r){const s=r.width/vw;
+  if(fromHub||fromFlo){
+    W.el.getAnimations().forEach(x=>x.cancel());$('#scrim').getAnimations().forEach(x=>x.cancel());W.el.style.transform='';W.el.style.borderRadius='';
+    W.el.hidden=false;W.el.style.visibility='';$('#scrim').hidden=false;chrome(true);showPill(2600);if(n&&!fromFlo)ripple(n.ax,n.ay,1.4);
+    if(fromHub)anim($('#scrim'),[{opacity:0},{opacity:1}],{duration:380,easing:EASE});
+    const r=fromFlo?null:iconRect(el||n?.el),vw=innerWidth,vh=innerHeight;
+    if(fromFlo){const R=fromFlo,s=R.width/vw;
+      anim(W.el,[{transform:`translate(${R.left}px,${R.top}px) scale(${s})`,borderRadius:`${14/s}px`,clipPath:`inset(0 0 ${Math.max(0,vh-R.height/s)}px 0 round ${14/s}px)`},{transform:'none',borderRadius:'0px',clipPath:'inset(0 0 0px 0 round 0px)'}],{duration:520,easing:'cubic-bezier(.32,.72,0,1)'})}
+    else if(r){const s=r.width/vw;
       anim(W.el,[{transform:`translate(${r.left}px,${r.top+r.height/2-vh*s/2}px) scale(${s})`,borderRadius:`${16/s}px`},{transform:'none',borderRadius:'0px'}],{duration:600,easing:OUT});
       anim(W.el,[{opacity:0},{opacity:1}],{duration:200,easing:'linear'})}
     else anim(W.el,[{opacity:0,transform:'scale(.97)'},{opacity:1,transform:'none'}],{duration:380,easing:OUT});
@@ -2702,9 +2732,10 @@ function switchTo(key,el){
   if(FINE)setTimeout(()=>{try{t.fr?.contentWindow?.focus()}catch{}},fromHub?620:30);
 }
 function goHome(){
-  if(!W.app||W.min)return;setPaused(false);closeSwitcher();chrome(false);
+  if(!W.app||W.min)return;if(floAuto(W.app)){floFromFull();return} // müzik/video: kapanmaz, köşeye mini pencere olur
+  setPaused(false);closeSwitcher();chrome(false);
   if(document.fullscreenElement&&!FINE)document.exitFullscreen?.().catch(()=>{});
-  W.min=true;slPinPaint();renderDock();const d=$('#dock');d.hidden=false;
+  W.min=true;slPinPaint();renderDock();const d=$('#dock');d.hidden=!d.querySelector('.dk');
   const c=d.querySelector(`[data-t="${CSS.escape(W.app.key)}"]`)||d,dr=c.getBoundingClientRect(),s=Math.max(.04,dr.width/innerWidth);
   anim($('#scrim'),[{opacity:1},{opacity:0}],{duration:300,easing:EASE,fill:'forwards'});
   anim(W.el,[{transform:'none',opacity:1},{transform:`translate(${dr.left}px,${dr.top}px) scale(${s})`,opacity:0}],{duration:420,easing:'cubic-bezier(.5,0,.1,1)',fill:'forwards'}).finished.then(()=>{if(!W.min)return;W.el.style.visibility='hidden';$('#scrim').hidden=true},()=>{});
@@ -2712,7 +2743,7 @@ function goHome(){
 }
 function restore(){const t=curTab()||mru()[0];if(t)switchTo(t.key)}
 async function closeTab(key){
-  const t=tabOf(key);if(!t)return;const front=W.app?.key===key&&!W.min,rest=mru().filter(o=>o!==t);
+  const t=tabOf(key);if(!t)return;const front=W.app?.key===key&&!W.min,rest=mru().filter(o=>o!==t&&o!==FL?.t);
   if(front&&rest.length){TABS.splice(TABS.indexOf(t),1);switchTo(rest[0].key);dropFrame(t)}
   else if(front){ // last app: fly back into its icon
     setPaused(false);const el=nodes.get(key)?.el,r=iconRect(el),vw=innerWidth,vh=innerHeight;
@@ -2724,7 +2755,7 @@ async function closeTab(key){
     TABS.splice(TABS.indexOf(t),1);dropFrame(t);hideAll();
     const n=nodes.get(key);if(n){ripple(n.ax,n.ay,1.1);anim(n.el.querySelector('.bob'),[{transform:'scale(.86)'},{transform:'scale(1.06)',offset:.5},{transform:'none'}],{duration:620,easing:EASE})}}
   else{TABS.splice(TABS.indexOf(t),1);dropFrame(t);
-    if(!TABS.length)hideAll();else{if(W.app?.key===key)W.app=rest[0].app;renderTabs();renderDock();if(SW)drawSwitcher()}}
+    if(!TABS.length)hideAll();else{if(W.app?.key===key)W.app=(rest[0]||FL?.t)?.app||null;renderTabs();renderDock();if(SW)drawSwitcher()}}
   if(key==='p:notlar'&&notesOn)readLocalNotes();
 }
 const closeWin=()=>{if(W.app&&!W.min)closeTab(W.app.key)};
@@ -2738,8 +2769,8 @@ function renderTabs(){const cur=curTab();
     return `<div class="tb${on?' on':''}${t.fr?'':' zz'}"><button class="tb-o" data-t="${esc(t.key)}" role="tab" aria-selected="${on}" title="${esc(t.app.name)}${i<9?` · Alt+${i+1}`:''}"><span class="mini" style="${m.style}">${m.html}</span><span class="tn">${esc(t.app.name)}</span></button><button class="tb-x" data-x="${esc(t.key)}" aria-label="${esc(t.app.name)} uygulamasını kapat" title="Kapat">${XI}</button></div>`}).join('');
   $('#tabs').querySelector('.on')?.scrollIntoView({block:'nearest',inline:'nearest'});
   if(cur){$('#wTab').hidden=cur.app.kind==='draft';$('#wFs').hidden=!document.fullscreenEnabled}}
-function renderDock(){const d=$('#dock');
-  d.innerHTML=`<span class="dk-l">Açık</span>`+mru().map(t=>{const m=miniIcon(t.app);
+function renderDock(){const d=$('#dock'),L=mru().filter(t=>t!==FL?.t);if(!L.length){d.innerHTML='';d.hidden=true;return} // mini penceredeki zaten görünüyor
+  d.innerHTML=`<span class="dk-l">Açık</span>`+L.map(t=>{const m=miniIcon(t.app);
     return `<div class="dk${t.fr?'':' zz'}"><button class="dk-o" data-t="${esc(t.key)}" title="${esc(t.app.name)}"><span class="mini" style="${m.style}">${m.html}</span><span class="t">${esc(t.app.name)}</span></button><button class="dk-x" data-x="${esc(t.key)}" aria-label="${esc(t.app.name)} uygulamasını kapat" title="Kapat">${XI}</button></div>`}).join('')+
     `<button class="dk-sw" data-sw aria-label="Uygulama değiştirici" title="Değiştirici · Shift+Tab ya da Alt+Q"><svg viewBox="0 0 16 16"><rect x="2.5" y="3.5" width="5" height="9" rx="1.5"/><rect x="9.5" y="3.5" width="4" height="9" rx="1.5"/></svg></button>`}
 function onTabClick(e){const x=e.target.closest('[data-x]');if(x){e.stopPropagation();closeTab(x.dataset.x);return}
@@ -2763,7 +2794,7 @@ function drawSwitcher(){if(!SW)return;const front=curTab();SW.list=SW.list.filte
   SW.el.innerHTML=`<div class="as"><div class="as-h">Açık uygulamalar <span>${FINE?(SW.shift?'Shift basılıyken Tab ile gez · bırakınca açılır':'Alt basılıyken Q ile gez · bırakınca açılır'):'Dokunarak geç'}</span></div><div class="as-g">`+SW.list.map((it,i)=>{
     if(it.home)return `<button class="as-c home${i===SW.sel?' sel':''}" data-i="${i}"><span class="as-ic"><svg viewBox="0 0 24 24"><path d="M4 11l8-6.5 8 6.5M6.5 9.5V19h11V9.5"/></svg></span><b>Ana ekran</b><small>Alt+H</small></button>`;
     const t=it.t,m=miniIcon(t.app),k=TABS.indexOf(t);
-    return `<div class="as-w"><button class="as-c${i===SW.sel?' sel':''}${t===front&&!W.min?' cur':''}" data-i="${i}"><span class="as-ic mini" style="${m.style}">${m.html}</span><b>${esc(t.app.name)}</b><small>${t.fr?(k<9?'Alt+'+(k+1):'açık'):'uykuda · dokununca yüklenir'}</small></button><button class="as-x" data-x="${esc(t.key)}" aria-label="${esc(t.app.name)} uygulamasını kapat" title="Kapat">${XI}</button></div>`}).join('')+`</div></div>`}
+    return `<div class="as-w"><button class="as-c${i===SW.sel?' sel':''}${t===front&&!W.min?' cur':''}" data-i="${i}"><span class="as-ic mini" style="${m.style}">${m.html}</span><b>${esc(t.app.name)}</b><small>${t===FL?.t?'mini pencerede':t.fr?(k<9?'Alt+'+(k+1):'açık'):'uykuda · dokununca yüklenir'}</small></button><button class="as-x" data-x="${esc(t.key)}" aria-label="${esc(t.app.name)} uygulamasını kapat" title="Kapat">${XI}</button></div>`}).join('')+`</div></div>`}
 function switcherPick(){if(!SW)return;const it=SW.list[SW.sel];closeSwitcher();if(!it)return;if(it.home)goHome();else switchTo(it.t.key)}
 function closeSwitcher(){if(!SW)return;const el=SW.el;SW=null;anim(el,[{opacity:1},{opacity:0}],{duration:140,easing:EASE}).finished.then(()=>el.remove(),()=>el.remove())}
 // shared by the hub and every open app (same-origin frames forward their keys here)
@@ -2774,6 +2805,7 @@ function osKeys(e){
   if(e.altKey&&!e.ctrlKey&&!e.metaKey){const c=e.code;
     if(c==='KeyQ'||c==='Backquote'){e.preventDefault();switcher(true,e.shiftKey?-1:1);return true}
     if(/^Digit[1-9]$/.test(c)){const t=TABS[+c.slice(5)-1];if(t){e.preventDefault();closeSwitcher();switchTo(t.key);return true}return false}
+    if(c==='KeyM'){e.preventDefault();if(W.app&&!W.min)floFromFull();else if(FL)floExpand();return true}
     if(c==='KeyH'||c==='Digit0'){if(W.app&&!W.min){e.preventDefault();goHome()}return true}
     if(c==='KeyW'&&W.app&&!W.min){e.preventDefault();closeWin();return true}}
   if(SW){if(e.key==='Escape'){e.preventDefault();closeSwitcher();return true}
@@ -2787,22 +2819,143 @@ addEventListener('keydown',e=>{if(e.key==='Tab'&&e.shiftKey&&!document.body.clas
 addEventListener('blur',()=>{if(SW?.alt)SW.alt=false});
 
 /* ── Touch: swipe the handle (or an app's screen edge) to change apps ── */
-function swipeOn(el,pick){let sx=0,sy=0,id=null,t0=0;
+function swipeOn(el,pick,noDown){let sx=0,sy=0,id=null,t0=0;
   el.addEventListener('touchstart',e=>{const p=e.changedTouches[0];if(!pick(p))return;id=p.identifier;sx=p.clientX;sy=p.clientY;t0=Date.now()},{passive:true});
   el.addEventListener('touchend',e=>{if(id==null)return;const p=[...e.changedTouches].find(q=>q.identifier===id);if(!p)return;id=null;
     const dx=p.clientX-sx,dy=p.clientY-sy;if(Date.now()-t0>700)return;
-    if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5)stepTab(dx<0?1:-1);else if(dy>50&&Math.abs(dy)>Math.abs(dx))switcher(false,0)},{passive:true})}
+    if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5)stepTab(dx<0?1:-1);else if(!noDown&&dy>50&&Math.abs(dy)>Math.abs(dx))switcher(false,0)},{passive:true})}
 function stepTab(d){if(TABS.length<2)return showPill(1800);const i=TABS.indexOf(curTab());switchTo(TABS[(i+d+TABS.length)%TABS.length].key)}
 function edgeSwipe(w){if(FINE)return;swipeOn(w.document,p=>p.clientX<16||p.clientX>w.innerWidth-16)}
-swipeOn($('#grab'),()=>true);
+swipeOn($('#grab'),()=>true,true); // aşağı çekmek = mini pencere (pullDown)
 $('#grab').addEventListener('click',()=>showPill(3500));
 
 function toggleFS(){if(!document.fullscreenEnabled)return toast('Bu tarayıcı tam ekranı desteklemiyor — ana ekrana ekleyerek dene');
   if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});else document.documentElement.requestFullscreen().catch(()=>{})}
 document.addEventListener('fullscreenchange',()=>$('#fsIcon').setAttribute('d',document.fullscreenElement?'M6 2.5V6H2.5M13.5 6H10V2.5M10 13.5V10h3.5M2.5 10H6v3.5':'M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10'));
 $('#pill').addEventListener('click',e=>{const b=e.target.closest('[data-w]');if(!b)return;const w=b.dataset.w,t=curTab();
-  if(w==='close')closeWin();else if(w==='home')goHome();else if(w==='fs')toggleFS();else if(w==='sw')switcher(false,0);
+  if(w==='close')closeWin();else if(w==='home')goHome();else if(w==='mini')floFromFull();else if(w==='fs')toggleFS();else if(w==='sw')switcher(false,0);
   else if(w==='reload'&&t){dropFrame(t);switchTo(t.key)}else if(w==='tab'&&t?.app.url)window.open(t.app.url,'_blank','noopener')});
+
+/* ════════════════════════════════════════════════════════════
+   MİNİ PENCERE — Samsung açılır görünüm + iOS resim içinde resim
+   · Müzik/video uygulaması (apps.json "win" ya da "float") ana ekrana dönünce küçülüp köşeye uçar, çalmaya devam eder
+   · Herhangi bir uygulama: üst şeridi (telefonda üst tutamacı) aşağı çek → parmağı izleyerek küçülür, bırak → pencere
+   · Pencere: başlıktan sürükle → hızına göre en yakın köşeye yaylı oturur; kenara fırlat → kenara saklanır (kulakçık);
+     aşağıdaki × hedefine bırak → kapanır; köşeden boyutlandır; başlığa çift tık / ⤢ → tam ekrana büyür
+   · Canlı iframe Element.moveBefore ile taşınır (yeniden yüklenmez, müzik kesilmez). Desteklemeyen tarayıcıda canlı olmayan kart.
+   FL={t,el,body,x,y,w,h,side,raf} · ayar appshell:flo {auto,c(köşe),w,h}
+   ════════════════════════════════════════════════════════════ */
+const FLK='appshell:flo',CANMOVE=typeof Element.prototype.moveBefore==='function',FBAR=30;
+const floCfg=()=>Object.assign({auto:true,c:'br'},store.get(FLK,{})),floSet=p=>store.set(FLK,Object.assign(floCfg(),p));
+let FL=null,pullJust=false;
+const floAuto=a=>!!a&&!!(a.win||a.float)&&floCfg().auto;
+const floPh=()=>innerWidth<700;
+function floSize(){const c=floCfg(),vw=innerWidth,vh=innerHeight,ph=floPh();
+  let w=c.w||(ph?Math.round(vw*.62):Math.round(clamp(vw*.3,320,460))),h=c.h||(ph?Math.round(w*1.25):Math.round(w*.66));
+  return{w:Math.round(clamp(w,ph?170:260,vw-24)),h:Math.round(clamp(h,ph?150:170,vh-FBAR-150))}}
+const floM=()=>({s:12,t:floPh()?62:66,b:floPh()?84:84});
+function floCorner(c,w,h){const m=floM();return{x:c[1]==='l'?m.s:innerWidth-w-m.s,y:c[0]==='t'?m.t:innerHeight-h-FBAR-m.b}}
+function floPlace(){if(!FL)return;const e=FL.el;e.style.width=FL.w+'px';e.style.height=(FL.h+FBAR)+'px';e.style.transform=`translate3d(${FL.x}px,${FL.y}px,0)`;
+  e.classList.toggle('flrl',FL.x+FL.w/2>innerWidth/2)}
+const floRect=()=>FL&&new DOMRect(FL.x,FL.y+FBAR,FL.w,FL.h);
+// yay fiziği (KARARLAR “Animasyon kalitesi”): hız korunur, hedefe yumuşak oturur
+function floSpring(tx,ty,vx=0,vy=0,done){if(!FL)return;cancelAnimationFrame(FL.raf);
+  if(REDUCED||document.documentElement.dataset.motion==='off'){FL.x=tx;FL.y=ty;floPlace();done?.();return}
+  let x=FL.x,y=FL.y,last=performance.now();vx*=1000;vy*=1000;const f=FL;
+  const step=now=>{if(FL!==f)return;const dt=Math.min(.032,(now-last)/1000);last=now;
+    vx+=(190*(tx-x)-24*vx)*dt;vy+=(190*(ty-y)-24*vy)*dt;x+=vx*dt;y+=vy*dt;FL.x=x;FL.y=y;floPlace();
+    if(Math.hypot(tx-x,ty-y)<.6&&Math.hypot(vx,vy)<8){FL.x=tx;FL.y=ty;floPlace();done?.();return}FL.raf=requestAnimationFrame(step)};
+  FL.raf=requestAnimationFrame(step)}
+function floMake(t){const m=miniIcon(t.app),e=document.createElement('div');e.className='flo'+(CANMOVE?'':' card');e.setAttribute('role','dialog');e.setAttribute('aria-label',t.app.name+' · mini pencere');
+  e.innerHTML=`<div class="flo-bar" title="Sürükle: taşı · çift tık: tam ekran"><span class="mini" style="${m.style}">${m.html}</span><b>${esc(t.app.name)}</b><span class="grow"></span>
+    <button data-fl="max" aria-label="Tam ekran" title="Tam ekran · Alt+M"><svg viewBox="0 0 16 16"><path d="M9.5 2.5h4v4M6.5 13.5h-4v-4M13.5 2.5L9 7M2.5 13.5L7 9"/></svg></button>
+    <button data-fl="x" aria-label="${esc(t.app.name)} uygulamasını kapat" title="Kapat">${XI}</button></div>
+    <div class="flo-body">${CANMOVE?'':`<div class="flo-card"><span class="mini" style="${m.style}">${m.html}</span><b>${esc(t.app.name)}</b><small>Arkada çalışıyor · dokununca açılır</small></div>`}</div>
+    <i class="flo-rs" aria-hidden="true"></i><button class="flo-tab" data-fl="out" aria-label="${esc(t.app.name)} penceresini geri getir" title="Geri getir"><span class="mini" style="${m.style}">${m.html}</span></button>`;
+  document.body.appendChild(e);e.addEventListener('click',floClick);e.querySelector('.flo-bar').addEventListener('pointerdown',floDrag);
+  e.querySelector('.flo-bar').addEventListener('dblclick',e2=>{if(!e2.target.closest('button'))floExpand()});
+  e.querySelector('.flo-rs').addEventListener('pointerdown',floResize);
+  if(!CANMOVE)e.querySelector('.flo-body').addEventListener('pointerdown',floDrag);
+  return e}
+function floClick(e){const b=e.target.closest('[data-fl]');if(!b){if(!CANMOVE&&FL&&!FL.moved&&e.target.closest('.flo-body'))floExpand();return}
+  const k=b.dataset.fl;if(k==='max')floExpand();else if(k==='x')floClose();else if(k==='out')floUnstash()}
+// pencereyi kur (canlı iframe'i içine taşı)
+function floMount(t,x,y,w,h){if(FL&&FL.t!==t)floBack();
+  if(!FL){FL={t,x,y,w,h,side:'',raf:0,el:floMake(t)};FL.body=FL.el.querySelector('.flo-body')}else Object.assign(FL,{x,y,w,h});
+  if(CANMOVE&&t.fr){try{FL.body.moveBefore(t.fr,null)}catch(err){console.warn('moveBefore',err)}t.fr.hidden=false}
+  floPlace();FL.el.classList.remove('st');renderDock();renderTabs();paintFocusBar()}
+// pencere kapanmadan uygulama arka plana döner (iframe ana pencereye geri, gizli; çalmaya devam eder)
+function floBack(){if(!FL)return;const f=FL;FL=null;cancelAnimationFrame(f.raf);
+  if(f.t.fr&&f.t.fr.parentNode===f.body){f.t.fr.hidden=true;try{W.el.moveBefore(f.t.fr,null)}catch{W.el.appendChild(f.t.fr)}}
+  f.el.remove();floBin(false)}
+function floKill(){if(!FL)return;const f=FL;FL=null;cancelAnimationFrame(f.raf);floBin(false);
+  const rm=()=>f.el.remove();anim(f.el,[{opacity:1,transform:f.el.style.transform},{opacity:0,transform:f.el.style.transform+' scale(.82)'}],{duration:220,easing:EASE}).finished.then(rm,rm);
+  renderDock();renderTabs()}
+function floClose(){if(FL)closeTab(FL.t.key)}
+function floExpand(){if(FL)switchTo(FL.t.key)}
+// tam ekrandaki uygulamayı (ya da çekilmekte olanı) köşeye küçült
+function floFromFull(o={}){const t=curTab();if(!t||W.min)return;if(!t.fr)mountFrame(t);
+  const {w,h}=floSize(),c=o.corner||floCfg().c,p=floCorner(c,w,h),vw=innerWidth,vh=innerHeight,s=w/vw,ty=p.y+FBAR;
+  if(o.corner)floSet({c});
+  W.min=true;setPaused(false);closeSwitcher();chrome(false);$('#pill').classList.add('hide');slPinPaint();
+  if(document.fullscreenElement&&!FINE)document.exitFullscreen?.().catch(()=>{});
+  const from=W.el.style.transform||'none',fromR=W.el.style.borderRadius||'0px',sc=$('#scrim'),so=+(sc.style.opacity||1);
+  W.el.getAnimations().forEach(x=>x.cancel());W.el.style.transform='';W.el.style.borderRadius='';sc.style.opacity='';
+  anim(sc,[{opacity:so},{opacity:0}],{duration:380,easing:EASE,fill:'forwards'});
+  const end=()=>{floMount(t,p.x,p.y,w,h);W.el.getAnimations().forEach(x=>x.cancel());sc.getAnimations().forEach(x=>x.cancel());
+    W.el.style.visibility='hidden';sc.hidden=true;renderDock();$('#dock').hidden=!$('#dock .dk');
+    if(FL&&!REDUCED)anim(FL.el.querySelector('.flo-bar'),[{opacity:0,transform:'translateY(6px)'},{opacity:1,transform:'none'}],{duration:260,easing:OUT})};
+  const a=anim(W.el,[{transform:from,borderRadius:fromR,clipPath:'inset(0 0 0px 0)'},
+    {transform:`translate(${p.x}px,${ty}px) scale(${s})`,borderRadius:`${14/s}px`,clipPath:`inset(0 0 ${Math.max(0,vh-h/s)}px 0 round ${14/s}px)`}],
+    {duration:o.fast?380:520,easing:'cubic-bezier(.32,.72,0,1)',fill:'forwards'});
+  a.finished.then(end,end)}
+/* ── pencere sürükleme: hız → köşe / kenara sakla / × hedefine bırak ── */
+function floBin(on,hot){let b=$('#floBin');if(!b){b=document.createElement('div');b.id='floBin';b.className='flo-bin';b.innerHTML=XI;document.body.appendChild(b)}
+  b.classList.toggle('on',!!on);b.classList.toggle('hot',!!hot)}
+function floDrag(e){if(!FL||e.button>0||e.target.closest('button'))return;const f=FL,sx=e.clientX,sy=e.clientY,x0=f.x,y0=f.y;let vx=0,vy=0,lx=sx,ly=sy,lt=performance.now(),on=false,hot=false;
+  cancelAnimationFrame(f.raf);f.moved=false;try{e.currentTarget.setPointerCapture(e.pointerId)}catch{}const tg=e.currentTarget;
+  const bin=()=>({x:innerWidth/2,y:innerHeight-56});
+  const mv=ev=>{const dx=ev.clientX-sx,dy=ev.clientY-sy;if(!on){if(Math.hypot(dx,dy)<5)return;on=true;f.moved=true;document.body.classList.add('flo-drag');f.el.classList.add('drag');floBin(true)}
+    const now=performance.now(),dt=Math.max(8,now-lt);vx=vx*.4+.6*(ev.clientX-lx)/dt;vy=vy*.4+.6*(ev.clientY-ly)/dt;lx=ev.clientX;ly=ev.clientY;lt=now;
+    f.x=x0+dx;f.y=y0+dy;const B=bin(),cx=f.x+f.w/2,cy=f.y+(f.h+FBAR)/2;hot=Math.hypot(cx-B.x,cy-B.y)<Math.max(90,f.w*.35)||Math.hypot(ev.clientX-B.x,ev.clientY-B.y)<56;
+    floBin(true,hot);f.el.classList.toggle('bin',hot);floPlace()};
+  const up=()=>{tg.removeEventListener('pointermove',mv);tg.removeEventListener('pointerup',up);tg.removeEventListener('pointercancel',up);
+    document.body.classList.remove('flo-drag');f.el.classList.remove('drag','bin');if(!on)return;floBin(false);
+    if(hot){floClose();return}
+    const px=f.x+vx*220,cx=px+f.w/2,py=f.y+vy*220,cy=py+(f.h+FBAR)/2,vw=innerWidth,vh=innerHeight;
+    if(px<-f.w*.28||px+f.w>vw+f.w*.28)return floStash(px<0?'l':'r',vy);
+    const c=(cy<vh/2?'t':'b')+(cx<vw/2?'l':'r'),p=floCorner(c,f.w,f.h);floSet({c});floSpring(p.x,p.y,vx,vy)};
+  tg.addEventListener('pointermove',mv);tg.addEventListener('pointerup',up);tg.addEventListener('pointercancel',up)}
+function floStash(side,vy=0){if(!FL)return;const vh=innerHeight,y=clamp(FL.y+vy*160,floM().t,vh-FL.h-FBAR-floM().b);FL.side=side;FL.el.classList.add('st');FL.el.dataset.side=side;
+  floSpring(side==='l'?-FL.w+30:innerWidth-30,y,0,vy)}
+function floUnstash(){if(!FL)return;const s=FL.side||'r',c=(FL.y+FL.h/2<innerHeight/2?'t':'b')+s,p=floCorner(c,FL.w,FL.h);FL.side='';FL.el.classList.remove('st');floSpring(p.x,FL.y,0,0)}
+function floResize(e){if(!FL||e.button>0)return;e.preventDefault();e.stopPropagation();const f=FL,sx=e.clientX,sy=e.clientY,w0=f.w,h0=f.h,x0=f.x,left=f.el.classList.contains('flrl'),ph=floPh();
+  try{e.currentTarget.setPointerCapture(e.pointerId)}catch{}const tg=e.currentTarget;document.body.classList.add('flo-drag');
+  const mv=ev=>{const dx=ev.clientX-sx,dy=ev.clientY-sy;const w=Math.round(clamp(w0+(left?-dx:dx),ph?170:260,innerWidth-24)),h=Math.round(clamp(h0+dy,ph?150:170,innerHeight-f.y-FBAR-12));
+    f.w=w;f.h=h;if(left)f.x=x0+w0-w;floPlace()};
+  const up=()=>{tg.removeEventListener('pointermove',mv);tg.removeEventListener('pointerup',up);tg.removeEventListener('pointercancel',up);document.body.classList.remove('flo-drag');floSet({w:f.w,h:f.h})};
+  tg.addEventListener('pointermove',mv);tg.addEventListener('pointerup',up);tg.addEventListener('pointercancel',up)}
+addEventListener('resize',()=>{if(!FL)return;if(FL.side){FL.x=FL.side==='l'?-FL.w+30:innerWidth-30;floPlace();return}
+  const c=(FL.y+FL.h/2<innerHeight/2?'t':'b')+(FL.x+FL.w/2<innerWidth/2?'l':'r');FL.w=Math.min(FL.w,innerWidth-24);FL.h=Math.min(FL.h,innerHeight-FBAR-150);const p=floCorner(c,FL.w,FL.h);FL.x=p.x;FL.y=p.y;floPlace()});
+/* ── aşağı çekerek küçült (üst şerit / telefonda üst tutamaç) — parmağı izler ── */
+function pullDown(e){if(!W.app||W.min||e.button>0||e.target.closest('.tb-x'))return;const sx=e.clientX,sy=e.clientY,vw=innerWidth,vh=innerHeight,tg=window;
+  document.body.classList.add('flo-drag'); // basılıyken iframe imleci yutmasın (yakalama tıklamayı bozardı)
+  let on=false,p=0,X=0,Y=0,s=1,vx=0,vy=0,lx=sx,ly=sy,lt=performance.now();
+  const mv=ev=>{const dx=ev.clientX-sx,dy=ev.clientY-sy;
+    if(!on){if(dy<12||Math.abs(dx)>dy)return;on=true;$('#pill').classList.add('hide');setPaused(false);
+      W.el.getAnimations().forEach(a=>a.cancel());$('#scrim').getAnimations().forEach(a=>a.cancel())}
+    const now=performance.now(),dt=Math.max(8,now-lt);vx=vx*.4+.6*(ev.clientX-lx)/dt;vy=vy*.4+.6*(ev.clientY-ly)/dt;lx=ev.clientX;ly=ev.clientY;lt=now;
+    p=clamp(dy/(vh*.6),0,1);s=1-p*.66;X=ev.clientX-sx*s;Y=ev.clientY-sy*s;
+    W.el.style.transform=`translate(${X}px,${Y}px) scale(${s})`;W.el.style.borderRadius=`${(22*Math.min(1,p*4))/s}px`;$('#scrim').style.opacity=String(1-p*.9)};
+  const up=()=>{tg.removeEventListener('pointermove',mv);tg.removeEventListener('pointerup',up);tg.removeEventListener('pointercancel',up);document.body.classList.remove('flo-drag');if(!on)return;
+    pullJust=true;setTimeout(()=>pullJust=false,60);
+    if(p>.14||vy>.55){const cx=X+vw*s/2+vx*200,cy=Y+vh*s/2+vy*200;floFromFull({corner:(cy<vh/2?'t':'b')+(cx<vw/2?'l':'r'),fast:true});return}
+    const from=W.el.style.transform,fr=W.el.style.borderRadius;W.el.style.transform='';W.el.style.borderRadius='';const so=$('#scrim').style.opacity;$('#scrim').style.opacity='';
+    anim(W.el,[{transform:from,borderRadius:fr},{transform:'none',borderRadius:'0px'}],{duration:420,easing:SPRING});anim($('#scrim'),[{opacity:+so||1},{opacity:1}],{duration:300,easing:EASE});
+    setTimeout(()=>{if(W.app&&!W.min)setPaused(true)},440)};
+  tg.addEventListener('pointermove',mv);tg.addEventListener('pointerup',up);tg.addEventListener('pointercancel',up)}
+$('#pill').addEventListener('pointerdown',pullDown);$('#grab').addEventListener('pointerdown',pullDown);
+for(const id of['#pill','#grab'])$(id).addEventListener('click',e=>{if(pullJust){e.stopPropagation();e.preventDefault();pullJust=false}},true);
 
 /* ── Menus ────────────────────────────────────────────────── */
 let menuEl=null;
@@ -2865,6 +3018,8 @@ function palette(){
     {ic:UI.graph,l:'Son değişiklikler',sub:'Uygulamada neler yenilendi',run:()=>changelog()},
     {ic:UI.fit,l:'Sakin mod',run:()=>calm(true)},
     ...(TABS.length?[{ic:UI.fit,l:'Açık uygulamalar (değiştirici)',k:'⌥Q',run:()=>switcher(false,0)}]:[]),
+    ...(W.app&&!W.min?[{ic:UI.fit,l:'Mini pencere yap',k:'⌥M',run:()=>floFromFull()}]:FL?[{ic:UI.fit,l:'Mini pencereyi tam ekran yap',k:'⌥M',run:floExpand}]:[]),
+    {ic:UI.fit,l:'Müzik/video ana ekranda mini pencere olsun'+(floCfg().auto?' ✓':''),sub:'YouTube, YouTube Music',run:()=>{floSet({auto:!floCfg().auto});toast(floCfg().auto?'Açık — ana ekrana dönünce köşede küçük pencere olur':'Kapalı — eskisi gibi arkada çalar')}},
     {ic:UI.zoom,l:'Görüntü: otomatik akıcılık'+(PERF.auto?' ✓':''),run:()=>{PERF.auto=true;localStorage.removeItem('appshell:perf');setTier(0);toast('Akıcılık otomatik — gerekirse kaliteyi kendim düşürürüm')}},
     {ic:UI.zoom,l:'Görüntü: yüksek kalite'+(!PERF.auto&&!TIER?' ✓':''),run:()=>{PERF.auto=false;localStorage.setItem('appshell:perf','fixed');setTier(0)}},
     {ic:UI.zoom,l:'Görüntü: hafif mod (eski cihazlar)'+(!PERF.auto&&TIER===2?' ✓':''),run:()=>{PERF.auto=false;localStorage.setItem('appshell:perf','fixed');setTier(2)}},

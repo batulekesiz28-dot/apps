@@ -4380,5 +4380,34 @@
     "text": "Site bilgisayarda hiç açık değilken telefondan gelen mesaj anında çıkmaz — açınca gösterilir (12 saate kadar)"
    }
   ]
+ },
+ {
+  "at": "2026-11-20T19:53:34",
+  "change": "Mini pencere geldi (Samsung açılır görünüm gibi): YouTube Music / YouTube'dan ana ekrana dönünce uygulama küçülerek köşeye uçar ve çalmaya devam eder. Herhangi bir uygulamayı üst şeridi (telefonda üstteki çizgiyi) aşağı çekerek küçültebilirsin — parmağını izler. Pencereyi başlığından sürükle → en yakın köşeye yaylı oturur; kenara fırlat → kenara saklanır; alttaki × işaretine bırak → kapanır; köşesinden boyutlandır; ⤢ ya da başlığa çift tık → tam ekrana büyür. Başka uygulama açıkken de üstte kalır. Kısayol Alt+M.",
+  "scores": {
+   "Hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Hub masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "hub",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Müzik uygulamasından çıkınca görünmeden arkada çalıyordu",
+    "fix": "Artık köşede canlı mini pencere olarak kalıyor (yeniden yüklenmeden)"
+   },
+   {
+    "app": "hub",
+    "sev": "bilgi",
+    "status": "open",
+    "text": "Canlı mini pencere Chrome/Edge'de çalışır; eski ya da başka tarayıcılarda pencerede uygulamanın simgesi ve 'arkada çalışıyor' kartı görünür"
+   }
+  ]
  }
 ]

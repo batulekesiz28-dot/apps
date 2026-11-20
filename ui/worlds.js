@@ -29,6 +29,13 @@ const read=()=>{try{return JSON.parse(localStorage.getItem(KEY))||'galaksi'}catc
 /* Her girişte rastgele arayüz (appshell:wrand = '1'): hub açılınca 10 arayüzden biri seçilir — bir önceki girişteki tekrar gelmez.
    Seçilen arayüz KAYDEDİLMEZ (appshell:world değişmez): anahtar kapatılınca kendi seçtiğin arayüz geri gelir, açık diğer sekmeler etkilenmez. */
 const RKEY='appshell:wrand',rnd=()=>{try{return localStorage.getItem(RKEY)==='1'}catch{return false}};
+// zar düğmesi: her girişte rastgele arayüzü aç/kapat (Galaksi'de üst çubukta #randBtn, diğer arayüzlerde alt menüde)
+const DICE='<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="11" height="11" rx="3"/><circle cx="5.75" cy="5.75" r=".9"/><circle cx="10.25" cy="5.75" r=".9"/><circle cx="8" cy="8" r=".9"/><circle cx="5.75" cy="10.25" r=".9"/><circle cx="10.25" cy="10.25" r=".9"/></svg>';
+const dice=()=>`<button class="wx-dice" data-wrand role="switch" aria-checked="${rnd()}" aria-label="Her girişte rastgele arayüz" title="Her girişte rastgele arayüz">${DICE}</button>`;
+function toggleRand(){const on=!rnd();try{on?localStorage.setItem(RKEY,'1'):localStorage.removeItem(RKEY)}catch{}
+  document.querySelectorAll('[data-wrand]').forEach(b=>b.setAttribute('aria-checked',on));const tb=document.getElementById('randBtn');if(tb){tb.setAttribute('aria-pressed',on);tb.classList.toggle('on',on)}
+  H().toast(on?'Her girişte rastgele bir arayüz açılacak':'Rastgele kapalı — seçtiğin arayüz açılır')}
+addEventListener('click',e=>{const b=e.target.closest?.('[data-wrand]');if(!b)return;e.preventDefault();e.stopPropagation();toggleRand()},true);
 function randWorld(){let last='';try{last=localStorage.getItem(RKEY+':last')||''}catch{}
   const pool=WORLDS.map(w=>w[0]).filter(w=>w!==last&&w!==cur),w=pool[Math.floor(Math.random()*pool.length)]||'galaksi';try{localStorage.setItem(RKEY+':last',w)}catch{}return w}
 
@@ -87,7 +94,7 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
       <button class="sp-recenter" data-sp="center">Ortala <kbd>0</kbd></button></div>
     <nav class="sp-orn" aria-label="Mekânsal gezinme"><button data-rot="-1" class="sp-arr" aria-label="Önceki uygulama">‹</button>
       <span class="sp-seg" role="group" aria-label="Görünüm"><button data-sp="halka" aria-pressed="false">Halka</button><button data-sp="izgara" aria-pressed="false">Izgara</button></span>
-      <button data-act="ara">Ara</button><button data-act="today">Bugün</button><button data-sp="envp" aria-expanded="false">Ortam</button><button data-act="world">Arayüz</button><button data-rot="1" class="sp-arr" aria-label="Sonraki uygulama">›</button></nav></div>`},
+      <button data-act="ara">Ara</button><button data-act="today">Bugün</button><button data-sp="envp" aria-expanded="false">Ortam</button><button data-act="world">Arayüz</button>${dice()}<button data-rot="1" class="sp-arr" aria-label="Sonraki uygulama">›</button></nav></div>`},
   live:{
     today:d=>{const r=[...d.items.map(x=>[x.t,x.sub]),...d.todos.map(t=>[t.t,t.done?'oldu':'açık'])].slice(0,5);
       return`<div class="sp-glass"><p class="sp-k">Bugün</p><p class="sp-t" data-clock="hm"></p><p class="sp-s">${esc(trDate(d.now,{weekday:'long',day:'numeric',month:'long'}))}</p>
@@ -305,7 +312,7 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
    Hareket azaltılmışsa (sistem ya da Ayarlar → hareket) sahne durgun çizilir; tıklama ve klavye aynen çalışır. */
 const tier=()=>{try{return H()?.tier?.()||0}catch{return 0}};
 const wxTop=d=>`<header class="wx-hd"><p class="wx-t" data-clock="hm"></p><p class="wx-d">${esc(greet(d.now))} · ${esc(trDate(d.now,{weekday:'long',day:'numeric',month:'long'}))}</p></header>`;
-const wxNav=n=>`<nav class="wx-nav" aria-label="${n}"><button data-act="ara">Ara</button><button data-act="today">Bugün</button><button data-act="world">Arayüz</button></nav>`;
+const wxNav=n=>`<nav class="wx-nav" aria-label="${n}"><button data-act="ara">Ara</button><button data-act="today">Bugün</button><button data-act="world">Arayüz</button>${dice()}</nav>`;
 // rAF döngüsü: fn(dt,t) false dönerse durur; go() yeniden başlatır
 function wxLoop(fn){const L={raf:0,last:0,on:true};const f=t=>{L.raf=0;if(!L.on)return;const dt=L.last?Math.min(.04,(t-L.last)/1000):1/60;L.last=t;
     if(fn(dt,t)!==false&&!document.hidden)L.raf=requestAnimationFrame(f);else L.last=0};
@@ -409,7 +416,7 @@ const MG={WD:[['study','Çalışma'],['todo','Bugün'],['note','Son not']],
       :`<button class="mg-a" role="listitem" data-i="${i}" data-app="${esc(it.k)}" aria-label="${esc(it.a.name)}${G.length>1?' — '+esc(G[it.gi].name):''}" title="${esc(it.a.desc)}"><i class="mg-hl" aria-hidden="true"></i>${appIcon(it.a)}<b>${esc(it.a.name)}</b></button>`).join('')}</div>
     <div class="mg-menu" role="dialog" aria-label="Düzen" hidden><p class="mg-mk">Widget'lar</p>${MG.WD.map(([k,n])=>`<button class="mg-tg" role="switch" data-mw="${k}" aria-checked="${!!MG.cfg.w[k]}"><span>${n}</span><i aria-hidden="true"></i></button>`).join('')}
       <button class="mg-rs" data-mg="reset">Yerleri sıfırla</button><p class="mg-mh">Damlaları sürükleyerek taşı · başka kümenin yanına bırak: o kümeye geçer · sağ tık / basılı tut: küme seçenekleri</p></div>
-    <nav class="wx-nav" aria-label="Mıknatıs"><button data-act="ara">Ara</button><button data-act="today">Bugün</button><button data-mg="menu" aria-expanded="false">Düzen</button><button data-act="world">Arayüz</button></nav>
+    <nav class="wx-nav" aria-label="Mıknatıs"><button data-act="ara">Ara</button><button data-act="today">Bugün</button><button data-mg="menu" aria-expanded="false">Düzen</button><button data-act="world">Arayüz</button>${dice()}</nav>
     <p class="wx-hint">${mobile()?'Damlaları sürükle · parmağını gezdir':'İmleci yaklaştır — mıknatıs gibi çeker · sürükleyerek taşı'}${WG.hint()}</p></div>`},
   live:{
     mg_study:d=>{const p=d.goal?Math.min(1,d.today/d.goal):0;return`<button class="mg-wb" data-app="p:studylog" aria-label="Çalışma: bugün ${fmt(d.today)}"><i class="mg-ring" style="--p:${Math.round(p*100)}" aria-hidden="true"></i><small>Çalışma</small><b>${fmt(d.today)}</b><span>${d.goal?'hedef '+fmt(d.goal):'bugün'}</span></button>`},
@@ -832,12 +839,11 @@ function picker(){if(pk)return;const el=document.createElement('div');el.classNa
   const key=e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation();close()}else if(/^[0-9]$/.test(e.key)&&(+e.key||10)<=WORLDS.length&&!e.metaKey&&!e.ctrlKey){e.preventDefault();e.stopPropagation();pick(WORLDS[(+e.key||10)-1][0])}
     else if((e.key==='r'||e.key==='R')&&!e.metaKey&&!e.ctrlKey&&!e.altKey){e.preventDefault();e.stopPropagation();close();const w=randWorld();if(w!==cur)apply(w)}};
   addEventListener('keydown',key,true);
-  el.addEventListener('click',e=>{const r=e.target.closest('[data-wrand]');if(r){const on=!rnd();try{on?localStorage.setItem(RKEY,'1'):localStorage.removeItem(RKEY)}catch{}r.setAttribute('aria-checked',on);
-      H().toast(on?'Her girişte rastgele bir arayüz açılacak':'Rastgele kapalı — seçtiğin arayüz açılır');return}
-    const c=e.target.closest('[data-w]');if(c)return pick(c.dataset.w);if(e.target===el||e.target.closest('.wp-x'))close()});
+  el.addEventListener('click',e=>{const c=e.target.closest('[data-w]');if(c)return pick(c.dataset.w);if(e.target===el||e.target.closest('.wp-x'))close()});
   requestAnimationFrame(()=>el.classList.add('on'));setTimeout(()=>el.querySelector('.wpc.on,.wpc')?.focus({preventScroll:true}),40)}
 
-function topBtn(){const t=document.getElementById('themeBtn');if(!t||document.getElementById('worldBtn'))return;const b=document.createElement('button');b.className='ib';b.id='worldBtn';b.title='Arayüz (⇧⌘U)';b.setAttribute('aria-label','Arayüzü değiştir');
+function topBtn(){const t=document.getElementById('themeBtn');if(!t||document.getElementById('worldBtn'))return;
+  const d=document.createElement('button');d.className='ib'+(rnd()?' on':'');d.id='randBtn';d.dataset.wrand='';d.title='Her girişte rastgele arayüz';d.setAttribute('aria-label','Her girişte rastgele arayüz');d.setAttribute('aria-pressed',rnd());d.innerHTML=DICE;t.before(d);const b=document.createElement('button');b.className='ib';b.id='worldBtn';b.title='Arayüz (⇧⌘U)';b.setAttribute('aria-label','Arayüzü değiştir');
   b.innerHTML='<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/><path d="M2.5 8h11M8 2.5c2 2 2 9 0 11M8 2.5c-2 2-2 9 0 11"/></svg>';b.onclick=e=>{e.stopPropagation();picker()};t.before(b)}
 function boot(){topBtn();if(started)return refresh();started=true;const w=rnd()?randWorld():read();if(w!=='galaksi'&&R[w])apply(w)}
 topBtn();

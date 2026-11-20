@@ -4053,5 +4053,35 @@
     "fix": "Seçicide anahtar + R tuşu"
    }
   ]
+ },
+ {
+  "at": "2026-11-20T10:44:01",
+  "change": "Rastgele arayüz artık görünür bir zar düğmesi: Galaksi'de üst çubukta, diğer arayüzlerde alttaki menüde. Bir kez basınca açılır (koyu olur), her girişte rastgele arayüz gelir; tekrar basınca kapanır ve seçtiğin arayüz açılır.",
+  "scores": {
+   "Hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Hub bilgisayar": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Hub",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Rastgele arayüz anahtarı seçicinin en altında kalıyordu, bulunmuyordu",
+    "fix": "Zar düğmesi üst çubukta ve her arayüzün menüsünde"
+   },
+   {
+    "app": "Hub",
+    "sev": "info",
+    "status": "open",
+    "text": "Dar telefonda (≤440px) galaksinin üst çubuğunda zar yok",
+    "fix": "Yer dar; arayüz seçicisindeki anahtar ve diğer arayüzlerin menüsündeki zar kullanılır"
+   }
+  ]
  }
 ]

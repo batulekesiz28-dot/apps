@@ -817,3 +817,21 @@ html[data-motion=off] .mpk-bg,html[data-motion=off] .mpk-r.in .mpk-c{animation:n
 .mfy-m{position:absolute;z-index:2;left:7px;bottom:7px;padding:3px 7px;border-radius:6px;font:700 11.5px/1.2 var(--sys,system-ui);color:#46D369;background:rgba(10,10,12,.82);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .mfy .mc-cap small{color:var(--mink2,rgba(255,255,255,.7))}
 .mfy-k{margin:-6px 0 18px}
+/* ── Sana özel sayfası (#lib/m/foryou) ── */
+.mfy-pg{padding-top:28px;padding-bottom:60px}
+.mfy-h{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px}
+.mfy-h h1{font:700 34px/1.1 var(--sys,system-ui);letter-spacing:-.02em;color:#fff}.mfy-h p{margin-top:6px;font-size:14px;color:var(--mink2,rgba(255,255,255,.7))}
+.mfy-h .mb{display:inline-flex;align-items:center;gap:8px;flex-shrink:0}.mfy-h .mb.busy .mvi{animation:mfySp 1s linear infinite}@keyframes mfySp{to{transform:rotate(360deg)}}
+.mfy-seeds{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:14px}
+.mfy-seeds>span{margin-right:4px;font-size:13px;color:var(--mink2,rgba(255,255,255,.7))}
+.mfy-seeds button,.mfy-k button{display:inline-flex;align-items:center;gap:6px;min-height:34px;padding:0 12px;border-radius:999px;background:rgba(255,255,255,.07);color:rgba(255,255,255,.86);font-size:13.5px;font-weight:600;transition:background .15s}
+.mfy-seeds button small{font-size:12px;font-weight:600;color:#F5C451}
+.mfy-seeds button:hover,.mfy-k button:hover{background:rgba(255,255,255,.13)}
+.mfy-seeds button[aria-pressed=true],.mfy-k button[aria-pressed=true]{background:#F4F4F6;color:#141417}.mfy-seeds button[aria-pressed=true] small{color:#8A6400}
+.mfy-k em{font-style:normal;font-weight:500;opacity:.65}
+.mfy-tools{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:22px}.mfy-k{display:flex;flex-wrap:wrap;gap:6px}
+.mfy-why{margin:-8px 0 18px;font-size:14px;color:var(--mink2,rgba(255,255,255,.75))}.mfy-clr{color:#fff;font-weight:600;text-decoration:underline;text-underline-offset:3px;min-height:32px}
+.mfy-g .mc-cap small{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal}
+.mc-tabs .t-foryou .mvi{color:#46D369}
+@media (max-width:640px){.mfy-pg{padding-top:16px}.mfy-h h1{font-size:28px}.mfy-h{align-items:flex-start;flex-direction:column}.mfy-seeds button,.mfy-k button{min-height:40px}.mfy-clr{min-height:40px}}
+@media (prefers-reduced-motion:reduce){.mfy-h .mb.busy .mvi{animation:none}}

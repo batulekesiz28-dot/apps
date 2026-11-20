@@ -4217,5 +4217,28 @@
     "fix": "Canlıda Medya ana sayfasına bak"
    }
   ]
+ },
+ {
+  "at": "2026-11-20T13:34:59",
+  "change": "Önerilere ayrı sayfa: Medya menüsünde “Sana özel” sekmesi (ana sayfadaki rafta da “Tümünü gör”). Bütün öneriler bir arada; Filmler/Diziler/Animeler süzgeci, sıralama (en uyumlu, en yüksek puan, en yeni), “Şunları sevdiğin için” çipleri — birine basınca sadece ona benzeyenler kalır — ve Yenile düğmesi.",
+  "scores": {
+   "Notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Notlar bilgisayar": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Notlar · Medya",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Öneriler sadece ana sayfadaki rafta, 20 tane görünüyordu",
+    "fix": "Hepsi kendi sayfasında, süzgeçli"
+   }
+  ]
  }
 ]

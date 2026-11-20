@@ -2,7 +2,10 @@
 
 YouTube ve YouTube Music, başka sitelerin içinde açılmayı yasaklayan bir güvenlik başlığı gönderir. Bu eklenti o başlığı
 **yalnızca** AppShell hub'ının (batulekesiz28-dot.github.io) içinde açılan YouTube / YouTube Music çerçevesi için kaldırır.
-Başka hiçbir siteye, sekmeye ya da YouTube Music'in kendi sekmesine dokunmaz; veri okumaz, hiçbir yere bir şey göndermez.
+Başka hiçbir siteye, sekmeye ya da YouTube Music'in kendi sekmesine dokunmaz.
+
+1.2: hub içindeki YouTube Music / YouTube çerçevesi çalan şarkının adını, sanatçısını ve kapağını SADECE hub'a bildirir
+(üstteki adada görünür) ve oradaki ⏮ ⏯ ⏭ düğmelerini oynatıcıya iletir. Başka hiçbir yere bir şey göndermez.
 
 Kurulum (Chrome / Edge / Brave):
 1. `appshell-gom.zip` dosyasını indir, sağ tık → Tümünü ayıkla.

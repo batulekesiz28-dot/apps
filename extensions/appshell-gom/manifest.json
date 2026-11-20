@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "AppShell · YouTube hub içinde",
-  "version": "1.1",
-  "description": "YouTube ve YouTube Music'in SADECE AppShell hub'ı içinde açılmasına izin verir. Başka hiçbir siteye dokunmaz.",
+  "version": "1.2",
+  "description": "YouTube ve YouTube Music'in SADECE AppShell hub'ı içinde açılmasına izin verir ve çalan şarkıyı hub'ın üst adasında gösterir. Başka hiçbir siteye dokunmaz.",
   "permissions": [
     "declarativeNetRequest"
   ],
@@ -32,6 +32,17 @@
       ],
       "run_at": "document_start",
       "all_frames": false
+    },
+    {
+      "matches": [
+        "https://music.youtube.com/*",
+        "https://www.youtube.com/*"
+      ],
+      "js": [
+        "calar.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": true
     }
   ]
 }

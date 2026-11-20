@@ -4083,5 +4083,24 @@
     "fix": "Yer dar; arayüz seçicisindeki anahtar ve diğer arayüzlerin menüsündeki zar kullanılır"
    }
   ]
+ },
+ {
+  "at": "2026-11-20T12:42:23",
+  "change": "Öneriler uygulamasına 12 yeni fikir eklendi (Medya: nerede izlenir, yıllık özet, +1 bölüm, izleme günlüğü, “ne izlesem” zarı, liste karşılaştırma; Notlar: günün hatırlatması, sabah planı/akşam kapanışı; Hub: metin parçaları, hızlı bağlantılar; SAT hata defteri; sınav geri sayımı + günlük kota). Beğendiklerine “İstiyorum” de.",
+  "scores": {
+   "Öneriler telefon": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Öneriler",
+    "sev": "info",
+    "status": "fixed",
+    "text": "⌘K içerik araması zaten yapılmıştı",
+    "fix": "Yapıldı olarak işaretlendi"
+   }
+  ]
  }
 ]

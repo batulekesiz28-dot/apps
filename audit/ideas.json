@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-13",
+ "updated": "2026-11-20",
  "method": "İki tür öneri var. “Eksik” olanlar: her uygulamamızın özelliklerini tek tek çıkarıp o alanda en iyi yapan uygulamalarla (Notion, Obsidian, Bear, Pomofocus, Session, Toggl, Bluebook, World Time Buddy, Todoist) karşılaştırdım; neyi atladığımızı, kimin en iyi yaptığını ve bizde nasıl olacağını yazdım. Diğerleri: Reddit / forum tartışmalarından çıkan genel fikirler. Hepsi kaynaklı ve kendi cümlelerimle.",
  "ideas": [
   {
@@ -139,7 +139,8 @@
      "t": "Command palette: geçmiş, bugün, gelecek",
      "u": "https://command.ai/blog/command-palette-past-present-and-future"
     }
-   ]
+   ],
+   "status": "done"
   },
   {
    "id": "spaces",
@@ -725,6 +726,318 @@
     {
      "t": "Claude — Prompting best practices",
      "u": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/be-clear-and-direct"
+    }
+   ]
+  },
+  {
+   "id": "mWhere",
+   "kind": "gap",
+   "app": "Medya",
+   "area": "Keşif",
+   "title": "Nerede izlenir? (Türkiye)",
+   "gap": "Bir filmi ya da diziyi açınca hangi platformda (Netflix, Prime, Disney+, BluTV…) olduğunu göstermiyoruz; ayrıca aramak gerekiyor.",
+   "best": [
+    {
+     "n": "JustWatch",
+     "how": "Her yapımın ülkeye göre hangi platformda, abonelikle mi kiralık mı olduğunu tek satırda gösteriyor."
+    },
+    {
+     "n": "Watchmode",
+     "how": "54 ülke ve 400'den fazla platform için ülkeye göre süzülen bir veri servisi sunuyor."
+    }
+   ],
+   "why": "“Ne izlesem” kararının yarısı “nerede var”. Listende duran film bir platforma geldiğinde haberin olur.",
+   "what": "Ayrıntı sayfasında küçük platform simgeleri (TR). Zaten girilebilen TMDB anahtarıyla TMDB'nin izleme sağlayıcıları bilgisi çekilir; anahtar yoksa satır görünmez. İsteğe bağlı: izleme listendeki bir yapım bir platforma gelince bildirim.",
+   "effort": "S",
+   "impact": 3,
+   "sources": [
+    {
+     "t": "JustWatch — Streaming API",
+     "u": "https://www.justwatch.com/al/JustWatch-Streaming-API"
+    },
+    {
+     "t": "Watchmode API",
+     "u": "https://api.watchmode.com/"
+    }
+   ]
+  },
+  {
+   "id": "mWrapped",
+   "kind": "gap",
+   "app": "Medya",
+   "area": "Özet",
+   "title": "Yıllık medya özeti (“Wrapped”)",
+   "gap": "Bu yıl kaç film/dizi/anime/oyun bitirdiğini, kaç saat harcadığını, en sevdiğin türü tek bakışta gösteren bir özet yok.",
+   "best": [
+    {
+     "n": "Letterboxd Year in Review",
+     "how": "Yıl sonunda izlenen film sayısı, saat, en çok izlenen yönetmen/oyuncu ve en çok tekrar izlenen filmi tek sayfada sunuyor."
+    }
+   ],
+   "why": "Kendi zevkini görmek keyifli ve listeyi düzenli tutmak için en iyi motivasyon.",
+   "what": "Medya'da tek, sinematik bir sayfa: bu yıl bitirilenler (türe göre), toplam saat, en yüksek puanların, en sevdiğin tür, yılın ilk ve son yapımı. Yıl boyunca açılabilir, aralıkta kendiliğinden öne çıkar.",
+   "effort": "M",
+   "impact": 2,
+   "sources": [
+    {
+     "t": "Letterboxd — Wrapped nasıl görülür",
+     "u": "https://letterboxd.zendesk.com/hc/en-us/articles/14756734879759-How-can-I-view-my-Letterboxd-Wrapped"
+    },
+    {
+     "t": "Uproxx — Letterboxd Wrapped",
+     "u": "https://uproxx.com/tv/how-to-see-your-letterboxd-wrapped-2024"
+    }
+   ]
+  },
+  {
+   "id": "mNextEp",
+   "kind": "gap",
+   "app": "Medya",
+   "area": "Takip",
+   "title": "Kaldığın yer: “+1 bölüm”",
+   "gap": "İzlediğin dizi/animede sezon ve bölüm alanı var ama ana sayfada “sıradaki bölüm” rafı ve tek dokunuşla bölüm ilerletme yok.",
+   "best": [
+    {
+     "n": "Trakt",
+     "how": "“Devam et” ve “Başla” adlı iki akıllı liste: yarım kalanlar ve hiç başlamadıkların ayrı rafta."
+    }
+   ],
+   "why": "Dizi takibinin en sık hareketi “bir bölüm daha izledim”; bu iki dokunuştan fazla sürmemeli.",
+   "what": "Medya ana sayfasında “Kaldığın yer” rafı: kartta S2·B5, üstünde +1 düğmesi. Son bölüme gelince “Bitirdin mi?” sorusu. Anime yayın takvimiyle bağlı: yeni bölüm çıkınca kart öne gelir.",
+   "effort": "S",
+   "impact": 3,
+   "sources": [
+    {
+     "t": "Trakt — Continue/Start Watching akıllı listeler",
+     "u": "https://alternativeto.net/news/2025/12/trakt-rolls-out-continue-watching-and-start-watching-smart-lists-in-new-lite-design/"
+    }
+   ]
+  },
+  {
+   "id": "mDiary",
+   "kind": "gap",
+   "app": "Medya",
+   "area": "Takip",
+   "title": "İzleme günlüğü ve tekrar izleme",
+   "gap": "Bir yapımı ne zaman izlediğini ve kaç kez izlediğini tutmuyoruz; sadece durum (izlendi/izlenecek) var.",
+   "best": [
+    {
+     "n": "Letterboxd",
+     "how": "Her izleme tarihli bir günlük kaydı; tekrar izlemeler ayrı işaretlenir, yıllık özet de bu günlükten çıkar."
+    }
+   ],
+   "why": "“Geçen ay ne izlemiştim?” sorusunun cevabı ve yıllık özetin temeli.",
+   "what": "İzlendi işaretlerken tarih (varsayılan bugün); tekrar izlersen sayaç artar. Takvim'de o güne küçük bir film çipi düşer.",
+   "effort": "S",
+   "impact": 2,
+   "sources": [
+    {
+     "t": "Popular Science — Letterboxd ipuçları",
+     "u": "https://www.popsci.com/diy/how-to-use-letterboxd/"
+    }
+   ]
+  },
+  {
+   "id": "mPick",
+   "kind": "gap",
+   "app": "Medya",
+   "area": "Keşif",
+   "title": "“Bu akşam ne izlesem?” tek düğme",
+   "gap": "İzleme listesi uzadıkça seçmek zorlaşıyor; süreye ve ruh haline göre tek öneri veren bir şey yok.",
+   "best": [
+    {
+     "n": "Trakt",
+     "how": "Henüz başlamadıklarını ayrı akıllı listede topluyor; seçimi daraltıyor."
+    }
+   ],
+   "why": "Karar yorgunluğu: 200 seçenek yerine 1 öneri + “başka” düğmesi.",
+   "what": "Medya'da zar düğmesi: “Kaç dakikan var?” (≤100 dk / dizi bölümü / fark etmez) ve tür seçimi → listenden tek kart, “Başka” ile değişir. Rastgele arayüz düğmesiyle aynı zar simgesi.",
+   "effort": "S",
+   "impact": 2,
+   "sources": [
+    {
+     "t": "Trakt — akıllı listeler",
+     "u": "https://alternativeto.net/news/2025/12/trakt-rolls-out-continue-watching-and-start-watching-smart-lists-in-new-lite-design/"
+    }
+   ]
+  },
+  {
+   "id": "mShare",
+   "kind": "gap",
+   "app": "Medya",
+   "area": "Paylaşım",
+   "title": "İzleme listesini arkadaşınla karşılaştır",
+   "gap": "Listeni bir arkadaşına göstermenin ya da ortak izlenecekleri bulmanın yolu yok.",
+   "best": [
+    {
+     "n": "Letterboxd",
+     "how": "İki kişinin izleme listesini karşılaştırıp ortak olanları gösteriyor; kullanıcıların en sevdiği özelliklerden."
+    }
+   ],
+   "why": "Birlikte film seçmek en çok zaman alan iş; kesişim tek bakışta çözer.",
+   "what": "“Listemi paylaş” → salt okunur bağlantı (giriş istemez). Arkadaşının listesini yapıştırınca ortak olanlar üstte.",
+   "effort": "M",
+   "impact": 1,
+   "sources": [
+    {
+     "t": "Popular Science — Letterboxd",
+     "u": "https://www.popsci.com/diy/how-to-use-letterboxd/"
+    }
+   ]
+  },
+  {
+   "id": "nResurface",
+   "kind": "gap",
+   "app": "Notlar",
+   "area": "Hatırlama",
+   "title": "Günün hatırlatması: eski notlar geri gelsin",
+   "gap": "Yazdığın notlar ve kitap/PDF alıntıları bir kez yazılıp unutuluyor; eskileri kendiliğinden önüne getiren bir şey yok.",
+   "best": [
+    {
+     "n": "Readwise Daily Review",
+     "how": "Her gün birkaç eski alıntıyı geri getiriyor; bir alıntı gösterildikçe tekrar gelme olasılığı düşüyor, kitap başına sıklık ayarlanabiliyor."
+    }
+   ],
+   "why": "Not almak kolay, hatırlamak zor; günde 1 dakikalık tekrar bilgiyi kalıcı yapar.",
+   "what": "Hub'da küçük bir “Bugün hatırla” kartı (ya da Bugün sayfasında): 3 eski not parçası. Tut / Atla / Bir daha gösterme. Gösterilen daha seyrek gelir.",
+   "effort": "S",
+   "impact": 2,
+   "sources": [
+    {
+     "t": "Readwise — Reviewing Highlights",
+     "u": "https://docs.readwise.io/readwise/docs/faqs/reviewing-highlights"
+    }
+   ]
+  },
+  {
+   "id": "tRitual",
+   "kind": "gap",
+   "app": "Notlar",
+   "area": "Görevler",
+   "title": "Sabah planı + akşam kapanışı",
+   "gap": "Görevler var ama günü gerçekçi planlatan ve günün sonunda yarım kalanları tek dokunuşla yarına taşıyan bir akış yok; fazla iş yüklendiğinde uyarmıyoruz.",
+   "best": [
+    {
+     "n": "Sunsama",
+     "how": "Sabah adım adım plan: görevleri çeker, süre tahmini ister, gün dolarsa uyarır. Akşam “kapanış”: biteni gözden geçirir, kalanı taşır, kısa bir değerlendirme ister."
+    }
+   ],
+   "why": "Plan yapan gün, yapmayana göre daha az strese girer; kapanış da işin “bitmeyen” hissini keser.",
+   "what": "Sabah tek ekran: bugünün görevleri + tahmini süre → “6 saatlik iş, 4 saatin var” uyarısı. Akşam belirlediğin saatte: tamamlananlar, kalanları “yarına taşı”, tek satır not (Study Log'a da yazılır).",
+   "effort": "M",
+   "impact": 3,
+   "sources": [
+    {
+     "t": "Sunsama — Daily planning and shutdown",
+     "u": "https://www.sunsama.com/features/daily-planning-and-shutdown"
+    },
+    {
+     "t": "Sunsama — Daily Planning yardım",
+     "u": "https://help.sunsama.com/docs/usage-guides/daily-planning"
+    }
+   ]
+  },
+  {
+   "id": "hSnip",
+   "kind": "gap",
+   "app": "Hub",
+   "area": "Hız",
+   "title": "Kayıtlı metin parçaları (⌘K'den kopyala)",
+   "gap": "Sık yazdığın şeyleri (adres, e-posta şablonu, okul numarası, kod parçası) saklayıp tek tuşla kopyalayamıyoruz.",
+   "best": [
+    {
+     "n": "Raycast Snippets",
+     "how": "Anahtar kelimeyle saklanan metinler; içine tarih ya da panodaki metin otomatik eklenebiliyor. Aynı şeyi sık kopyalıyorsan parça olarak kaydetmeyi öneriyor."
+    }
+   ],
+   "why": "Günde birkaç kez aynı şeyi yazmak küçük ama sürekli bir zaman kaybı.",
+   "what": "⌘K'de “Parçalar”: ;adres yaz → Enter → panoya kopyalandı. İçinde {tarih} gibi yer tutucular. Şifreler buraya KONMAZ (uyarı gösterilir).",
+   "effort": "S",
+   "impact": 2,
+   "sources": [
+    {
+     "t": "Raycast manual",
+     "u": "https://manual.raycast.com/llms.txt"
+    },
+    {
+     "t": "Raycast recipes",
+     "u": "https://manual.raycast.com/raycast-recipes"
+    }
+   ]
+  },
+  {
+   "id": "hQuick",
+   "kind": "gap",
+   "app": "Hub",
+   "area": "Hız",
+   "title": "Hızlı bağlantılar: “yt kedi”, “mal frieren”",
+   "gap": "⌘K uygulamaları ve notları arıyor ama dış sitelerde arama kısayolu yok.",
+   "best": [
+    {
+     "n": "Raycast Quicklinks",
+     "how": "Herhangi bir adresi klavye kısayoluna çeviriyor; adresin içine yazdığın sorgu yerleşiyor."
+    }
+   ],
+   "why": "YouTube, MyAnimeList, Google, College Board… her gün açılan sitelere iki tuşla gitmek.",
+   "what": "⌘K'ye “yt …”, “g …”, “mal …”, “sat …” gibi önekler; kendi önekini ekleyebilirsin (ad + adres + {sorgu}). YouTube öneki hub içindeki YouTube sekmesinde açılır.",
+   "effort": "S",
+   "impact": 2,
+   "sources": [
+    {
+     "t": "Raycast changelog — Quicklinks",
+     "u": "https://www.raycast.com/changelog/windows/6"
+    }
+   ]
+  },
+  {
+   "id": "satMistake",
+   "kind": "gap",
+   "app": "SAT Bank",
+   "area": "Tekrar",
+   "title": "Hata defteri: yanlışlar aralıklı geri gelsin",
+   "gap": "Yanlış yaptığın sorular bir kez görülüp kayboluyor; doğru zamanda tekrar önüne gelmiyor.",
+   "best": [
+    {
+     "n": "Anki (FSRS)",
+     "how": "Her kartın ne zaman unutulacağını tahmin edip tekrarı tam o zamana koyuyor; aynı hatırlama için daha az tekrar."
+    }
+   ],
+   "why": "SAT'te puanı en hızlı yükselten şey, aynı tip hatayı ikinci kez yapmamak.",
+   "what": "Yanlış ya da “emin değilim” işaretli soru otomatik hata defterine; 1–3–7 gün sonra (sonra FSRS) tekrar. Her gün “Bugünün tekrarları” sayısı Study Log'da görünür.",
+   "effort": "M",
+   "impact": 3,
+   "sources": [
+    {
+     "t": "Anki — hangi tekrar algoritması",
+     "u": "https://faqs.ankiweb.net/what-spaced-repetition-algorithm"
+    },
+    {
+     "t": "Spaced repetition recap (FSRS)",
+     "u": "https://domenic.me/fsrs/"
+    }
+   ]
+  },
+  {
+   "id": "slQuota",
+   "kind": "gap",
+   "app": "Study Log",
+   "area": "Hedef",
+   "title": "Sınav geri sayımı + günlük kota",
+   "gap": "Sınav tarihini ve kalan soru sayısını girip “bugün kaç soru çözmeliyim?” sorusunu otomatik hesaplayan bir yer yok (bunu sohbette elle hesaplamıştık).",
+   "best": [
+    {
+     "n": "Sunsama",
+     "how": "Günü gerçekçi tutmak için toplam yükü kalan zamana göre ölçüp fazla yüklenince uyarıyor."
+    }
+   ],
+   "why": "Hedef büyükken bile günlük küçük bir sayı motivasyonu korur; geride kalınca kota kendiliğinden güncellenir.",
+   "what": "Study Log'da hedef: sınav tarihi + kalan (ör. R&W 76, Math 87 zor soru). Halkada “bugün 7 soru · 23 gün kaldı”. Bir gün atlarsan kota yeniden dağıtılır; hub widget'ında da görünür.",
+   "effort": "S",
+   "impact": 3,
+   "sources": [
+    {
+     "t": "Sunsama — Daily planning",
+     "u": "https://www.sunsama.com/features/daily-planning-and-shutdown"
     }
    ]
   }

@@ -9,7 +9,7 @@ Kısaca:
 - Kullanıcıyla Türkçe, kısa ve samimi konuş; bitince “Ctrl+Shift+R ile yenile” de.
 - Değişiklikten sonra denetim: `python3 -m http.server 8766` + `python3 audit/run.py <slug>`; hataları düzelt,
   `audit/log.json`'a Türkçe kayıt ekle. Haritada yeni bir şey varsa `CLAUDE.md`'yi de güncelle.
-- API anahtarı asla HTML'e/tarayıcıya/repoya konmaz (sadece `apps/arena/server/.env`, gitignore'da).
+- API anahtarı asla HTML'e/repoya yazılmaz; kullanıcının kendi girdiği anahtarlar sadece kendi tarayıcısında (localStorage) durur.
 - Site GitHub Pages ile `main` dalından yayınlanır. Pull request açtıysan kullanıcıya “birleştirince yayına girer” de.
 
 ## Codex ortam kurulumu (setup script)

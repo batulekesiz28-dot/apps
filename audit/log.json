@@ -4270,5 +4270,35 @@
     "fix": "Canlıda Sana özel sayfasına bak"
    }
   ]
+ },
+ {
+  "at": "2026-11-20T19:26:03",
+  "change": "AI Warfront kaldırıldı, yerine Münazara Arenası geldi: bir konu seç, iki yapay zekâyı tartıştır ya da bir tarafı sen savun (Türkçe ya da İngilizce). Açılış, çürütme ve kapanıştan sonra hakem puan verir; sen tartıştıysan güçlü yanlarını, mantık hatalarını (alıntılı) ve daha güçlü bir cümle örneğini gösterir. Takıldığında “İpucu” düğmesi var.",
+  "scores": {
+   "Münazara Arenası telefon": {
+    "before": 98,
+    "after": 100
+   },
+   "Münazara Arenası bilgisayar": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Münazara Arenası",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "“Claude anahtarı ekle” bağlantısı telefonda küçüktü",
+    "fix": "40px"
+   },
+   {
+    "app": "Münazara Arenası",
+    "sev": "info",
+    "status": "open",
+    "text": "Gerçek yapay zekâ test ortamında denenemedi (internet yok); sahte cevaplarla bütün akış denendi",
+    "fix": "Canlıda bir münazara başlat"
+   }
+  ]
  }
 ]

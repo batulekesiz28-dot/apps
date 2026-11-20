@@ -68,11 +68,11 @@
    "ai": true
   },
   {
-   "slug": "arena",
-   "name": "AI Warfront",
-   "icon": "spark",
+   "slug": "munazara",
+   "name": "Münazara Arenası",
+   "icon": "chat",
    "color": "violet",
-   "desc": "ChatGPT, Gemini ve Claude yapay zekâlarının yönettiği üç ada ülkesi: sanal siber güvenlik strateji simülasyonu, canlı savaş haritası, oyun motoru ve puanlama",
+   "desc": "Bir konu seç; iki yapay zekâyı tartıştır ya da bir tarafı sen savun. Açılış, çürütme, kapanış; sonunda hakem puanı ve kişisel geri bildirim (mantık hataları, daha güçlü cümle). Türkçe ya da İngilizce münazara pratiği.",
    "ai": true
   },
   {

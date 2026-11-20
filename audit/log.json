@@ -4187,5 +4187,35 @@
     "fix": "Bilerek; boş görünmesin diye iskelet var"
    }
   ]
+ },
+ {
+  "at": "2026-11-20T13:23:08",
+  "change": "Medya ana sayfasına Netflix gibi “Sana özel” öneriler geldi: izleyip sevdiklerine göre film, dizi ve anime önerileri, her kartta “%94 uyum” ve “Dune sevdiğin için” gibi neden önerildiği. Ayrıca “Çünkü X izledin” rafları. Önizlemede “İzlemek istiyorum”, “Nerede izlenir?” ve “Bunu önerme”. Film ve dizi önerileri için Medya'daki TMDB anahtarı gerekiyor; animeler anahtarsız da çalışır.",
+  "scores": {
+   "Notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Notlar bilgisayar": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Notlar · Medya",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Sayfa yenilenince “Yeni çıkan popüler animeler” rafı boş iskelet olarak kalabiliyordu",
+    "fix": "Yeniden çizimde de dolduruluyor"
+   },
+   {
+    "app": "Notlar · Medya",
+    "sev": "info",
+    "status": "open",
+    "text": "Öneriler test ortamında sahte TMDB/AniList cevaplarıyla denendi (internet yok)",
+    "fix": "Canlıda Medya ana sayfasına bak"
+   }
+  ]
  }
 ]

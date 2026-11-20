@@ -813,3 +813,7 @@ html[data-motion=off] .mpk-bg,html[data-motion=off] .mpk-r.in .mpk-c{animation:n
 .mpk-shr{display:flex;gap:8px}.mpk-shr input{flex:1;min-width:0;height:40px;padding:0 12px;border:0;border-radius:12px;background:rgba(255,255,255,.07);color:#fff;font:inherit;font-size:14px;outline:none}
 .mpk-shr input::placeholder{color:rgba(255,255,255,.5)}.mpk-shr input:focus{box-shadow:0 0 0 2px #F4F4F6}
 @media (max-width:640px){.mpk-shr{flex-wrap:wrap}.mpk-shr input,.mpk-shr .mb{height:44px;flex:1 1 100%}.mpk-sh summary{min-height:44px}}
+/* Sana özel: uyum rozeti (Netflix'teki “eşleşme” yüzdesi gibi) */
+.mfy-m{position:absolute;z-index:2;left:7px;bottom:7px;padding:3px 7px;border-radius:6px;font:700 11.5px/1.2 var(--sys,system-ui);color:#46D369;background:rgba(10,10,12,.82);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.mfy .mc-cap small{color:var(--mink2,rgba(255,255,255,.7))}
+.mfy-k{margin:-6px 0 18px}

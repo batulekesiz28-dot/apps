@@ -57,7 +57,7 @@ const Media=(()=>{
     vls:S('<rect x="1.5" y="2.5" width="3" height="3" rx=".6"/><rect x="1.5" y="10.5" width="3" height="3" rx=".6"/><path d="M6.5 4h8M6.5 12h8"/>'),home:S('<path d="M2.5 7.5L8 3l5.5 4.5M4 6.5V13h8V6.5"/>'),
     minus:S('<path d="M3 8h10"/>'),sync:S('<path d="M13 8a5 5 0 0 1-9 3M3 8a5 5 0 0 1 9-3"/><path d="M12 2v3h-3M4 14v-3h3"/>')};
   // ana sayfa rafları (sırası ve görünürlüğü kullanıcıda) · liste sütunları
-  const SH={cont:'Kaldığın yerden devam et',arec:'Yeni çıkan popüler animeler',notes:'Not aldıkların',movies:'Filmler',series:'Diziler',anime:'Animeler',games:'Oyunlar',books:'Kitaplar',fav:'Favorilerin',top:'En sevdiklerin',docs:'Belgeler'};
+  const SH={cont:'Kaldığın yerden devam et',foryou:'Sana özel öneriler',arec:'Yeni çıkan popüler animeler',notes:'Not aldıkların',movies:'Filmler',series:'Diziler',anime:'Animeler',games:'Oyunlar',books:'Kitaplar',fav:'Favorilerin',top:'En sevdiklerin',docs:'Belgeler'};
   const LC=[['cover','Kapak'],['st','Durum'],['rate','Puanım'],['score','Genel puan'],['like','Beğeni'],['fav','Favori']];
   const LOOK0={view:'tv',cover:100,icon:'m',font:'m',gap:100,dens:'n',radius:8,ar:100,title:1,meta:1,badge:1,hero:1,rowh:100,
     lc:{cover:1,st:1,rate:1,score:0,like:1,fav:1},shelves:Object.keys(SH),off:[],tabsOff:[]};
@@ -328,7 +328,7 @@ const Media=(()=>{
   function lazy(html){if(!html)return'';const k='z'+(++lzN);LZ.set(k,html);return`<div class="mc-lz" data-lz="${k}"></div>`}
   function lazyWatch(){io?.disconnect();if(!('IntersectionObserver'in window)){qa('.mc [data-lz]').forEach(fillLz);return}
     io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){io.unobserve(e.target);fillLz(e.target)}}),{root:q('#scroll'),rootMargin:'900px 0px'});qa('.mc [data-lz]').forEach(z=>io.observe(z))}
-  function fillLz(z){const h=LZ.get(z.dataset.lz);LZ.delete(z.dataset.lz);if(h==null)return;z.outerHTML=h;arrows();if(h.includes('data-arec'))arecFill()}
+  function fillLz(z){const h=LZ.get(z.dataset.lz);LZ.delete(z.dataset.lz);if(h==null)return;z.outerHTML=h;arrows();if(h.includes('data-arec'))arecFill();if(h.includes('data-fy'))fyFill()}
   /* görünüm: tv = Apple TV (geniş büyük kapaklar) · nf = Netflix (yoğun posterler) · compact (küçük, az metin) · list (satırlar) */
   // Apple TV: kart şeklini kapaklar belirler — yatay görseli olanların çoğunluğu varsa geniş kart, yoksa büyük dikey poster (küçültülmüş/bulanık poster yok)
   const hasWide=it=>!!(it.wide||it.backdrop);
@@ -406,6 +406,7 @@ const Media=(()=>{
       fav:()=>shelf(SH.fav,byTouch(l.filter(i=>i.fav)),{}),
       top:()=>shelf(SH.top,byScore(w.filter(i=>i.status==='done')).slice(0,10),{v:'r',sub:'İzlediklerin arasında en yüksek puanlılar'}),
       arec:()=>recShelf(),
+      foryou:()=>`<div data-fy>${fyHTML||fySk('Sana özel','İzleyip sevdiklerine bakıyorum…')}</div>`,
       notes:()=>{const N=noteIndex();return shelf(SH.notes,l.filter(i=>N.has(i.id)).sort((a,b)=>N.get(b.id)[0].updated-N.get(a.id)[0].updated).slice(0,20),{sub:'Workspace’teki notlarına bağlı yapımlar'})},
       docs:()=>docsShelf()};
     const rows=L.shelves.filter(k=>!L.off.includes(k)).map((k,n)=>n<3?H[k]():lazy(H[k]())).join('');
@@ -494,6 +495,68 @@ const Media=(()=>{
   function recShelf(){return`<section class="mc-shelf an mrec" data-arec><header><h2>Yeni çıkan popüler animeler</h2><p>Bu sezon yayında · listende olmayanlar · sevdiğin türler önde</p></header>
     <div class="mc-rw"><button class="mc-arr l" data-row="-1" aria-label="Sola kaydır" tabindex="-1">${IC.l}</button><div class="mc-row v-p">${'<article class="mc-card v-p mrc-sk"><div class="mc-art"><div class="mp"></div></div></article>'.repeat(6)}</div><button class="mc-arr r" data-row="1" aria-label="Sağa kaydır" tabindex="-1">${IC.r}</button></div></section>`}
   let arecData=[];
+  /* ══ Sana özel (Netflix tarzı): izleyip sevdiklerinden yola çıkan öneriler ══
+     Tohumlar: bitirdiğin/devam ettiğin film-dizi-anime; puanın (≥6), beğeni, favori ağırlık verir; beğenmediklerin tohum olmaz.
+     Kaynak: TMDB “recommendations” (anahtar mc:tmdb; tohumun TMDB kimliği imdb → find, yoksa ad+yıl araması, önbellek mc:tmid),
+     anahtar yoksa animeler için AniList önerileri. Birden çok sevdiğine benzeyen yukarı çıkar; uyum % = göreli puan.
+     Önbellek mc:fy {at,sig,d} (24 sa, tohumlar değişince yenilenir); “Bunu önerme” → mc:fyno. Listende olanlar önerilmez. */
+  const FY_TTL=864e5;let fyP=null,fyData=[],fyErr='',fyHTML='';
+  const fySk=(h,p)=>`<section class="mc-shelf mrec mfy"><header><h2>${E(h)}</h2><p>${E(p)}</p></header><div class="mc-rw"><div class="mc-row v-p">${'<article class="mc-card v-p mrc-sk"><div class="mc-art"><div class="mp"></div></div></article>'.repeat(6)}</div></div></section>`;
+  function fySeeds(){const w=i=>(i.rating?i.rating/10:i.like>0?.8:i.fav?.9:.55)+(i.fav?.15:0);
+    return[...KB.items.values()].filter(i=>['movie','series','anime'].includes(i.type)&&['done','doing'].includes(stOf(i))&&!(i.like<0)&&!(i.rating&&i.rating<6))
+      .map(i=>({i,w:w(i)})).sort((a,b)=>b.w-a.w||(b.i.updated||0)-(a.i.updated||0)).slice(0,8)}
+  async function tmGenres(k){const c=lsg('mc:tmg',null);if(c&&Date.now()-c.at<30*864e5)return c.g;const g={};
+    for(const t of['movie','tv']){const j=await getJSON(`https://api.themoviedb.org/3/genre/${t}/list?api_key=${encodeURIComponent(k)}&language=tr-TR`);(j?.genres||[]).forEach(x=>g[x.id]=x.name)}
+    lss('mc:tmg',{at:Date.now(),g});return g}
+  async function tmId(it,k){const map=lsg('mc:tmid',{});if(map[it.id])return map[it.id];const t=it.type==='movie'?'movie':'tv',K=encodeURIComponent(k);let id=0;
+    if(it.imdb){const f=await getJSON(`https://api.themoviedb.org/3/find/${encodeURIComponent(it.imdb)}?api_key=${K}&external_source=imdb_id`);id=(f?.[t+'_results']||[])[0]?.id||0}
+    if(!id){const y=String(it.year||'').slice(0,4),s=await getJSON(`https://api.themoviedb.org/3/search/${t}?api_key=${K}&query=${encodeURIComponent(it.title)}${y?(t==='movie'?'&year=':'&first_air_date_year=')+y:''}`);id=(s?.results||[])[0]?.id||0}
+    const v=id?t+':'+id:'-';map[it.id]=v;lss('mc:tmid',map);return v}
+  const tmPack=(r,t,G)=>({key:`tm:${t}:${r.id}`,kind:t==='movie'?'movie':(r.original_language==='ja'&&(r.genre_ids||[]).includes(16)?'anime':'series'),t:r.title||r.name||'',o:r.original_title||r.original_name||'',
+    img:r.poster_path?'https://image.tmdb.org/t/p/w342'+r.poster_path:'',y:String(r.release_date||r.first_air_date||'').slice(0,4),sc:+r.vote_average||0,src:'TMDB',
+    g:(r.genre_ids||[]).map(id=>G[id]).filter(Boolean).slice(0,4),syn:String(r.overview||'').slice(0,900)});
+  function fyLoad(force){const k=tmdbKey(),S=fySeeds(),sig=S.map(s=>s.i.id+':'+(s.i.rating||0)+':'+(s.i.like||0)).join(',')+'|'+(k?1:0),c=lsg('mc:fy',null);
+    if(!S.length){fyErr='seed';return Promise.resolve(null)}
+    if(!force&&c&&c.sig===sig&&Date.now()-c.at<FY_TTL){fyErr='';return Promise.resolve(c.d)}if(fyP)return fyP;
+    fyP=(async()=>{const agg=new Map(),per=[];let G={},ok=0,fail=0;if(k)try{G=await tmGenres(k)}catch{}
+      for(const{i,w}of S){let list=[];
+        try{if(k){const id=await tmId(i,k);if(id!=='-'){const[t,n]=id.split(':'),j=await getJSON(`https://api.themoviedb.org/3/${t}/${n}/recommendations?api_key=${encodeURIComponent(k)}&language=tr-TR`);list=(j?.results||[]).filter(r=>r.poster_path).map(r=>tmPack(r,t,G))}ok++}
+          else if(i.type==='anime'&&i.mal){const d=await alGQL(`query($m:Int){Media(idMal:$m,type:ANIME){recommendations(sort:RATING_DESC,perPage:12){nodes{mediaRecommendation{idMal id title{romaji english} coverImage{extraLarge large} averageScore popularity episodes genres description(asHtml:false) startDate{year month day} status}}}}}`,{m:+i.mal});
+            list=(d?.Media?.recommendations?.nodes||[]).map(n=>n.mediaRecommendation).filter(m=>m&&!m.isAdult).map(m=>{const a=alPack(m);return{key:'al:'+a.key,kind:'anime',t:a.t,o:a.o,img:a.img,y:a.y?String(a.y):'',sc:a.sc,src:'AniList',g:a.g,syn:a.syn,mal:a.mal}});ok++}}catch(e){fail++;console.warn('Öneri',i.title,e)}
+        list=list.filter(d=>d.t&&d.img).slice(0,20);if(list.length)per.push({seed:i.title,list:list.map(d=>d.key)});
+        list.forEach((d,r)=>{const e=agg.get(d.key)||{d,s:0,from:[]};e.s+=w*(1-r/24);if(!e.from.includes(i.title))e.from.push(i.title);agg.set(d.key,e)})}
+      const out={per,all:[...agg.values()].map(e=>({...e.d,from:e.from,s:e.s+(e.d.sc||0)/25+Math.min(.3,(e.from.length-1)*.12)}))};
+      fyP=null;fyErr=!ok&&fail?'net':!k&&!S.some(s=>s.i.type==='anime'&&s.i.mal)?'key':'';if(ok)lss('mc:fy',{at:Date.now(),sig,d:out});return out})();return fyP}
+  function fyPick(D){const mine=[...KB.items.values()],tt=new Set(mine.flatMap(i=>[norm(i.title),norm(i.orig||'')]).filter(Boolean)),mal=new Set(mine.map(i=>String(i.mal||'')).filter(x=>x&&x!=='0')),no=new Set(lsg('mc:fyno',[]));
+    const ok=d=>!no.has(d.key)&&!tt.has(norm(d.t))&&!tt.has(norm(d.o))&&!(d.mal&&mal.has(String(d.mal)));
+    const all=(D?.all||[]).filter(ok).sort((a,b)=>b.s-a.s),mx=all[0]?.s||1;all.forEach(d=>d.fit=Math.round(72+26*Math.min(1,d.s/mx)));
+    const by=new Map(all.map(d=>[d.key,d]));return{top:all.slice(0,20),per:(D?.per||[]).map(p=>({seed:p.seed,list:p.list.map(k=>by.get(k)).filter(Boolean)})).filter(p=>p.list.length>=4)}}
+  const KN={movie:'Film',series:'Dizi',anime:'Anime'};
+  const whyTxt=d=>d.from?.length?`${d.from.slice(0,2).join(' ve ')}${d.from.length>2?` (+${d.from.length-2})`:''} sevdiğin için`:'';
+  const fyCard=(d,why)=>`<article class="mc-card v-p t-${d.kind} mrc" data-fyid="${E(d.key)}" tabindex="0" aria-label="${E(d.t)} — önizle, %${d.fit} uyum"><div class="mc-art"><div class="mp"><img src="${E(d.img)}" alt="" loading="lazy" referrerpolicy="no-referrer" onload="Media.imgOk(this)"></div><span class="mfy-m">%${d.fit} uyum</span></div>
+    <div class="mc-cap"><b>${E(d.t)}</b><small>${E(why?whyTxt(d):[KN[d.kind],d.y].filter(Boolean).join(' · '))}</small></div></article>`;
+  const fyRow=(h,p,l,why)=>`<section class="mc-shelf mrec mfy"><header><h2>${E(h)}</h2>${p?`<p>${E(p)}</p>`:''}</header><div class="mc-rw"><button class="mc-arr l" data-row="-1" aria-label="Sola kaydır" tabindex="-1">${IC.l}</button><div class="mc-row v-p">${l.map(d=>fyCard(d,why)).join('')}</div><button class="mc-arr r" data-row="1" aria-label="Sağa kaydır" tabindex="-1">${IC.r}</button></div></section>`;
+  async function fyFill(force){const box=qa('#view>.mc [data-fy]');if(!box.length)return;const D=await fyLoad(force),P=fyPick(D);fyData=P.top.concat(P.per.flatMap(p=>p.list));
+    let h='';if(P.top.length)h=fyRow('Sana özel',`İzleyip sevdiklerine göre · ${P.top.length} öneri`,P.top,true)+P.per.slice(0,2).map(p=>fyRow(`Çünkü ${p.seed} izledin`,'',p.list.slice(0,16),false)).join('');
+    if(P.top.length&&!tmdbKey()&&fySeeds().some(x=>x.i.type!=='anime'))h+=`<p class="mrec-e mfy-k">Şimdilik sadece anime önerileri var — film ve dizi önerileri için ücretsiz TMDB anahtarı ekle. <button class="mb sm" data-mset>Anahtarı gir</button></p>`;
+    else if(fyErr==='seed')h=`<section class="mc-shelf mfy"><header><h2>Sana özel</h2></header><p class="mrec-e">İzlediklerini “izledim” olarak işaretleyip puan verdikçe burada sana özel öneriler çıkar.</p></section>`;
+    else if(fyErr==='key')h=`<section class="mc-shelf mfy"><header><h2>Sana özel</h2></header><p class="mrec-e">Film ve dizi önerileri için ücretsiz bir TMDB anahtarı gerekiyor (animeler anahtarsız da çalışır). <button class="mb sm" data-mset>Anahtarı gir</button></p></section>`;
+    else if(fyErr==='net')h=`<section class="mc-shelf mfy"><header><h2>Sana özel</h2></header><p class="mrec-e">Öneriler şu an alınamadı — servislere ulaşılamıyor. <button class="mb sm" data-nettest>Bağlantıyı test et</button></p></section>`;
+    fyHTML=h;for(const b of qa('#view>.mc [data-fy]')){if(b.innerHTML!==h)b.innerHTML=h;if(!h)b.remove()}arrows()}
+  function fyOpen(k0){const d=fyData.find(x=>x.key===k0);if(!d)return;q('.mrcp-bg')?.remove();const bg=document.createElement('div');bg.className='mrcp-bg';
+    bg.innerHTML=`<div class="mrcp" role="dialog" aria-modal="true" aria-label="${E(d.t)}"><button class="mns-x mrcp-x" data-rx aria-label="Kapat">${IC.x}</button>
+      <div class="mrcp-p"><img src="${E(d.img)}" alt="" referrerpolicy="no-referrer"></div>
+      <div class="mrcp-b"><span class="mrcp-k">%${d.fit} uyum · ${E([KN[d.kind],d.y].filter(Boolean).join(' · '))}</span><h3>${E(d.t)}</h3>${d.o&&d.o!==d.t?`<p class="mrcp-o">${E(d.o)}</p>`:''}
+        ${d.sc?`<p class="mrcp-m"><span class="mc-sc"><i>${E(d.src||'')}</i>${(+d.sc).toFixed(1)}</span></p>`:''}
+        ${d.g?.length?`<p class="mrcp-g">${d.g.map(g=>`<span>${E(g)}</span>`).join('')}</p>`:''}
+        ${whyTxt(d)?`<p class="mrcp-w">${E(whyTxt(d))} önerildi</p>`:''}${d.syn?`<p class="mrcp-s">${E(d.syn)}</p>`:''}
+        <div class="mrcp-a"><button class="mb pri" data-fyadd>${IC.plus}İzlemek istiyorum</button><a class="mb" href="../izle/?q=${encodeURIComponent(d.t)}" target="_blank" rel="noopener">Nerede izlenir?</a><button class="mb" data-fyno>Bunu önerme</button></div></div></div>`;
+    document.body.appendChild(bg);if(motion())bg.firstElementChild.animate([{opacity:0,transform:'translateY(10px) scale(.98)'},{opacity:1,transform:'none'}],{duration:320,easing:'cubic-bezier(.16,1,.3,1)'});bg.querySelector('[data-fyadd]').focus();
+    const close=()=>bg.remove(),gone=()=>{fyData=fyData.filter(x=>x.key!==d.key);qa(`[data-fyid="${CSS.escape(d.key)}"]`).forEach(c=>c.remove());fyHTML=''};
+    bg.addEventListener('click',e=>{if(e.target===bg||e.target.closest('[data-rx]'))return close();
+      if(e.target.closest('[data-fyadd]')){KB.addItem({type:d.kind,title:d.t,year:d.y,cover:d.img,genres:d.g,desc:d.syn,mal:d.mal?String(d.mal):'',status:'todo',match:'ok',metaAt:Date.now(),reviewed:true,tags:[d.kind]});close();say(`“${d.t}” izlemek istediklerine eklendi`);gone();return}
+      if(e.target.closest('[data-fyno]')){const n=lsg('mc:fyno',[]);n.push(d.key);lss('mc:fyno',n.slice(-500));close();gone();say(`“${d.t}” bir daha önerilmeyecek`)}});
+    const key=e=>{if(e.key==='Escape'&&bg.isConnected){e.stopPropagation();close();removeEventListener('keydown',key,true)}};addEventListener('keydown',key,true)}
   async function arecFill(){const box=qa('#view>.mc [data-arec]');if(!box.length)return;const L=arecPick(await arecLoad());arecData=L;
     for(const b of qa('#view>.mc [data-arec]')){if(!L.length){const rw=b.querySelector('.mc-rw');if(arecErr&&rw)rw.outerHTML=`<p class="mrec-e">Öneriler şu an alınamadı — servislere ulaşılamıyor. <button class="mb sm" data-nettest>Bağlantıyı test et</button></p>`;else if(!arecErr)b.remove();continue}b.querySelector('.mc-row').innerHTML=L.map(arecCard).join('')}}
   function arecOpen(id){const d=arecData.find(x=>String(x.key||x.mal)===String(id));if(!d)return;q('.mrcp-bg')?.remove();const bg=document.createElement('div');bg.className='mrcp-bg';
@@ -565,10 +628,10 @@ const Media=(()=>{
     document.getElementById('app')?.classList.add('mc-on');
     if(typeof setCrumb==='function')setCrumb(IC.play,st.sec==='home'?'Medya':SEC[st.sec].n,'');
     if(changed&&!o.soft)q('#scroll').scrollTop=0;else if(changed)q('#scroll').scrollTop=0;
-    heroStart();arrows();lazyWatch();Library.loadPack?.().then(migrate);queue();arecFill();if(!aniFix.done){aniFix.done=1;setTimeout(()=>aniFix(),2500);setTimeout(()=>nsRun(),6000);setTimeout(()=>coverFix(),9000)}nsPaint()}
+    heroStart();arrows();lazyWatch();Library.loadPack?.().then(migrate);queue();arecFill();fyFill();if(!aniFix.done){aniFix.done=1;setTimeout(()=>aniFix(),2500);setTimeout(()=>nsRun(),6000);setTimeout(()=>coverFix(),9000)}nsPaint()}
   function refresh(){const root=q('#view>.mc');if(!root)return;const sc=q('#scroll'),y=sc.scrollTop,rows=qa('.mc-row',root).map(r=>r.scrollLeft),f=document.activeElement,inS=f&&f.matches('[data-ms]');
     if(inS){const m=q('.mc-main',root);m.innerHTML=body()}else{const b=body();root.innerHTML=nav()+`<main class="mc-main">${b}</main>`;root.classList.toggle('has-hero',!!q('.mh',root))}
-    lazyWatch();qa('.mc-row',root).forEach((r,i)=>r.scrollLeft=rows[i]||0);sc.scrollTop=y;heroStart();arrows();if(q('.mx-bg'))detailRefresh()}
+    lazyWatch();qa('.mc-row',root).forEach((r,i)=>r.scrollLeft=rows[i]||0);sc.scrollTop=y;heroStart();arrows();arecFill();fyFill();if(q('.mx-bg'))detailRefresh()}
   function arrows(){qa('.mc .mc-row').forEach(r=>{const w=r.closest('.mc-rw');const upd=()=>{w.classList.toggle('al',r.scrollLeft>8);w.classList.toggle('ar',r.scrollLeft+r.clientWidth<r.scrollWidth-8)};upd();r.onscroll=upd})}
   let rT=0;KB.on(()=>{if(!q('#view>.mc'))return;clearTimeout(rT);rT=setTimeout(()=>{const f=document.activeElement;if(f&&f.closest?.('.mx textarea,.mx input,.mx [contenteditable],.mq'))return detailRefresh(true);refresh()},140)});
 
@@ -584,6 +647,7 @@ const Media=(()=>{
       const mk=t.closest('[data-mk]');if(mk){st.kind=mk.dataset.mk;swap();return}
       const lv=t.closest('[data-lv]');if(lv){setLook('view',lv.dataset.lv,true);q('.mset')&&qa('.mset [data-lk=view]').forEach(x=>{const on=x.dataset.lval===V();x.classList.toggle('on',on);x.setAttribute('aria-checked',on)});return}
       const rc=t.closest('[data-arid]');if(rc){arecOpen(rc.dataset.arid);return}
+      const fy=t.closest('[data-fyid]');if(fy){fyOpen(fy.dataset.fyid);return}
       if(t.closest('[data-nettest]')){netTest();return}
       const nb=t.closest('[data-ns]');if(nb){nsPanel(nb);if(!nsBusy)nsRun();return}
       if(t.closest('[data-mpick]')){pickSheet();return}
@@ -594,7 +658,7 @@ const Media=(()=>{
       const mq=t.closest('[data-mq]');if(mq){e.preventDefault();e.stopPropagation();const id=mq.dataset.id||mq.closest('[data-mi]')?.dataset.mi;if(mq.dataset.mq==='more')return menu(id,mq);if(mq.dataset.mq==='rate')return ratePop(id,mq);act(id,mq.dataset.mq);return}
       const mo=t.closest('[data-mo]');if(mo){open(mo.dataset.mo);return}
       const c=t.closest('[data-mi]');if(c&&!t.closest('a')){open(c.dataset.mi)}});
-    root.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches?.('[data-arid]')){e.preventDefault();arecOpen(e.target.dataset.arid);return}const c=e.target.closest?.('[data-mi]');if(c&&e.target===c&&(e.key==='Enter'||e.key===' ')){e.preventDefault();open(c.dataset.mi)}
+    root.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches?.('[data-arid]')){e.preventDefault();arecOpen(e.target.dataset.arid);return}if(e.key==='Enter'&&e.target.matches?.('[data-fyid]')){e.preventDefault();fyOpen(e.target.dataset.fyid);return}const c=e.target.closest?.('[data-mi]');if(c&&e.target===c&&(e.key==='Enter'||e.key===' ')){e.preventDefault();open(c.dataset.mi)}
       if(c&&e.target===c&&(e.key==='ArrowRight'||e.key==='ArrowLeft')){const sib=e.key==='ArrowRight'?c.nextElementSibling:c.previousElementSibling;if(sib?.matches('[data-mi]')){e.preventDefault();sib.focus();sib.scrollIntoView({block:'nearest',inline:'nearest',behavior:motion()?'smooth':'auto'})}}
       if(e.target.matches('[data-ms]')){if(e.key==='Escape'){e.target.value='';st.qs='';refresh();e.target.blur()}if(e.key==='Enter'){const f=q('.mc-main [data-mi]');if(f)open(f.dataset.mi)}}});
     root.addEventListener('input',e=>{if(e.target.matches('[data-ms]')){clearTimeout(root.sT);root.sT=setTimeout(()=>{st.qs=e.target.value.trim();q('.mc-main',root).innerHTML=body();arrows();heroStart();lazyWatch()},140)}});
@@ -697,7 +761,7 @@ const Media=(()=>{
     setTimeout(()=>el.querySelector('button.on,input')?.focus(),0)}
   addEventListener('pointerdown',e=>{const m=q('.mset');if(m&&!m.contains(e.target)&&!e.target.closest('[data-mset]'))m.remove()});
   addEventListener('keydown',e=>{if(e.key==='Escape'&&q('.mset')){q('.mset').remove();q('[data-mset]')?.focus()}});
-  function swap(){const m=q('.mc .mc-main');if(!m)return;const y=q('#scroll').scrollTop;m.innerHTML=body();q('#scroll').scrollTop=y;arrows();lazyWatch()}
+  function swap(){const m=q('.mc .mc-main');if(!m)return;const y=q('#scroll').scrollTop;m.innerHTML=body();q('#scroll').scrollTop=y;arrows();lazyWatch();arecFill();fyFill()}
   addEventListener('keydown',e=>{if(!q('#view>.mc')||e.metaKey||e.ctrlKey||e.altKey)return;if(e.target.closest?.('input,textarea,select,[contenteditable]'))return;if(q('.mx-bg,.ma-bg,.mq,.pal-bg'))return;
     if(e.key==='/'){e.preventDefault();q('.mc [data-ms]')?.focus()}else if(e.key==='a'||e.key==='A'){e.preventDefault();addSheet()}});
 

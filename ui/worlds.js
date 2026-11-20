@@ -26,6 +26,11 @@ const greet=d=>{const h=d.getHours();return h<5?'İyi geceler':h<11?'Günaydın'
 const trDate=(d,o)=>d.toLocaleDateString('tr-TR',o);
 const hm=d=>d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
 const read=()=>{try{return JSON.parse(localStorage.getItem(KEY))||'galaksi'}catch{return'galaksi'}};
+/* Her girişte rastgele arayüz (appshell:wrand = '1'): hub açılınca 10 arayüzden biri seçilir — bir önceki girişteki tekrar gelmez.
+   Seçilen arayüz KAYDEDİLMEZ (appshell:world değişmez): anahtar kapatılınca kendi seçtiğin arayüz geri gelir, açık diğer sekmeler etkilenmez. */
+const RKEY='appshell:wrand',rnd=()=>{try{return localStorage.getItem(RKEY)==='1'}catch{return false}};
+function randWorld(){let last='';try{last=localStorage.getItem(RKEY+':last')||''}catch{}
+  const pool=WORLDS.map(w=>w[0]).filter(w=>w!==last&&w!==cur),w=pool[Math.floor(Math.random()*pool.length)]||'galaksi';try{localStorage.setItem(RKEY+':last',w)}catch{}return w}
 
 /* ── Ortak veri: her dünya aynı şeyi görür ── */
 function D(){const h=H(),now=new Date(),k=h.dayKey(now);
@@ -820,18 +825,21 @@ let pk=null;
 function picker(){if(pk)return;const el=document.createElement('div');el.className='wp-bg';el.innerHTML=`<div class="wp" role="dialog" aria-modal="true" aria-labelledby="wpT">
   <header><div><h2 id="wpT">Arayüz</h2><p>Aynı uygulamalar ve veriler, ${WORLDS.length} ayrı dünya; her birinde imleç sahneyi canlandırır. Renk teması Galaksi'de ve uygulamalarda geçerli.</p></div><button class="wp-x" aria-label="Kapat">✕</button></header>
   <div class="wp-g">${WORLDS.map(([k,n,ds],i)=>`<button class="wpc${k===cur?' on':''}" data-w="${k}" aria-pressed="${k===cur}"><div class="wpv pv-${k}" aria-hidden="true">${MINI[k]}</div><span class="wpn"><b>${n}</b><kbd>${(i+1)%10}</kbd></span><span class="wpd">${ds}</span></button>`).join('')}</div>
-  <footer>1–9 ve 0 tuşları ile seç · Esc kapatır</footer></div>`;
+  <footer><button class="wp-rand" role="switch" data-wrand aria-checked="${rnd()}"><i aria-hidden="true"></i>Her girişte rastgele arayüz</button><span>1–9 ve 0 ile seç · R rastgele · Esc kapatır</span></footer></div>`;
   document.body.appendChild(el);pk=el;
   const close=()=>{if(!pk)return;pk=null;removeEventListener('keydown',key,true);if(calmMotion())return el.remove();el.classList.add('out');setTimeout(()=>el.remove(),220)};
   const pick=w=>{close();if(w!==cur)set(w)};
-  const key=e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation();close()}else if(/^[0-9]$/.test(e.key)&&(+e.key||10)<=WORLDS.length&&!e.metaKey&&!e.ctrlKey){e.preventDefault();e.stopPropagation();pick(WORLDS[(+e.key||10)-1][0])}};
+  const key=e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation();close()}else if(/^[0-9]$/.test(e.key)&&(+e.key||10)<=WORLDS.length&&!e.metaKey&&!e.ctrlKey){e.preventDefault();e.stopPropagation();pick(WORLDS[(+e.key||10)-1][0])}
+    else if((e.key==='r'||e.key==='R')&&!e.metaKey&&!e.ctrlKey&&!e.altKey){e.preventDefault();e.stopPropagation();close();const w=randWorld();if(w!==cur)apply(w)}};
   addEventListener('keydown',key,true);
-  el.addEventListener('click',e=>{const c=e.target.closest('[data-w]');if(c)return pick(c.dataset.w);if(e.target===el||e.target.closest('.wp-x'))close()});
+  el.addEventListener('click',e=>{const r=e.target.closest('[data-wrand]');if(r){const on=!rnd();try{on?localStorage.setItem(RKEY,'1'):localStorage.removeItem(RKEY)}catch{}r.setAttribute('aria-checked',on);
+      H().toast(on?'Her girişte rastgele bir arayüz açılacak':'Rastgele kapalı — seçtiğin arayüz açılır');return}
+    const c=e.target.closest('[data-w]');if(c)return pick(c.dataset.w);if(e.target===el||e.target.closest('.wp-x'))close()});
   requestAnimationFrame(()=>el.classList.add('on'));setTimeout(()=>el.querySelector('.wpc.on,.wpc')?.focus({preventScroll:true}),40)}
 
 function topBtn(){const t=document.getElementById('themeBtn');if(!t||document.getElementById('worldBtn'))return;const b=document.createElement('button');b.className='ib';b.id='worldBtn';b.title='Arayüz (⇧⌘U)';b.setAttribute('aria-label','Arayüzü değiştir');
   b.innerHTML='<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/><path d="M2.5 8h11M8 2.5c2 2 2 9 0 11M8 2.5c-2 2-2 9 0 11"/></svg>';b.onclick=e=>{e.stopPropagation();picker()};t.before(b)}
-function boot(){topBtn();if(started)return refresh();started=true;const w=read();if(w!=='galaksi'&&R[w])apply(w)}
+function boot(){topBtn();if(started)return refresh();started=true;const w=rnd()?randWorld():read();if(w!=='galaksi'&&R[w])apply(w)}
 topBtn();
 window.Worlds={boot,refresh,regroup,picker,set,get:()=>cur,list:WORLDS.map(w=>w[0])};
 })();

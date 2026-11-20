@@ -428,7 +428,15 @@ html[data-motion=off] .world *{transition:none!important}
 .m-hx.h0{width:46px;height:46px;margin:-23px;background:#2453C4}.m-hx.h1{background:#1D7447;transform:translate(40px,0)}.m-hx.h2{background:#9A5A08;transform:translate(20px,-35px)}
 .m-hx.h3{background:#B1264C;transform:translate(-20px,-35px)}.m-hx.h4{background:#5A3DC2;transform:translate(-40px,0)}.m-hx.h5{background:#116C66;transform:translate(-20px,35px)}.m-hx.h6{background:#3F3F46;transform:translate(20px,35px)}
 @media (min-width:1100px){.wp{width:min(1200px,100%)}.wp-g{grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.wpv{height:112px}.wpd{font-size:12.5px}}
-.wp footer{margin-top:18px;font-size:12px;color:#A7ABB8;text-align:center}
+.wp footer{margin-top:18px;display:flex;align-items:center;justify-content:space-between;gap:12px 20px;flex-wrap:wrap;font-size:12px;color:#A7ABB8}
+/* her girişte rastgele: anahtar */
+.wp-rand{display:inline-flex;align-items:center;gap:10px;min-height:36px;padding:0 12px 0 8px;border:0;border-radius:12px;background:rgba(255,255,255,.06);color:#F2F3F7;font:inherit;font-size:13.5px;font-weight:550;cursor:pointer;transition:background .2s}
+.wp-rand:hover{background:rgba(255,255,255,.1)}.wp-rand:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.wp-rand i{position:relative;width:34px;height:20px;border-radius:99px;background:rgba(255,255,255,.18);transition:background .2s;flex-shrink:0}
+.wp-rand i::after{content:"";position:absolute;left:2px;top:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.4);transition:transform .2s cubic-bezier(.2,.9,.3,1)}
+.wp-rand[aria-checked=true] i{background:#34C759}.wp-rand[aria-checked=true] i::after{transform:translateX(14px)}
+@media (max-width:759px){.wp-rand{min-height:44px;width:100%}.wp footer{justify-content:center}}
+@media (prefers-reduced-motion:reduce){.wp-rand i,.wp-rand i::after{transition:none}}
 @media (max-width:759px){.wp{padding:18px;border-radius:22px}.wp-g{grid-template-columns:1fr 1fr;gap:10px}.wpv{height:110px}.wpd{display:none}.wp-bg{place-items:start center}}
 
 /* ── Kümeler (bütün arayüzler): küme adı etiketi .wg-l — her arayüz konumunu kendi verir ── */

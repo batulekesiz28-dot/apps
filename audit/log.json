@@ -4030,5 +4030,28 @@
     "fix": "Ada beyaz hale verildi; fizik gereği ara sıra olur"
    }
   ]
+ },
+ {
+  "at": "2026-11-20T10:13:01",
+  "change": "Arayüz seçicisine “Her girişte rastgele arayüz” anahtarı geldi: açıkken hub her açıldığında 10 arayüzden biri gelir (bir önceki tekrar etmez). Kapatınca kendi seçtiğin arayüz döner. Seçicide R tuşu: hemen rastgele birine geç.",
+  "scores": {
+   "Hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Hub bilgisayar": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Hub",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Her girişte farklı arayüzle başlamanın yolu yoktu",
+    "fix": "Seçicide anahtar + R tuşu"
+   }
+  ]
  }
 ]

@@ -504,7 +504,9 @@ const Media=(()=>{
   const fySk=(h,p)=>`<section class="mc-shelf mrec mfy"><header><h2>${E(h)}</h2><p>${E(p)}</p></header><div class="mc-rw"><div class="mc-row v-p">${'<article class="mc-card v-p mrc-sk"><div class="mc-art"><div class="mp"></div></div></article>'.repeat(6)}</div></div></section>`;
   function fySeeds(){const w=i=>(i.rating?i.rating/10:i.like>0?.8:i.fav?.9:.55)+(i.fav?.15:0);
     return[...KB.items.values()].filter(i=>['movie','series','anime'].includes(i.type)&&['done','doing'].includes(stOf(i))&&!(i.like<0)&&!(i.rating&&i.rating<6))
-      .map(i=>({i,w:w(i)})).sort((a,b)=>b.w-a.w||(b.i.updated||0)-(a.i.updated||0)).slice(0,8)}
+      .map(i=>({i,w:w(i)})).sort((a,b)=>b.w-a.w||(b.i.updated||0)-(a.i.updated||0)).reduce((o,s,_,A)=>{if(o.out.length>=10)return o;const q={movie:4,series:3,anime:3}[s.i.type];
+        if((o.n[s.i.type]||0)<q){o.out.push(s);o.n[s.i.type]=(o.n[s.i.type]||0)+1}return o},{out:[],n:{}}).out
+      .concat([]).sort((a,b)=>b.w-a.w)}
   async function tmGenres(k){const c=lsg('mc:tmg',null);if(c&&Date.now()-c.at<30*864e5)return c.g;const g={};
     for(const t of['movie','tv']){const j=await getJSON(`https://api.themoviedb.org/3/genre/${t}/list?api_key=${encodeURIComponent(k)}&language=tr-TR`);(j?.genres||[]).forEach(x=>g[x.id]=x.name)}
     lss('mc:tmg',{at:Date.now(),g});return g}
@@ -515,21 +517,55 @@ const Media=(()=>{
   const tmPack=(r,t,G)=>({key:`tm:${t}:${r.id}`,kind:t==='movie'?'movie':(r.original_language==='ja'&&(r.genre_ids||[]).includes(16)?'anime':'series'),t:r.title||r.name||'',o:r.original_title||r.original_name||'',
     img:r.poster_path?'https://image.tmdb.org/t/p/w342'+r.poster_path:'',y:String(r.release_date||r.first_air_date||'').slice(0,4),sc:+r.vote_average||0,src:'TMDB',
     g:(r.genre_ids||[]).map(id=>G[id]).filter(Boolean).slice(0,4),syn:String(r.overview||'').slice(0,900)});
-  function fyLoad(force){const k=tmdbKey(),S=fySeeds(),sig=S.map(s=>s.i.id+':'+(s.i.rating||0)+':'+(s.i.like||0)).join(',')+'|'+(k?1:0),c=lsg('mc:fy',null);
+  /* Anahtarsız film/dizi önerisi — Wikidata: tohumla aynı yönetmen (P57), senarist (P58), yaratıcı (P170), oyuncu (P161), seri (P179),
+     kaynak eser (P144), besteci (P86) paylaşan, en az 15 dilde maddesi olan film/diziler. Puan = ortak özelliklerin ağırlığı (oyuncu en çok 3). */
+  const WDW={P57:3,P170:3,P179:3,P58:2,P144:2,P161:1},WDC={Q11424:'movie',Q506240:'movie',Q29168811:'movie',Q5398426:'series',Q1259759:'series',Q581714:'series'};
+  async function wdRecs(seeds){const qs=seeds.filter(s=>/^Q\d+$/.test(s.i.mid||'')),im=seeds.filter(s=>!/^Q\d+$/.test(s.i.mid||'')&&/^tt\d+$/.test(s.i.imdb||''));if(!qs.length&&!im.length)return new Map();
+    // iç sorgu: (tohum, aday) başına TEK satır — ortak özellikler birleştirilir (oyuncu ve tarih satırları katlanmasın); oyuncu eşleşmesi sadece popüler yapımlarda (≥40 dil)
+    const q=`SELECT ?seed ?sim ?f ?cls ?links ?feats ?en ?tr ?date ?imdb ?d WHERE {
+      {SELECT ?seed ?sim ?f (SAMPLE(?c) AS ?cls) (SAMPLE(?ln) AS ?links) (GROUP_CONCAT(DISTINCT CONCAT(STRAFTER(STR(?p),"direct/"),"|",STRAFTER(STR(?x),"entity/"));separator=" ") AS ?feats) WHERE {
+        {VALUES ?seed {${qs.map(s=>'wd:'+s.i.mid).join(' ')||'wd:Q0'}}} UNION {VALUES ?sim {${im.map(s=>'"'+s.i.imdb+'"').join(' ')||'"tt0"'}} ?seed wdt:P345 ?sim}
+        VALUES ?p {${Object.keys(WDW).map(k=>'wdt:'+k).join(' ')}} ?seed ?p ?x. ?f ?p ?x. FILTER(?f!=?seed)
+        VALUES ?c {${Object.keys(WDC).map(k=>'wd:'+k).join(' ')}} ?f wdt:P31 ?c. ?f wikibase:sitelinks ?ln. FILTER(?ln>=15 && (?p!=wdt:P161 || ?ln>=40))
+      } GROUP BY ?seed ?sim ?f LIMIT 3000}
+      OPTIONAL{?f rdfs:label ?en FILTER(lang(?en)='en')} OPTIONAL{?f rdfs:label ?tr FILTER(lang(?tr)='tr')} OPTIONAL{?f wdt:P577 ?date} OPTIONAL{?f wdt:P345 ?imdb}
+      OPTIONAL{?f schema:description ?d FILTER(lang(?d)='tr')} }`;
+    const j=await getJSON('https://query.wikidata.org/sparql?format=json&query='+encodeURIComponent(q),{headers:{Accept:'application/sparql-results+json'}});
+    const bySeed=new Map(),seedOf=new Map([...qs.map(s=>['http://www.wikidata.org/entity/'+s.i.mid,s]),...im.map(s=>[s.i.imdb,s])]);
+    for(const r of j?.results?.bindings||[]){const v=k=>r[k]?.value||'',s=seedOf.get(v('seed'))||seedOf.get(v('sim'));if(!s)continue;const fid=v('f').split('/').pop(),pp=v('p').split('/').pop(),kind=WDC[v('cls').split('/').pop()];if(!kind)continue;
+      if(!bySeed.has(s))bySeed.set(s,new Map());const m=bySeed.get(s);let o=m.get(fid);if(!o){o={fid,kind,feats:new Set(),cast:0,links:+v('links')||0,en:'',tr:'',y:9999,imdb:'',d:''};m.set(fid,o)}
+      for(const f of (v('feats')||(pp+'|'+v('x'))).split(' ').filter(Boolean))if(!o.feats.has(f)){o.feats.add(f);if(f.startsWith('P161|'))o.cast++}if(v('en'))o.en=v('en');if(v('tr'))o.tr=v('tr');if(v('imdb'))o.imdb=v('imdb');if(v('d'))o.d=v('d');const y=parseInt(v('date'),10);if(y>1880&&y<o.y)o.y=y}
+    const out=new Map();for(const[s,m]of bySeed){const l=[...m.values()].map(o=>{let sc=0;for(const f of o.feats){const pp=f.split('|')[0];if(pp!=='P161')sc+=WDW[pp]||0}sc+=Math.min(3,o.cast);return{...o,sc:sc+Math.log10(o.links)*.6}})
+      .filter(o=>o.en||o.tr).sort((a,b)=>b.sc-a.sc).slice(0,20)
+      .map(o=>({key:'wd:'+o.fid,kind:o.kind,t:o.tr||o.en,o:o.en,img:'',y:o.y<9999?String(o.y):'',sc:0,src:'Wikidata',g:[],syn:o.d,imdb:o.imdb,mid:o.fid}));out.set(s,l)}return out}
+  // posterler: dizi → TVmaze (imdb ya da ad), film → iTunes; önbellek mc:fyimg
+  async function fyPosters(list){const C=lsg('mc:fyimg',{});let ch=0;
+    for(const d of list){if(d.img)continue;if(C[d.key]!==undefined){d.img=C[d.key];continue}let u='';
+      try{if(d.kind==='series'){const s=d.imdb?await tvget(`https://api.tvmaze.com/lookup/shows?imdb=${d.imdb}`):await tvget(`https://api.tvmaze.com/singlesearch/shows?q=${encodeURIComponent(d.o||d.t)}`);u=s?.image?.original||s?.image?.medium||''}
+        else u=await itunes(d.o||d.t,+d.y||0)}catch{}C[d.key]=u;d.img=u;ch++}
+    if(ch)lss('mc:fyimg',C);return list}
+  function fyLoad(force){const k=tmdbKey(),S=fySeeds(),sig=S.map(s=>s.i.id+':'+(s.i.rating||0)+':'+(s.i.like||0)).join(',')+'|'+(k?1:0)+'|v2',c=lsg('mc:fy',null);
     if(!S.length){fyErr='seed';return Promise.resolve(null)}
     if(!force&&c&&c.sig===sig&&Date.now()-c.at<FY_TTL){fyErr='';return Promise.resolve(c.d)}if(fyP)return fyP;
-    fyP=(async()=>{const agg=new Map(),per=[];let G={},ok=0,fail=0;if(k)try{G=await tmGenres(k)}catch{}
+    fyP=(async()=>{const agg=new Map(),per=[];let G={},ok=0,fail=0,WD=new Map();if(k)try{G=await tmGenres(k)}catch{}
+      if(!k&&S.some(s=>s.i.type!=='anime'))try{WD=await wdRecs(S.filter(s=>s.i.type!=='anime'));ok++}catch(e){fail++;console.warn('Wikidata öneri',e)}
       for(const{i,w}of S){let list=[];
         try{if(k){const id=await tmId(i,k);if(id!=='-'){const[t,n]=id.split(':'),j=await getJSON(`https://api.themoviedb.org/3/${t}/${n}/recommendations?api_key=${encodeURIComponent(k)}&language=tr-TR`);list=(j?.results||[]).filter(r=>r.poster_path).map(r=>tmPack(r,t,G))}ok++}
+          else if(i.type!=='anime'){const s=S.find(x=>x.i===i);list=WD.get(s)||[]}
           else if(i.type==='anime'&&i.mal){const d=await alGQL(`query($m:Int){Media(idMal:$m,type:ANIME){recommendations(sort:RATING_DESC,perPage:12){nodes{mediaRecommendation{idMal id title{romaji english} coverImage{extraLarge large} averageScore popularity episodes genres description(asHtml:false) startDate{year month day} status}}}}}`,{m:+i.mal});
             list=(d?.Media?.recommendations?.nodes||[]).map(n=>n.mediaRecommendation).filter(m=>m&&!m.isAdult).map(m=>{const a=alPack(m);return{key:'al:'+a.key,kind:'anime',t:a.t,o:a.o,img:a.img,y:a.y?String(a.y):'',sc:a.sc,src:'AniList',g:a.g,syn:a.syn,mal:a.mal}});ok++}}catch(e){fail++;console.warn('Öneri',i.title,e)}
-        list=list.filter(d=>d.t&&d.img).slice(0,20);if(list.length)per.push({seed:i.title,list:list.map(d=>d.key)});
+        list=list.filter(d=>d.t&&(d.img||d.src==='Wikidata')).slice(0,20); // Wikidata'nın posteri sonra bulunurif(list.length)per.push({seed:i.title,list:list.map(d=>d.key)});
         list.forEach((d,r)=>{const e=agg.get(d.key)||{d,s:0,from:[]};e.s+=w*(1-r/24);if(!e.from.includes(i.title))e.from.push(i.title);agg.set(d.key,e)})}
       const out={per,all:[...agg.values()].map(e=>({...e.d,from:e.from,s:e.s+(e.d.sc||0)/25+Math.min(.3,(e.from.length-1)*.12)}))};
-      fyP=null;fyErr=!ok&&fail?'net':!k&&!S.some(s=>s.i.type==='anime'&&s.i.mal)?'key':'';if(ok)lss('mc:fy',{at:Date.now(),sig,d:out});return out})();return fyP}
+      // posteri olmayanlara (Wikidata) en iyi 36 için poster bul
+      try{await fyPosters(out.all.filter(d=>!d.img).sort((a,b)=>b.s-a.s).slice(0,36))}catch{}out.all=out.all.filter(d=>d.img||d.src!=='Wikidata');
+      fyP=null;fyErr=!ok&&fail?'net':'';if(ok)lss('mc:fy',{at:Date.now(),sig,d:out});return out})();return fyP}
+  // türleri harmanla: her türün kendi sırası korunur, sırayla birer tane (Netflix gibi tek türün bütün rafı kaplamasını önler)
+  function mixKinds(l){const b={};l.forEach(d=>(b[d.kind]||(b[d.kind]=[])).push(d));const ks=Object.keys(b).sort((x,y)=>b[y][0].s-b[x][0].s),out=[];
+    while(out.length<l.length)for(const k of ks)if(b[k].length)out.push(b[k].shift());return out}
   function fyPick(D){const mine=[...KB.items.values()],tt=new Set(mine.flatMap(i=>[norm(i.title),norm(i.orig||'')]).filter(Boolean)),mal=new Set(mine.map(i=>String(i.mal||'')).filter(x=>x&&x!=='0')),no=new Set(lsg('mc:fyno',[]));
     const ok=d=>!no.has(d.key)&&!tt.has(norm(d.t))&&!tt.has(norm(d.o))&&!(d.mal&&mal.has(String(d.mal)));
-    const all=(D?.all||[]).filter(ok).sort((a,b)=>b.s-a.s),mx=all[0]?.s||1;all.forEach(d=>d.fit=Math.round(72+26*Math.min(1,d.s/mx)));
+    const all=mixKinds((D?.all||[]).filter(ok).sort((a,b)=>b.s-a.s)),mx=Math.max(1e-9,...all.map(d=>d.s));all.forEach(d=>d.fit=Math.round(72+26*Math.min(1,d.s/mx)));
     const by=new Map(all.map(d=>[d.key,d]));return{all,top:all.slice(0,20),per:(D?.per||[]).map(p=>({seed:p.seed,list:p.list.map(k=>by.get(k)).filter(Boolean)})).filter(p=>p.list.length>=4)}}
   const KN={movie:'Film',series:'Dizi',anime:'Anime'};
   const whyTxt=d=>d.from?.length?`${d.from.slice(0,2).join(' ve ')}${d.from.length>2?` (+${d.from.length-2})`:''} sevdiğin için`:'';
@@ -538,7 +574,7 @@ const Media=(()=>{
   const fyRow=(h,p,l,why,all)=>`<section class="mc-shelf mrec mfy"><header><h2>${E(h)}</h2>${p?`<p>${E(p)}</p>`:''}${all?`<a class="mc-all" href="#lib/m/foryou">Tümünü gör${IC.r}</a>`:''}</header><div class="mc-rw"><button class="mc-arr l" data-row="-1" aria-label="Sola kaydır" tabindex="-1">${IC.l}</button><div class="mc-row v-p">${l.map(d=>fyCard(d,why)).join('')}</div><button class="mc-arr r" data-row="1" aria-label="Sağa kaydır" tabindex="-1">${IC.r}</button></div></section>`;
   async function fyFill(force){const box=qa('#view>.mc [data-fy]');if(!box.length)return;const D=await fyLoad(force),P=fyPick(D);fyData=P.top.concat(P.per.flatMap(p=>p.list));
     let h='';if(P.top.length)h=fyRow('Sana özel',`İzleyip sevdiklerine göre · ${P.all.length} öneri`,P.top,true,true)+P.per.slice(0,2).map(p=>fyRow(`Çünkü ${p.seed} izledin`,'',p.list.slice(0,16),false)).join('');
-    if(P.top.length&&!tmdbKey()&&fySeeds().some(x=>x.i.type!=='anime'))h+=`<p class="mrec-e mfy-k">Şimdilik sadece anime önerileri var — film ve dizi önerileri için ücretsiz TMDB anahtarı ekle. <button class="mb sm" data-mset>Anahtarı gir</button></p>`;
+    if(P.top.length&&!tmdbKey()&&fySeeds().some(x=>x.i.type!=='anime'))h+=`<p class="mrec-e mfy-k">Film ve dizi önerileri Wikidata'dan (aynı yönetmen, oyuncu, seri). Daha isabetli öneriler için ücretsiz TMDB anahtarı ekleyebilirsin. <button class="mb sm" data-mset>Anahtarı gir</button></p>`;
     else if(fyErr==='seed')h=`<section class="mc-shelf mfy"><header><h2>Sana özel</h2></header><p class="mrec-e">İzlediklerini “izledim” olarak işaretleyip puan verdikçe burada sana özel öneriler çıkar.</p></section>`;
     else if(fyErr==='key')h=`<section class="mc-shelf mfy"><header><h2>Sana özel</h2></header><p class="mrec-e">Film ve dizi önerileri için ücretsiz bir TMDB anahtarı gerekiyor (animeler anahtarsız da çalışır). <button class="mb sm" data-mset>Anahtarı gir</button></p></section>`;
     else if(fyErr==='net')h=`<section class="mc-shelf mfy"><header><h2>Sana özel</h2></header><p class="mrec-e">Öneriler şu an alınamadı — servislere ulaşılamıyor. <button class="mb sm" data-nettest>Bağlantıyı test et</button></p></section>`;
@@ -553,7 +589,7 @@ const Media=(()=>{
     const seedOK=S.some(s=>s.i.title===fyF.seed);if(!seedOK)fyF.seed='';
     const base=fyF.seed?P.all.filter(d=>d.from.includes(fyF.seed)):P.all,cnt=k=>k==='all'?base.length:base.filter(d=>d.kind===k).length;
     let l=fyF.k==='all'?base:base.filter(d=>d.kind===fyF.k);
-    l=[...l].sort(fyF.s==='score'?(a,b)=>(b.sc||0)-(a.sc||0):fyF.s==='new'?(a,b)=>(+b.y||0)-(+a.y||0):(a,b)=>b.s-a.s);
+    l=fyF.s==='fit'?(fyF.k==='all'?mixKinds([...l].sort((a,b)=>b.s-a.s)):[...l].sort((a,b)=>b.s-a.s)):[...l].sort(fyF.s==='score'?(a,b)=>(b.sc||0)-(a.sc||0):(a,b)=>(+b.y||0)-(+a.y||0));
     const mark=i=>i.rating?'★ '+i.rating:i.fav?'♥':i.like>0?'beğendin':'';
     return`<section class="mc-page mfy-pg"><header class="mfy-h"><div><h1>Sana özel</h1><p>İzleyip sevdiklerine göre ${P.all.length} öneri${c?.at?' · '+agoTR(c.at)+' güncellendi':''}</p></div><button class="mb" data-fyre title="Önerileri yeniden hesapla">${IC.sync}Yenile</button></header>
       <div class="mfy-seeds" role="group" aria-label="Önerilerin dayandığı yapımlar"><span>Şunları sevdiğin için:</span>${S.map(s=>`<button data-fyseed="${E(s.i.title)}" aria-pressed="${fyF.seed===s.i.title}" title="Sadece buna benzeyenleri göster">${E(s.i.title)}${mark(s.i)?`<small>${E(mark(s.i))}</small>`:''}</button>`).join('')}</div>

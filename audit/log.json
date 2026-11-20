@@ -4240,5 +4240,35 @@
     "fix": "Hepsi kendi sayfasında, süzgeçli"
    }
   ]
+ },
+ {
+  "at": "2026-11-20T14:28:39",
+  "change": "“Sana özel” artık sadece anime önermiyor: film ve diziler de geliyor. Öneriler sevdiğin filmler, diziler ve animelerden dengeli seçiliyor, rafta türler karışık sıralanıyor. TMDB anahtarı olmasa bile film ve dizi önerileri Wikidata'dan geliyor (aynı yönetmen, yaratıcı, seri, oyuncu); posterler otomatik bulunuyor. Anahtar eklersen öneriler daha isabetli olur.",
+  "scores": {
+   "Notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Notlar bilgisayar": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Notlar · Medya",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "“Sana özel” sadece anime öneriyordu (puanlıların çoğu anime olunca ve TMDB anahtarı yokken)",
+    "fix": "Türlere dengeli kaynak + anahtarsız film/dizi önerisi"
+   },
+   {
+    "app": "Notlar · Medya",
+    "sev": "info",
+    "status": "open",
+    "text": "Wikidata sorgusu gerçek sunucuda denenemedi (test ortamı internete kapalı); sözdizimi ve mantığı yerelde doğrulandı",
+    "fix": "Canlıda Sana özel sayfasına bak"
+   }
+  ]
  }
 ]

@@ -4102,5 +4102,42 @@
     "fix": "Yapıldı olarak işaretlendi"
    }
   ]
+ },
+ {
+  "at": "2026-11-20T12:51:00",
+  "change": "Yeni uygulama: Nerede İzlenir. Film ya da dizi adını yaz; Türkiye'de yasal olarak nerede izlenebileceğini gösterir: önce bedava seçenekler (reklamlı platformlar ve Internet Archive'daki eski klasikler — bunlar uygulamanın içinde oynar), sonra abonelik platformları (Netflix, Prime…) ve kiralama. Medya'daki TMDB anahtarını kullanır. Korsan siteler aranmaz.",
+  "scores": {
+   "Nerede İzlenir telefon": {
+    "before": 98,
+    "after": 100
+   },
+   "Nerede İzlenir bilgisayar": {
+    "before": 97,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Nerede İzlenir",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "“Bul” düğmesi arama kutusunun üstüne biniyordu",
+    "fix": "Kutu ve düğme yan yana tek kapta"
+   },
+   {
+    "app": "Nerede İzlenir",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Alt bilgi satırları çok uzundu",
+    "fix": "72 harf genişlik"
+   },
+   {
+    "app": "Nerede İzlenir",
+    "sev": "info",
+    "status": "open",
+    "text": "Gerçek TMDB/Internet Archive bağlantısı test ortamında denenemedi (internet yok); sahte verilerle bütün durumlar denendi",
+    "fix": "Canlıda bir film arayıp kontrol et"
+   }
+  ]
  }
 ]

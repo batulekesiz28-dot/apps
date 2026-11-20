@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nerede İzlenir</title>
+<!--
+  Nerede İzlenir — film ya da dizi adını yaz, YASAL seçenekleri bulsun:
+   · Bedava (Türkiye'de reklamlı/ücretsiz platformlar) + Internet Archive'daki telif süresi dolmuş filmler (sayfada oynar)
+   · Aboneliğinde varsa (Netflix, Prime, Disney+ …) · Kirala / Satın al
+  Platform bilgisi TMDB'nin “izleme sağlayıcıları” verisinden (JustWatch kaynaklı), ülke: TR.
+  TMDB anahtarı Medya ile ORTAK: localStorage 'mc:tmdb' (sadece bu tarayıcıda; asla dosyaya yazılmaz).
+  Korsan siteler ARANMAZ, gösterilmez (docs/KARARLAR.md “Korsan yayın siteleri”).
+  Yerel: izle:recent (son aramalar).
+-->
+<style>
+  :root{--bg:#FAFAF8;--card:#FFFFFF;--ink:#17171A;--ink2:#56565E;--ink3:#6B6B74;--line:rgba(0,0,0,.08);--hover:rgba(0,0,0,.045);--acc:#0F766E;--ok:#1D7447;
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;--serif:"Iowan Old Style","Charter",Georgia,serif}
+  [data-theme=dark]{--bg:#0F0F11;--card:#17171A;--ink:#EDEDEF;--ink2:#A6A6AF;--ink3:#9393A0;--line:rgba(255,255,255,.08);--hover:rgba(255,255,255,.06);--acc:#5EC8BC;--ok:#6BD49A;color-scheme:dark}
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:var(--bg);color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased}
+  button,input{font:inherit;color:inherit}button{background:none;border:0;cursor:pointer}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:860px;margin:0 auto;padding:40px 24px 90px}
+  h1{font-family:var(--serif);font-size:38px;font-weight:700;letter-spacing:-.02em;line-height:1.05}
+  .sub{margin-top:8px;font-size:15px;line-height:1.5;color:var(--ink2);max-width:60ch}
+  /* arama */
+  /* arama kutusu: simge + alan + düğme yan yana tek kapta (düğme alanın üstüne binmez) */
+  form.q{display:flex;align-items:center;gap:10px;margin-top:22px;height:56px;padding:0 8px 0 18px;border-radius:16px;background:var(--card);box-shadow:0 0 0 1px var(--line),0 10px 30px -18px rgba(0,0,0,.25);transition:box-shadow .2s}
+  form.q:focus-within{box-shadow:0 0 0 2px var(--acc),0 10px 30px -18px rgba(0,0,0,.25)}
+  form.q input{flex:1;min-width:0;height:100%;border:0;background:none;font-size:17px;outline:none}
+  form.q input::placeholder{color:var(--ink3)}
+  form.q svg{flex-shrink:0;width:20px;height:20px;fill:none;stroke:var(--ink3);stroke-width:1.7;stroke-linecap:round}
+  form.q button{flex-shrink:0;height:40px;padding:0 18px;border-radius:11px;background:var(--ink);color:var(--bg);font-size:14.5px;font-weight:650}
+  form.q button:focus-visible,.chip:focus-visible,.pv:focus-visible,.alt:focus-visible,.lnk:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+  .recent{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  .chip{display:inline-flex;align-items:center;height:32px;padding:0 12px;border-radius:999px;background:var(--hover);font-size:13.5px;font-weight:550;color:var(--ink2)}
+  .chip:hover{color:var(--ink);background:color-mix(in srgb,var(--ink) 10%,transparent)}
+  /* anahtar satırı */
+  .key{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-top:18px;padding:14px 16px;border-radius:14px;background:var(--hover);font-size:14px;line-height:1.45;color:var(--ink2)}
+  .key b{color:var(--ink);font-weight:650}.key>span{max-width:72ch}
+  .key input{flex:1 1 220px;height:40px;padding:0 12px;border:0;border-radius:10px;background:var(--card);box-shadow:0 0 0 1px var(--line);font-size:14px;outline:none}
+  .key input:focus{box-shadow:0 0 0 2px var(--acc)}
+  .key .sv{height:40px;padding:0 14px;border-radius:10px;background:var(--ink);color:var(--bg);font-weight:650;font-size:14px}
+  .lnk{display:inline-flex;align-items:center;min-height:32px;color:var(--acc);font-weight:600}
+  .lnk:hover{text-decoration:underline;text-underline-offset:3px}
+  /* sonuç */
+  .res{margin-top:34px}
+  .hero{display:grid;grid-template-columns:150px minmax(0,1fr);gap:24px;align-items:start}
+  .po{width:150px;aspect-ratio:2/3;border-radius:14px;background:var(--hover) center/cover no-repeat;box-shadow:0 14px 34px -18px rgba(0,0,0,.5)}
+  .hero h2{font-family:var(--serif);font-size:30px;font-weight:700;letter-spacing:-.01em;line-height:1.12}
+  .hero .meta{margin-top:6px;font-size:14px;color:var(--ink3)}
+  .hero p{margin-top:12px;font-size:15px;line-height:1.6;color:var(--ink2);display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
+  .alts{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;align-items:center;font-size:13px;color:var(--ink3)}
+  .alt{height:30px;padding:0 10px;border-radius:999px;background:var(--hover);font-size:13px;font-weight:550;color:var(--ink2)}
+  .alt:hover{color:var(--ink)}
+  section.g{margin-top:30px}
+  section.g h3{display:flex;align-items:baseline;gap:10px;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:12px}
+  section.g h3 em{font-style:normal;font-weight:500;letter-spacing:0;text-transform:none}
+  section.free h3{color:var(--ok)}
+  .pvs{display:flex;flex-wrap:wrap;gap:10px}
+  .pv{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:6px 14px 6px 6px;border-radius:14px;background:var(--card);box-shadow:0 0 0 1px var(--line);font-size:14.5px;font-weight:600;transition:transform .15s,box-shadow .15s}
+  .pv:hover{transform:translateY(-1px);box-shadow:0 0 0 1px var(--line),0 8px 20px -12px rgba(0,0,0,.35)}
+  .pv img{width:36px;height:36px;border-radius:9px;background:var(--hover)}
+  .pv small{display:block;font-size:12px;font-weight:500;color:var(--ink3)}
+  /* Internet Archive: sayfada oynat */
+  .ia{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+  .iac{display:flex;flex-direction:column;gap:4px;padding:12px 14px;border-radius:14px;background:var(--card);box-shadow:0 0 0 1px var(--line);text-align:left}
+  .iac b{font-size:14.5px;line-height:1.35}.iac span{font-size:12.5px;color:var(--ink3)}
+  .iac .pl{margin-top:6px;display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:650;color:var(--acc)}
+  .iac:hover .pl{text-decoration:underline;text-underline-offset:3px}
+  .player{margin-top:14px;border-radius:16px;overflow:hidden;background:#000;aspect-ratio:16/9}
+  .player iframe{width:100%;height:100%;border:0;display:block}
+  .none{font-size:14.5px;line-height:1.55;color:var(--ink2)}
+  .note{max-width:72ch;margin-top:34px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;line-height:1.55;color:var(--ink3)}
+  .tmdb{display:inline-block;margin-top:6px}
+  /* durumlar */
+  .sk{border-radius:12px;background:linear-gradient(90deg,var(--hover),color-mix(in srgb,var(--ink) 9%,transparent),var(--hover));background-size:200% 100%;animation:sk 1.2s ease-in-out infinite}
+  @keyframes sk{to{background-position:-200% 0}}
+  .err{margin-top:30px;padding:18px;border-radius:14px;background:var(--hover);font-size:14.5px;line-height:1.55;color:var(--ink2)}
+  .empty{margin-top:40px;text-align:center;color:var(--ink3);font-size:14.5px;line-height:1.6}
+  .empty b{display:block;font-size:17px;color:var(--ink);margin-bottom:4px}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  @media (max-width:640px){
+    .wrap{padding:24px 16px 80px}h1{font-size:30px}
+    form.q{height:52px;padding-left:14px}form.q input{font-size:16px}form.q button{height:40px;padding:0 14px}
+    .hero{grid-template-columns:96px minmax(0,1fr);gap:16px}.po{width:96px}.hero h2{font-size:22px}.hero p{-webkit-line-clamp:4}
+    .chip,.alt{min-height:40px;height:auto}.pv{min-height:52px}.key input,.key .sv{height:44px}.lnk{min-height:40px}
+    .iac{min-height:44px}
+  }
+  @media (prefers-reduced-motion:reduce){.sk{animation:none}.pv{transition:none}}
+  html[data-motion=off] .sk{animation:none}
+</style>
+<script>try{var f=JSON.parse(localStorage.getItem('notlar:theme'));if(f)document.documentElement.dataset.theme=f}catch(e){}</script>
+<script src="../../shared/skin.js?v=20261119b"></script>
+</head>
+<body>
+<main class="wrap">
+  <h1>Nerede İzlenir</h1>
+  <p class="sub">Film ya da dizi adını yaz; Türkiye'de yasal olarak nerede izleyebileceğini bulayım. Önce bedava seçenekler.</p>
+  <form class="q" role="search" autocomplete="off">
+    <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="6"/><path d="M13.5 13.5L17 17"/></svg>
+    <label class="sr" for="q">Film ya da dizi adı</label>
+    <input id="q" name="q" placeholder="ör. Kış Uykusu, Dune, Frieren…" enterkeyhint="search" autofocus>
+    <button type="submit">Bul</button>
+  </form>
+  <div class="recent" id="recent"></div>
+  <div id="key"></div>
+  <div id="out" aria-live="polite"></div>
+  <p class="note">Sadece yasal kaynaklar gösterilir: platform bilgisi TMDB'den (JustWatch verisi), bedava klasik filmler Internet Archive'dan (telif süresi dolmuş). İzinsiz yayın yapan siteler aranmaz.
+    <br><a class="tmdb lnk" href="https://www.themoviedb.org/" target="_blank" rel="noopener">TMDB verisi kullanılır ↗</a></p>
+</main>
+<script>
+'use strict';
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ls={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+// TMDB anahtarı Medya ile ortak ('mc:tmdb'; Medya düz metin olarak da yazmış olabilir)
+const tmdbKey=()=>{try{const v=localStorage.getItem('mc:tmdb')||'';try{const j=JSON.parse(v);return typeof j==='string'?j:''}catch{return v}}catch{return''}};
+const IMG='https://image.tmdb.org/t/p/';
+async function getJSON(u,ms=9000){const c=new AbortController(),t=setTimeout(()=>c.abort(),ms);try{const r=await fetch(u,{signal:c.signal});if(!r.ok){const e=new Error('http');e.status=r.status;throw e}return await r.json()}finally{clearTimeout(t)}}
+const tm=(path,q='')=>getJSON(`https://api.themoviedb.org/3/${path}?api_key=${encodeURIComponent(tmdbKey())}&language=tr-TR${q}`);
+
+/* ── son aramalar ── */
+function paintRecent(){const r=ls.get('izle:recent',[]);$('#recent').innerHTML=r.map(t=>`<button class="chip" data-q="${esc(t)}">${esc(t)}</button>`).join('')}
+function remember(t){const r=ls.get('izle:recent',[]).filter(x=>x.toLocaleLowerCase('tr')!==t.toLocaleLowerCase('tr'));r.unshift(t);ls.set('izle:recent',r.slice(0,8));paintRecent()}
+
+/* ── anahtar satırı (yoksa) ── */
+function paintKey(){const k=tmdbKey();$('#key').innerHTML=k?'':`<div class="key"><span><b>Platform bilgisi için ücretsiz TMDB anahtarı gerekir.</b> Anahtar olmadan sadece Internet Archive'daki bedava klasik filmler aranır. Medya'da girdiysen burada da çalışır.</span>
+  <input id="tk" placeholder="TMDB API anahtarı (v3)" aria-label="TMDB API anahtarı" spellcheck="false"><button class="sv" data-save>Kaydet</button>
+  <a class="lnk" href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener">Nasıl alınır ↗</a></div>`}
+
+/* ── arama ── */
+let RUN=0;
+async function search(q,pick){q=q.trim();if(!q)return;$('#q').value=q;remember(q);const my=++RUN;
+  $('#out').innerHTML=`<div class="res"><div class="hero"><div class="po sk"></div><div><div class="sk" style="height:30px;width:60%"></div><div class="sk" style="height:14px;width:30%;margin-top:12px"></div><div class="sk" style="height:60px;margin-top:16px"></div></div></div></div>`;
+  let cands=[],err=null;
+  if(tmdbKey()){try{const j=await tm('search/multi',`&include_adult=false&query=${encodeURIComponent(q)}`);cands=(j.results||[]).filter(x=>x.media_type==='movie'||x.media_type==='tv')}catch(e){err=e}}
+  if(my!==RUN)return;
+  const it=pick!=null?cands.find(c=>String(c.id)===String(pick))||cands[0]:cands[0];
+  let prov=null;if(it){try{prov=(await tm(`${it.media_type}/${it.id}/watch/providers`)).results?.TR||{}}catch(e){prov=null}}
+  // Internet Archive: özgün/İngilizce adla da ara (klasikler genelde İngilizce adla kayıtlı)
+  const names=[...new Set([q,it?.original_title,it?.original_name,it?.title,it?.name].filter(Boolean))].slice(0,3);
+  let ia=[];try{ia=await archive(names,it)}catch{}
+  if(my!==RUN)return;
+  paint(q,it,cands,prov,ia,err)}
+
+async function archive(names,it){const yr=(it?.release_date||it?.first_air_date||'').slice(0,4);
+  const t=names.map(n=>`title:("${n.replace(/["\\]/g,'')}")`).join(' OR ');
+  const u=`https://archive.org/advancedsearch.php?q=${encodeURIComponent(`(${t}) AND mediatype:(movies) AND collection:(feature_films OR classic_cinema OR silent_films OR film_noir OR sci-fi_horror)`)}&fl[]=identifier&fl[]=title&fl[]=year&fl[]=downloads&sort[]=downloads+desc&rows=6&output=json`;
+  const j=await getJSON(u,8000);let d=(j.response?.docs||[]);
+  if(yr)d.sort((a,b)=>(String(b.year||'').startsWith(yr))-(String(a.year||'').startsWith(yr)));return d.slice(0,4)}
+
+const pvHTML=(arr,sub)=>arr.map(p=>`<a class="pv" href="${esc(LINK)}" target="_blank" rel="noopener" title="${esc(p.provider_name)} — TMDB üzerinden aç"><img src="${IMG}w92${esc(p.logo_path)}" alt="" loading="lazy"><span>${esc(p.provider_name)}${sub?`<small>${sub}</small>`:''}</span></a>`).join('');
+let LINK='';
+function paint(q,it,cands,prov,ia,err){
+  if(!it&&!ia.length){$('#out').innerHTML=err?`<div class="err">TMDB'ye ulaşılamadı${err.status===401?': anahtar geçersiz görünüyor — Medya → Görünüm → TMDB anahtarı satırından ya da yukarıdan yeniden gir.':'. İnternet bağlantını kontrol edip tekrar dene.'}</div>`
+      :`<div class="empty"><b>“${esc(q)}” bulunamadı</b>${tmdbKey()?'Adı farklı yazmayı ya da özgün (İngilizce) adını denemeyi dene.':'TMDB anahtarı olmadan sadece bedava klasik filmler aranabiliyor.'}</div>`;return}
+  const pr=prov||{},uniq=a=>{const s=new Set();return(a||[]).filter(p=>!s.has(p.provider_id)&&s.add(p.provider_id))};
+  LINK=pr.link||(it?`https://www.themoviedb.org/${it.media_type}/${it.id}/watch?locale=TR`:'');
+  const free=uniq([...(pr.free||[]),...(pr.ads||[])]),sub=uniq(pr.flatrate),buy=uniq([...(pr.rent||[]),...(pr.buy||[])]).filter(p=>!sub.some(s=>s.provider_id===p.provider_id));
+  const yr=it?(it.release_date||it.first_air_date||'').slice(0,4):'',title=it?(it.title||it.name):q,kind=it?(it.media_type==='tv'?'Dizi':'Film'):'';
+  const others=cands.filter(c=>c!==it).slice(0,5);
+  $('#out').innerHTML=`<div class="res">
+    ${it?`<div class="hero"><div class="po" style="${it.poster_path?`background-image:url('${IMG}w342${esc(it.poster_path)}')`:''}" role="img" aria-label="${esc(title)} afişi"></div>
+      <div><h2>${esc(title)}</h2><p class="meta">${[kind,yr,it.original_title&&it.original_title!==title?it.original_title:it.original_name&&it.original_name!==title?it.original_name:''].filter(Boolean).map(esc).join(' · ')}</p>
+      ${it.overview?`<p>${esc(it.overview)}</p>`:''}
+      ${others.length?`<div class="alts"><span>Bunu mu demek istedin?</span>${others.map(c=>`<button class="alt" data-pick="${c.id}">${esc(c.title||c.name)} ${esc((c.release_date||c.first_air_date||'').slice(0,4))}</button>`).join('')}</div>`:''}</div></div>`:''}
+    <section class="g free"><h3>Bedava izle <em>reklamlı ya da tamamen ücretsiz</em></h3>
+      ${free.length?`<div class="pvs">${pvHTML(free,'Ücretsiz')}</div>`:''}
+      ${ia.length?`<div class="ia" style="${free.length?'margin-top:12px':''}">${ia.map(d=>`<button class="iac" data-ia="${esc(d.identifier)}"><b>${esc(d.title)}</b><span>Internet Archive${d.year?' · '+esc(String(d.year).slice(0,4)):''} · telif süresi dolmuş</span><span class="pl">▶ Burada izle</span></button>`).join('')}</div><div id="player"></div>`:''}
+      ${!free.length&&!ia.length?`<p class="none">${it&&prov?'Türkiye’de şu an bedava ve yasal bir yayını görünmüyor.':it?'Platform bilgisi alınamadı.':'TMDB anahtarı olmadan bedava platformlar aranamıyor.'}</p>`:''}</section>
+    ${it&&prov?`<section class="g"><h3>Aboneliğinde varsa</h3>${sub.length?`<div class="pvs">${pvHTML(sub,'Abonelikle')}</div>`:'<p class="none">Türkiye’de hiçbir abonelik platformunda görünmüyor.</p>'}</section>
+    ${buy.length?`<section class="g"><h3>Kirala / Satın al</h3><div class="pvs">${pvHTML(buy,'Kiralık ya da satın al')}</div></section>`:''}`:''}
+  </div>`}
+
+/* ── olaylar ── */
+$('form.q').addEventListener('submit',e=>{e.preventDefault();search($('#q').value)});
+document.addEventListener('click',e=>{
+  const c=e.target.closest('[data-q]');if(c){search(c.dataset.q);return}
+  const p=e.target.closest('[data-pick]');if(p){search($('#q').value,p.dataset.pick);return}
+  if(e.target.closest('[data-save]')){const v=$('#tk').value.trim();if(!v)return $('#tk').focus();try{localStorage.setItem('mc:tmdb',JSON.stringify(v))}catch{}paintKey();if($('#q').value.trim())search($('#q').value);return}
+  const a=e.target.closest('[data-ia]');if(a){const pl=$('#player');pl.innerHTML=`<div class="player"><iframe src="https://archive.org/embed/${encodeURIComponent(a.dataset.ia)}" title="${esc(a.querySelector('b').textContent)}" allow="fullscreen; autoplay" allowfullscreen loading="lazy"></iframe></div>`;pl.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'})}});
+addEventListener('storage',e=>{if(e.key==='mc:tmdb')paintKey();if(e.key==='notlar:theme'){try{document.documentElement.dataset.theme=JSON.parse(e.newValue)}catch{}}});
+paintRecent();paintKey();
+const q0=new URLSearchParams(location.search).get('q');if(q0)search(q0);
+</script>
+</body>
+</html>

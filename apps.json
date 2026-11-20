@@ -106,6 +106,13 @@
    "icon": "globe",
    "color": "blue",
    "desc": "Bugünkü haberler: Türkiye gündemi, oyun, ABD siyaseti, teknoloji, anime · kendi konuların"
+  },
+  {
+   "slug": "izle",
+   "name": "Nerede İzlenir",
+   "icon": "play",
+   "color": "teal",
+   "desc": "Film ya da dizi adını yaz; Türkiye'de yasal olarak nerede izlenir — önce bedava seçenekler (reklamlı platformlar, Internet Archive klasikleri), sonra abonelik ve kiralama. Medya, sinema, dizi"
   }
  ]
 }

@@ -99,7 +99,7 @@ Kullanıcı, yaptığım her işin kendi gözünden denetlenmesini istiyor. Her 
    Metinler Türkçe, kısa ve kullanıcının anlayacağı dilde.
 5. Sonra commit + push (main dalına; GitHub Pages oradan yayınlar).
 
-Denetim motoru: `audit/engine.js` (hub'daki Denetçi uygulaması da aynısını kullanır). Katı eleştirmen: kategori `insan` (Gerçek kullanıcı) + sert puan (18/8/3, a11y/insan hatası → toplam ≤85); kurallar `docs/STANDART.md` “Denetçi — katı eleştirmen”. Denetçi uygulaması kategorileri `Audit.CATS`'ten okur.
+Denetim motoru: `audit/engine.js` (hub'daki Denetçi uygulaması da aynısını kullanır). “İnanılmaz katı” eleştirmen: kategori `insan` + puan 22/10/4 (a11y/insan hatası → toplam ≤80, insan uyarısı → ≤94). Kullanıcı şikâyetlerinden kurallar: `textcover`, `buried`, `offscreen`, `textoverlap`, `ghost` (önemliyse), `instant` (JS animasyonlu kaba `data-anim`), `nested`; kaydırılan harita kabına `data-pan`. Kurallar `docs/STANDART.md` “Denetçi — inanılmaz katı”. Arayüzler: `node audit/worlds.js`, Notlar ekranları: `node audit/screens.js`. Denetçi uygulaması kategorileri `Audit.CATS`'ten okur.
 Yazı/renk ölçüleri: metin için en az 12px (telefon), dokunma alanı ≥ 24px (telefonda ≥ 40px), kontrast ≥ 4.5:1.
 
 ## Galaksi düzeni

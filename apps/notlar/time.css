@@ -243,7 +243,9 @@
 .cal .dp::-webkit-scrollbar{display:none}
 .cal .dp>.tm-qa{height:38px;margin:2px 0 20px;padding:0 6px 0 10px;border-radius:10px;background:color-mix(in srgb,var(--ink) 5%,transparent);box-shadow:none}
 .cal .dp>.tm-qa:focus-within{background:var(--card);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ink) 18%,transparent)}
-.cal .dp>.tm-qa .tm-qa-b{display:none;height:28px}.cal .dp>.tm-qa:focus-within .tm-qa-b{display:inline-flex;align-items:center}
+.cal .dp>.tm-qa .tm-qa-b{display:none;height:28px}.cal .dp>.tm-qa:focus-within .tm-qa-b{display:inline-flex;align-items:center;animation:tmQaIn .24s cubic-bezier(.2,.8,.2,1)}
+@keyframes tmQaIn{from{opacity:0;transform:translateX(-6px) scale(.96)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.cal .dp>.tm-qa:focus-within .tm-qa-b{animation:none}}
 .tmc{margin:0 0 18px}
 .tmc-h{display:flex;align-items:center;gap:2px;height:28px;margin:0 0 4px 6px}.tmc-h b{flex:1;font-size:13px;font-weight:600}.tmc-h em{font-style:normal;font-weight:400;color:var(--ink3)}
 .tmc-h .tb{width:28px;height:28px;border-radius:8px}

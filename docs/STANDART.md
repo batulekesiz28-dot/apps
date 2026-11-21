@@ -347,3 +347,15 @@ Denetçi artık “bir insan burada nerede takılır?” diye bakar (`audit/engi
 - Kesilen metne `title`; uzun metin ~70 harf genişlik (`max-width:72ch`).
 - Telefonda küçük düğmeler arasında en az 4px boşluk.
 - Bilerek İngilizce bırakılan bölüm adlarına `translate="no"`.
+
+## Denetçi — “inanılmaz katı” (2026-11-21)
+Kullanıcının bugüne kadarki şikâyetlerinden çıkan kurallar (`audit/engine.js`, kategori `insan`). Her biri gerçekten yaşanmış bir sorun:
+- **Yazının üstüne bir şey binmiş** (hata) — Kadran'da ibre ortadaki yazının üstündeydi; telefonda ada saatin üstüne bindi. Yazının ortasına `elementFromPoint` ile bakılır; üstte başka boyalı öğe varsa bulgu. Büyük yüzen panel (kart, pencere), ekran kenarına yapışık/yapışkan çubuk ve kaydırılıp gizlenmiş içerik sayılmaz.
+- **Altında kalmış, basılamayan düğme** (hata) — küme etiketi uygulama katmanının altında kaldı, çift tık çalışmadı.
+- **Ekrandan taşan düğme ya da başlık** (hata) — Deste yelpazesi ekrandan taştı. Kaydırılabilir kutu ve `data-pan` (galaksi gibi kaydırılan harita) hariç.
+- **Yazılar üst üste binmiş** (hata) — Harita'da haplar üst üste bindi. Opak kartın altında kalan yazı ve eğik kartlar hariç.
+- **Önemli düğme görünmüyor** (bilgisayarda uyarı, telefonda hata) — “Güncelle” bulunamadı. Satır üstüne gelince çıkan ikincil işler bilgisayarda not.
+- **“Tak diye” açılan parça** (uyarı) — ada geçişsiz açılıyordu. Durumla (`.open`, `:hover`, `[aria-expanded=true]`…) görünür olan öğede geçiş/animasyon yoksa bulgu; JS ile canlandırılan kaba `data-anim` ver.
+- **Kart içinde kart** (tasarım, orta) — Apple sadeliği: kutu yığını yok.
+- Yazı en az 12px telefon / 11px bilgisayar (10px altı hata); İngilizce arayüz sözcüğü ve kesilen yazı artık uyarı; sayfa 2500 öğe üstü hata, açılış 1.8 sn üstü uyarı.
+- Puan: hata 22, uyarı 10, not 4. Erişim/gerçek kullanıcıda hata → toplam en çok 80; gerçek kullanıcıda uyarı → en çok 94.

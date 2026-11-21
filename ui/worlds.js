@@ -78,11 +78,11 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
         <div class="sp-floor"></div></div></div>
     <div class="sp-light" aria-hidden="true"></div>
     <div class="sp-stage"><div class="sp-scene">
-      <aside class="sp-side sp-left" data-side="left"><div data-live="today"></div><button class="sp-grab" aria-label="Bugün penceresini taşı (çift tık: yerine koy)"></button></aside>
+      <aside class="sp-side sp-left" data-side="left"><div data-live="today"></div><button class="sp-grab" aria-label="Bugün penceresini taşı (çift tık: yerine koy)" title="Taşı · çift tık: yerine koy"></button></aside>
       <div class="sp-ringw"><div class="sp-shadow" aria-hidden="true"></div><div class="sp-ring" role="listbox" aria-label="Gruplara göre uygulamalar halkası">${SP.list.map((a,i)=>{const g=SP.G[a.gi];return`<button class="sp-win" role="option" data-i="${i}" data-key="${esc(a.key)}" style="--gc:${esc(g.color)}" aria-label="${esc(a.name)} — ${esc(g.name)}"><em class="sp-tag"><i></i>${esc(g.name)}</em><span class="sp-ic">${appIcon(a)}</span><b>${esc(a.name)}</b><small>${esc(a.desc.slice(0,80))}</small></button>`}).join('')}
         ${SP.G.length>1?SP.G.map((g,gi)=>`<button class="sp-gt" data-g="${gi}" style="--gc:${esc(g.color)}" tabindex="-1"><i></i>${esc(g.name)}<small>${g.apps.length}</small></button>`).join(''):''}</div></div>
       <div class="sp-home" role="list" aria-label="Ana görünüm, gruplara göre"><i class="sp-slot" aria-hidden="true"></i>${SP.G.length>1?SP.G.map((g,gi)=>`<p class="sp-gh" data-g="${gi}" style="--gc:${esc(g.color)}" title="${g.id[0]==='_'?'Otomatik grup':'Çift tık: yeniden adlandır'}"><i></i><span>${esc(g.name)}</span></p>`).join(''):''}${SP.list.map((a,i)=>`<button class="sp-hi" role="listitem" data-i="${i}" data-key="${esc(a.key)}" title="${esc(a.desc)}" style="--gc:${esc(SP.G[a.gi].color)}"><span class="sp-hb">${appIcon(a)}</span><b>${esc(a.name)}</b></button>`).join('')}</div>
-      <aside class="sp-side sp-right" data-side="right"><div data-live="notes"></div><button class="sp-grab" aria-label="Son sayfalar penceresini taşı (çift tık: yerine koy)"></button></aside></div></div>
+      <aside class="sp-side sp-right" data-side="right"><div data-live="notes"></div><button class="sp-grab" aria-label="Son sayfalar penceresini taşı (çift tık: yerine koy)" title="Taşı · çift tık: yerine koy"></button></aside></div></div>
     <div class="sp-find" aria-live="polite"></div>
     <div class="sp-hint">${mobile()?'Uzun bas, sürükle: yuvaya otomatik hizalanır':'Uzun bas ya da sürükle: bir yuvaya taşı, otomatik hizalanır · Sağ tık: menü · Grup adına çift tık: yeniden adlandır'}</div>
     <div class="sp-drop" aria-hidden="true">${SP.G.map(g=>`<span data-drop="${esc(g.id)}" style="--gc:${esc(g.color)}"><i></i>${esc(g.name)}</span>`).join('')}<span data-drop="_new">＋ Yeni grup</span></div>
@@ -92,9 +92,9 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
       <div class="sp-envs">${SP.ENVS.map(([k,n])=>`<button data-env="${k}" aria-pressed="false"><i class="ept ept-${k}"></i><span>${n}</span></button>`).join('')}</div>
       <label class="sp-imm"><span>Dalma</span><input type="range" min="0" max="100" step="1" aria-label="Dalma düzeyi"><b></b></label>
       <button class="sp-recenter" data-sp="center">Ortala <kbd>0</kbd></button></div>
-    <nav class="sp-orn" aria-label="Mekânsal gezinme"><button data-rot="-1" class="sp-arr" aria-label="Önceki uygulama">‹</button>
+    <nav class="sp-orn" aria-label="Mekânsal gezinme"><button data-rot="-1" class="sp-arr" aria-label="Önceki uygulama" title="Önceki uygulama (←)">‹</button>
       <span class="sp-seg" role="group" aria-label="Görünüm"><button data-sp="halka" aria-pressed="false">Halka</button><button data-sp="izgara" aria-pressed="false">Izgara</button></span>
-      <button data-act="ara">Ara</button><button data-act="today">Bugün</button><button data-sp="envp" aria-expanded="false">Ortam</button><button data-act="world">Arayüz</button>${dice()}<button data-rot="1" class="sp-arr" aria-label="Sonraki uygulama">›</button></nav></div>`},
+      <button data-act="ara">Ara</button><button data-act="today">Bugün</button><button data-sp="envp" aria-expanded="false">Ortam</button><button data-act="world">Arayüz</button>${dice()}<button data-rot="1" class="sp-arr" aria-label="Sonraki uygulama" title="Sonraki uygulama (→)">›</button></nav></div>`},
   live:{
     today:d=>{const r=[...d.items.map(x=>[x.t,x.sub]),...d.todos.map(t=>[t.t,t.done?'oldu':'açık'])].slice(0,5);
       return`<div class="sp-glass"><p class="sp-k">Bugün</p><p class="sp-t" data-clock="hm"></p><p class="sp-s">${esc(trDate(d.now,{weekday:'long',day:'numeric',month:'long'}))}</p>
@@ -122,9 +122,10 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
     root.querySelectorAll('.sp-win').forEach((el,i)=>{const a=SP.dist(SP.ang[i]),k=Math.min(1,a/180);
       const far=a>92,side=i!==f&&mobile();el.style.opacity=(1-k*.3).toFixed(2);el.style.visibility=far?'hidden':'';el.style.pointerEvents=side?'none':'';el.classList.toggle('front',i===f);
       if(i!==f){el.setAttribute('aria-hidden','true');el.style.removeProperty('--tx');el.style.removeProperty('--ty')}else el.removeAttribute('aria-hidden');el.setAttribute('aria-selected',i===f);el.tabIndex=i===f?0:-1});
-    root.querySelectorAll('.sp-gt').forEach(el=>{const gi=+el.dataset.g,a=SP.dist(SP.G[gi].mid);const lim=mobile()?40:80;el.style.visibility=a>lim?'hidden':'';el.style.opacity=(1-Math.min(1,a/lim)*.25).toFixed(2);el.classList.toggle('on',SP.list[f]?.gi===gi)});
+    root.querySelectorAll('.sp-gt').forEach(el=>{const gi=+el.dataset.g,a=SP.dist(SP.G[gi].mid);const lim=mobile()?40:80;el.style.visibility=a>lim?'hidden':'';el.style.opacity=(1-Math.min(1,a/lim)*.25).toFixed(2);el.classList.toggle('on',SP.list[f]?.gi===gi);
+      if(a<=lim){const r=el.getBoundingClientRect();if(r.width&&(r.left<4||r.right>innerWidth-4))el.style.visibility='hidden'}}); // ekrandan taşan küme etiketi gösterilmez
     if(SP.cfg.mode==='halka'){SP.sel=f;SP.cap(root)}},
-  cap(root){const a=SP.list[SP.sel],g=a&&SP.G[a.gi];root.querySelector('.sp-cap').innerHTML=a?`<b>${esc(a.name)}</b><span>${SP.G.length>1?`<em style="--gc:${esc(g.color)}"><i></i>${esc(g.name)}</em> `:''}${esc(a.desc)}</span><button data-app="${esc(a.key)}" class="sp-open">Aç ↵</button>`:''},
+  cap(root){const a=SP.list[SP.sel],g=a&&SP.G[a.gi];root.querySelector('.sp-cap').innerHTML=a?`<b>${esc(a.name)}</b><span title="${esc(a.desc||'')}">${SP.G.length>1?`<em style="--gc:${esc(g.color)}"><i></i>${esc(g.name)}</em> `:''}${esc(a.desc)}</span><button data-app="${esc(a.key)}" class="sp-open">Aç ↵</button>`:''},
   rotTo(root,i){SP.deg+=((SP.ang[i]-SP.deg)%360+540)%360-180;SP.apply(root)},
   turn(root,dx){SP.rotTo(root,(SP.f+dx+SP.n)%SP.n)},
   goTo(root,i){if(SP.cfg.mode==='izgara'){SP.sel=i;root.querySelectorAll('.sp-hi')[i]?.focus({preventScroll:true});SP.cap(root);return}SP.rotTo(root,i)},
@@ -413,7 +414,7 @@ const MG={WD:[['study','Çalışma'],['todo','Bugün'],['note','Son not']],
     <div class="mg-goo" aria-hidden="true">${MG.items.map(()=>'<i class="mg-b"></i>').join('')}<i class="mg-c"></i>${'<i class="mg-s"></i>'.repeat(9)}</div>
     <div class="mg-gls">${G.length>1?G.map((g,gi)=>`<p class="mg-gl${g.id[0]==='_'?'':' ed'}" data-g="${gi}" style="--gc:${esc(g.color)}" title="${g.id[0]==='_'?'Otomatik grup':'Çift tık: yeniden adlandır'}"><i></i><span>${esc(g.name)}</span></p>`).join(''):''}</div>
     <div class="mg-apps" role="list" aria-label="Uygulamalar">${MG.items.map((it,i)=>it.w?`<div class="mg-a mg-w" role="listitem" data-i="${i}" title="Sürükleyerek taşı"><div class="mg-wi" data-live="mg_${it.w}"></div></div>`
-      :`<button class="mg-a" role="listitem" data-i="${i}" data-app="${esc(it.k)}" aria-label="${esc(it.a.name)}${G.length>1?' — '+esc(G[it.gi].name):''}" title="${esc(it.a.desc)}"><i class="mg-hl" aria-hidden="true"></i>${appIcon(it.a)}<b>${esc(it.a.name)}</b></button>`).join('')}</div>
+      :`<button class="mg-a" role="listitem" data-i="${i}" data-app="${esc(it.k)}" aria-label="${esc(it.a.name)}${G.length>1?' — '+esc(G[it.gi].name):''}" title="${esc(it.a.name)}${it.a.desc?' · '+esc(it.a.desc):''}"><i class="mg-hl" aria-hidden="true"></i>${appIcon(it.a)}<b>${esc(it.a.name)}</b></button>`).join('')}</div>
     <div class="mg-menu" role="dialog" aria-label="Düzen" hidden><p class="mg-mk">Widget'lar</p>${MG.WD.map(([k,n])=>`<button class="mg-tg" role="switch" data-mw="${k}" aria-checked="${!!MG.cfg.w[k]}"><span>${n}</span><i aria-hidden="true"></i></button>`).join('')}
       <button class="mg-rs" data-mg="reset">Yerleri sıfırla</button><p class="mg-mh">Damlaları sürükleyerek taşı · başka kümenin yanına bırak: o kümeye geçer · sağ tık / basılı tut: küme seçenekleri</p></div>
     <nav class="wx-nav" aria-label="Mıknatıs"><button data-act="ara">Ara</button><button data-act="today">Bugün</button><button data-mg="menu" aria-expanded="false">Düzen</button><button data-act="world">Arayüz</button>${dice()}</nav>
@@ -629,7 +630,7 @@ const KM={
    kaldırma kuvvetiyle ipin ucuna geri süzülür. İpler her karede eğri olarak çizilir. */
 const BL={
   html:d=>{const{G,list}=WG.of(d);BL.list=list;return`<div class="bl">${wxTop(d)}<canvas class="bl-cv" aria-hidden="true"></canvas>${WG.many()?`<div class="bl-gl">${G.map((g,gi)=>WG.lab(g,gi,'bl-l')).join('')}</div>`:''}
-    <div class="bl-g" role="list" aria-label="Uygulamalar">${list.map((a,i)=>`<button class="bl-a" role="listitem" data-app="${esc(a.key)}" style="--hue:${Math.round(prand(i+11)*360)}" aria-label="${esc(a.name)}" title="${esc(a.desc)}"><i class="bl-k" aria-hidden="true"></i>${appIcon(a)}<b>${esc(a.name)}</b></button>`).join('')}</div>
+    <div class="bl-g" role="list" aria-label="Uygulamalar">${list.map((a,i)=>`<button class="bl-a" role="listitem" data-app="${esc(a.key)}" style="--hue:${Math.round(prand(i+11)*360)}" aria-label="${esc(a.name)}" title="${esc(a.name)}${a.desc?' · '+esc(a.desc):''}"><i class="bl-k" aria-hidden="true"></i>${appIcon(a)}<b>${esc(a.name)}</b></button>`).join('')}</div>
     ${wxNav('Balon')}<p class="wx-hint">${mobile()?'Balonlara dokun, it':'İmleçle balonları it — çarpışıp yerine süzülürler'}${WG.hint()}</p></div>`},
   lay(root){const B=BL.B,prevE=[...B.e],m=mobile(),W=innerWidth,Hh=innerHeight,n=B.n,r=m?(WG.many()&&n>8?28:32):42,gy=Hh-(WG.many()?(m?138:150):(m?104:112)),cols=Math.min(n,Math.max(3,Math.floor((W-(m?20:120))/(r*2.4)),Math.ceil(n/(m?3:2)))),rows=Math.max(m?3:2,Math.ceil(n/cols)),
       sp=(W-(m?20:120))/cols,top=m?140:150,span=gy-top-r*2;B.r=r;B.gy=gy;root.style.setProperty('--br',r*2+'px');
@@ -749,7 +750,7 @@ const DS={sel:-1,
    eş yükselti çizgileri her karede yeniden çizilir (marching squares). Zirvenin yanında ad, harita etiketi gibi. */
 const HR={
   html:d=>{const{G,list}=WG.of(d);HR.list=list;return`<div class="hr">${wxTop(d)}<canvas class="hr-cv" aria-hidden="true"></canvas>${WG.many()?`<div class="hr-gl">${G.map((g,gi)=>WG.lab(g,gi,'hr-l')).join('')}</div>`:''}
-    <div class="hr-g" role="list" aria-label="Uygulamalar">${list.map(a=>`<button class="hr-a" role="listitem" data-app="${esc(a.key)}" aria-label="${esc(a.name)}" title="${esc(a.desc)}"><i class="hr-pk" aria-hidden="true"></i>${appIcon(a)}<b>${esc(a.name)}</b></button>`).join('')}</div>
+    <div class="hr-g" role="list" aria-label="Uygulamalar">${list.map(a=>`<button class="hr-a" role="listitem" data-app="${esc(a.key)}" aria-label="${esc(a.name)}" title="${esc(a.name)}${a.desc?' · '+esc(a.desc):''}"><i class="hr-pk" aria-hidden="true"></i>${appIcon(a)}<b>${esc(a.name)}</b></button>`).join('')}</div>
     ${wxNav('Harita')}<p class="wx-hint">${mobile()?'Parmağını gezdir — arazi kabarır':'İmleç arazide tepe kabartır · zirveler uygulamalar'}${WG.hint()}</p></div>`},
   lay(root){const T=HR.T,m=mobile(),W=innerWidth,Hh=innerHeight,n=T.n,top=m?140:150,bot=m?130:130,many=WG.many();
     // her küme haritada bir bölge: zirveleri bir arada (altıgen ada), bölgenin adı üstünde harita yazısı gibi

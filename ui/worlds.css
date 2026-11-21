@@ -1,5 +1,5 @@
 /* AppShell — Arayüz dünyaları. Her dünya kendi tasarım sistemi: yerleşim, tipografi, ritim, hareket. */
-body.inworld .top,body.inworld #nodes,body.inworld #widgets,body.inworld .status,body.inworld .hint,body.inworld #stage,body.inworld #field,body.inworld #fx,body.inworld #sky{visibility:hidden!important}
+body.inworld .top,body.inworld #nodes,body.inworld #widgets,body.inworld .status,body.inworld .hint,body.inworld .zbar,body.inworld #stage,body.inworld #field,body.inworld #fx,body.inworld #sky{visibility:hidden!important}
 body.locked .world{display:none}
 .world{position:fixed;inset:0;z-index:40;overflow:auto;overscroll-behavior:contain;-webkit-font-smoothing:antialiased;outline:none}
 .world :where(button){font:inherit;color:inherit;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
@@ -469,3 +469,8 @@ html[data-motion=off] .world *{transition:none!important}
 /* Canlı ada her arayüzde görünür (şarkı, bildirim, sayaç) — dünyaların üstünde */
 body.inworld .island{z-index:45}
 @media (max-width:600px){body.inworld .island{top:calc(16px + env(safe-area-inset-top));left:auto;right:10px;transform:none;min-width:0;max-width:calc(100vw - 150px)}body.inworld .island.open{max-width:calc(100vw - 20px)}}
+
+/* telefonda uzun uygulama adları komşusunun üstüne binmesin (Denetçi: “Yazılar üst üste binmiş”) — ad kısalır, tamamı ipucunda */
+@media (max-width:600px){.mg-a>b{max-width:52px;overflow:hidden;text-overflow:ellipsis}.bl-a b{max-width:74px;overflow:hidden;text-overflow:ellipsis}.hr-a b{max-width:52px;overflow:hidden;text-overflow:ellipsis}}
+/* balon adları başka bir balonun üstüne düşünce de okunsun (Denetçi: kontrast) */
+.bl-a b{padding:1px 7px;border-radius:7px;background:rgba(255,255,255,.78);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);text-shadow:none}

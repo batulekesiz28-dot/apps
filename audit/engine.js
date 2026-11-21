@@ -9,7 +9,7 @@
 const CATS={insan:'Gerçek kullanıcı',a11y:'Erişilebilirlik',ux:'Kullanılabilirlik',look:'Estetik',design:'Tasarım kararları',perf:'Hız'};
 /* tasarım kararı bulgularının önem düzeyi → puan ağırlığı */
 const LVL={kritik:'error',yuksek:'warn',orta:'info',dusuk:'info'};
-const W={error:18,warn:8,info:3}; // katı eleştirmen: eskisinden sert (14/6/2 idi)
+const W={error:22,warn:10,info:4}; // “inanılmaz katı” (2026-11-21): 18/8/3 idi
 
 function parseColor(c){const sr=String(c).match(/color\(srgb\s+([^)]+)\)/);if(sr){const p=sr[1].split(/[\s\/]+/).filter(Boolean).map(Number);return{r:p[0]*255,g:p[1]*255,b:p[2]*255,a:p.length>3?p[3]:1}}const m=String(c).match(/rgba?\(([^)]+)\)/);if(!m)return null;const p=m[1].split(/[\s,\/]+/).filter(Boolean).map(Number);return{r:p[0],g:p[1],b:p[2],a:p.length>3?p[3]:1}}
 const lum=({r,g,b})=>{const f=v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)};return .2126*f(r)+.7152*f(g)+.0722*f(b)};
@@ -80,8 +80,9 @@ function run(doc,opt={}){
     if(m<24&&!(e.tagName==='A'&&getComputedStyle(e).display==='inline'))tiny.push(e);else if(mobile&&m<36)small.push(e)}
   if(tiny.length)add('ux','error','target','Çok küçük dokunma alanı','24px’ten küçük düğmeler parmakla zor tutturulur (WCAG 2.5.8).','Düğmeyi en az 24×24, telefonda tercihen 40×40 yap; padding ile büyüt.',tiny);
   if(small.length)add('ux','warn','target2','Küçük dokunma alanı','Telefonda 36px altı düğmeler yanlış basmaya açık.','Telefonda 40px civarına çıkar.',small);
-  const smallText=textEls.filter(e=>parseFloat(getComputedStyle(e).fontSize)<(mobile?11.5:10.5));
-  if(smallText.length)add('ux','warn','fontsize','Çok küçük yazı',`${mobile?'Telefonda 11.5px':'10.5px'} altı yazılar zor okunur.`,'En az 12px kullan; etiketlerde 11px’in altına inme.',smallText);
+  const smallText=textEls.filter(e=>parseFloat(getComputedStyle(e).fontSize)<(mobile?12:11)),tinyText=smallText.filter(e=>parseFloat(getComputedStyle(e).fontSize)<10);
+  if(tinyText.length)add('ux','error','fontsize0','Okunamayacak kadar küçük yazı','10px altı yazı telefonda da bilgisayarda da okunmuyor.','En az 12px kullan.',tinyText);
+  if(smallText.length)add('ux','warn','fontsize','Çok küçük yazı',`${mobile?'Telefonda 12px':'11px'} altı yazılar zor okunur.`,'En az 12px kullan; etiketlerde 11px’in altına inme.',smallText);
   const longLines=vis.filter(e=>e.matches('p,li,blockquote')&&e.textContent.length>120).filter(e=>{const fs=parseFloat(getComputedStyle(e).fontSize);return e.getBoundingClientRect().width/(fs*.52)>95});
   if(longLines.length)add('ux','info','measure','Satırlar çok uzun','95 karakteri aşan satırlar zor takip edilir.','Metin sütununu max-width:68ch ile sınırla.',longLines);
 
@@ -140,6 +141,9 @@ function run(doc,opt={}){
   /* ── Gerçek kullanıcı: katı bir eleştirmenin gözü — bir insan burada nerede takılır, neye ulaşamaz? ──
      Her bulgu “kullanıcı ne yaşar” diye yazılır. Bilerek sert: şüpheli durum da bulgudur. */
   const addH=(sev,id,title,detail,fix,els)=>add('insan',sev,id,title,detail,fix,els);
+  const VW=win.innerWidth,VH=win.innerHeight,inVP=r=>r.width>0&&r.left+r.width/2>0&&r.left+r.width/2<VW&&r.top+r.height/2>0&&r.top+r.height/2<VH;
+  const rootOf=e=>{let p=e;while(p&&p!==doc.body){const ps=win.getComputedStyle(p).position;if(ps==='fixed'||ps==='sticky')return p;p=p.parentElement}return doc.body};
+  const okLayer=(a,b)=>{const ra=rootOf(a),rb=rootOf(b);if(ra===rb)return true;const r=R(rb===doc.body?ra:rb);return r.width*r.height<VW*VH*.15};
   const allCtrls=all.filter(e=>e.matches('button,a[href],[role=button],input:not([type=hidden]),select,textarea,[tabindex]:not([tabindex="-1"])'));
   // 1) görünmez ama tıklanabilir: opaklığı ~0 ama imleç/parmak yakalıyor (kullanıcı boşluğa basıp bir şey açar)
   const ghost=allCtrls.filter(e=>{const r=R(e);if(r.width<4||r.height<4||!inViewish(e,win))return false;const cs=win.getComputedStyle(e);if(cs.display==='none'||cs.visibility==='hidden'||cs.pointerEvents==='none')return false;
@@ -147,14 +151,16 @@ function run(doc,opt={}){
     if(e.matches('select,input')&&e.parentElement&&opacityChain(e.parentElement,win)>.5)return false;
     return opacityChain(e,win)<.08});
   // bilgisayarda “üstüne gelince görünen ikincil iş” kabul edilir (not), telefonda parmak üstüne gelemez → uyarı
-  if(ghost.length)addH(mobile?'warn':'info','ghost','Görünmez ama tıklanabilir yerler','Göremediği bir yere basan kullanıcı beklemediği bir şeyi açar; ya da düğmeyi hiç bulamaz (fareyle üstüne gelmeden görünmüyor, telefonda hiç görünmez).','Gizliyken pointer-events:none ver; önemli düğmeyi hiç gizleme ya da telefonda hep göster.',ghost);
+  // bilgisayarda satır üstüne gelince çıkan ikincil işler (Notion deseni) not; ÖNEMLİ iş gizliyse uyarı (kullanıcı “Güncelle”yi bulamamıştı)
+  const vital=e=>/pri|solid|primary|cta|is-ca/.test(e.className||'')||/güncelle|kaydet|gönder|onayla|giriş|kur\b|indir|yükle|başlat/i.test(nameOf(e)||e.textContent||'');
+  if(ghost.length)addH(mobile?'error':ghost.some(vital)?'warn':'info','ghost','Görünmez ama tıklanabilir yerler','Göremediği bir yere basan kullanıcı beklemediği bir şeyi açar; ya da düğmeyi hiç bulamaz (fareyle üstüne gelmeden görünmüyor, telefonda hiç görünmez).','Gizliyken pointer-events:none ver; önemli düğmeyi hiç gizleme ya da telefonda hep göster.',ghost);
   // 2) kesilen metin: adın sonu “…” ile kesilmiş, tamamı başka yerde okunamıyor
   const cut=textEls.filter(e=>{const cs=getComputedStyle(e);return cs.textOverflow==='ellipsis'&&e.scrollWidth>e.clientWidth+1&&!e.title&&!e.closest('[title]')&&!e.getAttribute('aria-label')});
-  if(cut.length)addH(cut.length>4?'warn':'info','cut','Yazının sonu kesiliyor','Kullanıcı adın ya da başlığın tamamını göremiyor; benzer başlıkları ayırt edemez.','Metne title ekle, alanı genişlet ya da iki satıra izin ver.',cut);
+  if(cut.length)addH('warn','cut','Yazının sonu kesiliyor','Kullanıcı adın ya da başlığın tamamını göremiyor; benzer başlıkları ayırt edemez.','Metne title ekle, alanı genişlet ya da iki satıra izin ver.',cut);
   // 3) Türkçe arayüzde İngilizce arayüz sözcüğü (ürün/özel adlar hariç)
   const EN=/^(settings|home|library|workspace|search|open|close|save|cancel|delete|edit|add|more|back|next|done|loading|share|filter|sort|profile|menu|help|login|logout|submit|upload|download|explore|discover|view all|see all|learn more|play|pause|preview|dashboard|inbox|feed)$/i;
   const eng=vis.filter(e=>e.matches('button,a,[role=tab],label,h1,h2,h3,summary')&&!e.closest('[translate=no]')&&EN.test(txt(e))); // translate="no" = bilerek seçilmiş ürün/bölüm adı
-  if(doc.documentElement.lang==='tr'&&eng.length)addH('info','lang','Türkçe arayüzde İngilizce kelime',`“${[...new Set(eng.map(e=>(e.textContent||'').trim()))].slice(0,5).join('”, “')}” — kullanıcı iki dil arasında gidip geliyor.`,'Arayüz sözcüklerini Türkçeleştir (Ayarlar, Ara, Kaydet…); ürün adları kalabilir.',eng);
+  if(doc.documentElement.lang==='tr'&&eng.length)addH('warn','lang','Türkçe arayüzde İngilizce kelime',`“${[...new Set(eng.map(e=>(e.textContent||'').trim()))].slice(0,5).join('”, “')}” — kullanıcı iki dil arasında gidip geliyor.`,'Arayüz sözcüklerini Türkçeleştir (Ayarlar, Ara, Kaydet…); ürün adları kalabilir.',eng);
   // 4) seçim felci: bir araç satırında 8'den fazla düğme
   const busy=[];for(const [p,l] of rows){if(l.length<=8)continue;
     // sayı ölçeği (1–10 puan), sekme/gezinme listesi ve yatay kayan şerit bir “araç sırası” değildir
@@ -164,7 +170,7 @@ function run(doc,opt={}){
   // sadece ikisi de gerçekten basılabiliyorsa say: kendi ortasında en üstte olmayan (bir pencerenin ya da sabit çubuğun altında kalan) öğe atlanır
   const onTop=c=>{const r=R(c),h=doc.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return!!h&&(h===c||c.contains(h))};
   const ov=[],vc=ctrls.filter(c=>R(c).width>8&&R(c).bottom>0&&R(c).top<win.innerHeight&&onTop(c));for(let i=0;i<vc.length&&ov.length<20;i++){const a=R(vc[i]);for(let j=i+1;j<vc.length;j++){if(vc[i].contains(vc[j])||vc[j].contains(vc[i]))continue;const b=R(vc[j]),ix=Math.max(0,Math.min(a.right,b.right)-Math.max(a.left,b.left)),iy=Math.max(0,Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)),ar=Math.min(a.width*a.height,b.width*b.height);
-      if(ar>0&&ix*iy/ar>.3){ov.push(vc[j]);break}}}
+      if(ar>0&&ix*iy/ar>.3&&okLayer(vc[i],vc[j])){ov.push(vc[j]);break}}}
   if(ov.length)addH('warn','overlap','Üst üste binen düğmeler','İki tıklanabilir öğe aynı yerde; kullanıcı istediğine değil üsttekine basar.','Öğeleri ayır ya da alttakini o sırada devre dışı bırak.',ov);
   // 6) belirsiz düğme adı: ne yapacağını söylemiyor
   const vague=ctrls.filter(c=>/^(tıkla|buraya tıkla|tamam|ok|evet|hayır|git|devam|daha|\.\.\.|…|›|»|>)$/i.test((nameOf(c)||'').trim()));
@@ -185,7 +191,7 @@ function run(doc,opt={}){
   // 11) yalnızca simge olan düğmenin üstüne gelince hiçbir ipucu çıkmıyor (aria-label ekran okuyucuya yeter, göze görünmez)
   const autotip=doc.documentElement.hasAttribute('data-autotip'); // sayfa aria-label'ı üstüne gelince ipucu yapıyorsa
   const iconOnly=ctrls.filter(c=>!(autotip&&c.getAttribute('aria-label'))&&!(c.innerText||'').replace(/[^\p{L}\p{N}]/gu,'').length&&!c.title&&!c.closest('[title]')&&!(c.closest('label')?.innerText||'').trim()&&c.tagName!=='INPUT'&&c.tagName!=='SELECT');
-  if(!mobile&&iconOnly.length)addH(iconOnly.length>6?'warn':'info','tip','Simge düğmesinin ne yaptığı yazmıyor','Sadece simgesi olan düğmenin üstüne gelince ipucu çıkmıyor; kullanıcı denemeden ne yapacağını bilemez.','Her simge düğmesine kısa bir title (ipucu) ver: “Ayarlar (,)”.',iconOnly);
+  if(!mobile&&iconOnly.length)addH(iconOnly.length>2?'warn':'info','tip','Simge düğmesinin ne yaptığı yazmıyor','Sadece simgesi olan düğmenin üstüne gelince ipucu çıkmıyor; kullanıcı denemeden ne yapacağını bilemez.','Her simge düğmesine kısa bir title (ipucu) ver: “Ayarlar (,)”.',iconOnly);
   // 12) telefonda birbirine yapışık dokunma alanları: parmak yanlış düğmeye basar
   if(mobile){const tight=[];const tc=ctrls.filter(c=>{const r=R(c);return r.width>4&&r.top<win.innerHeight&&r.bottom>0});
     for(let i=0;i<tc.length&&tight.length<15;i++){const a=R(tc[i]);if(a.width>=44&&a.height>=44)continue;for(let j=0;j<tc.length;j++){if(i===j||tc[i].contains(tc[j])||tc[j].contains(tc[i]))continue;const b=R(tc[j]);
@@ -195,11 +201,62 @@ function run(doc,opt={}){
   const longL=textEls.filter(e=>{const cs=win.getComputedStyle(e);if(!/block|list-item/.test(cs.display))return false;const fs=parseFloat(cs.fontSize),w=R(e).width;return(e.textContent||'').trim().length>160&&w/(fs*.5)>110});
   if(longL.length)addH('info','measure','Satırlar çok uzun','Bir satıra 100’den fazla harf sığıyor; göz bir sonraki satırın başını kaybeder.','Metin genişliğini ~65–80 harfe sınırla (max-width: 68ch).',longL);
 
+  /* ── Kullanıcının bugüne kadarki şikâyetlerinden çıkan kurallar (2026-11-21, “inanılmaz katı”) ──
+     her biri gerçekten yaşanmış bir sorun: kadranda ibre yazının üstündeydi · etiket uygulama katmanının altında kaldı (çift tık çalışmadı) ·
+     deste ekrandan taştı · haritada haplar üst üste bindi · Güncelle düğmesi bulunamadı (ada gizliydi) · ada “tak diye” açıldı · telefonda ada saatin üstüne bindi */
+  const modal=[...doc.querySelectorAll('[aria-modal=true],[role=dialog],.sheet-scrim,.pal-bg,.cc-bg,.rm-bg')].some(e=>visible(e,win));
+  const overlay=h=>{const r=R(h);return r.width*r.height>VW*VH*.6}; // tam ekran katman (zemin, dünya, perde) örtme sayılmaz
+  const painted=h=>{if(/^(IMG|CANVAS|VIDEO|IFRAME|svg|INPUT|TEXTAREA|SELECT)$/i.test(h.tagName))return true;const cs=win.getComputedStyle(h);return(parseColor(cs.backgroundColor)?.a>.35)||cs.backgroundImage!=='none'||[...h.childNodes].some(n=>n.nodeType===3&&n.textContent.trim())};
+  // katman: en yakın sabit (fixed/sticky) ata. Farklı katmandaki BÜYÜK yüzen panel (kart, pencere) üstteki içeriği bilerek örter → sayılmaz;
+  // küçük yüzen parça (ada, rozet) altındaki yazıyı örterse sayılır (telefonda ada saatin üstüne binmişti)
+  // ekranın üst/alt kenarına yapışık çubuk (başlık, gezinme, alt bar): kaydırılan içeriğin altından geçmesi doğaldır
+  const edgeBar=h=>{const rt=rootOf(h);if(rt===doc.body)return false;if(win.getComputedStyle(rt).position==='sticky')return true;const r=R(rt);return r.top<=2||r.bottom>=VH-2};
+  // kaydırılan bir kutunun görünen alanının dışında kalmış (kaydırılıp gizlenmiş) öğe gerçekte görünmüyor
+  const clipped=e=>{const r=R(e),cx=r.left+r.width/2,cy=r.top+r.height/2;for(let p=e.parentElement;p&&p!==doc.body;p=p.parentElement){const cs=win.getComputedStyle(p);if(cs.overflowX==='visible'&&cs.overflowY==='visible')continue;const q=R(p);if(cx<q.left||cx>q.right||cy<q.top||cy>q.bottom)return true}return false};
+  const coverOf=(e,r)=>{const pts=[[r.left+r.width/2,r.top+r.height/2],[r.left+Math.min(8,r.width/3),r.top+r.height/2],[r.right-Math.min(8,r.width/3),r.top+r.height/2]];let hit=0,by=null;
+    for(const[x,y]of pts){const h=doc.elementFromPoint(x,y);if(!h||h===e||e.contains(h)||h.contains(e)||overlay(h)||!painted(h)||!okLayer(e,h))continue;
+      if(h.closest('[role=tooltip],.toast,.toasts')||opacityChain(h,win)<.08||edgeBar(h))continue;hit++;by=h}return hit>=2?by:null};
+  if(!modal){
+    // 14) yazının üstüne başka bir şey binmiş (kadran ibresi, ada saatin üstünde…)
+    const tc=[];for(const e of textEls.slice(0,700)){const r=R(e);if(!inVP(r)||r.width<6||animating(e)||clipped(e))continue;const by=coverOf(e,r);if(by){tc.push(e);if(tc.length>=15)break}}
+    if(tc.length)addH('error','textcover','Yazının üstüne başka bir şey binmiş','Bir çizgi, ibre ya da başka bir kutu metnin üstünde duruyor; kullanıcı yazıyı okuyamıyor.','Üstteki öğeyi yazıdan uzaklaştır ya da yazıyı ondan kaçır (z-index değil, yerleşim düzelt).',tc);
+    // 15) basılamayan düğme: başka bir katmanın altında kalmış (etiket uygulama katmanının altındaydı)
+    const cc=[];for(const c of ctrls){const r=R(c);if(!inVP(r)||r.width<8||animating(c))continue;const by=coverOf(c,r);if(by&&!by.closest('button,a,[role=button]')){cc.push(c);if(cc.length>=15)break}}
+    if(cc.length)addH('error','buried','Altında kalmış, basılamayan düğme','Düğme görünüyor ama üstünde başka bir katman var; kullanıcı basınca hiçbir şey olmuyor ya da alttakine basıyor.','Katman sırasını (z-index) düzelt ya da üstteki öğeye pointer-events:none ver.',cc)}
+  // 16) ekrandan taşan düğme/yazı (deste yelpazesi ekran dışına taştı)
+  const scroller=e=>{let p=e.parentElement;while(p&&p!==doc.body){const s=win.getComputedStyle(p);if(/auto|scroll/.test(s.overflowX)||/auto|scroll/.test(s.overflowY)||p.hasAttribute('data-pan'))return true;p=p.parentElement}return false}; // data-pan: kaydırılıp yakınlaştırılan harita/galaksi
+  const off=[...ctrls,...heads].filter(e=>{const r=R(e);if(r.width<8||r.height<8||r.bottom<0||r.top>VH)return false;return(r.left<-2||r.right>VW+2)&&!scroller(e)&&!e.closest('[aria-hidden=true],.st,[data-offscreen]')});
+  if(off.length)addH('error','offscreen','Ekrandan taşan düğme ya da başlık','Bir kısmı ekranın dışında kalıyor; kullanıcı ona ulaşamıyor ya da tamamını göremiyor.','Yerleşimi ekrana sığdır (ölçekle, sar ya da kaydırılabilir yap).',off);
+  // 17) üst üste binen yazılar (haritada haplar, etiketler birbirinin üstünde)
+  // biri öbürünün opak kartının altında kalıyorsa (deste yelpazesi: üstteki kart alttakini örter) bu “üst üste yazı” değil, gizlenmiş yazıdır
+  const opq=e=>{for(let p=e;p&&p!==doc.body;p=p.parentElement){const cs=win.getComputedStyle(p);if((parseColor(cs.backgroundColor)?.a>.85)||cs.backgroundImage!=='none')return p}return null};
+  // eğik (döndürülmüş) kartlardaki yazıların dış kutuları yazılar çakışmadan da kesişir → ölçülemez, atla
+  const rotd=e=>{for(let p=e;p&&p!==doc.body;p=p.parentElement){const t=win.getComputedStyle(p).transform;const m=t&&t.match(/matrix\(([^)]+)\)/);if(m){const v=m[1].split(',').map(Number);if(Math.abs(v[1])>.05)return true}}return false};
+  const occluded=(A,B,a,b)=>{if(rotd(A)||rotd(B))return true;const x=(Math.max(a.left,b.left)+Math.min(a.right,b.right))/2,y=(Math.max(a.top,b.top)+Math.min(a.bottom,b.bottom))/2,h=doc.elementFromPoint(x,y);if(!h)return true;
+    if(!A.contains(h)&&!B.contains(h)&&h!==A&&h!==B&&!h.contains(A)&&!h.contains(B))return true; // ikisinin de üstünde başka bir şey var (görünmüyorlar)
+    const top=A.contains(h)||h===A?A:B,low=top===A?B:A,card=opq(top);return!!card&&!card.contains(low)};
+  const labs=textEls.filter(e=>{const r=R(e);const t=(e.textContent||'').trim();return t.length>0&&t.length<60&&inVP(r)&&r.width>4&&!animating(e)&&!clipped(e)}).slice(0,350),lo=[];
+  for(let i=0;i<labs.length&&lo.length<12;i++){const a=R(labs[i]);for(let j=i+1;j<labs.length;j++){if(labs[i].contains(labs[j])||labs[j].contains(labs[i])||!okLayer(labs[i],labs[j]))continue;const b=R(labs[j]);
+      const ix=Math.max(0,Math.min(a.right,b.right)-Math.max(a.left,b.left)),iy=Math.max(0,Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top));if(ix*iy>Math.min(a.width*a.height,b.width*b.height)*.25&&!occluded(labs[i],labs[j],a,b)){lo.push(labs[j]);break}}}
+  if(lo.length)addH('error','textoverlap','Yazılar üst üste binmiş','İki etiket aynı yere düşmüş; ikisi de okunmuyor.','Etiketleri ayır: yerleşimde çakışma kontrolü yap ya da birini kısalt/gizle.',lo);
+  // 18) “tak diye” açılan parça: durumla (açık/hover/seçili) görünür olan öğe hiç geçişsiz beliriyor
+  const inst=[];try{const ST=/(\.open|\.on\b|\.show|\.active|\.expanded|\[open\]|\[aria-expanded="?true"?\]|:hover|:focus-within)/;
+    for(const sh of doc.styleSheets){let rules;try{rules=sh.cssRules}catch{continue}
+      for(const r of rules){if(!r.selectorText||!r.style)continue;const d=r.style.display;if(!d||d==='none'||!ST.test(r.selectorText))continue;if((r.style.animationName&&r.style.animationName!=='none')||parseFloat(r.style.transitionDuration)>0)continue; // kural kendi animasyonunu taşıyor
+        for(const sx of r.selectorText.split(',')){if(!ST.test(sx))continue;const base=sx.replace(/:hover|:focus-within/g,'').replace(/\.(open|on|show|active|expanded)\b/g,'').replace(/\[open\]|\[aria-expanded="?true"?\]/g,'').trim();let el=null;try{el=doc.querySelector(base)}catch{}
+          if(!el||el.closest('[data-anim]'))continue;const cs=win.getComputedStyle(el);const dur=Math.max(...cs.transitionDuration.split(',').map(parseFloat),...cs.animationDuration.split(',').map(parseFloat));
+          if(!(dur>0)){inst.push(el);break}}if(inst.length>=12)break}if(inst.length>=12)break}}catch{}
+  if(inst.length)addH('warn','instant','“Tak diye” açılan parça','Bir panel, menü ya da liste geçişsiz bir anda beliriyor/kayboluyor; göz neyin nereden geldiğini kaçırıyor.','Açılırken boyut/opaklık geçişi ver (transform/opacity, 200–500 ms, yaylı); JS ile canlandırıyorsan kaba data-anim ekle.',inst);
+  // 19) kart içinde kart (Apple sadeliği: kutu yığını yok)
+  const card=e=>{const cs=win.getComputedStyle(e);return cs.boxShadow!=='none'&&parseFloat(cs.borderTopLeftRadius)>=10&&(parseColor(cs.backgroundColor)?.a>.5)&&R(e).width>120&&R(e).height>60};
+  const nested=vis.filter(e=>{if(!card(e))return false;let p=e.parentElement;while(p&&p!==doc.body){if(card(p))return!p.matches('[role=dialog],dialog');p=p.parentElement}return false}).slice(0,10);
+  if(nested.length)addD('orta','nested','Kart içinde kart','Gölgeli, köşeli kutunun içinde yine gölgeli kutu var; ekran kalabalık ve ağır görünüyor (kutu yığını).','İçteki kutunun gölgesini/zeminini kaldır; ayrımı boşluk ve hizayla yap.',nested);
+
   /* ── Hız ── */
   const n=doc.getElementsByTagName('*').length;
-  if(n>3000)add('perf','error','dom','Çok büyük sayfa',`${n} öğe; kaydırma ve açılış yavaşlar.`,'Görünmeyen listeleri sanallaştır, gereksiz sarmalayıcıları kaldır.');else if(n>1500)add('perf','warn','dom','Büyük sayfa',`${n} öğe.`,'Öğe sayısını azaltmayı düşün.');
+  if(n>2500)add('perf','error','dom','Çok büyük sayfa',`${n} öğe; kaydırma ve açılış yavaşlar.`,'Görünmeyen listeleri sanallaştır, gereksiz sarmalayıcıları kaldır.');else if(n>1500)add('perf','warn','dom','Büyük sayfa',`${n} öğe.`,'Öğe sayısını azaltmayı düşün.');
   let nav=null;try{nav=win.performance.getEntriesByType('navigation')[0]}catch{}
-  if(nav&&nav.domContentLoadedEventEnd>0){const ms=Math.round(nav.domContentLoadedEventEnd);if(ms>2500)add('perf','warn','load','Geç açılıyor',`İçerik ${ms}ms’de hazır oldu.`,'Fontları/ağır scriptleri ertele, gereksiz istekleri kaldır.')}
+  if(nav&&nav.domContentLoadedEventEnd>0){const ms=Math.round(nav.domContentLoadedEventEnd);if(ms>1800)add('perf','warn','load','Geç açılıyor',`İçerik ${ms}ms’de hazır oldu.`,'Fontları/ağır scriptleri ertele, gereksiz istekleri kaldır.')}
   let big=[];try{big=win.performance.getEntriesByType('resource').filter(r=>r.transferSize>400000).map(r=>r.name.split('/').pop())}catch{}
   if(big.length)add('perf','warn','heavy','Ağır dosya',`400 KB üstü: ${big.slice(0,3).join(', ')}.`,'Görselleri sıkıştır (webp), büyük kütüphaneleri çıkar.');
 
@@ -207,7 +264,8 @@ function run(doc,opt={}){
   // katı puan: her bulgu tekrar sayısıyla da ağırlaşır; erişilebilirlikte ya da gerçek kullanıcıda “hata” varsa toplam 85'i geçemez
   const score={};for(const c of Object.keys(CATS)){let s=100;for(const f of out)if(f.cat===c)s-=W[f.sev]+(f.sev==='error'?Math.min(12,(f.count-1)*2):f.sev==='warn'?Math.min(6,f.count-1):0);score[c]=Math.max(0,Math.round(s))}
   score.total=Math.round(score.insan*.2+score.a11y*.25+score.ux*.2+score.look*.1+score.design*.1+score.perf*.15);
-  if(out.some(f=>(f.cat==='a11y'||f.cat==='insan')&&f.sev==='error'))score.total=Math.min(85,score.total);
+  if(out.some(f=>(f.cat==='a11y'||f.cat==='insan')&&f.sev==='error'))score.total=Math.min(80,score.total);
+  else if(out.some(f=>f.cat==='insan'&&f.sev==='warn'))score.total=Math.min(94,score.total); // gerçek kullanıcının takıldığı bir yer varsa 100 yok
   return{at:Date.now(),mobile,url:doc.location.pathname,findings:out.sort((a,b)=>W[b.sev]-W[a.sev]),score,stats:{nodes:n,fonts:[...fam],sizes:sizes.size,colors:cols.size,ms:Math.round(performance.now()-t0)}}
 }
 const api={run,CATS,LVL};

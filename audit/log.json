@@ -4579,5 +4579,75 @@
    }
   },
   "items": []
+ },
+ {
+  "at": "2026-11-21T21:15:26",
+  "change": "Ekranda tutulan Study Log süre penceresi artık ada gibi esneyerek büyüyüp küçülüyor. Denetçi “inanılmaz katı” oldu: şimdiye kadar şikâyet ettiğin her şey artık kural — yazının üstüne bir şey binmesi (kadrandaki ibre gibi), bir katmanın altında kalıp basılamayan düğme, ekrandan taşan düğme, üst üste binen yazılar (haritadaki haplar gibi), bulunamayan önemli düğme (Güncelle gibi), “tak diye” açılan parçalar, kart içinde kart, 12px altı yazı. Puanlar sertleşti (bir hata → en çok 80). Bu kurallarla bütün uygulamalar ve 10 arayüz tarandı; bulunan gerçek sorunlar düzeltildi: telefonda Mıknatıs ve Harita'da uzun adlar komşusunun üstüne biniyordu (artık kısalıyor, tamamı üstüne gelince görünür), Mekânsal'da ekrandan taşan küme etiketi gizleniyor, Balon adları her zeminde okunuyor, birçok uygulamada küçük yazılar büyüdü, İstatistik'te tarih seçici ve Takvim'deki Ekle düğmesi artık animasyonla açılıyor.",
+  "scores": {
+   "Hub telefon": {
+    "before": 80,
+    "after": 100
+   },
+   "Hub masaüstü": {
+    "before": 80,
+    "after": 100
+   },
+   "Study Log telefon": {
+    "before": 96,
+    "after": 100
+   },
+   "Denetçi telefon": {
+    "before": 97,
+    "after": 100
+   },
+   "İstatistik telefon": {
+    "before": 94,
+    "after": 100
+   },
+   "Mıknatıs telefon": {
+    "before": 80,
+    "after": 100
+   },
+   "Deste masaüstü": {
+    "before": 80,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "hub",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Telefonda Mıknatıs ve Harita'da uzun uygulama adları komşusunun üstüne biniyordu",
+    "fix": "Adlar kısalıyor, tamamı ipucunda"
+   },
+   {
+    "app": "hub",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Mekânsal'da telefonda küme etiketi ekrandan taşıyordu",
+    "fix": "Taşan etiket gizleniyor"
+   },
+   {
+    "app": "studylog",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "12px altı yazılar",
+    "fix": "Büyütüldü"
+   },
+   {
+    "app": "istatistik",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Özel tarih alanı tak diye açılıyordu",
+    "fix": "Kayarak açılıyor"
+   },
+   {
+    "app": "oneriler",
+    "sev": "bilgi",
+    "status": "open",
+    "text": "Öneri kartlarının içinde ikinci kutular var (kart içinde kart) — tasarım notu, sonra sadeleştirilebilir"
+   }
+  ]
  }
 ]

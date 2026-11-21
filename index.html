@@ -272,9 +272,9 @@ body.locked #widgets,body.locked .zbar{visibility:hidden}
 .zbar button{height:26px;min-width:26px;border-radius:8px;display:grid;place-items:center;color:var(--ink2);transition:background .15s,color .15s}
 .zbar button:hover{background:var(--hover);color:var(--ink)}
 .zbar svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
-.zbar #zPct{font:500 10.5px/1 var(--mono);min-width:44px;letter-spacing:.02em}
+.zbar #zPct{font:500 11px/1 var(--mono);min-width:44px;letter-spacing:.02em}
 .zbar i{width:.5px;height:14px;background:var(--line3);margin:0 3px}
-@media (max-width:700px){.zbar{bottom:calc(58px + env(safe-area-inset-bottom));right:14px;height:44px;padding:0 4px}.zbar button{height:38px;min-width:38px}.status{font-size:11.5px}.nlabel{font-size:12px}.wg-h{font-size:11.5px}}
+@media (max-width:700px){.zbar{bottom:calc(58px + env(safe-area-inset-bottom));right:14px;height:44px;padding:0 4px}.zbar button{height:38px;min-width:38px}.status{font-size:12px}.nlabel{font-size:12px}.wg-h{font-size:11.5px}}
 
 /* ── Floating chrome ──────────────────────────── */
 .top{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;gap:8px;padding:calc(16px + env(safe-area-inset-top)) 22px 16px;pointer-events:none}
@@ -289,7 +289,7 @@ body.locked #widgets,body.locked .zbar{visibility:hidden}
 .search:hover{box-shadow:0 0 0 .5px var(--line3),0 8px 24px -12px rgba(0,0,0,.18);color:var(--ink2)}
 .search:active{transform:scale(.98)}
 .search span:first-of-type{flex:1;text-align:left}
-.kbd{font:500 10.5px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radius:4px;box-shadow:inset 0 0 0 .5px var(--line3)}
+.kbd{font:500 11px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radius:4px;box-shadow:inset 0 0 0 .5px var(--line3)}
 .ib{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;color:var(--ink2);background:var(--menu);box-shadow:0 0 0 .5px var(--line2),0 6px 20px -12px rgba(0,0,0,.14);transition:transform .45s var(--spring),box-shadow .2s,color .2s}
 .ib:hover{color:var(--ink);box-shadow:0 0 0 .5px var(--line3),0 8px 24px -12px rgba(0,0,0,.2)}
 .ib:active{transform:scale(.9);transition-duration:.08s}
@@ -297,7 +297,7 @@ body.locked #widgets,body.locked .zbar{visibility:hidden}
 .ib.solid{background:var(--ink);color:var(--bg);box-shadow:0 8px 20px -8px rgba(0,0,0,.35)}
 .ib.solid svg{transition:transform .5s var(--spring)}.ib.solid:hover svg{transform:rotate(90deg)}
 .me{overflow:hidden;font-size:12px;font-weight:600}.me img{width:100%;height:100%;object-fit:cover}
-.status{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;align-items:center;gap:12px;padding:14px 22px calc(16px + env(safe-area-inset-bottom));font:500 10.5px/1 var(--mono);color:var(--ink3);letter-spacing:.04em;pointer-events:none;user-select:none}
+.status{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;align-items:center;gap:12px;padding:14px 22px calc(16px + env(safe-area-inset-bottom));font:500 11px/1 var(--mono);color:var(--ink3);letter-spacing:.04em;pointer-events:none;user-select:none}
 .status .dot{width:5px;height:5px;border-radius:50%;background:#22C55E;box-shadow:0 0 0 3px rgba(34,197,94,.14)}
 .status .dot.warn{background:#F59E0B;box-shadow:0 0 0 3px rgba(245,158,11,.14)}
 .status .dot.err{background:#EF4444;box-shadow:0 0 0 3px rgba(239,68,68,.14)}
@@ -549,7 +549,7 @@ body.locked .top,body.locked #nodes,body.locked .status,body.locked .hint,body.l
 @media (hover:hover){.grab{display:none}}
 @media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important;animation-duration:.01ms!important}}
 /* Denetçi: telefonda dokunma alanları ve okunur yazı */
-@media (max-width:700px){.zbar{height:46px;gap:4px;padding:0 4px;border-radius:14px}.zbar button{height:38px;min-width:40px;border-radius:10px}.status,.zbar #zPct{font-size:11.5px}.node .nlabel{font-size:12px}.ib{width:40px;height:40px}.search{height:40px}}
+@media (max-width:700px){.zbar{height:46px;gap:4px;padding:0 4px;border-radius:14px}.zbar button{height:38px;min-width:40px;border-radius:10px}.status,.zbar #zPct{font-size:12px}.node .nlabel{font-size:12px}.ib{width:40px;height:40px}.search{height:40px}}
 .top .ib{flex-shrink:0}@media (max-width:440px){#layoutBtn{display:none}} /* dar telefonda düğmeler sıkışmasın; galaksi: palet ya da G */
 
 /* focus / rss / calendar widgets */
@@ -876,7 +876,7 @@ body,.btn,.mi,.pal-in,input,textarea,button{font-family:var(--font)}
 <canvas id="fx"></canvas>
 <div id="stage"></div>
 <div id="widgets"></div>
-<div id="nodes"></div>
+<div id="nodes" data-pan></div>
 <div class="zbar" id="zbar">
   <button data-z="out" title="Uzaklaş (−)" aria-label="Uzaklaş"><svg viewBox="0 0 14 14"><path d="M3 7h8"/></svg></button>
   <button data-z="reset" id="zPct" title="%100 (0)">100%</button>
@@ -905,7 +905,7 @@ body,.btn,.mi,.pal-in,input,textarea,button{font-family:var(--font)}
   <span class="sp" id="clock"></span><span class="help" id="helpBtn" title="Kısayollar">? kısayollar</span>
 </footer>
 
-<div class="island" id="focusBar" hidden role="button" tabindex="0" aria-label="Canlı ada: sayaç, günün odağı, bugünkü işler"></div>
+<div class="island" id="focusBar" data-anim hidden role="button" tabindex="0" aria-label="Canlı ada: sayaç, günün odağı, bugünkü işler"></div>
 <div class="calm" id="calm" hidden role="dialog" aria-label="Sakin mod"></div>
 <div class="dock" id="dock" hidden></div>
 <div class="scrim" id="scrim" hidden></div>
@@ -2136,7 +2136,13 @@ function islandItems(){const out=[],r=STUDY.run;
   if(TABS.length)out.push({k:'apps',pri:1,ic:'<i class="ico">▣</i>',t:`${TABS.length} uygulama açık`,v:'',sub:'Shift+Tab',act:'<button data-isl="sw">Geç</button>'});
   return out.sort((a,b)=>b.pri-a.pri)}
 let islOpen=false,islKey='';
-/* Dynamic Island gibi esneme: boyut eski kutudan yenisine yaylanır, açılıp kapanırken içerik bulanıktan netleşir */
+/* Dynamic Island gibi esneme: boyut eski kutudan yenisine yaylanır, açılıp kapanırken içerik bulanıktan netleşir.
+   boxMorph(el,r0,büyüdü?,içerik seçici) — ada dışında “geçen süre” penceresi (.slpin) de kullanır */
+function boxMorph(el,r0,grow,inSel){const r1=el.getBoundingClientRect();if(Math.abs(r1.width-r0.width)<2&&Math.abs(r1.height-r0.height)<2)return;
+  el.getAnimations().forEach(a=>{if(a.id==='box')a.cancel()});const ov=el.style.overflow;el.style.overflow='hidden';
+  const a=anim(el,[{width:r0.width+'px',height:r0.height+'px'},{width:r1.width+'px',height:r1.height+'px'}],{duration:grow?560:440,easing:grow?'cubic-bezier(.32,1.22,.5,1)':'cubic-bezier(.35,1.12,.5,1)'});
+  a.id='box';a.finished.then(()=>{el.style.overflow=ov},()=>{el.style.overflow=ov});
+  el.querySelectorAll(inSel).forEach(c=>anim(c,[{opacity:0,filter:'blur(6px)',scale:grow?'.95':'1.04'},{opacity:1,filter:'blur(0)',scale:'1'}],{duration:grow?420:300,delay:grow?70:40,easing:'cubic-bezier(.2,.8,.2,1)',fill:'backwards'}))}
 function islMorph(b,r0,toggle){const r1=b.getBoundingClientRect();if(Math.abs(r1.width-r0.width)<2&&Math.abs(r1.height-r0.height)<2&&!toggle)return;
   b.getAnimations().forEach(a=>{if(a.id==='isl')a.cancel()});const op=b.classList.contains('open');
   const a=anim(b,[{width:r0.width+'px',height:r0.height+'px',borderRadius:op?'22px':'24px'},{width:r1.width+'px',height:r1.height+'px',borderRadius:op?'24px':'22px'}],
@@ -2389,7 +2395,7 @@ function slPinPaint(force){const want=wReady&&(SLP.mode==='always'||(SLP.mode===
   if(!slEl){slEl=document.createElement('div');slEl.className='slpin';slEl.setAttribute('role','complementary');slEl.setAttribute('aria-label','Study Log');document.body.appendChild(slEl);slWire(slEl);force=true;
     anim(slEl,[{opacity:0,transform:'translateY(8px) scale(.96)'},{opacity:1,transform:'none'}],{duration:360,easing:OUT})}
   const r=STUDY.run,k=[Math.round(studyToday()),!!r,r?.on,r?.subj,SLP.big,STUDY.goal,(STUDY.subj||[]).length].join('|');
-  if(force||k!==slK){slK=k;slEl.classList.toggle('big',SLP.big);slEl.innerHTML=`<div class="slp-in">${slHTML(true)}</div>${SLP.big?slSubsHTML(slSubs()):''}<div class="slp-tools"><button data-act="big" aria-label="${SLP.big?'Küçült':'Büyüt'}" title="${SLP.big?'Küçült':'Büyüt'}"><svg viewBox="0 0 16 16"><path d="${SLP.big?'M9.5 6.5 13 3M13 6.5V3H9.5M6.5 9.5 3 13M3 9.5V13h3.5':'M3 6.5V3h3.5M3 3l3.5 3.5M13 9.5V13H9.5M13 13 9.5 9.5'}"/></svg></button><button data-act="open" aria-label="Study Log'u aç" title="Study Log'u aç"><svg viewBox="0 0 16 16"><path d="M6 3.5h6.5V10M12.5 3.5 4 12"/></svg></button><button data-act="unpin" aria-label="Ekrandan kaldır" title="Ekrandan kaldır"><svg viewBox="0 0 16 16"><path d="m4 4 8 8M12 4l-8 8"/></svg></button></div>`;slPlace()}
+  if(force||k!==slK){const bigCh=slEl.classList.contains('big')!==!!SLP.big&&!!slK,r0=bigCh?slEl.getBoundingClientRect():null;slK=k;slEl.classList.toggle('big',SLP.big);slEl.innerHTML=`<div class="slp-in">${slHTML(true)}</div>${SLP.big?slSubsHTML(slSubs()):''}<div class="slp-tools"><button data-act="big" aria-label="${SLP.big?'Küçült':'Büyüt'}" title="${SLP.big?'Küçült':'Büyüt'}"><svg viewBox="0 0 16 16"><path d="${SLP.big?'M9.5 6.5 13 3M13 6.5V3H9.5M6.5 9.5 3 13M3 9.5V13h3.5':'M3 6.5V3h3.5M3 3l3.5 3.5M13 9.5V13H9.5M13 13 9.5 9.5'}"/></svg></button><button data-act="open" aria-label="Study Log'u aç" title="Study Log'u aç"><svg viewBox="0 0 16 16"><path d="M6 3.5h6.5V10M12.5 3.5 4 12"/></svg></button><button data-act="unpin" aria-label="Ekrandan kaldır" title="Ekrandan kaldır"><svg viewBox="0 0 16 16"><path d="m4 4 8 8M12 4l-8 8"/></svg></button></div>`;slPlace();if(r0)boxMorph(slEl,r0,!!SLP.big,'.slp-in,.sl-subs')}
   else{const t=slEl.querySelector('[data-slt]');if(t&&r)t.textContent=slClock(slRunSec(r))}}
 function slPlace(){if(!slEl)return;const w=slEl.offsetWidth||220,h=slEl.offsetHeight||80,m=12;
   let x=SLP.x??innerWidth-w-16,y=SLP.y??innerHeight-h-90;x=Math.max(m,Math.min(innerWidth-w-m,x));y=Math.max(m,Math.min(innerHeight-h-m,y));slEl.style.left=x+'px';slEl.style.top=y+'px'}
@@ -3522,9 +3528,9 @@ window.HUB={apps:()=>pub,open:k=>{const a=find(k);if(a)openApp(a,nodes.get(k)?.e
   toast:(t,undo,label)=>toast(t,undo,label),bh:BH_KEY};
 addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.shiftKey&&(e.key==='u'||e.key==='U')){e.preventDefault();window.Worlds?.picker()}});
 </script>
-<link rel="stylesheet" href="ui/worlds.css?v=20261121b">
-<script src="ui/worlds.js?v=20261120c"></script>
-<link rel="stylesheet" href="ui/day.css?v=20261120b">
+<link rel="stylesheet" href="ui/worlds.css?v=20261121e">
+<script src="ui/worlds.js?v=20261121c"></script>
+<link rel="stylesheet" href="ui/day.css?v=20261121a">
 <script src="apps/notlar/tasks.js?v=20261120a"></script>
 <script src="ui/day.js?v=20261120c"></script>
 <link rel="stylesheet" href="ui/notify.css?v=20261120d">

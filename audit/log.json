@@ -4519,5 +4519,35 @@
     "text": "Şarkı adı, kapak ve ⏮ ⏯ ⏭ için eklentinin 1.2 sürümü kurulmalı (adadaki Güncelle düğmesi adımları gösterir)"
    }
   ]
+ },
+ {
+  "at": "2026-11-21T20:40:18",
+  "change": "Üstteki ada artık her arayüzde görünüyor (önceden Galaksi dışındaki arayüzlerde gizliydi — bu yüzden şarkı da Güncelle düğmesi de görünmüyordu). Telefonda arayüzlerde sağ üstte durur. Eklenti eskiyse: YouTube Music'i açınca üstten 'Çalan şarkı üstte görünsün · Nasıl güncellerim?' bildirimi iner; ana ekrana dönünce adada doğrudan beyaz 'Güncelle' düğmesi görünür; Ctrl+K'da 'Eklentiyi güncelle' de var.",
+  "scores": {
+   "Hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Hub masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "hub",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Canlı ada (şarkı, bildirim, Güncelle) Galaksi dışındaki 9 arayüzde gizliydi",
+    "fix": "Ada her arayüzde, dünyaların üstünde"
+   },
+   {
+    "app": "hub",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Güncelle düğmesi sadece ada açılınca görünüyordu",
+    "fix": "Kapalı adada da görünür + açılışta bildirim + Ctrl+K"
+   }
+  ]
  }
 ]

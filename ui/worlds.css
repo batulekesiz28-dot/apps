@@ -1,5 +1,5 @@
 /* AppShell — Arayüz dünyaları. Her dünya kendi tasarım sistemi: yerleşim, tipografi, ritim, hareket. */
-body.inworld .top,body.inworld #nodes,body.inworld #widgets,body.inworld .status,body.inworld .hint,body.inworld .island,body.inworld #stage,body.inworld #field,body.inworld #fx,body.inworld #sky{visibility:hidden!important}
+body.inworld .top,body.inworld #nodes,body.inworld #widgets,body.inworld .status,body.inworld .hint,body.inworld #stage,body.inworld #field,body.inworld #fx,body.inworld #sky{visibility:hidden!important}
 body.locked .world{display:none}
 .world{position:fixed;inset:0;z-index:40;overflow:auto;overscroll-behavior:contain;-webkit-font-smoothing:antialiased;outline:none}
 .world :where(button){font:inherit;color:inherit;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
@@ -465,3 +465,7 @@ html[data-motion=off] .world *{transition:none!important}
 #randBtn.on{background:var(--ink,#111);color:var(--bg,#fff)}
 #randBtn svg circle{fill:currentColor;stroke:none}
 @media (max-width:440px){#randBtn{display:none}} /* dar telefonda üst çubuk sıkışmasın; seçicideki anahtar ve arayüz menüsündeki zar duruyor */
+
+/* Canlı ada her arayüzde görünür (şarkı, bildirim, sayaç) — dünyaların üstünde */
+body.inworld .island{z-index:45}
+@media (max-width:600px){body.inworld .island{top:calc(16px + env(safe-area-inset-top));left:auto;right:10px;transform:none;min-width:0;max-width:calc(100vw - 150px)}body.inworld .island.open{max-width:calc(100vw - 20px)}}

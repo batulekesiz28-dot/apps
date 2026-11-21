@@ -588,6 +588,7 @@ body.locked .focusbar{display:none}
 .island .is-c{display:flex;align-items:center;gap:9px;height:40px;padding:0 14px 0 13px;font-size:13px}
 .island .is-t{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:550;flex:1}
 .island .is-t.done,.island .is-rt.done b{text-decoration:line-through;opacity:.6}
+.island .is-ca{flex-shrink:0;height:28px;min-width:0;padding:0 11px;border-radius:999px;background:#fff!important;color:#0B0B0D;font-size:12.5px;font-weight:650}.island .is-ca:hover{background:#E4E4E7!important}
 .island .is-v{font:600 14px var(--mono);letter-spacing:-.02em;color:#fff}
 .island .is-n{font:500 12px var(--mono);color:#A1A1AA}
 .island .dot{width:9px;height:9px;border-radius:50%;background:var(--c);flex-shrink:0}
@@ -2129,7 +2130,7 @@ function islandItems(){const out=[],r=STUDY.run;
   if(dndOn()){const n=store.get(NHK,[]).filter(x=>x.at>(store.get('appshell:dndAt',0))).length;out.push({k:'dnd',pri:.5,ic:'<i class="ico">☾</i>',t:'Rahatsız etme açık',sub:n?n+' sessiz bildirim':'bildirimler sessiz',act:'<button data-isl="dnd">Kapat</button>'})}
   const np=npTab()&&NP.t&&(NP.on||Date.now()-NP.at<30*6e4)?NP:null;
   if(!np){const bg=TABS.find(t=>t.app.win&&t.fr&&(W.min||curTab()!==t));if(bg){const old=(parseFloat(document.documentElement.dataset.appshellGom||'0')||0)<1.2,m=miniIcon(bg.app);
-    out.push({k:'np0',pri:6,ic:`<span class="mini" style="${m.style}">${m.html}</span>`,t:bg.app.name,sub:old?'Şarkı adı ve ⏮ ⏯ ⏭ için eklentiyi güncelle':'arkada açık',
+    out.push({k:'np0',pri:6,ic:`<span class="mini" style="${m.style}">${m.html}</span>`,t:bg.app.name,sub:old?'Şarkı adı ve ⏮ ⏯ ⏭ için eklentiyi güncelle':'arkada açık',cact:old?`<button class="is-ca" data-isl="gom" data-id="${esc(bg.key)}">Güncelle</button>`:'',
       act:(old?`<button data-isl="gom" data-id="${esc(bg.key)}">Güncelle</button>`:'')+`<button data-isl="np0" data-id="${esc(bg.key)}">Aç</button>`})}}
   if(np)out.push({k:'np',pri:np.on?7:3,on:np.on,img:np.img,ic:'',t:np.t,sub:np.a||tabOf(np.key).app.name,v:'',act:''});
   if(TABS.length)out.push({k:'apps',pri:1,ic:'<i class="ico">▣</i>',t:`${TABS.length} uygulama açık`,v:'',sub:'Shift+Tab',act:'<button data-isl="sw">Geç</button>'});
@@ -2194,7 +2195,7 @@ function paintFocusBar(){const b=$('#focusBar');if(!b)return;const it=islandItem
   if(key===islKey){for(const x of it)if(x.v)b.querySelectorAll(`[data-lv="${x.k}"]`).forEach(e=>e.textContent=x.v);
     const pb=b.querySelector('[data-v=np]');if(pb&&NP?.dur){const c=npCur();pb.style.width=(c/NP.dur*100).toFixed(2)+'%';const tc=b.querySelector('[data-v=npc]');if(tc)tc.textContent=fmtClock(c)}return}
   islKey=key;
-  b.innerHTML=`<div class="is-c">${top.k==='np'?npArt(top):top.ic}<span class="is-t${top.done?' done':''}">${esc(top.t)}</span>${top.k==='np'?npEq(top):''}${top.v?`<b class="is-v num" data-lv="${esc(top.k)}">${esc(top.v)}</b>`:''}${it.length>1?`<span class="is-n">+${it.length-1}</span>`:''}</div>
+  b.innerHTML=`<div class="is-c">${top.k==='np'?npArt(top):top.ic}<span class="is-t${top.done?' done':''}">${esc(top.t)}</span>${top.k==='np'?npEq(top):''}${top.cact||''}${top.v?`<b class="is-v num" data-lv="${esc(top.k)}">${esc(top.v)}</b>`:''}${it.length>1?`<span class="is-n">+${it.length-1}</span>`:''}</div>
     <div class="is-l">${it.map(x=>x.k==='np'?npCard(x):`<div class="is-r">${x.ic}<span class="is-rt${x.done?' done':''}"><b>${esc(x.t)}</b><small>${esc(x.sub)}</small></span>${x.v&&x.k!=='focus'?`<b class="num is-rv" data-lv="${esc(x.k)}">${esc(x.v)}</b>`:''}${x.act}</div>`).join('')}</div>`}
 {let py=null;$('#focusBar').addEventListener('pointerdown',e=>{py=e.clientY});
   addEventListener('pointermove',e=>{if(py!=null&&e.buttons&&e.clientY-py>34){py=null;islOpen=false;paintFocusBar();window.OS?.open()}},{passive:true});
@@ -2824,20 +2825,21 @@ function openWin(a){hidePeek(true);const name='appshell-'+a.slug,sk='appshell:wi
 const gomHosts=()=>{const d=document.documentElement.dataset;return d.appshellGom?(d.appshellGomHosts||'music.youtube.com').split(/\s+/):[]};
 const gomOK=a=>{try{return gomHosts().includes(new URL(a.url).hostname)}catch{return false}};
 function gomSheet(a){if(matchMedia('(pointer:coarse)').matches){openWin(a);return}const n=esc(a.name),old=!!document.documentElement.dataset.appshellGom,upd=old&&gomOK(a);
-  sheet(upd?'Eklentinin yeni sürümü':`${n} · hub içinde`,`<div class="gom">${upd?`<p><b>Yeni:</b> çalan şarkının adı ve kapağı üstteki adada görünür; dokununca ⏮ ⏯ ⏭ ile kontrol edersin. Bunun için eklentiyi bir kez yenile:</p>`:old?`<p><b>Eklentinin yeni sürümü gerekiyor</b> — kurulu sürüm ${n}'u tanımıyor.</p>`:''}<p>${n} başka sitelerin içinde açılmayı engelliyor. Tarayıcına <b>bir kerelik küçük bir eklenti</b> kurarsan hub'ın içinde, kendi sekmesinde açılır. Eklenti sadece bu hub'ın içinde ve sadece YouTube / YouTube Music için çalışır; başka hiçbir siteye dokunmaz.</p>
+  sheet(upd?'Eklentinin yeni sürümü':`${n} · hub içinde`,`<div class="gom">${upd?`<p><b>Yeni:</b> çalan şarkının adı ve kapağı üstteki adada görünür; dokununca ⏮ ⏯ ⏭ ile kontrol edersin. Bunun için eklentiyi bir kez yenile:</p>`:old?`<p><b>Eklentinin yeni sürümü gerekiyor</b> — kurulu sürüm ${n}'u tanımıyor.</p>`:''}${upd?'':`<p>${n} başka sitelerin içinde açılmayı engelliyor. Tarayıcına <b>bir kerelik küçük bir eklenti</b> kurarsan hub'ın içinde, kendi sekmesinde açılır. Eklenti sadece bu hub'ın içinde ve sadece YouTube / YouTube Music için çalışır; başka hiçbir siteye dokunmaz.</p>`}
     <ol><li><a href="extensions/appshell-gom.zip" download>Eklentiyi ${old?'yeniden ':''}indir</a>, zip'e sağ tık → <b>Tümünü ayıkla</b>.</li>
       <li>Adres çubuğuna <code>chrome://extensions</code> yaz <button class="btn ghost" data-gc>Kopyala</button></li>
       ${old?`<li>AppShell eklentisini kaldır (<b>Kaldır</b>), sonra <b>Paketlenmemiş öğe yükle</b> → yeni çıkardığın klasörü seç.</li>`:`<li>Sağ üstte <b>Geliştirici modu</b>nu aç.</li>
       <li><b>Paketlenmemiş öğe yükle</b> → çıkardığın klasörü seç (içinde <code>manifest.json</code> görünen klasör).</li>`}
       <li>Bu sayfayı yenile — ${n} artık burada açılır.</li></ol>
     <p class="gom-n">Hesabın görünmezse bir kez normal sekmede youtube.com'da oturum aç.</p></div>`,
-    `<button class="btn ghost" data-gw>Ayrı pencerede aç</button><span class="grow"></span><button class="btn solid" data-gr>Kurdum, yenile</button>`,
+    `${upd?'':'<button class="btn ghost" data-gw>Ayrı pencerede aç</button>'}<span class="grow"></span><button class="btn solid" data-gr>${upd?'Güncelledim, yenile':'Kurdum, yenile'}</button>`,
     s=>s.addEventListener('click',e=>{if(e.target.closest('[data-gc]')){navigator.clipboard?.writeText('chrome://extensions').then(()=>toast('Kopyalandı — adres çubuğuna yapıştır'),()=>{});return}
       if(e.target.closest('[data-gw]')){closeSheet();openWin(a);return}if(e.target.closest('[data-gr]'))location.reload()}))}
 const GOMV=()=>parseFloat(document.documentElement.dataset.appshellGom||'0')||0;
 function openApp(a,el){
   if(!a||justDragged||linkDrag)return;if(a.win&&!gomOK(a)){gomSheet(a);return}hidePeek(true);
-  if(a.win&&GOMV()<1.2&&!store.get('appshell:npHint',0)){store.set('appshell:npHint',1);setTimeout(()=>toast('Çalan şarkı üstte görünsün (⏮ ⏯ ⏭): eklentiyi güncelle',()=>gomSheet(a),'Nasıl?'),1500)}
+  if(a.win&&GOMV()<1.2){let seen=0;try{seen=sessionStorage.getItem('appshell:npHint')}catch{}if(!seen){try{sessionStorage.setItem('appshell:npHint','1')}catch{}
+    setTimeout(()=>islAlert({ic:'🎵',t:'Çalan şarkı üstte görünsün',sub:'Eklentiyi bir kez güncellemen gerekiyor (1 dakika)',key:'gomupd',acts:[['Sonra',()=>{}],['Nasıl güncellerim?',()=>gomSheet(a),1]]}),1200)}}
   let t=tabOf(a.key);
   if(!t){t={key:a.key,app:a,fr:null,blob:null,t:0,loading:false};TABS.push(t)}
   else if(a.url&&a.url!==t.app.url&&t.fr&&a.kind!=='draft'){t.app=a;try{t.fr.contentWindow.location.replace(bust(a.url))}catch{t.fr.src=bust(a.url)}}
@@ -2894,7 +2896,7 @@ function toIsland(){const b=$('#focusBar');
       {transform:`translate(${r.left}px,${r.top+r.height/2-vh*s/2}px) scale(${s})`,clipPath:`inset(${(vh-h)/2}px 0px round ${h/2}px)`,opacity:0}],
     {duration:560,easing:'cubic-bezier(.32,.72,0,1)',fill:'forwards'});
   a.finished.then(()=>{if(!W.min)return;W.el.style.visibility='hidden';$('#scrim').hidden=true},()=>{});
-  anim(b,[{transform:'translateX(-50%)'},{transform:'translateX(-50%) scale(1.14,1.22)',offset:.45},{transform:'translateX(-50%) scale(.98)',offset:.75},{transform:'translateX(-50%)'}],{duration:560,delay:400,easing:'ease-out'});
+  anim(b,[{scale:'1'},{scale:'1.14 1.22',offset:.45},{scale:'.98',offset:.75},{scale:'1'}],{duration:560,delay:400,easing:'ease-out'}); // 'scale' özelliği: arayüzlerde ada sağda (transform yok)
   return true}
 /* ── Yan yana (Samsung çoklu pencere / Windows Snap): iki uygulama aynı anda; ortadaki tutamaç boyut, çift tık yer değiştir, × çık.
    SPLIT={a,b,r} a=sol/üst · telefonda dikeyse üst-alt. Alt+S, şeritteki ◫. switchTo sonunda applySplit. ── */
@@ -3215,6 +3217,7 @@ function palette(){
     {ic:UI.fit,l:'Sakin mod',run:()=>calm(true)},
     ...(TABS.length?[{ic:UI.fit,l:'Açık uygulamalar (değiştirici)',k:'⌥Q',run:()=>switcher(false,0)}]:[]),
     ...(W.app&&!W.min?[{ic:UI.fit,l:'Mini pencere yap',k:'⌥M',run:()=>floFromFull()}]:FL?[{ic:UI.fit,l:'Mini pencereyi tam ekran yap',k:'⌥M',run:floExpand}]:[]),
+    ...(document.documentElement.dataset.appshellGom&&GOMV()<1.2?[{ic:UI.dl,l:'Eklentiyi güncelle',sub:'YouTube Music şarkı adı ve ⏮ ⏯ ⏭ üstteki adada görünsün',run:()=>{const a=find('p:ytmusic')||find('p:youtube');if(a)gomSheet(a)}}]:[]),
     {ic:UI.fit,l:'Kontrol merkezi',sub:'Hızlı ayarlar ve bildirimler · adayı aşağı çek',k:'⌥A',run:()=>window.OS?.open()},
     {ic:UI.fit,l:'Rahatsız etme'+(dndOn()?' ✓':''),sub:'Bildirimler inmez, sessiz durur',run:()=>window.OS?.dnd(!dndOn())},
     ...(W.app&&!W.min&&TABS.length>1?[{ic:UI.fit,l:SPLIT?'Yan yanadan çık':'Yan yana aç',k:'⌥S',run:splitToggle}]:[]),
@@ -3495,7 +3498,7 @@ window.HUB={apps:()=>pub,open:k=>{const a=find(k);if(a)openApp(a,nodes.get(k)?.e
   toast:(t,undo,label)=>toast(t,undo,label),bh:BH_KEY};
 addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.shiftKey&&(e.key==='u'||e.key==='U')){e.preventDefault();window.Worlds?.picker()}});
 </script>
-<link rel="stylesheet" href="ui/worlds.css?v=20261120c">
+<link rel="stylesheet" href="ui/worlds.css?v=20261121b">
 <script src="ui/worlds.js?v=20261120c"></script>
 <link rel="stylesheet" href="ui/day.css?v=20261120b">
 <script src="apps/notlar/tasks.js?v=20261120a"></script>

@@ -4549,5 +4549,20 @@
     "fix": "Kapalı adada da görünür + açılışta bildirim + Ctrl+K"
    }
   ]
+ },
+ {
+  "at": "2026-11-21T20:46:37",
+  "change": "Açılış animasyonu: giriş kartı kilit açılır gibi büyüyüp bulanıklaşarak kaybolur; ana ekran büyükten ve bulanıktan yerine oturur, üst çubuk yukarıdan iner, galakside uygulamalar merkezden dışa doğru dalga gibi belirir, widget'lar sırayla yükselir, üstteki ada en son yaylanarak düşer (~1 sn). Animasyonlar kapalıysa ya da 'hareketi azalt' açıksa oynamaz.",
+  "scores": {
+   "Hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Hub masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": []
  }
 ]

@@ -51,8 +51,11 @@ async function add(text,at,{br=true,ph=cfg().ph&&!!topic()}={}){text=String(text
   const r={id:'R'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),text,at:Math.max(at,Date.now()),br,ph,phSent:false,fired:false};
   if(ph&&r.at-Date.now()<MAXPH)r.phSent=await ntfy(text,r.at,'Hatırlatıcı');
   const l=list();l.push(r);save(l);tick();return r}
+const alert=o=>{const a=H()?.alert;if(a){a(o);return true}return false};
 function fire(r,late){const body=late?'Kaçırdığın hatırlatıcı · '+when(r.at):'AppShell hatırlatıcı';
-  if(r.br)brShow(r.text,body,r.id);toast((late?'⏰ Kaçırdığın: ':'⏰ ')+r.text)}
+  if(r.br&&document.hidden)brShow(r.text,body,r.id); // sayfa önündeyse adadaki bildirim yeter (çift olmasın)
+  if(!alert({ic:'⏰',t:r.text,sub:late?'Kaçırdığın · '+when(r.at):'Hatırlatıcı',sound:!late,key:'rem'+r.id,
+    acts:[['10 dk sonra',()=>{add(r.text,Date.now()+6e5,{br:r.br,ph:r.ph&&!!topic()});toast('10 dakika sonra tekrar hatırlatırım')}],['Tamam',()=>{},1]]}))toast((late?'⏰ Kaçırdığın: ':'⏰ ')+r.text)}
 function tick(){const now=Date.now(),l=list();let ch=false;
   for(const r of l){if(r.ph&&!r.phSent&&!r.fired&&r.at-now<MAXPH&&r.at>now){r.phSent=true;ch=true;ntfy(r.text,r.at,'Hatırlatıcı')} // 3 günden uzak olanlar yaklaşınca telefona gönderilir
     if(!r.fired&&r.at<=now){r.fired=true;ch=true;if(now-r.at<12*36e5)fire(r,now-r.at>9e4)}}
@@ -61,7 +64,8 @@ function tick(){const now=Date.now(),l=list();let ch=false;
 function taskTick(){if(!cfg().tasks||typeof TK==='undefined'||!TK.ready)return;const d=new Date(),t=ymd(d),done=get('appshell:remtk',{});let ch=false;
   for(const x of TK.list()){if(!x.time||x.status==='done'||TK.dayOf(x)!==t)continue;const[h,m]=x.time.split(':').map(Number),at=new Date(d.getFullYear(),d.getMonth(),d.getDate(),h,m).getTime(),k=x.id+'@'+t;
     if(cfg().ph&&topic()&&!done[k+':ph']&&at>Date.now()+6e4){done[k+':ph']=1;ch=true;ntfy(x.title,at,'Görev · '+x.time)}
-    if(!done[k]&&at<=Date.now()&&Date.now()-at<5*6e4){done[k]=1;ch=true;brShow(x.title,'Görev · '+x.time,k);toast('⏰ '+x.title)}}
+    if(!done[k]&&at<=Date.now()&&Date.now()-at<5*6e4){done[k]=1;ch=true;if(document.hidden)brShow(x.title,'Görev · '+x.time,k);
+      if(!alert({ic:'☐',t:x.title,sub:'Görev · '+x.time,sound:true,key:k,acts:[['Tamamla',()=>{const t=TK.tasks.get(x.id)||x;TK.setStatus(t,'done');toast('✓ '+x.title,()=>TK.setStatus(TK.tasks.get(x.id)||t,'todo'))},1]]}))toast('⏰ '+x.title)}}
   if(ch){for(const k in done)if(!k.includes('@'+t))delete done[k];set('appshell:remtk',done)}}
 /* ── telefondan bilgisayara: site açıkken (arka sekmede de) ntfy konusunu dinler (SSE) ──
    Hub'ın kendi gönderdikleri (tag bell + bizim başlıklar) atlanır — onları zaten tick gösteriyor.
@@ -73,8 +77,10 @@ function incoming(m,late){if(!m||m.event!=='message'||seen.has(m.id))return;seen
   const n=get('appshell:ntfy',{});set('appshell:ntfy',Object.assign(n,{last:m.id}));if(ours(m))return;
   const txt=String(m.message||(m.attachment?'📎 '+(m.attachment.name||'Dosya'):'')).trim();if(!txt)return;
   const url=isUrl(txt)?txt:m.click||'';
-  brShow(m.title||(late?'Telefondan · kaçırdığın':'Telefondan'),txt,'ntfy-'+m.id,url);
-  if(!document.hidden)toast('📱 '+txt.slice(0,120),url?()=>window.open(url,'_blank','noopener'):()=>{try{navigator.clipboard.writeText(txt)}catch{}},url?'Aç':'Kopyala')}
+  if(document.hidden)brShow(m.title||(late?'Telefondan · kaçırdığın':'Telefondan'),txt,'ntfy-'+m.id,url);
+  else if(!alert({ic:'📱',t:txt.slice(0,160),sub:m.title||(late?'Telefondan · kaçırdığın':'Telefondan'),sound:!late,key:'ntfy-'+m.id,
+      acts:[[url?'Aç':'Kopyala',url?()=>window.open(url,'_blank','noopener'):()=>{try{navigator.clipboard.writeText(txt);toast('Kopyalandı')}catch{}},1]]}))
+    toast('📱 '+txt.slice(0,120),url?()=>window.open(url,'_blank','noopener'):()=>{try{navigator.clipboard.writeText(txt)}catch{}},url?'Aç':'Kopyala')}
 function listen(){clearTimeout(esT);try{es?.close()}catch{}es=null;const t=topic();if(!t||!cfg().pc||!window.EventSource)return;
   const last=get('appshell:ntfy',{}).last,t0=Date.now();
   es=new EventSource(`https://ntfy.sh/${encodeURIComponent(t)}/sse?since=${last?encodeURIComponent(last):Math.floor(Date.now()/1000)}`);
@@ -138,7 +144,9 @@ async function onSubmit(e){e.preventDefault();const inp=el.querySelector('#rmIn'
   const r=await add(text,at,{br,ph:cfg().ph&&!!topic()});if(!r)return;inp.value='';
   toast(pick==='now'?(r.ph?'Telefonuna gönderildi':'Gönderildi'):`Hatırlatılacak: ${when(r.at)}${r.ph?' · telefona da':''}`);if(el)paint()}
 
-window.Notify={start,open,close,add,send:(t,o)=>add(t,Date.now(),o)};
+const upcoming=ms=>{const n=Date.now();return list().filter(r=>!r.fired&&r.at>n&&r.at-n<=ms).sort((a,b)=>a.at-b.at)};
+const remove=id=>{save(list().filter(r=>r.id!==id));if(el)paintList()};
+window.Notify={start,open,close,add,upcoming,remove,send:(t,o)=>add(t,Date.now(),o)};
 // hub bu dosya yüklenmeden açıldıysa (hızlı açılış) kendin başla
 if(window.HUB?.booted?.())start();
 })();

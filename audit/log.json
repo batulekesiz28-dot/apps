@@ -4438,5 +4438,35 @@
     "text": "Telefonda eklenti olmadığı için (YouTube Music ayrı pencerede açılır) adada şarkı görünmez"
    }
   ]
+ },
+ {
+  "at": "2026-11-21T13:08:35",
+  "change": "Üstteki ada artık telefonun durum çubuğu gibi: (1) Hatırlatıcı, saatli görev, odak sayacı bitişi ve telefondan gelen mesaj, açık uygulamanın da üstüne adadan büyüyerek iner — sesli, düğmeli (10 dk sonra / Tamam / Tamamla / Molayı başlat / Aç); üstüne gelince bekler, yukarı kaydırınca ya da Esc ile kapanır. (2) Adada canlı: 1 saat içindeki hatırlatıcı (Sil), yaklaşan saatli görev (✓ ile bitir), çalışan odak sayacı (Duraklat). (3) Başka uygulamadayken üst şeritte çalan şarkı: kapak, ad, ⏯ ⏭. Klavye: Alt+P duraklat/oynat, Alt+N sonraki.",
+  "scores": {
+   "Hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Hub masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "hub",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Hatırlatıcı ve mesajlar sadece köşede küçük yazı olarak çıkıyordu, uygulama açıkken kaçıyordu",
+    "fix": "Adadan inen, düğmeli bildirim"
+   },
+   {
+    "app": "hub",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Odak sayacı widget ekranda değilken bitince haber vermiyordu",
+    "fix": "Her yerde bitince ses + bildirim"
+   }
+  ]
  }
 ]

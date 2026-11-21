@@ -623,6 +623,24 @@ body.locked .focusbar{display:none}
 .island .np-c .np-pp{width:46px;height:46px;background:#fff;color:#0B0B0D}.island .np-c .np-pp:hover{background:#E4E4E7}
 .island .np-c svg{width:20px;height:20px;fill:currentColor}
 .island .is-np+.is-r{margin-top:6px;border-top:1px solid rgba(255,255,255,.08);border-radius:0 0 14px 14px}
+/* Ada bildirimi — uygulamaların da üstünde, adadan büyüyerek iner */
+.isl-al{position:fixed;top:calc(10px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:130;width:min(380px,calc(100vw - 24px));display:grid;grid-template-columns:40px 1fr auto;gap:4px 12px;align-items:center;padding:12px 10px 12px 12px;border-radius:26px;background:#0B0B0D;color:#F4F4F5;box-shadow:0 18px 44px -14px rgba(0,0,0,.55),0 0 0 .5px rgba(255,255,255,.1);touch-action:none;user-select:none;-webkit-user-select:none}
+.isl-al .ia-ic{width:40px;height:40px;border-radius:12px;background:#27272A;display:grid;place-items:center;font-size:19px;overflow:hidden}.isl-al .ia-ic img{width:100%;height:100%;object-fit:cover}
+.isl-al .ia-m{min-width:0;display:grid;gap:2px}.isl-al .ia-m b{font-size:14.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow-wrap:anywhere}
+.isl-al .ia-m small{font-size:12.5px;color:#A1A1AA;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.isl-al .ia-x{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#A1A1AA;align-self:start}.isl-al .ia-x:hover{background:rgba(255,255,255,.1);color:#fff}
+.isl-al .ia-x svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round}
+.isl-al .ia-a{grid-column:1/-1;display:flex;justify-content:flex-end;gap:8px;margin-top:6px}
+.isl-al .ia-a button{height:34px;padding:0 14px;border-radius:999px;background:rgba(255,255,255,.12);color:#fff;font-size:13px;font-weight:600}.isl-al .ia-a button:hover{background:rgba(255,255,255,.2)}
+.isl-al .ia-a .pri{background:#fff;color:#0B0B0D}.isl-al .ia-a .pri:hover{background:#E4E4E7}
+@media (max-width:600px){.isl-al .ia-x{width:40px;height:40px}.isl-al .ia-a button{height:40px}}
+/* üst şeritte çalan şarkı */
+.pill .pnp{display:flex;align-items:center;gap:1px;margin:0 2px 0 4px;padding-left:6px;border-left:.5px solid var(--line3)}
+.pill .pnp .pnp-o{width:auto;max-width:150px;display:flex;align-items:center;gap:6px;padding:0 6px 0 3px;font-size:12px;font-weight:550;color:var(--ink)}
+.pill .pnp .pnp-o span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pill .pnp .np-art{width:22px;height:22px;border-radius:6px;object-fit:cover;flex-shrink:0;background:var(--hover);display:grid;place-items:center;font-style:normal;font-size:11px;color:var(--ink3)}
+.pill .pnp svg{fill:currentColor;stroke:none;width:14px;height:14px}
+@media (max-width:700px){.pill .pnp .pnp-o span{display:none}.pill .pnp .pnp-o{padding:0 4px}}
 body.locked .island{display:none}
 @media (max-width:600px){.island{top:calc(64px + env(safe-area-inset-top))}.island button{min-width:40px;height:40px}}
 /* radyal menü */
@@ -891,6 +909,7 @@ body,.btn,.mi,.pal-in,input,textarea,button{font-family:var(--font)}
   <span class="psep"></span>
   <div class="tabs" id="tabs" role="tablist" aria-label="Açık uygulamalar"></div>
   <span class="psep"></span>
+  <div class="pnp" id="pnp" hidden></div>
   <button data-w="sw" title="Tüm açık uygulamalar · Shift+Tab ya da Alt+Q" aria-label="Uygulama değiştirici"><svg viewBox="0 0 16 16"><rect x="2.5" y="3.5" width="5" height="9" rx="1.5"/><rect x="9.5" y="3.5" width="4" height="9" rx="1.5"/></svg></button>
   <button data-w="reload" title="Yenile"><svg viewBox="0 0 16 16"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2.5v3h-3"/></svg></button>
   <button data-w="tab" id="wTab" title="Yeni sekmede aç"><svg viewBox="0 0 16 16"><path d="M9.5 2.5h4v4M13.5 2.5L7.5 8.5M12 9.5v3.5H3V4h3.5"/></svg></button>
@@ -2087,11 +2106,39 @@ function islandItems(){const out=[],r=STUDY.run;
   const dated=NOTES.reduce((a,p)=>a+(p?.blocks||[]).filter(b=>b.d===k&&!(b.t==='todo'&&b.c)).length,0);
   if(open+dated)out.push({k:'today',pri:2,ic:'<i class="ico">☑</i>',t:`Bugün ${open+dated} açık iş`,v:'',sub:'Notlar',act:'<button data-isl="today">Aç</button>'});
   const ev=(GCAL.ev||[]).find(e=>!e.all&&new Date(e.s.replace(' ','T'))>Date.now());if(ev){const mins=Math.round((new Date(ev.s)-Date.now())/6e4);if(mins<12*60)out.push({k:'event',pri:mins<30?6:2,ic:'<i class="ico">▦</i>',t:ev.t,v:ev.s.slice(11,16),sub:mins<60?mins+' dk sonra':'takvim',act:''})}
+  for(const id in TM){const t=TM[id];if(!t.on)continue;const left=Math.max(0,(t.end-Date.now())/1000);
+    out.push({k:'tm'+id,pri:5,ic:`<i class="dot live" style="--c:${t.mode==='focus'?'#F97316':'#22C55E'}"></i>`,t:t.mode==='focus'?'Odak':'Mola',v:mmss(left),sub:'odak sayacı',act:`<button data-isl="tm" data-id="${esc(id)}">Duraklat</button>`});break}
+  const now=Date.now(),hm=d=>{const x=new Date(d);return String(x.getHours()).padStart(2,'0')+':'+String(x.getMinutes()).padStart(2,'0')},inM=ms=>{const m=Math.round(ms/6e4);return m<=0?'şimdi':m+' dk sonra'};
+  const rm=window.Notify?.upcoming?.(36e5)?.[0];
+  if(rm)out.push({k:'rem',pri:rm.at-now<15*6e4?6:2,ic:'<i class="ico">⏰</i>',t:rm.text,v:hm(rm.at),sub:inM(rm.at-now),act:`<button data-isl="remx" data-id="${esc(rm.id)}" aria-label="Hatırlatıcıyı sil">Sil</button>`});
+  if(typeof TK!=='undefined'&&TK.ready){const dk=dayKey(new Date());let best=null;
+    for(const x of TK.list()){if(!x.time||x.status==='done'||TK.dayOf(x)!==dk)continue;const[h,m]=x.time.split(':').map(Number),at=new Date().setHours(h,m,0,0);
+      if(at-now<36e5&&now-at<30*6e4&&(!best||at<best.at))best={x,at}}
+    if(best)out.push({k:'task',pri:best.at-now<15*6e4?6:2,ic:'<i class="ico">☐</i>',t:best.x.title,v:best.x.time,sub:best.at<=now?'zamanı geldi':inM(best.at-now),act:`<button data-isl="tdone" data-id="${esc(best.x.id)}" aria-label="Tamamla">✓</button>`})}
   const np=npTab()&&NP.t&&(NP.on||Date.now()-NP.at<30*6e4)?NP:null;
   if(np)out.push({k:'np',pri:np.on?7:3,on:np.on,img:np.img,ic:'',t:np.t,sub:np.a||tabOf(np.key).app.name,v:'',act:''});
   if(TABS.length)out.push({k:'apps',pri:1,ic:'<i class="ico">▣</i>',t:`${TABS.length} uygulama açık`,v:'',sub:'Shift+Tab',act:'<button data-isl="sw">Geç</button>'});
   return out.sort((a,b)=>b.pri-a.pri)}
 let islOpen=false,islKey='';
+/* ── Ada bildirimi (iOS Dynamic Island / Samsung): hatırlatıcı, görev, odak sayacı, telefondan mesaj — uygulama açıkken de
+   adadan büyüyerek iner; üstüne gelince bekler, yukarı kaydır/Esc/× kapatır. Sıra ALQ. islAlert({ic,t,sub,acts:[[ad,fn,birincil]],ms,sound}) ── */
+const ALQ=[];let AL=null;
+function islAlert(o){if(!o||!o.t)return;if(AL&&AL.o.key&&AL.o.key===o.key)return;ALQ.push(o);if(!AL)alNext()}
+function alNext(){const o=ALQ.shift();if(!o){AL=null;return}const e=document.createElement('div');e.className='isl-al';e.setAttribute('role','alert');
+  e.innerHTML=`<div class="ia-ic" aria-hidden="true">${o.img?`<img src="${esc(o.img)}" alt="">`:esc(o.ic||'•')}</div><div class="ia-m"><b>${esc(o.t)}</b>${o.sub?`<small>${esc(o.sub)}</small>`:''}</div>
+    <button class="ia-x" data-ia="x" aria-label="Kapat" title="Kapat (Esc)">${XI}</button>${o.acts?.length?`<div class="ia-a">${o.acts.map((a,i)=>`<button data-ia="${i}"${a[2]?' class="pri"':''}>${esc(a[0])}</button>`).join('')}</div>`:''}`;
+  document.body.appendChild(e);AL={o,e,t:0,left:o.ms||(o.acts?.length?9000:5500),t0:Date.now()};
+  if(o.sound)chime();
+  anim(e,[{opacity:0,transform:'translateX(-50%) translateY(-14px) scale(.55,.4)',borderRadius:'22px'},{opacity:1,transform:'translateX(-50%)',borderRadius:'26px'}],{duration:520,easing:'cubic-bezier(.3,1.25,.5,1)'});
+  const go=()=>{clearTimeout(AL.t);AL.t0=Date.now();AL.t=setTimeout(alClose,AL.left)};go();
+  e.addEventListener('pointerenter',()=>{if(!AL||AL.e!==e)return;clearTimeout(AL.t);AL.left=Math.max(1500,AL.left-(Date.now()-AL.t0))});
+  e.addEventListener('pointerleave',()=>{if(AL?.e===e)go()});
+  e.addEventListener('click',ev=>{const b=ev.target.closest('[data-ia]');if(!b)return;const k=b.dataset.ia;if(k!=='x')try{o.acts[+k][1]()}catch(err){console.warn(err)}alClose()});
+  let sy=null;e.addEventListener('pointerdown',ev=>{if(!ev.target.closest('button'))sy=ev.clientY});
+  e.addEventListener('pointerup',ev=>{if(sy!=null&&sy-ev.clientY>24)alClose();sy=null})}
+function alClose(){if(!AL)return;const{e,t}=AL;clearTimeout(t);AL={o:{},e:null,t:0};
+  anim(e,[{opacity:1,transform:'translateX(-50%)'},{opacity:0,transform:'translateX(-50%) translateY(-12px) scale(.7,.5)'}],{duration:260,easing:'cubic-bezier(.5,0,.75,0)',fill:'forwards'}).finished.then(()=>{e.remove();alNext()},()=>{e.remove();alNext()})}
+addEventListener('keydown',e=>{if(e.key==='Escape'&&AL?.e){e.stopPropagation();alClose()}},true);
 /* ── Şu an çalan (Samsung'un üst çubuğu gibi): eklenti 1.2 calar.js hub içindeki YT Music / YouTube çerçevesinden
    {appshell:'np',t,a,img,on,cur,dur,has} yollar; ⏮ ⏯ ⏭ {appshell:'np-cmd',c} ile geri gider. NP={key,t,a,img,on,cur,dur,at} ── */
 let NP=null;
@@ -2099,12 +2146,17 @@ addEventListener('message',e=>{const d=e.data;if(!d||d.appshell!=='np')return;co
   if(!d.has){if(NP?.key===t.key&&!d.on){NP=null;paintFocusBar()}return}
   if(NP&&NP.key!==t.key&&NP.on&&!d.on&&Date.now()-NP.at<5000)return; // çalan sekme duraklatılmış olana yer vermez
   const was=NP&&NP.t+NP.on;NP={key:t.key,t:String(d.t||''),a:String(d.a||''),img:/^https:\/\//.test(d.img||'')?d.img:'',on:!!d.on,cur:+d.cur||0,dur:+d.dur||0,at:Date.now()};
-  if(was!==NP.t+NP.on||!document.hidden)paintFocusBar()});
+  if(was!==NP.t+NP.on||!document.hidden){paintFocusBar();paintPnp()}});
+// uygulama açıkken üst şeritte (Alt+P ⏯, Alt+N ⏭): çalan sekme öndeyse gizli — kendi oynatıcısı var
+function paintPnp(){const p=$('#pnp');if(!p)return;const t=npTab(),show=!!(t&&NP.t&&(NP.on||Date.now()-NP.at<30*6e4)&&curTab()!==t);
+  if(!show){p.hidden=true;p.innerHTML='';return}const k=NP.t+NP.on+NP.img;if(p.dataset.k===k&&!p.hidden)return;p.dataset.k=k;p.hidden=false;
+  p.innerHTML=`<button class="pnp-o" data-np="open" title="${esc(NP.t)}${NP.a?' · '+esc(NP.a):''} — aç">${npArt(NP)}<span>${esc(NP.t)}</span></button><button data-np="toggle" aria-label="${NP.on?'Duraklat':'Oynat'}" title="${NP.on?'Duraklat':'Oynat'} · Alt+P">${NP.on?NPI.pause:NPI.play}</button><button data-np="next" aria-label="Sonraki" title="Sonraki · Alt+N">${NPI.next}</button>`}
+$('#pnp')?.addEventListener('click',e=>{const b=e.target.closest('[data-np]');if(!b||!NP)return;e.stopPropagation();const c=b.dataset.np;if(c==='open')switchTo(NP.key);else npCmd(c);paintPnp()});
 const npTab=()=>{const t=NP&&tabOf(NP.key);return t&&t.fr?t:null};
 const npCur=()=>NP?Math.min(NP.dur||1e9,NP.cur+(NP.on?(Date.now()-NP.at)/1000:0)):0;
 function npCmd(c,x){const t=npTab();if(!t)return;let o='*';try{o=new URL(t.app.url).origin}catch{}
   try{t.fr.contentWindow.postMessage(Object.assign({appshell:'np-cmd',c},x||{}),o)}catch{}
-  if(c==='toggle'){NP.cur=npCur();NP.at=Date.now();NP.on=!NP.on;paintFocusBar()}
+  if(c==='toggle'){NP.cur=npCur();NP.at=Date.now();NP.on=!NP.on;paintFocusBar();paintPnp()}
   else if(c==='seek'){NP.cur=x.t;NP.at=Date.now();paintFocusBar()}}
 const NPI={prev:'<svg viewBox="0 0 24 24"><path d="M7 6h2v12H7zM10.5 12L19 6v12z"/></svg>',next:'<svg viewBox="0 0 24 24"><path d="M15 6h2v12h-2zM13.5 12L5 18V6z"/></svg>',
   play:'<svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg>',pause:'<svg viewBox="0 0 24 24"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg>'};
@@ -2120,17 +2172,21 @@ function paintFocusBar(){const b=$('#focusBar');if(!b)return;const it=islandItem
   if(!it.length||calmOn){b.hidden=true;islKey='';return}
   const top=it[0],key=it.map(x=>x.k+x.t+x.sub+(x.done?1:0)+(x.on?1:0)+(x.img||'')+(x.k==='np'&&NP.dur?Math.round(NP.dur):'')).join('|')+islOpen;
   b.hidden=false;b.className='island'+(islOpen?' open':'')+(top.k==='timer'&&STUDY.run?.on?' live':'');
-  if(key===islKey){const v=b.querySelector('[data-v=timer]');if(v)v.textContent=top.k==='timer'?top.v:(it.find(x=>x.k==='timer')?.v||'');
+  if(key===islKey){for(const x of it)if(x.v)b.querySelectorAll(`[data-lv="${x.k}"]`).forEach(e=>e.textContent=x.v);
     const pb=b.querySelector('[data-v=np]');if(pb&&NP?.dur){const c=npCur();pb.style.width=(c/NP.dur*100).toFixed(2)+'%';const tc=b.querySelector('[data-v=npc]');if(tc)tc.textContent=fmtClock(c)}return}
   islKey=key;
-  b.innerHTML=`<div class="is-c">${top.k==='np'?npArt(top):top.ic}<span class="is-t${top.done?' done':''}">${esc(top.t)}</span>${top.k==='np'?npEq(top):''}${top.v?`<b class="is-v num" ${top.k==='timer'?'data-v="timer"':''}>${esc(top.v)}</b>`:''}${it.length>1?`<span class="is-n">+${it.length-1}</span>`:''}</div>
-    <div class="is-l">${it.map(x=>x.k==='np'?npCard(x):`<div class="is-r">${x.ic}<span class="is-rt${x.done?' done':''}"><b>${esc(x.t)}</b><small>${esc(x.sub)}</small></span>${x.v&&x.k==='timer'?`<b class="num is-rv" data-v="timer">${esc(x.v)}</b>`:''}${x.act}</div>`).join('')}</div>`}
+  b.innerHTML=`<div class="is-c">${top.k==='np'?npArt(top):top.ic}<span class="is-t${top.done?' done':''}">${esc(top.t)}</span>${top.k==='np'?npEq(top):''}${top.v?`<b class="is-v num" data-lv="${esc(top.k)}">${esc(top.v)}</b>`:''}${it.length>1?`<span class="is-n">+${it.length-1}</span>`:''}</div>
+    <div class="is-l">${it.map(x=>x.k==='np'?npCard(x):`<div class="is-r">${x.ic}<span class="is-rt${x.done?' done':''}"><b>${esc(x.t)}</b><small>${esc(x.sub)}</small></span>${x.v&&x.k!=='focus'?`<b class="num is-rv" data-lv="${esc(x.k)}">${esc(x.v)}</b>`:''}${x.act}</div>`).join('')}</div>`}
 $('#focusBar').addEventListener('pointerenter',e=>{if(e.pointerType==='mouse'){islOpen=true;paintFocusBar()}});
 $('#focusBar').addEventListener('pointerleave',e=>{if(e.pointerType==='mouse'){islOpen=false;paintFocusBar()}});
 $('#focusBar').addEventListener('click',e=>{const fb=e.target.closest('[data-fb]'),is=e.target.closest('[data-isl]'),np=e.target.closest('[data-np]');
   if(np&&NP){const c=np.dataset.np;if(c==='open'){islOpen=false;paintFocusBar();switchTo(NP.key)}
     else if(c==='seek'){if(NP.dur){const r=np.getBoundingClientRect();npCmd('seek',{t:clamp((e.clientX-r.left)/r.width,0,1)*NP.dur})}}else npCmd(c);return}
   if(fb){const r=focusWidget(),f=r&&focusOf(r.w);if(!f)return;f.ok=fb.dataset.fb==='ok';saveMeta();renderW(r);paintFocusBar();if(f.ok)toast('Günün odağı tamam ✓');return}
+  if(is&&['tm','remx','tdone'].includes(is.dataset.isl)){const a=is.dataset.isl,id=is.dataset.id;
+    if(a==='tm')tmGo(id);else if(a==='remx'){window.Notify?.remove?.(id);toast('Hatırlatıcı silindi')}
+    else if(a==='tdone'&&typeof TK!=='undefined'){const t=TK.tasks.get(id);if(t){TK.setStatus(t,'done');toast('✓ '+t.title,()=>TK.setStatus(TK.tasks.get(id)||t,'todo'))}}
+    islKey='';paintFocusBar();return}
   if(is){const a=is.dataset.isl;islOpen=false;if(a==='study'){const s=find('p:studylog');s&&openApp(s,nodes.get(s.key)?.el)}else if(a==='today')openNotes('#today');else if(a==='sw')switcher(false,0);paintFocusBar();return}
   if(!matchMedia('(hover:hover)').matches){islOpen=!islOpen;paintFocusBar()}});
 $('#focusBar').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.id==='focusBar'){e.preventDefault();islOpen=!islOpen;paintFocusBar()}});
@@ -2212,6 +2268,11 @@ function spark(a){const v=a.slice(-30),lo=Math.min(...v),hi=Math.max(...v),s=hi-
 /* ── Focus timer runtime (per device) ── */
 const TM=store.get('appshell:timers',{});const tmSave=()=>store.set('appshell:timers',TM);
 const tmOf=id=>TM[id]||(TM[id]={mode:'focus',dur:1500,left:1500,end:0,on:false});
+// odak sayacı bitti: ses + adada bildirim (widget ekranda olmasa da — aşağıdaki saniyelik döngü yakalar)
+function tmDone(id){const t=TM[id];if(!t)return;const was=t.mode;t.on=false;t.mode=was==='focus'?'break':'focus';t.dur=was==='focus'?300:1500;t.left=t.dur;tmSave();chime();
+  islAlert({ic:'◎',t:was==='focus'?'Odak bitti':'Mola bitti',sub:was==='focus'?'5 dakika mola ver':'Yeni odak zamanı',
+    acts:[[was==='focus'?'Molayı başlat':'Odağı başlat',()=>tmGo(id),1]]})}
+function tmGo(id){const t=tmOf(id);if(t.on){t.left=(t.end-Date.now())/1000;t.on=false}else{t.end=Date.now()+t.left*1000;t.on=true}tmSave();const r=WEL.get(id);if(r)renderW(r);paintFocusBar()}
 const mmss=s=>{s=Math.max(0,Math.ceil(s));return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
 function chime(){try{const a=new(window.AudioContext||window.webkitAudioContext)();[0,.18,.36].forEach((d,i)=>{const o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.value=[880,1108,1318][i];
   g.gain.setValueAtTime(0,a.currentTime+d);g.gain.linearRampToValueAtTime(.18,a.currentTime+d+.02);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+d+.5);o.connect(g).connect(a.destination);o.start(a.currentTime+d);o.stop(a.currentTime+d+.55)});setTimeout(()=>a.close(),1500)}catch{}}
@@ -2430,8 +2491,7 @@ const WT={
       else if(a==='m25'||a==='m5'){t.mode=a==='m25'?'focus':'break';t.dur=a==='m25'?1500:300;t.left=t.dur;t.on=false}
       tmSave();renderW(r);WT.timer.tick(r)},
     tick:r=>{const t=tmOf(r.w.id);if(t.on){t.left=(t.end-Date.now())/1000;
-        if(t.left<=0){const was=t.mode;t.on=false;t.mode=was==='focus'?'break':'focus';t.dur=was==='focus'?300:1500;t.left=t.dur;tmSave();chime();
-          toast(was==='focus'?'Odak bitti — 5 dakika mola ver':'Mola bitti — yeni odak zamanı');renderW(r);const c=r.el.getBoundingClientRect();ripple(c.left+c.width/2,c.top+c.height/2,2);return}}
+        if(t.left<=0){tmDone(r.w.id);renderW(r);const c=r.el.getBoundingClientRect();ripple(c.left+c.width/2,c.top+c.height/2,2);return}}
       const C=2*Math.PI*34,fg=r.el.querySelector('.fg'),tm=r.el.querySelector('.tm');if(fg)fg.style.strokeDashoffset=(C*(1-t.left/t.dur)).toFixed(2);if(tm)tm.textContent=mmss(t.left);
       if(t.on)document.title=`${mmss(t.left)} · ${t.mode==='focus'?'Odak':'Mola'}`;else if(document.title.includes(' · Odak')||document.title.includes(' · Mola'))document.title=$('#brand').textContent}},
   cal:{n:'Mini takvim',d:"Ay görünümü · Notlar'da planlı günler işaretli",w:240,
@@ -2659,6 +2719,7 @@ function seedMore(){if(store.get('appshell:seed2',false)||widgets===null||!wRead
 function widgetGallery(){
   sheet('Widget ekle',`<div class="wgal">${Object.entries(WT).map(([k,T])=>`<button data-wt="${k}"><span class="gi"><svg viewBox="0 0 16 16">${T.ic}</svg></span><span><b>${T.n}</b><span>${T.d}</span></span></button>`).join('')}</div>`,'',
     s=>s.querySelector('.wgal').addEventListener('click',e=>{const b=e.target.closest('[data-wt]');if(!b)return;closeSheet();setTimeout(()=>addWidget(b.dataset.wt),120)}))}
+setInterval(()=>{for(const id in TM){const t=TM[id];if(t.on&&t.end<=Date.now()&&!WEL.get(id))tmDone(id)}}, 1000);
 setInterval(()=>{if(document.hidden)return;slPinPaint();const fs=W.app&&!W.min;for(const r of WEL.values()){const T=WT[r.w.type];if(!T.tick)continue;if(r.w.type==='timer'||(!fs&&r.vis))T.tick(r)}},1000);
 addEventListener('focus',()=>{if(notesOn)readLocalNotes()});
 
@@ -2763,7 +2824,7 @@ function switchTo(key,el){
   t.t=performance.now();if(!t.fr)mountFrame(t);
   W.app=t.app;W.min=false;closeSwitcher();slPinPaint();
   for(const o of TABS)if(o.fr&&o.fr.parentNode===W.el)o.fr.hidden=o!==t;
-  sleepExtra();renderTabs();$('#dock').hidden=true;
+  sleepExtra();renderTabs();$('#dock').hidden=true;paintPnp();
   if(t.loading)progress();else{progA?.cancel();$('#prog').style.opacity=0}
   const n=nodes.get(key);
   if(fromHub||fromFlo){
@@ -2856,6 +2917,7 @@ function osKeys(e){
   if(e.altKey&&!e.ctrlKey&&!e.metaKey){const c=e.code;
     if(c==='KeyQ'||c==='Backquote'){e.preventDefault();switcher(true,e.shiftKey?-1:1);return true}
     if(/^Digit[1-9]$/.test(c)){const t=TABS[+c.slice(5)-1];if(t){e.preventDefault();closeSwitcher();switchTo(t.key);return true}return false}
+    if((c==='KeyP'||c==='KeyN')&&npTab()){e.preventDefault();npCmd(c==='KeyP'?'toggle':'next');toast(c==='KeyP'?(NP.on?'▶ '+NP.t:'⏸ Duraklatıldı'):'⏭ Sonraki');return true}
     if(c==='KeyM'){e.preventDefault();if(W.app&&!W.min)floFromFull();else if(FL)floExpand();return true}
     if(c==='KeyH'||c==='Digit0'){if(W.app&&!W.min){e.preventDefault();goHome()}return true}
     if(c==='KeyW'&&W.app&&!W.min){e.preventDefault();closeWin();return true}}
@@ -3328,7 +3390,7 @@ buildMesh();introStart=performance.now();wake();
 /* ── Arayüz dünyaları için köprü (ui/worlds.js bunu kullanır) ── */
 window.HUB={apps:()=>pub,open:k=>{const a=find(k);if(a)openApp(a,nodes.get(k)?.el)},openNotes:h=>openNotes(h),palette:()=>palette(),
   items:()=>{try{return islandItems()}catch{return[]}},notes:()=>NOTES,study:()=>STUDY,studyToday:()=>{try{return studyToday()}catch{return 0}},dayKey,
-  icon:a=>miniIcon(a),themeMenu:()=>themeMenu(),tabs:()=>TABS.length,booted:()=>booted,tier:()=>TIER,
+  alert:o=>islAlert(o),icon:a=>miniIcon(a),themeMenu:()=>themeMenu(),tabs:()=>TABS.length,booted:()=>booted,tier:()=>TIER,
   pause:on=>{if(on)setPaused(true);else setPaused(document.hidden||(!!W.app&&!W.min))},esc,
   /* galaksideki kümeler: [{id,name,color,keys}] — sıra: yapay zekâ yörüngesi, adlı kümeler, Diğer */
   groups:()=>{try{GX.poke=true;galaxyModel()}catch{}const col=c=>GCOL[c]||c||GCOL.violet;
@@ -3350,6 +3412,6 @@ addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.shiftKey&&(e.key==='
 <script src="apps/notlar/tasks.js?v=20261120a"></script>
 <script src="ui/day.js?v=20261120c"></script>
 <link rel="stylesheet" href="ui/notify.css?v=20261120d">
-<script src="ui/notify.js?v=20261120c"></script>
+<script src="ui/notify.js?v=20261121a"></script>
 </body>
 </html>

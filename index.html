@@ -2136,6 +2136,13 @@ function islandItems(){const out=[],r=STUDY.run;
   if(TABS.length)out.push({k:'apps',pri:1,ic:'<i class="ico">▣</i>',t:`${TABS.length} uygulama açık`,v:'',sub:'Shift+Tab',act:'<button data-isl="sw">Geç</button>'});
   return out.sort((a,b)=>b.pri-a.pri)}
 let islOpen=false,islKey='';
+/* Dynamic Island gibi esneme: boyut eski kutudan yenisine yaylanır, açılıp kapanırken içerik bulanıktan netleşir */
+function islMorph(b,r0,toggle){const r1=b.getBoundingClientRect();if(Math.abs(r1.width-r0.width)<2&&Math.abs(r1.height-r0.height)<2&&!toggle)return;
+  b.getAnimations().forEach(a=>{if(a.id==='isl')a.cancel()});const op=b.classList.contains('open');
+  const a=anim(b,[{width:r0.width+'px',height:r0.height+'px',borderRadius:op?'22px':'24px'},{width:r1.width+'px',height:r1.height+'px',borderRadius:op?'24px':'22px'}],
+    {duration:op?560:440,easing:op?'cubic-bezier(.32,1.22,.5,1)':'cubic-bezier(.35,1.12,.5,1)'});if(a)a.id='isl';
+  if(toggle){const c=b.querySelector(op?'.is-l':'.is-c');
+    if(c)anim(c,[{opacity:0,filter:'blur(6px)',scale:op?'.94':'1.04'},{opacity:1,filter:'blur(0)',scale:'1'}],{duration:op?420:300,delay:op?70:40,easing:'cubic-bezier(.2,.8,.2,1)',fill:'backwards'})}}
 /* ── Ada bildirimi (iOS Dynamic Island / Samsung): hatırlatıcı, görev, odak sayacı, telefondan mesaj — uygulama açıkken de
    adadan büyüyerek iner; üstüne gelince bekler, yukarı kaydır/Esc/× kapatır. Sıra ALQ. islAlert({ic,t,sub,acts:[[ad,fn,birincil]],ms,sound}) ── */
 const ALQ=[];let AL=null;
@@ -2191,12 +2198,14 @@ function npCard(x){const d=NP.dur,c=npCur(),app=tabOf(NP.key)?.app.name||'';
 function paintFocusBar(){const b=$('#focusBar');if(!b)return;const it=islandItems();
   if(!it.length||calmOn){b.hidden=true;islKey='';return}
   const top=it[0],key=it.map(x=>x.k+x.t+x.sub+(x.done?1:0)+(x.on?1:0)+(x.img||'')+(x.k==='np'&&NP.dur?Math.round(NP.dur):'')).join('|')+islOpen;
+  const vis=!b.hidden,wasOpen=b.classList.contains('open'),r0=vis&&key!==islKey?b.getBoundingClientRect():null;
   b.hidden=false;b.className='island'+(islOpen?' open':'')+(top.k==='timer'&&STUDY.run?.on?' live':'');
   if(key===islKey){for(const x of it)if(x.v)b.querySelectorAll(`[data-lv="${x.k}"]`).forEach(e=>e.textContent=x.v);
     const pb=b.querySelector('[data-v=np]');if(pb&&NP?.dur){const c=npCur();pb.style.width=(c/NP.dur*100).toFixed(2)+'%';const tc=b.querySelector('[data-v=npc]');if(tc)tc.textContent=fmtClock(c)}return}
   islKey=key;
   b.innerHTML=`<div class="is-c">${top.k==='np'?npArt(top):top.ic}<span class="is-t${top.done?' done':''}">${esc(top.t)}</span>${top.k==='np'?npEq(top):''}${top.cact||''}${top.v?`<b class="is-v num" data-lv="${esc(top.k)}">${esc(top.v)}</b>`:''}${it.length>1?`<span class="is-n">+${it.length-1}</span>`:''}</div>
-    <div class="is-l">${it.map(x=>x.k==='np'?npCard(x):`<div class="is-r">${x.ic}<span class="is-rt${x.done?' done':''}"><b>${esc(x.t)}</b><small>${esc(x.sub)}</small></span>${x.v&&x.k!=='focus'?`<b class="num is-rv" data-lv="${esc(x.k)}">${esc(x.v)}</b>`:''}${x.act}</div>`).join('')}</div>`}
+    <div class="is-l">${it.map(x=>x.k==='np'?npCard(x):`<div class="is-r">${x.ic}<span class="is-rt${x.done?' done':''}"><b>${esc(x.t)}</b><small>${esc(x.sub)}</small></span>${x.v&&x.k!=='focus'?`<b class="num is-rv" data-lv="${esc(x.k)}">${esc(x.v)}</b>`:''}${x.act}</div>`).join('')}</div>`;
+  if(r0)islMorph(b,r0,wasOpen!==islOpen)}
 {let py=null;$('#focusBar').addEventListener('pointerdown',e=>{py=e.clientY});
   addEventListener('pointermove',e=>{if(py!=null&&e.buttons&&e.clientY-py>34){py=null;islOpen=false;paintFocusBar();window.OS?.open()}},{passive:true});
   addEventListener('pointerup',()=>{py=null})}

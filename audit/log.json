@@ -4564,5 +4564,20 @@
    }
   },
   "items": []
+ },
+ {
+  "at": "2026-11-21T20:51:03",
+  "change": "Üstteki ada artık tak diye açılmıyor: iPhone'daki Dynamic Island gibi esneyerek büyüyor (hafif yaylanıp yerine oturuyor), içindekiler bulanıktan netleşerek beliriyor; kapanırken de yumuşakça küçülüyor. İçerik değişince (yeni bildirim, şarkı) boyutu da kayarak değişiyor.",
+  "scores": {
+   "Hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Hub masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": []
  }
 ]

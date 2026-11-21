@@ -146,7 +146,8 @@ async function onSubmit(e){e.preventDefault();const inp=el.querySelector('#rmIn'
 
 const upcoming=ms=>{const n=Date.now();return list().filter(r=>!r.fired&&r.at>n&&r.at-n<=ms).sort((a,b)=>a.at-b.at)};
 const remove=id=>{save(list().filter(r=>r.id!==id));if(el)paintList()};
-window.Notify={start,open,close,add,upcoming,remove,send:(t,o)=>add(t,Date.now(),o)};
+const pc=v=>{if(v==null)return !!(cfg().pc&&topic());setCfg({pc:!!v});listen()};
+window.Notify={start,open,close,add,upcoming,remove,pc,hasTopic:()=>!!topic(),send:(t,o)=>add(t,Date.now(),o)};
 // hub bu dosya yüklenmeden açıldıysa (hızlı açılış) kendin başla
 if(window.HUB?.booted?.())start();
 })();

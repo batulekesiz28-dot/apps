@@ -4468,5 +4468,27 @@
     "fix": "Her yerde bitince ses + bildirim"
    }
   ]
+ },
+ {
+  "at": "2026-11-21T14:13:17",
+  "change": "Telefondaki gibi yeni sistem özellikleri: (1) Kontrol merkezi — üstteki adayı aşağı çek (telefonda ekranın en üstünden aşağı kaydır) ya da Alt+A: saat, tarih, pil, bağlantı; 8 hızlı ayar (Rahatsız etme, Karanlık, Sakin mod, Animasyon, Hafif mod, Mini pencere, Telefon mesajları, Tam ekran); çalan şarkı; bildirim geçmişi (tek tek ya da hepsini sil). (2) Rahatsız etme — açıkken bildirimler inmez, ses çıkmaz, sessizce Kontrol merkezinde birikir; adada 'Rahatsız etme açık' görünür. (3) Yan yana — bir uygulamadayken üst şeritteki ◫ ya da Alt+S: iki uygulama yan yana (telefonda üst-alt); ortadaki çizgiyi sürükle (1/3, 1/2, 2/3'e oturur), ⇄ ile yer değiştir, × ile tek uygulamaya dön. (4) Adada 'N yeni bildirim'.",
+  "scores": {
+   "Hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Hub masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "hub",
+    "sev": "bilgi",
+    "status": "open",
+    "text": "Pil göstergesi sadece pil bilgisini veren tarayıcılarda (Chrome/Edge) görünür"
+   }
+  ]
  }
 ]

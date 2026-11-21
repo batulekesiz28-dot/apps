@@ -624,6 +624,15 @@ body.locked .focusbar{display:none}
 .island .np-c svg{width:20px;height:20px;fill:currentColor}
 .island .is-np+.is-r{margin-top:6px;border-top:1px solid rgba(255,255,255,.08);border-radius:0 0 14px 14px}
 /* Ada bildirimi — uygulamaların da üstünde, adadan büyüyerek iner */
+.split-bar{position:absolute;top:0;bottom:0;z-index:3;width:16px;cursor:col-resize;touch-action:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.split-bar::before{content:"";position:absolute;inset:0 5px;background:var(--bg)}
+.split-bar i{position:relative;width:4px;height:44px;border-radius:2px;background:var(--ink3);opacity:.6;transition:opacity .15s,height .2s var(--out)}
+.split-bar:hover i{opacity:1;height:64px}
+.split-bar button{position:relative;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--menu);color:var(--ink2);box-shadow:var(--shadow);font-size:12px;opacity:0;transition:opacity .15s}
+.split-bar:hover button,.split-bar button:focus-visible{opacity:1}.split-bar button svg{width:10px;height:10px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round}
+.split-bar.v{top:auto;bottom:auto;left:0;right:0;width:auto;height:16px;cursor:row-resize;flex-direction:row}.split-bar.v::before{inset:5px 0}.split-bar.v i{width:44px;height:4px}
+@media (hover:none){.split-bar button{opacity:1;width:40px;height:40px}}
+.pill [data-w=split][aria-pressed=true]{background:var(--hover);color:var(--ink)}
 .isl-al{position:fixed;top:calc(10px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:130;width:min(380px,calc(100vw - 24px));display:grid;grid-template-columns:40px 1fr auto;gap:4px 12px;align-items:center;padding:12px 10px 12px 12px;border-radius:26px;background:#0B0B0D;color:#F4F4F5;box-shadow:0 18px 44px -14px rgba(0,0,0,.55),0 0 0 .5px rgba(255,255,255,.1);touch-action:none;user-select:none;-webkit-user-select:none}
 .isl-al .ia-ic{width:40px;height:40px;border-radius:12px;background:#27272A;display:grid;place-items:center;font-size:19px;overflow:hidden}.isl-al .ia-ic img{width:100%;height:100%;object-fit:cover}
 .isl-al .ia-m{min-width:0;display:grid;gap:2px}.isl-al .ia-m b{font-size:14.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow-wrap:anywhere}
@@ -914,6 +923,7 @@ body,.btn,.mi,.pal-in,input,textarea,button{font-family:var(--font)}
   <button data-w="reload" title="Yenile"><svg viewBox="0 0 16 16"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2.5v3h-3"/></svg></button>
   <button data-w="tab" id="wTab" title="Yeni sekmede aç"><svg viewBox="0 0 16 16"><path d="M9.5 2.5h4v4M13.5 2.5L7.5 8.5M12 9.5v3.5H3V4h3.5"/></svg></button>
   <button data-w="fs" id="wFs" title="Tarayıcı tam ekranı (F)"><svg viewBox="0 0 16 16"><path id="fsIcon" d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg></button>
+  <button data-w="split" aria-pressed="false" title="Yan yana · Alt+S" aria-label="Yan yana aç"><svg viewBox="0 0 16 16"><rect x="2.5" y="3.5" width="11" height="9" rx="1.5"/><path d="M8 3.5v9"/></svg></button>
   <button data-w="mini" title="Mini pencere · Alt+M (ya da bu şeridi aşağı çek)" aria-label="Mini pencere yap"><svg viewBox="0 0 16 16"><rect x="2.5" y="3.5" width="11" height="9" rx="1.5"/><rect x="8" y="8" width="3.5" height="2.5" rx=".6" fill="currentColor" stroke="none"/></svg></button>
   <button data-w="close" title="Bu uygulamayı kapat · ⇧Esc" aria-label="Bu uygulamayı kapat"><svg viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
 </div>
@@ -2115,6 +2125,8 @@ function islandItems(){const out=[],r=STUDY.run;
     for(const x of TK.list()){if(!x.time||x.status==='done'||TK.dayOf(x)!==dk)continue;const[h,m]=x.time.split(':').map(Number),at=new Date().setHours(h,m,0,0);
       if(at-now<36e5&&now-at<30*6e4&&(!best||at<best.at))best={x,at}}
     if(best)out.push({k:'task',pri:best.at-now<15*6e4?6:2,ic:'<i class="ico">☐</i>',t:best.x.title,v:best.x.time,sub:best.at<=now?'zamanı geldi':inM(best.at-now),act:`<button data-isl="tdone" data-id="${esc(best.x.id)}" aria-label="Tamamla">✓</button>`})}
+  {const n=store.get(NHK,[]).filter(x=>x.at>store.get('appshell:ccSeen',0)).length;if(n&&!dndOn())out.push({k:'notif',pri:1.5,ic:'<i class="ico">●</i>',t:n===1?'1 yeni bildirim':n+' yeni bildirim',sub:'Kontrol merkezi · aşağı çek',act:'<button data-isl="cc">Aç</button>'})}
+  if(dndOn()){const n=store.get(NHK,[]).filter(x=>x.at>(store.get('appshell:dndAt',0))).length;out.push({k:'dnd',pri:.5,ic:'<i class="ico">☾</i>',t:'Rahatsız etme açık',sub:n?n+' sessiz bildirim':'bildirimler sessiz',act:'<button data-isl="dnd">Kapat</button>'})}
   const np=npTab()&&NP.t&&(NP.on||Date.now()-NP.at<30*6e4)?NP:null;
   if(np)out.push({k:'np',pri:np.on?7:3,on:np.on,img:np.img,ic:'',t:np.t,sub:np.a||tabOf(np.key).app.name,v:'',act:''});
   if(TABS.length)out.push({k:'apps',pri:1,ic:'<i class="ico">▣</i>',t:`${TABS.length} uygulama açık`,v:'',sub:'Shift+Tab',act:'<button data-isl="sw">Geç</button>'});
@@ -2123,7 +2135,11 @@ let islOpen=false,islKey='';
 /* ── Ada bildirimi (iOS Dynamic Island / Samsung): hatırlatıcı, görev, odak sayacı, telefondan mesaj — uygulama açıkken de
    adadan büyüyerek iner; üstüne gelince bekler, yukarı kaydır/Esc/× kapatır. Sıra ALQ. islAlert({ic,t,sub,acts:[[ad,fn,birincil]],ms,sound}) ── */
 const ALQ=[];let AL=null;
-function islAlert(o){if(!o||!o.t)return;if(AL&&AL.o.key&&AL.o.key===o.key)return;ALQ.push(o);if(!AL)alNext()}
+const NHK='appshell:notifs',dndOn=()=>!!store.get('appshell:dnd',false);
+function islAlert(o){if(!o||!o.t)return;if(AL&&AL.o.key&&AL.o.key===o.key)return;
+  try{const h=store.get(NHK,[]);if(!o.key||!h.some(x=>x.key===o.key)){h.unshift({key:o.key||'',ic:o.ic||'•',img:o.img||'',t:String(o.t).slice(0,200),sub:o.sub||'',at:Date.now()});store.set(NHK,h.slice(0,40))}window.OS?.notified?.()}catch{}
+  if(dndOn()){paintFocusBar();return} /* Rahatsız etme: inmez, ses yok — Kontrol merkezinde durur */
+  ALQ.push(o);if(!AL)alNext()}
 function alNext(){const o=ALQ.shift();if(!o){AL=null;return}const e=document.createElement('div');e.className='isl-al';e.setAttribute('role','alert');
   e.innerHTML=`<div class="ia-ic" aria-hidden="true">${o.img?`<img src="${esc(o.img)}" alt="">`:esc(o.ic||'•')}</div><div class="ia-m"><b>${esc(o.t)}</b>${o.sub?`<small>${esc(o.sub)}</small>`:''}</div>
     <button class="ia-x" data-ia="x" aria-label="Kapat" title="Kapat (Esc)">${XI}</button>${o.acts?.length?`<div class="ia-a">${o.acts.map((a,i)=>`<button data-ia="${i}"${a[2]?' class="pri"':''}>${esc(a[0])}</button>`).join('')}</div>`:''}`;
@@ -2177,14 +2193,19 @@ function paintFocusBar(){const b=$('#focusBar');if(!b)return;const it=islandItem
   islKey=key;
   b.innerHTML=`<div class="is-c">${top.k==='np'?npArt(top):top.ic}<span class="is-t${top.done?' done':''}">${esc(top.t)}</span>${top.k==='np'?npEq(top):''}${top.v?`<b class="is-v num" data-lv="${esc(top.k)}">${esc(top.v)}</b>`:''}${it.length>1?`<span class="is-n">+${it.length-1}</span>`:''}</div>
     <div class="is-l">${it.map(x=>x.k==='np'?npCard(x):`<div class="is-r">${x.ic}<span class="is-rt${x.done?' done':''}"><b>${esc(x.t)}</b><small>${esc(x.sub)}</small></span>${x.v&&x.k!=='focus'?`<b class="num is-rv" data-lv="${esc(x.k)}">${esc(x.v)}</b>`:''}${x.act}</div>`).join('')}</div>`}
+{let py=null;$('#focusBar').addEventListener('pointerdown',e=>{py=e.clientY});
+  addEventListener('pointermove',e=>{if(py!=null&&e.buttons&&e.clientY-py>34){py=null;islOpen=false;paintFocusBar();window.OS?.open()}},{passive:true});
+  addEventListener('pointerup',()=>{py=null})}
 $('#focusBar').addEventListener('pointerenter',e=>{if(e.pointerType==='mouse'){islOpen=true;paintFocusBar()}});
 $('#focusBar').addEventListener('pointerleave',e=>{if(e.pointerType==='mouse'){islOpen=false;paintFocusBar()}});
 $('#focusBar').addEventListener('click',e=>{const fb=e.target.closest('[data-fb]'),is=e.target.closest('[data-isl]'),np=e.target.closest('[data-np]');
   if(np&&NP){const c=np.dataset.np;if(c==='open'){islOpen=false;paintFocusBar();switchTo(NP.key)}
     else if(c==='seek'){if(NP.dur){const r=np.getBoundingClientRect();npCmd('seek',{t:clamp((e.clientX-r.left)/r.width,0,1)*NP.dur})}}else npCmd(c);return}
   if(fb){const r=focusWidget(),f=r&&focusOf(r.w);if(!f)return;f.ok=fb.dataset.fb==='ok';saveMeta();renderW(r);paintFocusBar();if(f.ok)toast('Günün odağı tamam ✓');return}
-  if(is&&['tm','remx','tdone'].includes(is.dataset.isl)){const a=is.dataset.isl,id=is.dataset.id;
-    if(a==='tm')tmGo(id);else if(a==='remx'){window.Notify?.remove?.(id);toast('Hatırlatıcı silindi')}
+  if(is?.dataset.isl==='cc'){islOpen=false;paintFocusBar();window.OS?.open();return}
+  if(is&&['tm','remx','tdone','dnd'].includes(is.dataset.isl)){const a=is.dataset.isl,id=is.dataset.id;
+    if(a==='dnd'){store.set('appshell:dnd',false);toast('Rahatsız etme kapandı');window.OS?.paint?.()}
+    else if(a==='tm')tmGo(id);else if(a==='remx'){window.Notify?.remove?.(id);toast('Hatırlatıcı silindi')}
     else if(a==='tdone'&&typeof TK!=='undefined'){const t=TK.tasks.get(id);if(t){TK.setStatus(t,'done');toast('✓ '+t.title,()=>TK.setStatus(TK.tasks.get(id)||t,'todo'))}}
     islKey='';paintFocusBar();return}
   if(is){const a=is.dataset.isl;islOpen=false;if(a==='study'){const s=find('p:studylog');s&&openApp(s,nodes.get(s.key)?.el)}else if(a==='today')openNotes('#today');else if(a==='sw')switcher(false,0);paintFocusBar();return}
@@ -2841,6 +2862,7 @@ function switchTo(key,el){
     setTimeout(()=>{if(W.app&&!W.min)setPaused(true)},640);
   }else if(prev!==t){const dir=TABS.indexOf(t)>TABS.indexOf(prev)?1:-1;
     anim(t.fr,[{opacity:0,transform:`translateX(${dir*36}px)`},{opacity:1,transform:'none'}],{duration:280,easing:OUT});showPill(1600)}
+  applySplit();
   if(FINE)setTimeout(()=>{try{t.fr?.contentWindow?.focus()}catch{}},fromHub?620:30);
 }
 function goHome(){
@@ -2854,7 +2876,45 @@ function goHome(){
   anim(d,[{transform:'translateX(-50%) translateY(14px) scale(.94)',opacity:0},{transform:'translateX(-50%)',opacity:1}],{duration:520,easing:SPRING});
 }
 function restore(){const t=curTab()||mru()[0];if(t)switchTo(t.key)}
+/* ── Yan yana (Samsung çoklu pencere / Windows Snap): iki uygulama aynı anda; ortadaki tutamaç boyut, çift tık yer değiştir, × çık.
+   SPLIT={a,b,r} a=sol/üst · telefonda dikeyse üst-alt. Alt+S, şeritteki ◫. switchTo sonunda applySplit. ── */
+let SPLIT=null;
+const splitV=()=>innerWidth<innerHeight&&innerWidth<700;
+function applySplit(){const front=curTab();
+  if(SPLIT&&(!tabOf(SPLIT.a)||!tabOf(SPLIT.b)||!front||W.min||(front.key!==SPLIT.a&&front.key!==SPLIT.b)))clearSplit(!front||W.min?false:true);
+  const bar=$('#splitBar');
+  if(!SPLIT){bar?.remove();for(const t of TABS)if(t.fr&&t.fr.parentNode===W.el)t.fr.style.cssText='';return}
+  const A=tabOf(SPLIT.a),B=tabOf(SPLIT.b);for(const t of[A,B]){if(!t.fr)mountFrame(t);t.fr.hidden=false}
+  const r=SPLIT.r,v=splitV(),g=3;
+  A.fr.style.cssText=v?`top:0;height:calc(${r*100}% - ${g}px);bottom:auto`:`left:0;width:calc(${r*100}% - ${g}px);right:auto`;
+  B.fr.style.cssText=v?`top:calc(${r*100}% + ${g}px);height:calc(${(1-r)*100}% - ${g}px);bottom:auto`:`left:calc(${r*100}% + ${g}px);width:calc(${(1-r)*100}% - ${g}px);right:auto`;
+  let b=bar;if(!b){b=document.createElement('div');b.id='splitBar';b.className='split-bar';b.setAttribute('role','separator');
+    b.innerHTML='<i></i><button data-sp="swap" aria-label="Yer değiştir" title="Yer değiştir (çift tık)">⇄</button><button data-sp="x" aria-label="Yan yanadan çık" title="Tek uygulamaya dön · Alt+S">'+XI+'</button>';
+    W.el.appendChild(b);b.addEventListener('pointerdown',splitDrag);b.addEventListener('dblclick',e=>{if(!e.target.closest('button'))splitSwap()});
+    b.addEventListener('click',e=>{const k=e.target.closest('[data-sp]')?.dataset.sp;if(k==='swap')splitSwap();else if(k==='x'){clearSplit(true);applySplit()}})}
+  b.classList.toggle('v',v);b.style.cssText=v?`top:calc(${r*100}% - 8px)`:`left:calc(${r*100}% - 8px)`;
+  $('#pill [data-w=split]')?.setAttribute('aria-pressed','true')}
+function clearSplit(keepFront){if(!SPLIT)return;const other=W.app?.key===SPLIT.a?SPLIT.b:SPLIT.a;SPLIT=null;$('#pill [data-w=split]')?.setAttribute('aria-pressed','false');
+  if(keepFront){const t=tabOf(other);if(t?.fr&&t.fr.parentNode===W.el)t.fr.hidden=true}}
+function splitWith(key){const f=curTab();if(!f||W.min||key===f.key)return;const t=tabOf(key);if(!t)return;
+  SPLIT={a:f.key,b:key,r:store.get('appshell:splitR',.5)};applySplit();
+  if(!REDUCED){anim(tabOf(key).fr,[{opacity:0,transform:splitV()?'translateY(30px)':'translateX(30px)'},{opacity:1,transform:'none'}],{duration:360,easing:OUT})}
+  renderTabs();toast('Yan yana · ortadaki çizgiyi sürükle, çift tıkla yer değiştir')}
+function splitToggle(){if(SPLIT){clearSplit(true);applySplit();return}const f=curTab();if(!f||W.min)return;
+  const o=mru().filter(t=>t!==f&&t!==FL?.t);if(!o.length)return toast('Yan yana için önce başka bir uygulama aç');
+  if(o.length===1)return splitWith(o[0].key);
+  const r=$('#pill [data-w=split]').getBoundingClientRect();
+  popMenu(r.left,r.bottom+8,`<div class="mh">Yanına aç</div>`+o.map(t=>{const m=miniIcon(t.app);return `<button class="mi" data-k="${esc(t.key)}"><span class="mini" style="${m.style}">${m.html}</span>${esc(t.app.name)}</button>`}).join(''),
+    e=>{const b=e.target.closest('[data-k]');if(b){hideMenu();splitWith(b.dataset.k)}})}
+function splitSwap(){if(!SPLIT)return;[SPLIT.a,SPLIT.b]=[SPLIT.b,SPLIT.a];SPLIT.r=1-SPLIT.r;applySplit()}
+function splitDrag(e){if(e.target.closest('button')||!SPLIT)return;e.preventDefault();const tg=e.currentTarget;try{tg.setPointerCapture(e.pointerId)}catch{}document.body.classList.add('flo-drag');
+  const mv=ev=>{const R=W.el.getBoundingClientRect();SPLIT.r=clamp(splitV()?(ev.clientY-R.top)/R.height:(ev.clientX-R.left)/R.width,.2,.8);applySplit()};
+  const up=()=>{tg.removeEventListener('pointermove',mv);tg.removeEventListener('pointerup',up);document.body.classList.remove('flo-drag');
+    const sn=[1/3,.5,2/3].find(x=>Math.abs(x-SPLIT.r)<.035);if(sn){SPLIT.r=sn;applySplit()}store.set('appshell:splitR',SPLIT.r)};
+  tg.addEventListener('pointermove',mv);tg.addEventListener('pointerup',up)}
+addEventListener('resize',()=>{if(SPLIT)applySplit()});
 async function closeTab(key){
+  if(SPLIT&&(SPLIT.a===key||SPLIT.b===key)){const o=SPLIT.a===key?SPLIT.b:SPLIT.a;SPLIT=null;applySplit();if(W.app?.key===key&&!W.min&&tabOf(o)){TABS.splice(TABS.indexOf(tabOf(key)),1);dropFrame(tabOf(key)||{});switchTo(o);return}}
   const t=tabOf(key);if(!t)return;const front=W.app?.key===key&&!W.min,rest=mru().filter(o=>o!==t&&o!==FL?.t);
   if(front&&rest.length){TABS.splice(TABS.indexOf(t),1);switchTo(rest[0].key);dropFrame(t)}
   else if(front){ // last app: fly back into its icon
@@ -2917,6 +2977,8 @@ function osKeys(e){
   if(e.altKey&&!e.ctrlKey&&!e.metaKey){const c=e.code;
     if(c==='KeyQ'||c==='Backquote'){e.preventDefault();switcher(true,e.shiftKey?-1:1);return true}
     if(/^Digit[1-9]$/.test(c)){const t=TABS[+c.slice(5)-1];if(t){e.preventDefault();closeSwitcher();switchTo(t.key);return true}return false}
+    if(c==='KeyS'&&W.app&&!W.min){e.preventDefault();splitToggle();return true}
+    if(c==='KeyA'){e.preventDefault();window.OS?.toggle();return true}
     if((c==='KeyP'||c==='KeyN')&&npTab()){e.preventDefault();npCmd(c==='KeyP'?'toggle':'next');toast(c==='KeyP'?(NP.on?'▶ '+NP.t:'⏸ Duraklatıldı'):'⏭ Sonraki');return true}
     if(c==='KeyM'){e.preventDefault();if(W.app&&!W.min)floFromFull();else if(FL)floExpand();return true}
     if(c==='KeyH'||c==='Digit0'){if(W.app&&!W.min){e.preventDefault();goHome()}return true}
@@ -2946,7 +3008,7 @@ function toggleFS(){if(!document.fullscreenEnabled)return toast('Bu tarayıcı t
   if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});else document.documentElement.requestFullscreen().catch(()=>{})}
 document.addEventListener('fullscreenchange',()=>$('#fsIcon').setAttribute('d',document.fullscreenElement?'M6 2.5V6H2.5M13.5 6H10V2.5M10 13.5V10h3.5M2.5 10H6v3.5':'M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10'));
 $('#pill').addEventListener('click',e=>{const b=e.target.closest('[data-w]');if(!b)return;const w=b.dataset.w,t=curTab();
-  if(w==='close')closeWin();else if(w==='home')goHome();else if(w==='mini')floFromFull();else if(w==='fs')toggleFS();else if(w==='sw')switcher(false,0);
+  if(w==='close')closeWin();else if(w==='home')goHome();else if(w==='mini')floFromFull();else if(w==='split')splitToggle();else if(w==='fs')toggleFS();else if(w==='sw')switcher(false,0);
   else if(w==='reload'&&t){dropFrame(t);switchTo(t.key)}else if(w==='tab'&&t?.app.url)window.open(t.app.url,'_blank','noopener')});
 
 /* ════════════════════════════════════════════════════════════
@@ -3132,6 +3194,9 @@ function palette(){
     {ic:UI.fit,l:'Sakin mod',run:()=>calm(true)},
     ...(TABS.length?[{ic:UI.fit,l:'Açık uygulamalar (değiştirici)',k:'⌥Q',run:()=>switcher(false,0)}]:[]),
     ...(W.app&&!W.min?[{ic:UI.fit,l:'Mini pencere yap',k:'⌥M',run:()=>floFromFull()}]:FL?[{ic:UI.fit,l:'Mini pencereyi tam ekran yap',k:'⌥M',run:floExpand}]:[]),
+    {ic:UI.fit,l:'Kontrol merkezi',sub:'Hızlı ayarlar ve bildirimler · adayı aşağı çek',k:'⌥A',run:()=>window.OS?.open()},
+    {ic:UI.fit,l:'Rahatsız etme'+(dndOn()?' ✓':''),sub:'Bildirimler inmez, sessiz durur',run:()=>window.OS?.dnd(!dndOn())},
+    ...(W.app&&!W.min&&TABS.length>1?[{ic:UI.fit,l:SPLIT?'Yan yanadan çık':'Yan yana aç',k:'⌥S',run:splitToggle}]:[]),
     {ic:UI.fit,l:'Müzik/video ana ekranda mini pencere olsun'+(floCfg().auto?' ✓':''),sub:'Kapalıyken arkada çalar, şarkı üstteki adada görünür',run:()=>{floSet({auto:!floCfg().auto});toast(floCfg().auto?'Açık — ana ekrana dönünce köşede küçük pencere olur':'Kapalı — arkada çalar, şarkı üstteki adada görünür')}},
     {ic:UI.zoom,l:'Görüntü: otomatik akıcılık'+(PERF.auto?' ✓':''),run:()=>{PERF.auto=true;localStorage.removeItem('appshell:perf');setTier(0);toast('Akıcılık otomatik — gerekirse kaliteyi kendim düşürürüm')}},
     {ic:UI.zoom,l:'Görüntü: yüksek kalite'+(!PERF.auto&&!TIER?' ✓':''),run:()=>{PERF.auto=false;localStorage.setItem('appshell:perf','fixed');setTier(0)}},
@@ -3390,7 +3455,10 @@ buildMesh();introStart=performance.now();wake();
 /* ── Arayüz dünyaları için köprü (ui/worlds.js bunu kullanır) ── */
 window.HUB={apps:()=>pub,open:k=>{const a=find(k);if(a)openApp(a,nodes.get(k)?.el)},openNotes:h=>openNotes(h),palette:()=>palette(),
   items:()=>{try{return islandItems()}catch{return[]}},notes:()=>NOTES,study:()=>STUDY,studyToday:()=>{try{return studyToday()}catch{return 0}},dayKey,
-  alert:o=>islAlert(o),icon:a=>miniIcon(a),themeMenu:()=>themeMenu(),tabs:()=>TABS.length,booted:()=>booted,tier:()=>TIER,
+  alert:o=>islAlert(o),np:()=>npTab()?NP:null,npCmd:(c,x)=>npCmd(c,x),openNp:()=>NP&&switchTo(NP.key),island:()=>{islKey='';paintFocusBar()},
+  calm:on=>calm(on),calmOn:()=>calmOn,motion:m=>m?applyMotion(m):MOTION,setTier:t=>setTier(t),fs:()=>toggleFS(),
+  dark:()=>!!THEMES[document.documentElement.dataset.theme]?.dark,setTheme:t=>setTheme(t),theme:()=>document.documentElement.dataset.theme,
+  flo:v=>{if(v==null)return floCfg().auto;floSet({auto:!!v})},icon:a=>miniIcon(a),themeMenu:()=>themeMenu(),tabs:()=>TABS.length,booted:()=>booted,tier:()=>TIER,
   pause:on=>{if(on)setPaused(true);else setPaused(document.hidden||(!!W.app&&!W.min))},esc,
   /* galaksideki kümeler: [{id,name,color,keys}] — sıra: yapay zekâ yörüngesi, adlı kümeler, Diğer */
   groups:()=>{try{GX.poke=true;galaxyModel()}catch{}const col=c=>GCOL[c]||c||GCOL.violet;
@@ -3412,6 +3480,8 @@ addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.shiftKey&&(e.key==='
 <script src="apps/notlar/tasks.js?v=20261120a"></script>
 <script src="ui/day.js?v=20261120c"></script>
 <link rel="stylesheet" href="ui/notify.css?v=20261120d">
-<script src="ui/notify.js?v=20261121a"></script>
+<script src="ui/notify.js?v=20261121b"></script>
+<link rel="stylesheet" href="ui/os.css?v=20261121a">
+<script src="ui/os.js?v=20261121a"></script>
 </body>
 </html>

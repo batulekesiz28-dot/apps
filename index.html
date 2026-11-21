@@ -2128,6 +2128,9 @@ function islandItems(){const out=[],r=STUDY.run;
   {const n=store.get(NHK,[]).filter(x=>x.at>store.get('appshell:ccSeen',0)).length;if(n&&!dndOn())out.push({k:'notif',pri:1.5,ic:'<i class="ico">●</i>',t:n===1?'1 yeni bildirim':n+' yeni bildirim',sub:'Kontrol merkezi · aşağı çek',act:'<button data-isl="cc">Aç</button>'})}
   if(dndOn()){const n=store.get(NHK,[]).filter(x=>x.at>(store.get('appshell:dndAt',0))).length;out.push({k:'dnd',pri:.5,ic:'<i class="ico">☾</i>',t:'Rahatsız etme açık',sub:n?n+' sessiz bildirim':'bildirimler sessiz',act:'<button data-isl="dnd">Kapat</button>'})}
   const np=npTab()&&NP.t&&(NP.on||Date.now()-NP.at<30*6e4)?NP:null;
+  if(!np){const bg=TABS.find(t=>t.app.win&&t.fr&&(W.min||curTab()!==t));if(bg){const old=(parseFloat(document.documentElement.dataset.appshellGom||'0')||0)<1.2,m=miniIcon(bg.app);
+    out.push({k:'np0',pri:6,ic:`<span class="mini" style="${m.style}">${m.html}</span>`,t:bg.app.name,sub:old?'Şarkı adı ve ⏮ ⏯ ⏭ için eklentiyi güncelle':'arkada açık',
+      act:(old?`<button data-isl="gom" data-id="${esc(bg.key)}">Güncelle</button>`:'')+`<button data-isl="np0" data-id="${esc(bg.key)}">Aç</button>`})}}
   if(np)out.push({k:'np',pri:np.on?7:3,on:np.on,img:np.img,ic:'',t:np.t,sub:np.a||tabOf(np.key).app.name,v:'',act:''});
   if(TABS.length)out.push({k:'apps',pri:1,ic:'<i class="ico">▣</i>',t:`${TABS.length} uygulama açık`,v:'',sub:'Shift+Tab',act:'<button data-isl="sw">Geç</button>'});
   return out.sort((a,b)=>b.pri-a.pri)}
@@ -2202,6 +2205,7 @@ $('#focusBar').addEventListener('click',e=>{const fb=e.target.closest('[data-fb]
   if(np&&NP){const c=np.dataset.np;if(c==='open'){islOpen=false;paintFocusBar();switchTo(NP.key)}
     else if(c==='seek'){if(NP.dur){const r=np.getBoundingClientRect();npCmd('seek',{t:clamp((e.clientX-r.left)/r.width,0,1)*NP.dur})}}else npCmd(c);return}
   if(fb){const r=focusWidget(),f=r&&focusOf(r.w);if(!f)return;f.ok=fb.dataset.fb==='ok';saveMeta();renderW(r);paintFocusBar();if(f.ok)toast('Günün odağı tamam ✓');return}
+  if(is&&(is.dataset.isl==='np0'||is.dataset.isl==='gom')){islOpen=false;paintFocusBar();const t=tabOf(is.dataset.id);if(t){if(is.dataset.isl==='np0')switchTo(t.key);else gomSheet(t.app)}return}
   if(is?.dataset.isl==='cc'){islOpen=false;paintFocusBar();window.OS?.open();return}
   if(is&&['tm','remx','tdone','dnd'].includes(is.dataset.isl)){const a=is.dataset.isl,id=is.dataset.id;
     if(a==='dnd'){store.set('appshell:dnd',false);toast('Rahatsız etme kapandı');window.OS?.paint?.()}
@@ -2866,7 +2870,8 @@ function switchTo(key,el){
   if(FINE)setTimeout(()=>{try{t.fr?.contentWindow?.focus()}catch{}},fromHub?620:30);
 }
 function goHome(){
-  if(!W.app||W.min)return;if(floAuto(W.app)){floFromFull();return} // müzik/video: kapanmaz, köşeye mini pencere olur
+  if(!W.app||W.min)return;if(floAuto(W.app)){floFromFull();return} // isteğe bağlı: köşeye mini pencere
+  if((W.app.win||NP?.key===W.app.key)&&toIsland())return; // müzik/video: üstteki adanın içine uçar, orada çalmaya devam eder
   setPaused(false);closeSwitcher();chrome(false);
   if(document.fullscreenElement&&!FINE)document.exitFullscreen?.().catch(()=>{});
   W.min=true;slPinPaint();renderDock();const d=$('#dock');d.hidden=!d.querySelector('.dk');
@@ -2876,6 +2881,21 @@ function goHome(){
   anim(d,[{transform:'translateX(-50%) translateY(14px) scale(.94)',opacity:0},{transform:'translateX(-50%)',opacity:1}],{duration:520,easing:SPRING});
 }
 function restore(){const t=curTab()||mru()[0];if(t)switchTo(t.key)}
+/* Samsung/iOS gibi: çalan uygulama küçülüp üstteki adaya girer (ada hapı şeklini alır), ada içine alıyormuş gibi esner */
+function toIsland(){const b=$('#focusBar');
+  W.min=true;setPaused(false);closeSwitcher();chrome(false);slPinPaint();
+  if(document.fullscreenElement&&!FINE)document.exitFullscreen?.().catch(()=>{});
+  islKey='';paintFocusBar();if(!b||b.hidden){W.min=false;return false}
+  renderDock();const d=$('#dock');d.hidden=!d.querySelector('.dk');paintPnp();
+  const r=b.getBoundingClientRect(),vw=innerWidth,vh=innerHeight,s=r.width/vw,h=r.height/s;
+  anim($('#scrim'),[{opacity:1},{opacity:0}],{duration:420,easing:EASE,fill:'forwards'});
+  const a=anim(W.el,[{transform:'none',clipPath:`inset(0px 0px round 0px)`,opacity:1},
+      {transform:`translate(${r.left}px,${r.top+r.height/2-vh*s/2}px) scale(${s})`,clipPath:`inset(${(vh-h)/2}px 0px round ${h/2}px)`,opacity:1,offset:.82},
+      {transform:`translate(${r.left}px,${r.top+r.height/2-vh*s/2}px) scale(${s})`,clipPath:`inset(${(vh-h)/2}px 0px round ${h/2}px)`,opacity:0}],
+    {duration:560,easing:'cubic-bezier(.32,.72,0,1)',fill:'forwards'});
+  a.finished.then(()=>{if(!W.min)return;W.el.style.visibility='hidden';$('#scrim').hidden=true},()=>{});
+  anim(b,[{transform:'translateX(-50%)'},{transform:'translateX(-50%) scale(1.14,1.22)',offset:.45},{transform:'translateX(-50%) scale(.98)',offset:.75},{transform:'translateX(-50%)'}],{duration:560,delay:400,easing:'ease-out'});
+  return true}
 /* ── Yan yana (Samsung çoklu pencere / Windows Snap): iki uygulama aynı anda; ortadaki tutamaç boyut, çift tık yer değiştir, × çık.
    SPLIT={a,b,r} a=sol/üst · telefonda dikeyse üst-alt. Alt+S, şeritteki ◫. switchTo sonunda applySplit. ── */
 let SPLIT=null;
@@ -3021,7 +3041,8 @@ $('#pill').addEventListener('click',e=>{const b=e.target.closest('[data-w]');if(
    FL={t,el,body,x,y,w,h,side,raf} · ayar appshell:flo {auto,c(köşe),w,h}
    ════════════════════════════════════════════════════════════ */
 const FLK='appshell:flo',CANMOVE=typeof Element.prototype.moveBefore==='function',FBAR=30;
-const floCfg=()=>Object.assign({auto:false,c:'br'},store.get(FLK,{})),floSet=p=>store.set(FLK,Object.assign(floCfg(),p));
+const floCfg=()=>{const o=store.get(FLK,{});return Object.assign({c:'br'},o,{auto:!!o.auto2})}, // eski 'auto' (varsayılan açıktı) sayılmaz
+  floSet=p=>{const o=store.get(FLK,{});delete o.auto;if('auto' in p){o.auto2=!!p.auto;p=Object.assign({},p);delete p.auto}store.set(FLK,Object.assign(o,p))};
 let FL=null,pullJust=false;
 const floAuto=a=>!!a&&!!(a.win||a.float)&&floCfg().auto;
 const floPh=()=>innerWidth<700;

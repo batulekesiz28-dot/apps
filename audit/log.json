@@ -4490,5 +4490,34 @@
     "text": "Pil göstergesi sadece pil bilgisini veren tarayıcılarda (Chrome/Edge) görünür"
    }
   ]
+ },
+ {
+  "at": "2026-11-21T18:27:47",
+  "change": "YouTube Music'ten çıkınca artık küçük pencere AÇILMIYOR: uygulama küçülüp üstteki siyah adanın içine uçuyor (ada içine alıyormuş gibi esniyor) ve orada çalmaya devam ediyor. Adaya dokununca şarkı kartı açılıyor (kapak, ⏮ ⏯ ⏭). Eklenti henüz güncellenmediyse adada 'YouTube Music · Şarkı adı için eklentiyi güncelle' ve Güncelle/Aç düğmeleri çıkıyor. Eski mini pencere ayarı sıfırlandı (istersen Kontrol merkezinden açılır).",
+  "scores": {
+   "Hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Hub masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "hub",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Müzik uygulamasından çıkınca hâlâ köşede küçük pencere açılıyordu (eski ayar kalmıştı)",
+    "fix": "Eski ayar sayılmıyor; uygulama adanın içine uçuyor"
+   },
+   {
+    "app": "hub",
+    "sev": "uyari",
+    "status": "open",
+    "text": "Şarkı adı, kapak ve ⏮ ⏯ ⏭ için eklentinin 1.2 sürümü kurulmalı (adadaki Güncelle düğmesi adımları gösterir)"
+   }
+  ]
  }
 ]

@@ -5303,5 +5303,28 @@
     "fix": "Az öneri varsa internetten o türden yenileri aranıyor (anime AniList, dizi TVmaze, film Wikidata); “Daha fazla ara” düğmesi"
    }
   ]
+ },
+ {
+  "at": "2026-11-22T21:34:18",
+  "change": "Notlar'a fotoğraf ve Google Docs gibi biçimlendirme geldi. Fotoğraf: “/foto” yaz ya da fotoğrafı yapıştır / sayfaya sürükle-bırak; üstüne gelince sola-ortaya-sağa hizala, Küçük-Orta-Tam boy, kenarından sürükleyerek boyutlandır, altına açıklama yaz, çöp kutusuyla kaldır (geri al var). Fotoğraflar otomatik küçültülür ve notun içine değil ayrı saklanır (notlar şişmez); girişliyken buluta da gider. Yazıyı seçince çıkan çubukta artık: vurgu kalemi (sarı, yeşil, mavi, pembe, turuncu), yazı rengi (6 renk), hizalama (sola, ortala, sağa, iki yana — ⌘⇧E ortala, ⌘⇧L sola) ve biçimi temizle var.",
+  "scores": {
+   "Notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "status": "kabul",
+    "text": "Fotoğraflar bulutta ayrı belgede (hub/notes/imgs) duruyor; Firebase kuralları bu yolu kapatıyorsa yüklemede uyarı çıkar, fotoğraf yine bu cihazda görünür",
+    "fix": "Bilinen sınır"
+   }
+  ]
  }
 ]

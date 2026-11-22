@@ -115,3 +115,4 @@ Son güncelleme: 2026-11-15
 | Sana özel çeşitlilik | Kullanıcı “sürekli aynı önerileri istemem” dedi: rafta ve sayfada “Yeni öneriler” düğmesi; gösterilenler 2 hafta geri planda kalır, hepsi görülünce baştan başlar. “Yenile” ayrı: internetten yeniden hesaplar. |
 | Yedekten geri yükleme | Ctrl+K “Yedekten geri yükle”: önce şu anki hâlin yedeği iner, sonra seçilen yedek bu cihaza yazılır, sayfa yenilenir. Anahtarlar yedekte yok, mevcutlar korunur. |
 | Sana özel boş süzgeç | “Bu süzgeçte öneri yok” demek yerine internetten o türden yeni öneri aranır (kullanıcı istedi). |
+| Notlarda fotoğraf + Docs biçimi | Fotoğraf bloğu (/foto, yapıştır, sürükle-bırak; hizala, 3 boy + kenardan boyut, açıklama). Dosya notun içine yazılmaz (yerel IndexedDB + bulutta ayrı belge) — not belgesi 1 MB sınırına ve localStorage kotasına takılmasın. Biçim çubuğunda vurgu kalemi (5 renk), yazı rengi (6), hizalama, biçimi temizle; renkler sınıfla (temaya uyar). |

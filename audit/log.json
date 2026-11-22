@@ -4649,5 +4649,31 @@
     "text": "Öneri kartlarının içinde ikinci kutular var (kart içinde kart) — tasarım notu, sonra sadeleştirilebilir"
    }
   ]
+ },
+ {
+  "at": "2026-11-22T20:59:28",
+  "change": "“Sana özel” yine sadece anime gösteriyordu — sebepleri düzeltildi: film/dizi önerileri için Wikidata'ya tek dev sorgu gidiyordu ve yavaşlayınca hepsi düşüyordu (artık her yapım için ayrı küçük sorgu, 3'er paralel); o “sadece anime” sonuç 24 saat önbellekte kalıyordu (artık film/dizi gelmezse önbelleğe yazılmıyor, eski önbellek de silindi); posteri bulunamayan filmler tamamen atılıyordu (artık kendi sade kapağıyla görünüyor); “Çünkü X izledin” rafları hiç çıkmıyordu (düzeldi). Film/dizi yine alınamazsa rafın altında “Tekrar dene” düğmeli bir not çıkıyor.",
+  "scores": {
+   "Notlar telefon": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Sana özel'de sadece anime öneriliyordu",
+    "fix": "Wikidata sorguları bölündü, başarısız sonuç önbelleğe yazılmıyor, posteri olmayan öneri gösteriliyor"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "“Çünkü X izledin” rafları görünmüyordu",
+    "fix": "Yorum satırında kalan kod düzeltildi"
+   }
+  ]
  }
 ]

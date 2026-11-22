@@ -835,3 +835,9 @@ html[data-motion=off] .mpk-bg,html[data-motion=off] .mpk-r.in .mpk-c{animation:n
 .mc-tabs .t-foryou .mvi{color:#46D369}
 @media (max-width:640px){.mfy-pg{padding-top:16px}.mfy-h h1{font-size:28px}.mfy-h{align-items:flex-start;flex-direction:column}.mfy-seeds button,.mfy-k button{min-height:40px}.mfy-clr{min-height:40px}}
 @media (prefers-reduced-motion:reduce){.mfy-h .mb.busy .mvi{animation:none}}
+
+/* Sana özel: posteri bulunamayan öneri — kendi sade kapağı (silinmez) */
+.mfy-ph{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:6px;padding:14px 14px 40px;background:linear-gradient(165deg,#2b3046 0%,#171a27 70%);color:#F4F4F5}
+.mfy-ph b{font-size:15px;font-weight:650;line-height:1.2;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.mfy-ph small{font-size:12px;color:#A1A1AA}
+.mc-card.t-series .mfy-ph{background:linear-gradient(165deg,#263a46 0%,#141d24 70%)}

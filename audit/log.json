@@ -4675,5 +4675,24 @@
     "fix": "Yorum satırında kalan kod düzeltildi"
    }
   ]
+ },
+ {
+  "at": "2026-11-22T21:01:55",
+  "change": "Sana özel'e “Yeni öneriler” düğmesi geldi (rafın başlığında ve Sana özel sayfasında): basınca şu an gördüklerin 2 haftalığına kenara konur, kartlar kayarak sıradaki önerilerle yenilenir; hepsini gördüysen “baştan başlıyorum” der. Öneri havuzu da büyütüldü (her izlediğin için daha fazla benzer yapım), böylece aynı şeyler daha az tekrar ediyor. Sayfadaki “Yenile” önerileri internetten yeniden hesaplar.",
+  "scores": {
+   "Notlar telefon": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Sana özel hep aynı önerileri gösteriyordu",
+    "fix": "Yeni öneriler düğmesi + gösterilenleri 2 hafta geri planda tutma + daha büyük havuz"
+   }
+  ]
  }
 ]

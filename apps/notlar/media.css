@@ -841,3 +841,9 @@ html[data-motion=off] .mpk-bg,html[data-motion=off] .mpk-r.in .mpk-c{animation:n
 .mfy-ph b{font-size:15px;font-weight:650;line-height:1.2;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .mfy-ph small{font-size:12px;color:#A1A1AA}
 .mc-card.t-series .mfy-ph{background:linear-gradient(165deg,#263a46 0%,#141d24 70%)}
+/* Sana özel: “Yeni öneriler” (rafta ve sayfada) */
+.mfy-hb{display:flex;gap:8px;flex-shrink:0}
+.mc-shelf header .mfy-new{display:inline-flex;align-items:center;gap:6px;background:none;border:0;cursor:pointer;font:inherit;margin-left:auto}
+.mc-shelf header .mfy-new+.mc-all{margin-left:14px}
+.mfy-new .mvi{width:14px;height:14px}
+@media (max-width:600px){.mfy-hb .mb{min-height:40px}}

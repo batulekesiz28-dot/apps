@@ -46,7 +46,7 @@ body.running .brand i::after{background:var(--bg);animation:pulse 1.6s ease-in-o
 .ib{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;color:var(--ink2);transition:background .2s,color .2s}
 .ib:hover{background:var(--hover);color:var(--ink)}
 .ib svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
-.me{width:28px;height:28px;border-radius:50%;overflow:hidden;font-size:11px;font-weight:600;background:var(--bg2);box-shadow:0 0 0 .5px var(--line2)}.me img{width:100%;height:100%;object-fit:cover}
+.me{width:32px;height:32px;border-radius:50%;overflow:hidden;font-size:11px;font-weight:600;background:var(--bg2);box-shadow:0 0 0 .5px var(--line2)}.me img{width:100%;height:100%;object-fit:cover}
 @media (max-width:680px){
   .top{padding:calc(12px + env(safe-area-inset-top)) 16px 10px;backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--bg)}
   main{padding:6px 14px 60px}
@@ -149,14 +149,13 @@ main{max-width:980px;margin:0 auto;padding:10px 22px 60px}
 .cd:hover{box-shadow:inset 0 0 0 .5px var(--line2)}
 .cd:active{transform:scale(.95)}
 .cd .dn{font-size:12px;color:var(--ink2);position:relative;z-index:1}
-.cd .dv{font:500 10.5px/1 var(--mono);position:relative;z-index:1;color:var(--ink)}
+.cd .dv{font:500 11px/1 var(--mono);position:relative;z-index:1;color:var(--ink)}
 .cd .fill{position:absolute;inset:0;background:var(--heat);opacity:var(--o,0);transition:opacity .4s}
 .cd.o{background:transparent}.cd.o .dn{color:var(--ink3)}
 .cd.t .dn{font-weight:700;color:var(--ink)}
 .cd.sel{box-shadow:inset 0 0 0 1.5px var(--ink)}
 .cd.goal::after{content:'';position:absolute;top:7px;right:7px;width:6px;height:6px;border-radius:50%;background:var(--ink);z-index:1}
-.cd.hot .dn,.cd.hot .dv{color:#fff}
-[data-theme=dark] .cd.hot .dn,[data-theme=dark] .cd.hot .dv{color:#0E0E10}
+.cd[style*="--tc"] .dn,.cd[style*="--tc"] .dv{color:var(--tc)}
 .legend{display:flex;align-items:center;gap:4px;margin-top:12px;font-size:11px;color:var(--ink3);justify-content:flex-end}
 .legend i{width:12px;height:12px;border-radius:4px;background:var(--heat)}
 .dayp{padding:20px;display:grid;gap:12px}
@@ -303,7 +302,7 @@ main{max-width:980px;margin:0 auto;padding:10px 22px 60px}
 .cel small{font-size:12px;color:rgba(255,255,255,.65);margin-top:14px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 /* Denetçi: telefonda dokunma alanları ve okunur yazı */
-@media (max-width:680px){.tadd input,.tk{min-height:40px}.tadd input{height:40px}.tk .tx{width:40px;height:40px;opacity:1}.chip{height:40px}.seg button{height:36px}.cg .wd,.cd .dv,.h,.legend,.fl{font-size:12px}.ib{width:40px;height:40px}}
+@media (max-width:680px){.me{width:40px;height:40px}.tadd input,.tk{min-height:40px}.tadd input{height:40px}.tk .tx{width:40px;height:40px;opacity:1}.chip{height:40px}.seg button{height:36px}.cg .wd,.cd .dv,.h,.legend,.fl{font-size:12px}.ib{width:40px;height:40px}}
 </style>
 <script src="../../shared/skin.js?v=20261119b"></script>
 </head>
@@ -319,7 +318,7 @@ main{max-width:980px;margin:0 auto;padding:10px 22px 60px}
 </header>
 <main id="main"></main>
 <div class="toasts" id="toasts"></div>
-<div class="gate" id="gate" hidden>
+<div class="gate" id="gate" hidden role="dialog" aria-modal="true" aria-label="Giriş">
   <div class="gate-c">
     <div class="brand"><i></i>Study Log</div>
     <p id="gMsg"></p>
@@ -598,10 +597,17 @@ function miniTimer(){const r=set.run;
 function vDays(){
   const now=new Date();if(!calM)calM={y:now.getFullYear(),m:now.getMonth()};
   const first=new Date(calM.y,calM.m,1),off=(first.getDay()+6)%7,tk=today(),acc=getComputedStyle(document.body).getPropertyValue('--ink');
+  // renkli günün yazısı: zemin (vurgu × yoğunluk + kart rengi) ile hangisi daha okunaklıysa — beyaz ya da koyu (açık vurgu renginde beyaz okunmuyordu)
+  const rgb=c=>{c=String(c||'').trim();let m=c.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);if(m){let h=m[1];if(h.length===3)h=h.split('').map(x=>x+x).join('');return[0,2,4].map(i=>parseInt(h.slice(i,i+2),16))}m=c.match(/rgba?\(([^)]+)\)/);return m?m[1].split(/[ ,\/]+/).slice(0,3).map(Number):null};
+  const lum=a=>{const f=v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)};return .2126*f(a[0])+.7152*f(a[1])+.0722*f(a[2])},cr=(a,b)=>{const x=lum(a),y=lum(b);return(Math.max(x,y)+.05)/(Math.min(x,y)+.05)};
+  const A=rgb(acc)||[24,24,27],B=rgb(getComputedStyle(document.body).getPropertyValue('--bg2'))||[245,245,245];
+  // yoğunluk ara tonda kalırsa (ne beyaz ne koyu yazı okunur) en yakın okunaklı tona kaydırılır → {o,tc}
+  const W=[255,255,255],K=[17,17,19],bl=o=>A.map((v,i)=>v*o+B[i]*(1-o));
+  const tcOf=o=>{if(o<=.01)return{o,tc:''};for(let d=0;d<=1;d+=.02)for(const x of[o-d,o+d]){if(x<0||x>1)continue;const b=bl(x);if(cr(K,b)>=4.6)return{o:x,tc:'#111113'};if(cr(W,b)>=4.6)return{o:x,tc:'#fff'}}return{o,tc:''}};
   const mStart=ymd(first),mEnd=ymd(new Date(calM.y,calM.m+1,0)),mTot=rangeMin(mStart,mEnd);
   let cells=WD.map(w=>`<div class="wd">${w}</div>`).join('');
-  for(let i=0;i<42;i++){const d=new Date(calM.y,calM.m,1-off+i),k=ymd(d);if(i>=35&&d.getMonth()!==calM.m)break;const m=minsOn(k)+(set.run&&set.run.date===k?liveMin():0),o=heat(m);
-    cells+=`<button class="cd${d.getMonth()!==calM.m?' o':''}${k===tk?' t':''}${k===selDay?' sel':''}${m>=set.goalDay&&set.goalDay?' goal':''}${o>.55?' hot':''}" data-day="${k}" ${k>tk?'disabled style="opacity:.25"':''}><span class="fill" style="--o:${o}"></span><span class="dn">${d.getDate()}</span><span class="dv num">${m?fs2(m):''}</span></button>`}
+  for(let i=0;i<42;i++){const d=new Date(calM.y,calM.m,1-off+i),k=ymd(d);if(i>=35&&d.getMonth()!==calM.m)break;const m=minsOn(k)+(set.run&&set.run.date===k?liveMin():0),H=tcOf(heat(m)),o=H.o;
+    cells+=`<button class="cd${d.getMonth()!==calM.m?' o':''}${k===tk?' t':''}${k===selDay?' sel':''}${m>=set.goalDay&&set.goalDay?' goal':''}" data-day="${k}" style="${k>tk?'opacity:.25;':''}${o>.01?`background:color-mix(in srgb,var(--heat) ${(o*100).toFixed(0)}%,var(--bg2));`:''}${H.tc?'--tc:'+H.tc:''}"${k>tk?' disabled':''}><span class="dn">${d.getDate()}</span><span class="dv num">${m?fs2(m):''}</span></button>`}
   // last 14 days strip
   const strip=[];let mx=1;for(let i=13;i>=0;i--){const k=addDays(tk,-i),m=minsOn(k);strip.push([k,m]);mx=Math.max(mx,m)}
   const day=list().filter(s=>s.date===selDay).sort((a,b)=>(a.start||0)-(b.start||0)),dm=minsOn(selDay)+(set.run&&set.run.date===selDay?liveMin():0);

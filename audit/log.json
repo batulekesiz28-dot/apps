@@ -4720,5 +4720,588 @@
     "fix": "Ana sayfadaki durumların hepsi + İzledim'de puan"
    }
   ]
+ },
+ {
+  "at": "2026-11-22T21:20:56",
+  "change": "Denetçi'nin listesi temizlendi: Study Log takviminde renkli günlerin yazısı artık her renkte okunuyor; Denetçi başka sitelerdeki uygulamaları (YouTube, SAT) taramayı bıraktı (GitHub'ın 404 sayfasını denetliyordu); çözülmüş eski notlar kapandı, bilinen sınırlar “bilerek” olarak işaretlendi; yedekten geri yükleme eklendi (Ctrl+K). Sana özel: film kapakları geldi, bir türde öneri azsa internetten o türden yenileri aranıyor.",
+  "scores": {
+   "Study Log telefon": {
+    "before": 80,
+    "after": 100
+   },
+   "Study Log masaüstü": {
+    "before": 80,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "Notlar",
+    "sev": "warn",
+    "text": "Telefonda birkaç küçük yazı (gün başlığı, “Önümüzdeki 7 gün”) ve 3–4 küçük düğme kaldı.",
+    "status": "fixed",
+    "fix": "Notlar bütün ekranlarda 100 (yeni katı kurallarla)"
+   },
+   {
+    "app": "Hub",
+    "sev": "info",
+    "text": "Galaksinin tamamı ekrana sığınca (%36) uygulama adları gizleniyor; yakınlaşınca görünüyor.",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "Hub",
+    "sev": "info",
+    "text": "Kaydırırken kara deliğin çevresindeki bükülmüş ağ her karede yeniden çiziliyor.",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "Notlar · Study Log · Denetçi",
+    "sev": "info",
+    "text": "Diğer uygulamalar şimdilik seçilen temanın açık/koyu karşılığını kullanıyor; kendi tema renkleri yok.",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "SAT Bank",
+    "sev": "info",
+    "text": "SAT Bank ayrı bir repoda ve ayrı Firebase projesinde; Denetçi'nin otomatik taramasına henüz dahil değil.",
+    "status": "kabul",
+    "fix": "Kullanıcı isteğiyle kapsam dışı"
+   },
+   {
+    "app": "Notlar",
+    "sev": "warn",
+    "text": "Telefonda hâlâ birkaç küçük yazı ve 4 küçük düğme var (önceden de açıktı).",
+    "status": "fixed",
+    "fix": "Notlar bütün ekranlarda 100"
+   },
+   {
+    "app": "Hub",
+    "sev": "warn",
+    "text": "Telefonda uygulama içi üst tutamaç 24px yüksek (40px önerilir)",
+    "status": "kabul",
+    "fix": "Bilerek: daha büyük tutamaç uygulamanın kendi üst düğmelerine basmayı engellerdi; dokunma alanı 120×24 genişlikte"
+   },
+   {
+    "app": "Notlar",
+    "sev": "warn",
+    "text": "Telefonda küçük yazı ve düğmeler (önceki kayıttan devam)",
+    "status": "fixed",
+    "fix": "Notlar bütün ekranlarda 100"
+   },
+   {
+    "app": "Hub",
+    "sev": "info",
+    "text": "Google Takvim için proje ayarlarında Calendar API açık olmalı; izin saatte bir yenileniyor",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "Hub",
+    "sev": "info",
+    "text": "Uzaklaştırınca widget içi düğmeler doğal olarak küçülüyor; Denetçi bunu o anki yakınlığa göre ölçer",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "Netleştir",
+    "sev": "info",
+    "text": "Ücretsiz yardım (Pollinations) yazılan metni o servise gönderir; gizli bilgi için Claude anahtarı ya da çevrimdışı seçilmeli",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "Hub",
+    "sev": "bilgi",
+    "text": "Tema yazı tipleri ilk açılışta internetten yükleniyor; yavaş bağlantıda kısa süre sistem yazısı görünür",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "Hub",
+    "sev": "bilgi",
+    "text": "Dünyaların yazı tipleri ilk açılışta internetten iniyor; bir an yedek yazı tipi görünebilir",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "Mekânsal",
+    "sev": "bilgi",
+    "text": "Denetçi galaksinin merkezi olduğu için gruba taşınamıyor (bilerek)",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "Notlar",
+    "sev": "uyarı",
+    "text": "Dosyalar (PDF, görsel) sadece bu cihazda (IndexedDB) duruyor; başlık/kapak/notlar buluta gidiyor ama dosyanın kendisi diğer cihazda açılmaz",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "Notlar",
+    "sev": "uyarı",
+    "text": "Kapak/başlık otomatik bulma dış servislere bağlı (YouTube, Open Library, microlink); erişilemezse tasarlanmış kapak kullanılıyor",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "Notlar",
+    "sev": "uyarı",
+    "text": "Oyun listesi gibi uzun listelerde sayfa büyüyor (58 kart)",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "Notlar",
+    "sev": "uyarı",
+    "text": "Kapaklar Wikipedia aramasıyla bulunuyor; az bilinen oyunlarda yanlış/eksik kapak çıkabilir — detayda 'Kapağı yenile' var",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "Notlar",
+    "sev": "uyarı",
+    "text": "Posterler gerçek internette denenemedi (test ortamında dış ağ kapalı); servislerin cevap biçimleri taklit edilerek test edildi",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "Notlar",
+    "sev": "uyarı",
+    "text": "Anahtarsız modda film arka planları yok (poster bulanıklaştırılarak kullanılıyor); TMDB anahtarı eklenirse büyük arka planlar gelir",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "arena",
+    "sev": "info",
+    "text": "Gerçek modellerle tam tur, ancak bilgisayarda yerel sunucu açıkken test edilebilir (buradan internete çıkılamıyor)",
+    "status": "fixed",
+    "fix": "AI Warfront kaldırıldı"
+   },
+   {
+    "app": "arena",
+    "sev": "info",
+    "text": "Gerçek modellerle tam savaş, bilgisayarda yerel sunucu açıkken denenmeli (buradan internete çıkılamıyor)",
+    "status": "fixed",
+    "fix": "AI Warfront kaldırıldı"
+   },
+   {
+    "app": "denetci",
+    "sev": "warn",
+    "text": "Denetçi'de 'uyarı/not' etiketlerinin kontrastı sınırda (önceden vardı)",
+    "status": "fixed",
+    "fix": "Denetçi 100 — etiketler büyütüldü"
+   },
+   {
+    "app": "hub",
+    "sev": "info",
+    "text": "Köşe yuvarlaklığı, yazı boyutu, yoğunluk ayarları eklenmedi: hub'da bu değerler sabit; güvenli şekilde değiştirmek ayrı bir iş",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "text": "Notların içindeki eski yapılacak satırları ayrı bölümde kalıyor; görev kayıtlarına otomatik taşınmıyor",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "text": "Telefonda hafta görünümünde sütunlar dar; uzun başlıklar kısalıyor (gün görünümü tam gösteriyor)",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "text": "Library (medya/kütüphane) kendi sıcak renkli tasarımında kaldı; bu dile geçirilmedi",
+    "status": "fixed",
+    "fix": "Medya ve Belgeler tek koyu dilde"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "text": "Hub'da bir tema evreni (Evren, Neon…) seçiliyse renkleri o tema belirler; yüzey ve yazı kuralları yine uygulanır",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "text": "Yan panelde etkinlik durumunu tek tıkla değiştirme kalktı; durum, etkinliğe tıklayınca açılan pencereden ve Aktiviteler sayfasından değişiyor",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "text": "Telefonda görünüm değiştirme düğmeleri yer kaplamasın diye ayar (dişli) panelinde",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "text": "Kitaplar Belgeler (PDF/makale) sayfasında da görünmeye devam ediyor — aynı kayıt, kopya değil",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "text": "Telefonda kapsüller sığmadığı için soldan başlayıp yana kayıyor",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "text": "Raf satırında anahtar ve sıralama okları yan yana (denetçi 'yapışık düğme' bilgisi veriyor); her biri 28px+ ve ayrı amaçlı, bilerek bırakıldı",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "text": "Hub'ın kendisi (galaksi, sekmeler, widget'lar) bu turda derin denetlenmedi; sadece otomatik denetimden geçti (100)",
+    "status": "fixed",
+    "fix": "Hub ve 10 arayüz artık her seferinde taranıyor"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "text": "Bulut (giriş yapılmış) modu yerelde test edilemiyor; yerel modda veri kalıcılığı doğrulandı",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "notlar",
+    "sev": "info",
+    "text": "Düşük: 'bugün' kırmızısı (#FF453A) koyu zeminde 4.0:1 — Apple sistem rengi, bilerek bırakıldı",
+    "status": "fixed",
+    "fix": "Katı denetimde kontrast hatası çıkmıyor"
+   },
+   {
+    "app": "notlar",
+    "sev": "info",
+    "text": "CSS katmanları üst üste yama: glass.css ve media.css sonundaki düzeltmeler asıl kurallarla birleştirilmeli (temizlik planı)",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyarı",
+    "text": "Takvim hafta görünümünde bugünün rakamı kontrast sınırında (4.5:1'e yakın)",
+    "status": "fixed",
+    "fix": "Katı denetimde kontrast hatası çıkmıyor"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "text": "Gerçek YouTube’la denenemedi (bu ortamda internet yok); süre/konum bilgisi YouTube’un oynatıcı mesajlarından geliyor, sahte oynatıcıyla doğrulandı",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "text": "Gerçek YouTube/site önizlemesi bu ortamda denenemedi (internet yok); sahte yanıtlarla doğrulandı",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "text": "Vimeo videoları kendi oynatıcısıyla kalıyor (denetimleri dışarıdan gizlenemiyor)",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "text": "Gerçek YouTube'la denenemedi (internet yok); YouTube gibi davranan sahte oynatıcıyla doğrulandı. YouTube başlarken kısa süre başlık gösterebilir",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "text": "Gerçek YouTube'la denenemedi (internet yok); ses komutları sahte oynatıcıyla doğrulandı",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "text": "Oyun fragmanları için anahtarsız iyi bir kaynak yok (Steam tarayıcıdan sorgulanamıyor); YouTube anahtarı gerekiyor",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "text": "KinoCheck gerçek internette denenemedi; çalışmazsa sessizce atlanıyor, bağlantı testinde görünüyor",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "hub",
+    "sev": "bilgi",
+    "text": "YouTube Music hub penceresinin içine gömülemiyor (site buna izin vermiyor); ayrı pencerede açılıyor",
+    "status": "fixed",
+    "fix": "Eklentiyle hub içinde açılıyor"
+   },
+   {
+    "app": "hub",
+    "sev": "bilgi",
+    "text": "Gerçek YouTube Music'le denenemedi (internet yok); bağı kesen ve kesmeyen sahte siteyle doğrulandı",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "hub",
+    "sev": "bilgi",
+    "text": "Gerçek YouTube Music'le denenemedi (internet yok); gömme yasağı koyan sahte sunucuyla: eklentisiz boş kaldı, eklentiyle açıldı. Oturum için 3. taraf çerezlerine izin gerekebilir",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "hub",
+    "sev": "bilgi",
+    "text": "hdfilmizlesene ve animecix eklenmedi: izinsiz yayın yapan siteler",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "hub",
+    "sev": "bilgi",
+    "text": "Gerçek YouTube'la denenemedi (internet yok); gömme yasağı koyan sahte sunucuyla iki adres de hub içinde açıldı",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "hub",
+    "sev": "bilgi",
+    "text": "YouTube'un hub içinde ilk açılışı yavaş: tarayıcı başka site içindeki sitelere ayrı önbellek kullanıyor; ikinci açılışta hızlanır",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "hub",
+    "sev": "bilgi",
+    "text": "Mıknatıs'taki sıvı karışma efekti (SVG süzgeci) zayıf bilgisayarlarda yorabilir; sadece damlaların alanında çalışıyor",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "hub",
+    "sev": "bilgi",
+    "text": "Deste'de yelpazenin uç kartlarının köşeleri döndükleri için ekran kenarına taşabiliyor (yelpaze görünümü)",
+    "status": "fixed",
+    "fix": "Arayüz taramasında taşma yok"
+   },
+   {
+    "app": "haberler",
+    "sev": "bilgi",
+    "text": "Gerçek haber siteleriyle denenemedi (internet yok); sahte RSS akışlarıyla doğrulandı. Bazı siteler tarayıcıdan doğrudan okunamıyor, aracı servisler (rss2json/allorigins) kullanılıyor",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "notlar",
+    "sev": "bilgi",
+    "text": "Gerçek AniList'le denenemedi (internet yok); sahte yanıtla doğrulandı. Sadece MyAnimeList kimliği (mal) eşleşmiş animeler takvime düşer",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "Hub",
+    "sev": "info",
+    "text": "Çevrimdışı çalışma yok",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "Hub",
+    "sev": "info",
+    "text": "Yedekten geri yükleme yok",
+    "status": "fixed",
+    "fix": "Ctrl+K “Yedekten geri yükle” eklendi"
+   },
+   {
+    "app": "Hub · Deste",
+    "sev": "info",
+    "text": "Kartlar üst üste duruyor (yelpaze tasarımı gereği)",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "Hub · Balon",
+    "sev": "info",
+    "text": "Bir balonun adı başka balonun üstüne gelebiliyor",
+    "status": "fixed",
+    "fix": "Balon adlarının arkasına okunaklı zemin eklendi"
+   },
+   {
+    "app": "Hub",
+    "sev": "info",
+    "text": "Dar telefonda (≤440px) galaksinin üst çubuğunda zar yok",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "Nerede İzlenir",
+    "sev": "info",
+    "text": "Gerçek TMDB/Internet Archive bağlantısı test ortamında denenemedi (internet yok); sahte verilerle bütün durumlar denendi",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "Hub",
+    "sev": "info",
+    "text": "Bulut modunda kart, Firestore görevleri gelene kadar kısa bir an “yükleniyor” gösterir",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "Notlar · Medya",
+    "sev": "info",
+    "text": "Öneriler test ortamında sahte TMDB/AniList cevaplarıyla denendi (internet yok)",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "Notlar · Medya",
+    "sev": "info",
+    "text": "Wikidata sorgusu gerçek sunucuda denenemedi (test ortamı internete kapalı); sözdizimi ve mantığı yerelde doğrulandı",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "Münazara Arenası",
+    "sev": "info",
+    "text": "Gerçek yapay zekâ test ortamında denenemedi (internet yok); sahte cevaplarla bütün akış denendi",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "Hub",
+    "sev": "info",
+    "text": "Tarayıcı bildirimleri site açıkken çalışır; site kapalıyken bildirim için telefon (ntfy) gerekir",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "Hub",
+    "sev": "info",
+    "text": "Telefona zamanlanmış bir hatırlatıcıyı silmek ntfy'deki bekleyen bildirimi iptal etmeyebilir",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "Hub",
+    "sev": "info",
+    "text": "ntfy.sh'ye gerçek gönderim test ortamında denenemedi (internet yok)",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "hub",
+    "sev": "bilgi",
+    "text": "Site bilgisayarda hiç açık değilken telefondan gelen mesaj anında çıkmaz — açınca gösterilir (12 saate kadar)",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "hub",
+    "sev": "bilgi",
+    "text": "Canlı mini pencere Chrome/Edge'de çalışır; eski ya da başka tarayıcılarda pencerede uygulamanın simgesi ve 'arkada çalışıyor' kartı görünür",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "hub",
+    "sev": "bilgi",
+    "text": "Telefonda eklenti olmadığı için (YouTube Music ayrı pencerede açılır) adada şarkı görünmez",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "hub",
+    "sev": "bilgi",
+    "text": "Pil göstergesi sadece pil bilgisini veren tarayıcılarda (Chrome/Edge) görünür",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "hub",
+    "sev": "uyari",
+    "text": "Şarkı adı, kapak ve ⏮ ⏯ ⏭ için eklentinin 1.2 sürümü kurulmalı (adadaki Güncelle düğmesi adımları gösterir)",
+    "status": "kabul",
+    "fix": "Bilinen sınır / bilgi notu — hata değil"
+   },
+   {
+    "app": "oneriler",
+    "sev": "bilgi",
+    "text": "Öneri kartlarının içinde ikinci kutular var (kart içinde kart) — tasarım notu, sonra sadeleştirilebilir",
+    "status": "fixed",
+    "fix": "İç kutuların gölgesi kaldırıldı"
+   },
+   {
+    "app": "Study Log",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Takvimde renkli günlerin yazısı okunmuyordu (açık vurgu renklerinde beyaz yazı)",
+    "fix": "Yazı rengi zemine göre seçiliyor; ara tonlar okunaklı tona kaydırılıyor"
+   },
+   {
+    "app": "Study Log",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Hesap düğmesi telefonda küçük, gün saatleri 10.5px",
+    "fix": "40px ve 11–12px"
+   },
+   {
+    "app": "Denetçi",
+    "sev": "error",
+    "status": "fixed",
+    "text": "YouTube, YouTube Music, SAT Bank/Math için GitHub'ın 404 sayfası denetleniyordu",
+    "fix": "Başka sitedeki uygulamalar taranmıyor"
+   },
+   {
+    "app": "Denetçi",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Çözülmüş eski notlar hâlâ “açık” görünüyordu; bazılarında seviye “undefined” yazıyordu",
+    "fix": "Her konunun son durumu geçerli; “bilerek” durumu; seviye adları düzeltildi"
+   },
+   {
+    "app": "İstatistik",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Giriş ekranı “ekranı kapatan katman” sayılıyordu",
+    "fix": "Giriş ekranı artık pencere (dialog) olarak işaretli"
+   },
+   {
+    "app": "Notlar · Medya",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Önerilerde film kapakları yoktu",
+    "fix": "IMDb kimliğiyle açık poster deposundan kapak; yüklenmezse sade kapak"
+   },
+   {
+    "app": "Notlar · Medya",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Sana özel'de bir türe basınca “Bu süzgeçte öneri yok” diyordu",
+    "fix": "Az öneri varsa internetten o türden yenileri aranıyor (anime AniList, dizi TVmaze, film Wikidata); “Daha fazla ara” düğmesi"
+   }
+  ]
  }
 ]

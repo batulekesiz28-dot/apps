@@ -123,7 +123,8 @@ function ring(el,v){const C=2*Math.PI*30;el.innerHTML=`<svg viewBox="0 0 72 72">
 
 /* ── Live audit: load each app in an off-screen frame at phone and desktop size ── */
 async function targets(){const j=await(await fetch('../../apps.json',{cache:'no-cache'})).json();
-  return[{slug:'hub',name:'Hub',url:'../../'+LOCAL},...j.apps.filter(a=>a.slug!=='denetci').map(a=>({slug:a.slug,name:a.name,url:`../../apps/${a.slug}/${LOCAL}`}))]}
+  // başka sitedeki uygulamalar (SAT Bank, YouTube…) bu repoda değil: taranmaz (yoksa GitHub'ın 404 sayfası denetleniyordu)
+  return[{slug:'hub',name:'Hub',url:'../../'+LOCAL},...j.apps.filter(a=>a.slug!=='denetci'&&!a.url).map(a=>({slug:a.slug,name:a.name,url:`../../apps/${a.slug}/${LOCAL}`}))]}
 function loadIn(url,w,h){return new Promise(res=>{const f=$('#lab');f.style.width=w+'px';f.style.height=h+'px';let done=false;
   const fin=()=>{if(done)return;done=true;res(f)};f.onload=()=>{const d=f.contentDocument;let n=0;
     const wait=()=>{const g=d?.getElementById('gate');if((!g||g.hidden)||n++>40)setTimeout(fin,900);else setTimeout(wait,200)};wait()};
@@ -147,9 +148,13 @@ function paint(){
         <div class="fd"><div>${esc(x.detail)}</div><div class="fix">${esc(x.fix)}</div>${x.samples?.length?`<code>${x.samples.map(esc).join(' · ')}</code>`:''}</div></details>`).join(''):'<div class="clean">✓ Sorun bulunamadı</div>'}</div></section>`}).join('');
   const tv=n?Math.round(sum/n):null;ring($('#tot'),tv);$('#totT').textContent=`${dev==='mobile'?'telefon':'bilgisayar'} · ${new Date(res.at).toLocaleString('tr-TR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}`;
   paintOpen()}
+const SEVN=s=>({hata:'error',error:'error',uyari:'warn',uyarı:'warn',warn:'warn',bilgi:'info',not:'info',info:'info'})[s]||'info';
+const STL={fixed:['fixed','düzeltildi'],kabul:['info','bilerek'],open:[null,'açık']};
 function openItems(){const items=[];
   if(res)for(const[slug,a]of Object.entries(res.apps))for(const d of['mobile','desktop'])for(const f of(a[d]?.findings||[]))if(f.sev!=='info')items.push({app:a.name,dev:d,...f});
-  for(const e of LOG)for(const it of e.items||[])if(it.status==='open'&&!items.some(x=>x.title===it.text))items.push({app:it.app,dev:'',sev:it.sev||'warn',title:it.text,fix:it.fix||'',samples:[]});
+  // günlükte aynı konu sonradan “düzeltildi” ya da “bilerek” (kabul) diye kapatıldıysa artık açık değil: her konunun SON durumu geçerli
+  const last=new Map();for(const e of LOG)for(const it of e.items||[])last.set((it.app||'')+'|'+it.text,it);
+  for(const it of last.values())if(it.status==='open'&&!items.some(x=>x.title===it.text))items.push({app:it.app,dev:'',sev:SEVN(it.sev),title:it.text,fix:it.fix||'',samples:[]});
   return items}
 function paintOpen(){const it=openItems(),el=$('#open');
   el.innerHTML=it.length?it.map(x=>`<details><summary><span class="sev ${x.sev}">${x.lvl?LVL_N[x.lvl]:SEV[x.sev]}</span><span class="t">${esc(x.app)} · ${esc(x.title)}</span><span class="c">${x.dev==='mobile'?'telefon':x.dev==='desktop'?'bilgisayar':''}</span></summary><div class="fd">${x.detail?`<div>${esc(x.detail)}</div>`:''}${x.fix?`<div class="fix">${esc(x.fix)}</div>`:''}${x.samples?.length?`<code>${x.samples.map(esc).join(' · ')}</code>`:''}</div></details>`).join('')
@@ -164,7 +169,7 @@ async function loadLog(){try{LOG=await(await fetch('../../audit/log.json',{cache
   const rev=LOG.slice().reverse(),shown=logAll?rev:rev.slice(0,12);
   $('#log').innerHTML=LOG.length?shown.map(e=>`<article class="card entry"><div class="entry-h"><b>${esc(e.change)}</b><time>${esc(new Date(e.at).toLocaleString('tr-TR',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'}))}</time></div>
     ${e.scores?`<div class="sc">${Object.entries(e.scores).map(([k,v])=>`<span>${esc(k)} ${v.before} → <b>${v.after}</b></span>`).join('')}</div>`:''}
-    ${(e.items||[]).map(it=>`<div class="it"><span class="sev ${it.status==='fixed'?'fixed':it.sev||'warn'}">${it.status==='fixed'?'düzeltildi':'açık'}</span><span>${it.app?`<b style="font-weight:500;color:var(--ink)">${esc(it.app)}</b> · `:''}${esc(it.text)}</span></div>`).join('')}</article>`).join('')+(rev.length>shown.length?`<button class="more-log" onclick="logAll=true;loadLog()">Daha eski ${rev.length-shown.length} kaydı göster</button>`:'')
+    ${(e.items||[]).map(it=>`<div class="it"><span class="sev ${(STL[it.status]||STL.open)[0]||SEVN(it.sev)}">${(STL[it.status]||STL.open)[1]}</span><span>${it.app?`<b style="font-weight:500;color:var(--ink)">${esc(it.app)}</b> · `:''}${esc(it.text)}</span></div>`).join('')}</article>`).join('')+(rev.length>shown.length?`<button class="more-log" onclick="logAll=true;loadLog()">Daha eski ${rev.length-shown.length} kaydı göster</button>`:'')
     :'<div class="empty">Henüz kayıt yok.</div>';paintOpen()}
 
 $('#dev').onclick=e=>{const b=e.target.closest('[data-d]');if(!b)return;dev=b.dataset.d;[...$('#dev').children].forEach(x=>x.classList.toggle('on',x===b));paint()};

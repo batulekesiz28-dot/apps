@@ -210,7 +210,7 @@ function run(doc,opt={}){
   // katman: en yakın sabit (fixed/sticky) ata. Farklı katmandaki BÜYÜK yüzen panel (kart, pencere) üstteki içeriği bilerek örter → sayılmaz;
   // küçük yüzen parça (ada, rozet) altındaki yazıyı örterse sayılır (telefonda ada saatin üstüne binmişti)
   // ekranın üst/alt kenarına yapışık çubuk (başlık, gezinme, alt bar): kaydırılan içeriğin altından geçmesi doğaldır
-  const edgeBar=h=>{const rt=rootOf(h);if(rt===doc.body)return false;if(win.getComputedStyle(rt).position==='sticky')return true;const r=R(rt);return r.top<=2||r.bottom>=VH-2};
+  const edgeBar=h=>{const rt=rootOf(h);if(rt===doc.body)return false;if(win.getComputedStyle(rt).position==='sticky')return true;const r=R(rt);return r.top<=24||r.bottom>=VH-24}; // kenara yakın yüzen çubuk (alt sekme çubuğu gibi) da sayılır
   // kaydırılan bir kutunun görünen alanının dışında kalmış (kaydırılıp gizlenmiş) öğe gerçekte görünmüyor
   const clipped=e=>{const r=R(e),cx=r.left+r.width/2,cy=r.top+r.height/2;for(let p=e.parentElement;p&&p!==doc.body;p=p.parentElement){const cs=win.getComputedStyle(p);if(cs.overflowX==='visible'&&cs.overflowY==='visible')continue;const q=R(p);if(cx<q.left||cx>q.right||cy<q.top||cy>q.bottom)return true}return false};
   const coverOf=(e,r)=>{const pts=[[r.left+r.width/2,r.top+r.height/2],[r.left+Math.min(8,r.width/3),r.top+r.height/2],[r.right-Math.min(8,r.width/3),r.top+r.height/2]];let hit=0,by=null;
@@ -248,7 +248,7 @@ function run(doc,opt={}){
           if(!(dur>0)){inst.push(el);break}}if(inst.length>=12)break}if(inst.length>=12)break}}catch{}
   if(inst.length)addH('warn','instant','“Tak diye” açılan parça','Bir panel, menü ya da liste geçişsiz bir anda beliriyor/kayboluyor; göz neyin nereden geldiğini kaçırıyor.','Açılırken boyut/opaklık geçişi ver (transform/opacity, 200–500 ms, yaylı); JS ile canlandırıyorsan kaba data-anim ekle.',inst);
   // 19) kart içinde kart (Apple sadeliği: kutu yığını yok)
-  const card=e=>{const cs=win.getComputedStyle(e);return cs.boxShadow!=='none'&&parseFloat(cs.borderTopLeftRadius)>=10&&(parseColor(cs.backgroundColor)?.a>.5)&&R(e).width>120&&R(e).height>60};
+  const card=e=>{if(e.matches('textarea,input,select,button,img,video,iframe,canvas'))return false;const cs=win.getComputedStyle(e);return cs.boxShadow!=='none'&&parseFloat(cs.borderTopLeftRadius)>=10&&(parseColor(cs.backgroundColor)?.a>.5)&&R(e).width>120&&R(e).height>60};
   const nested=vis.filter(e=>{if(!card(e))return false;let p=e.parentElement;while(p&&p!==doc.body){if(card(p))return!p.matches('[role=dialog],dialog');p=p.parentElement}return false}).slice(0,10);
   if(nested.length)addD('orta','nested','Kart içinde kart','Gölgeli, köşeli kutunun içinde yine gölgeli kutu var; ekran kalabalık ve ağır görünüyor (kutu yığını).','İçteki kutunun gölgesini/zeminini kaldır; ayrımı boşluk ve hizayla yap.',nested);
 

@@ -929,7 +929,7 @@ body,.btn,.mi,.pal-in,input,textarea,button{font-family:var(--font)}
   <button data-w="close" title="Bu uygulamayı kapat · ⇧Esc" aria-label="Bu uygulamayı kapat"><svg viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
 </div>
 
-<div class="gate" id="gate" hidden>
+<div class="gate" id="gate" hidden role="dialog" aria-modal="true" aria-label="Giriş">
   <div class="gate-card">
     <div class="mark-glyph"><i></i><i></i><i></i><i></i></div>
     <h1>AppShell</h1>
@@ -3247,6 +3247,7 @@ function palette(){
     {ic:UI.chk,l:'Bugünün görevleri',sub:'Sabah planı · tahmini süreler',run:()=>window.DayCard?.open('plan')},
     {ic:UI.chk,l:'Günü kapat',sub:'Bitenler, kalanları yarına taşı',run:()=>window.DayCard?.open('close')},
     {ic:UI.dl,l:'Verilerimi yedekle (indir)',sub:'Notlar, görevler, takvim, kütüphane, Study Log — tek dosya',run:backupAll},
+    {ic:UI.dl,l:'Yedekten geri yükle',sub:'İndirdiğin yedek dosyasını seç — önce şu anki hâlin yedeklenir',run:restoreAll},
     ...(S.kind==='cloud'?[{ic:UI.out,l:'Çıkış yap',run:()=>firebase.auth().signOut()}]:[]),
   ];
   const draw=()=>{
@@ -3320,6 +3321,18 @@ function backupAll(){
   const blob=new Blob([JSON.stringify({app:'AppShell',kind:'yedek',at:d.toISOString(),note:'Bu cihazdaki veriler. API anahtarları dahil değildir. PDF/dosyalar (IndexedDB) dahil değildir.',keys:out},null,1)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`appshell-yedek-${stamp}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);
   toast(`Yedek indirildi · ${n} kayıt, ${(bytes/1024).toFixed(0)} KB (anahtarlar hariç)`)}
+/* Yedekten geri yükle: backupAll dosyasını seç → önce şu anki hâlin yedeği iner → kayıtlar bu cihaza yazılır → sayfa yenilenir.
+   Anahtarlar (key/token…) yedekte yoktur, mevcutları korunur. Girişliyken bulut verisi açılışta yeniden eşitlenir. */
+function restoreAll(){const f=document.createElement('input');f.type='file';f.accept='application/json,.json';
+  f.onchange=async()=>{const file=f.files?.[0];if(!file)return;let j;try{j=JSON.parse(await file.text())}catch{return toast('Bu dosya okunamadı — AppShell yedeği mi?')}
+    if(!j||j.kind!=='yedek'||typeof j.keys!=='object')return toast('Bu bir AppShell yedeği değil');
+    const ks=Object.keys(j.keys).filter(k=>!/key|token|secret|pass|şifre|auth/i.test(k)),when=j.at?new Date(j.at).toLocaleString('tr-TR',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}):'tarihsiz';
+    sheet('Yedekten geri yükle',`<p style="margin:0 0 10px;line-height:1.55">${esc(when)} tarihli yedekte <b>${ks.length}</b> kayıt var (notlar, görevler, takvim, kütüphane, Study Log, ayarlar).</p><p style="margin:0;line-height:1.55;color:var(--ink2)">Bu cihazdaki aynı kayıtların üzerine yazılır. Güvenlik için önce <b>şu anki hâlinin yedeği indirilir</b>; sonra sayfa yenilenir.</p>`,
+      `<button class="btn ghost" data-rx>Vazgeç</button><span class="grow"></span><button class="btn solid" data-ro>Geri yükle</button>`,
+      el=>el.addEventListener('click',e=>{if(e.target.closest('[data-rx]'))return closeSheet();if(!e.target.closest('[data-ro]'))return;
+        backupAll();setTimeout(()=>{let n=0;for(const k of ks){try{const v=j.keys[k];localStorage.setItem(k,typeof v==='string'?v:JSON.stringify(v));n++}catch{}}
+          closeSheet();toast(`${n} kayıt geri yüklendi — yenileniyor…`);setTimeout(()=>location.reload(),900)},400)}))};
+  f.click()}
 function shortcuts(){
   const K=(...k)=>k.map(x=>`<span class="kbd">${x}</span>`).join('');
   sheet('Klavye kısayolları',`<div class="keys">

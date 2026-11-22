@@ -847,3 +847,12 @@ html[data-motion=off] .mpk-bg,html[data-motion=off] .mpk-r.in .mpk-c{animation:n
 .mc-shelf header .mfy-new+.mc-all{margin-left:14px}
 .mfy-new .mvi{width:14px;height:14px}
 @media (max-width:600px){.mfy-hb .mb{min-height:40px}}
+
+/* Sana özel önizleme: ana sayfadaki gibi durum seçimi + İzledim'de puan */
+.mrcp-st{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;padding-top:12px}
+.mrcp-rt{margin-top:auto;padding-top:12px}.mrcp-rt[hidden]{display:none}.mrcp-rt p{font-size:13.5px;font-weight:600;color:#fff;margin-bottom:8px}
+.mrcp-rn{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin-bottom:10px}
+.mrcp-rn button{height:36px;border-radius:9px;background:rgba(255,255,255,.08);color:#fff;font:600 13.5px var(--sys,system-ui);transition:background .15s,transform .2s}
+.mrcp-rn button:hover,.mrcp-rn button:focus-visible{background:#F5C518;color:#111}.mrcp-rn button:active{transform:scale(.92)}
+.mrcp-st+.mrcp-rt+.mrcp-a,.mrcp-st~.mrcp-a{margin-top:0}
+@media (max-width:600px){.mrcp-rn{grid-template-columns:repeat(5,1fr)}.mrcp-rn button{height:40px}}

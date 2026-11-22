@@ -4694,5 +4694,31 @@
     "fix": "Yeni öneriler düğmesi + gösterilenleri 2 hafta geri planda tutma + daha büyük havuz"
    }
   ]
+ },
+ {
+  "at": "2026-11-22T21:09:25",
+  "change": "Sana özel: izlediğin ya da listende olan şeyler artık önerilmiyor — sadece ada değil, Wikidata/IMDb/TMDB kimliğine de bakılıyor; adı Türkçe/İngilizce farklı yazılmış ya da “2. Sezon”, yıl eklenmiş olsa da yakalanıyor. Öneriye basınca açılan pencerede ana sayfadaki gibi dört seçenek var: İzlemek istiyorum · İzliyorum · Yarım bıraktım · İzledim (İzledim'e basınca 1–10 puan sorar). Öneriler de daha hızlı geliyor (posterler paralel aranıyor).",
+  "scores": {
+   "Notlar telefon": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "İzlediğin diziler öneri olarak çıkıyordu",
+    "fix": "Kimlik (Wikidata/IMDb/TMDB/MAL) + sadeleştirilmiş adla ayıklama"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Öneride sadece “İzlemek istiyorum” vardı",
+    "fix": "Ana sayfadaki durumların hepsi + İzledim'de puan"
+   }
+  ]
  }
 ]

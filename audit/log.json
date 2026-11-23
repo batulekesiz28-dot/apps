@@ -5349,5 +5349,20 @@
     "fix": "Adanın tamamı ve her satır kendi uygulamasını açıyor"
    }
   ]
+ },
+ {
+  "at": "2026-11-23",
+  "change": "Ada iPhone/Samsung gibi gelişti: iki canlı iş varsa ikincisi yanında küçük bir baloncukta duruyor, sayaçlarda ilerleme halkası var, çalan şarkının kapak rengi adaya ve ekolayzere yansıyor, adayı yana kaydırınca canlı işler arasında geçiliyor, şarj/pil/internet ve Rahatsız etme değişince ada kısa bir an durumu gösteriyor.",
+  "scores": {
+   "Hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Hub masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": []
  }
 ]

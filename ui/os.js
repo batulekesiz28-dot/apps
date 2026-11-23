@@ -13,7 +13,9 @@ const I={dnd:'<path d="M13.5 9.8A5.5 5.5 0 1 1 6.2 2.5a4.5 4.5 0 0 0 7.3 7.3z"/>
   lite:'<path d="M9 1.5L4 9h4l-1 5.5L12 7H8z"/>',mini:'<rect x="2" y="3" width="12" height="10" rx="1.5"/><rect x="8" y="8" width="4" height="3" rx=".6" fill="currentColor" stroke="none"/>',
   phone:'<rect x="4.5" y="1.5" width="7" height="13" rx="1.8"/><path d="M7 12.5h2"/>',fs:'<path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/>'};
 const dnd=v=>{if(v==null)return !!get('appshell:dnd',false);set('appshell:dnd',!!v);if(v)set('appshell:dndAt',Date.now());H()?.island?.();if(el)paint();
-  H()?.toast?.(v?'Rahatsız etme açık — bildirimler sessizce burada birikir':'Rahatsız etme kapandı')};
+  // panel kapalıyken (Ctrl+K vb.) iPhone'daki odak modu gibi adada kısa bir flaş; panel açıksa ada altta kalır → bildirim
+  if(!el&&H()?.flash)H().flash({ic:'☾',t:v?'Rahatsız etme':'Rahatsız etme kapalı',v:v?'açık':'',c:'#A78BFA'});
+  else H()?.toast?.(v?'Rahatsız etme açık — bildirimler sessizce burada birikir':'Rahatsız etme kapandı')};
 function tiles(){const h=H();if(!h)return[];const ph=window.Notify?.hasTopic?.();
   return[
     {k:'dnd',l:'Rahatsız etme',on:dnd(),s:dnd()?'açık':'kapalı',run:()=>dnd(!dnd())},

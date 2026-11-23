@@ -598,7 +598,18 @@ body.locked .focusbar{display:none}
 .island .is-l{display:none;padding:2px 8px 10px}
 .island.open{border-radius:24px}.island.open .is-c{display:none}.island.open .is-l{display:grid;gap:2px}
 .island .is-r{display:flex;align-items:center;gap:10px;min-height:44px;padding:4px 6px 4px 8px;border-radius:14px}
-.island .is-r:hover{background:rgba(255,255,255,.06)}.island .is-r[data-go]{cursor:pointer}.island .is-np .np-m{cursor:pointer}
+.island .is-r:hover{background:rgba(255,255,255,.06)}.island .is-r[data-go]{cursor:pointer}
+.is-ring{width:20px;height:20px;flex-shrink:0;border-radius:50%;background:conic-gradient(var(--c) calc(var(--p) * 1turn),rgba(255,255,255,.16) 0);-webkit-mask:radial-gradient(circle,transparent 6.5px,#000 7px);mask:radial-gradient(circle,transparent 6.5px,#000 7px);transition:background .6s linear}
+.island.np-on{box-shadow:0 10px 30px -10px rgba(0,0,0,.45),0 0 0 .5px rgba(255,255,255,.08),0 0 26px -8px var(--npc)}
+#focusBar .np-eq b{background:var(--npc,#4ADE80)}#focusBar .np-bar i{background:var(--npc,#fff)}
+.island.flash .is-c{font-weight:600}.island .is-fic{font-size:16px;width:auto}
+.isl-mini{position:fixed;z-index:30;width:40px;height:40px;border-radius:50%;background:#0B0B0D;color:#fff;display:grid;place-items:center;box-shadow:0 10px 26px -10px rgba(0,0,0,.5),0 0 0 .5px rgba(255,255,255,.08);cursor:pointer;transition:top .45s var(--out),left .45s var(--out)}
+.isl-mini[hidden]{display:none}.isl-mini>*{grid-area:1/1}.isl-mini .is-ring{width:32px;height:32px;-webkit-mask:radial-gradient(circle,transparent 13px,#000 13.5px);mask:radial-gradient(circle,transparent 13px,#000 13.5px)}
+.isl-mini .np-art{width:24px;height:24px;border-radius:50%;object-fit:cover;background:#27272A;display:grid;place-items:center;font-style:normal;color:#A1A1AA}
+.isl-mini .dot{width:9px;height:9px;border-radius:50%;background:var(--c)}.isl-mini .ico{font-style:normal}
+.isl-mini:hover{transform:scale(1.06)}body.locked .isl-mini,body.calm .isl-mini{display:none}
+body.inworld .isl-mini{z-index:45}
+@media (max-width:600px){.isl-mini{width:40px;height:40px}}.island .is-np .np-m{cursor:pointer}
 .island .is-rt{flex:1;min-width:0;display:grid}.island .is-rt b{font-size:13.5px;font-weight:550;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.island .is-rt small{font-size:12px;color:#A1A1AA}
 .island .is-rv{font:600 15px var(--mono);margin-right:4px}
 .island button{min-width:34px;height:32px;padding:0 10px;border-radius:10px;background:rgba(255,255,255,.1);color:#fff;font-size:12.5px;font-weight:550}
@@ -2109,7 +2120,7 @@ function openNotes(h){const a=find('p:notlar');if(!a)return toast('Notlar uygula
 const fmtClock=s=>{s=Math.max(0,Math.floor(s));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return(h?h+':':'')+String(m).padStart(h?2:1,'0')+':'+String(x).padStart(2,'0')};
 function islandItems(){const out=[],r=STUDY.run;
   if(r){const e=r.acc+(r.on?(Date.now()-r.at)/1000:0),sb=(STUDY.subj||[]).find(s=>s.id===r.subj),left=r.mode==='down'?r.target-e:null;
-    out.push({k:'timer',pri:5,ic:`<i class="dot${r.on?' live':''}" style="--c:${sb?.color||'#E11D48'}"></i>`,t:`${sb?.name||'Çalışma'}${r.topic?' · '+r.topic:''}`,v:fmtClock(left!=null?left:e),sub:r.on?(left!=null?'kalan':'süre'):'duraklatıldı',act:'<button data-isl="study">Aç</button>'})}
+    out.push({k:'timer',pri:5,live:1,col:sb?.color||'#E11D48',p:left!=null&&r.target?clamp(1-left/r.target,0,1):STUDY.goal?clamp(studyToday()/STUDY.goal,0,1):null,ic:`<i class="dot${r.on?' live':''}" style="--c:${sb?.color||'#E11D48'}"></i>`,t:`${sb?.name||'Çalışma'}${r.topic?' · '+r.topic:''}`,v:fmtClock(left!=null?left:e),sub:r.on?(left!=null?'kalan':'süre'):'duraklatıldı',act:'<button data-isl="study">Aç</button>'})}
   const fr=focusWidget(),f=fr&&focusOf(fr.w);
   if(f){const ask=f.ok==null&&new Date().getHours()>=18;out.push({k:'focus',pri:ask?4:3,ic:'<i class="ico">◎</i>',t:f.text,v:f.ok===true?'✓':'',sub:f.ok===true?'oldu':f.ok===false?'olmadı':ask?'oldu mu?':'günün odağı',done:f.ok===true,
     act:f.ok==null?`<button data-fb="ok" aria-label="Oldu">✓</button>${ask?'<button data-fb="no" aria-label="Olmadı">✕</button>':''}`:''})}
@@ -2118,7 +2129,7 @@ function islandItems(){const out=[],r=STUDY.run;
   if(open+dated)out.push({k:'today',pri:2,ic:'<i class="ico">☑</i>',t:`Bugün ${open+dated} açık iş`,v:'',sub:'Notlar',act:'<button data-isl="today">Aç</button>'});
   const ev=(GCAL.ev||[]).find(e=>!e.all&&new Date(e.s.replace(' ','T'))>Date.now());if(ev){const mins=Math.round((new Date(ev.s)-Date.now())/6e4);if(mins<12*60)out.push({k:'event',pri:mins<30?6:2,ic:'<i class="ico">▦</i>',t:ev.t,v:ev.s.slice(11,16),sub:mins<60?mins+' dk sonra':'takvim',act:''})}
   for(const id in TM){const t=TM[id];if(!t.on)continue;const left=Math.max(0,(t.end-Date.now())/1000);
-    out.push({k:'tm'+id,pri:5,ic:`<i class="dot live" style="--c:${t.mode==='focus'?'#F97316':'#22C55E'}"></i>`,t:t.mode==='focus'?'Odak':'Mola',v:mmss(left),sub:'odak sayacı',act:`<button data-isl="tm" data-id="${esc(id)}">Duraklat</button>`});break}
+    out.push({k:'tm'+id,pri:5,live:1,col:t.mode==='focus'?'#F97316':'#22C55E',p:clamp(1-left/(t.dur||1),0,1),ic:`<i class="dot live" style="--c:${t.mode==='focus'?'#F97316':'#22C55E'}"></i>`,t:t.mode==='focus'?'Odak':'Mola',v:mmss(left),sub:'odak sayacı',act:`<button data-isl="tm" data-id="${esc(id)}">Duraklat</button>`});break}
   const now=Date.now(),hm=d=>{const x=new Date(d);return String(x.getHours()).padStart(2,'0')+':'+String(x.getMinutes()).padStart(2,'0')},inM=ms=>{const m=Math.round(ms/6e4);return m<=0?'şimdi':m+' dk sonra'};
   const rm=window.Notify?.upcoming?.(36e5)?.[0];
   if(rm)out.push({k:'rem',pri:rm.at-now<15*6e4?6:2,ic:'<i class="ico">⏰</i>',t:rm.text,v:hm(rm.at),sub:inM(rm.at-now),act:`<button data-isl="remx" data-id="${esc(rm.id)}" aria-label="Hatırlatıcıyı sil">Sil</button>`});
@@ -2132,10 +2143,28 @@ function islandItems(){const out=[],r=STUDY.run;
   if(!np){const bg=TABS.find(t=>t.app.win&&t.fr&&(W.min||curTab()!==t));if(bg){const old=(parseFloat(document.documentElement.dataset.appshellGom||'0')||0)<1.2,m=miniIcon(bg.app);
     out.push({k:'np0',pri:6,ic:`<span class="mini" style="${m.style}">${m.html}</span>`,t:bg.app.name,sub:old?'Şarkı adı ve ⏮ ⏯ ⏭ için eklentiyi güncelle':'arkada açık',cact:old?`<button class="is-ca" data-isl="gom" data-id="${esc(bg.key)}">Güncelle</button>`:'',
       act:(old?`<button data-isl="gom" data-id="${esc(bg.key)}">Güncelle</button>`:'')+`<button data-isl="np0" data-id="${esc(bg.key)}">Aç</button>`})}}
-  if(np)out.push({k:'np',pri:np.on?7:3,on:np.on,img:np.img,ic:'',t:np.t,sub:np.a||tabOf(np.key).app.name,v:'',act:''});
+  if(np)out.push({k:'np',live:1,col:NP.col||'#4ADE80',p:NP.dur?clamp(npCur()/NP.dur,0,1):null,pri:np.on?7:3,on:np.on,img:np.img,ic:'',t:np.t,sub:np.a||tabOf(np.key).app.name,v:'',act:''});
   if(TABS.length)out.push({k:'apps',pri:1,ic:'<i class="ico">▣</i>',t:`${TABS.length} uygulama açık`,v:'',sub:'Shift+Tab',act:'<button data-isl="sw">Geç</button>'});
-  return out.sort((a,b)=>b.pri-a.pri)}
-let islOpen=false,islKey='',islIt=[];
+  if(FLASH&&FLASH.until>Date.now())out.push({k:'flash',pri:99,ic:`<i class="ico is-fic" style="color:${FLASH.c||'#4ADE80'}">${esc(FLASH.ic)}</i>`,t:FLASH.t,v:FLASH.v||'',sub:FLASH.sub||'',act:''});
+  out.sort((a,b)=>b.pri-a.pri);
+  // Samsung Now Bar gibi: yana kaydırarak seçilen canlı iş öne geçer (flaş hariç)
+  if(islSel&&out[0]?.k!=='flash'){const i=out.findIndex(x=>x.k===islSel&&x.live);if(i>0)out.unshift(out.splice(i,1)[0])}
+  return out}
+let islOpen=false,islKey='',islIt=[],islSel='';
+/* ── Sistem flaşı (iPhone'da şarj/AirPods anı gibi): ada kısa süre büyüyüp bir durum gösterir, sonra eski hâline döner ── */
+let FLASH=null,flashT=0;
+function islFlash(o){FLASH={...o,until:Date.now()+(o.ms||2600)};clearTimeout(flashT);islKey='';paintFocusBar();flashT=setTimeout(()=>{FLASH=null;islKey='';paintFocusBar()},(o.ms||2600)+30)}
+try{navigator.getBattery?.().then(bt=>{let low=false;const pc=()=>Math.round(bt.level*100)+'%';
+  bt.addEventListener('chargingchange',()=>islFlash(bt.charging?{ic:'⚡',t:'Şarj oluyor',v:pc(),c:'#4ADE80'}:{ic:'🔌',t:'Şarj kesildi',v:pc(),c:'#A1A1AA'}));
+  bt.addEventListener('levelchange',()=>{const l=bt.level;if(!bt.charging&&l<=.2&&!low){low=true;islFlash({ic:'🪫',t:'Pil azaldı',v:pc(),c:'#F87171',ms:4000})}if(l>.25)low=false})})}catch{}
+addEventListener('offline',()=>islFlash({ic:'⚠',t:'İnternet yok',sub:'bağlantı kesildi',c:'#FBBF24',ms:3200}));
+addEventListener('online',()=>islFlash({ic:'✓',t:'Bağlandı',c:'#4ADE80'}));
+/* şarkı kapağının baskın rengi (Samsung Now Bar gibi ekolayzer ve ilerleme o renge boyanır); CORS izin vermezse yeşil kalır */
+const NPCOL=new Map();
+function npColor(u){if(!u||NPCOL.has(u))return;NPCOL.set(u,'');const im=new Image();im.crossOrigin='anonymous';im.referrerPolicy='no-referrer';
+  im.onload=()=>{try{const c=document.createElement('canvas');c.width=c.height=12;const x=c.getContext('2d');x.drawImage(im,0,0,12,12);const d=x.getImageData(0,0,12,12).data;let best=null,bs=-1;
+    for(let i=0;i<d.length;i+=4){const r=d[i],g=d[i+1],b=d[i+2],mx=Math.max(r,g,b),mn=Math.min(r,g,b),sat=mx?(mx-mn)/mx:0,sc=sat*(mx/255)*(mx>60?1:.2);if(sc>bs){bs=sc;best=[r,g,b]}}
+    if(best&&bs>.12){const k=Math.max(1,170/Math.max(...best));const col=`rgb(${best.map(v=>Math.min(255,Math.round(v*k))).join(',')})`;NPCOL.set(u,col);if(NP?.img===u){NP.col=col;islKey='';paintFocusBar()}}}catch{}};im.src=u}
 /* adaya dokununca o şeyin uygulaması açılır (iPhone Dynamic Island / Samsung Now Bar gibi): şarkı → YouTube Music, sayaç → Study Log… */
 function islGo(k){const x=islIt.find(i=>i.k===k);if(!x)return false;islOpen=false;paintFocusBar();
   if(k==='np'&&NP&&tabOf(NP.key)){switchTo(NP.key);return true}
@@ -2189,8 +2218,8 @@ let NP=null;
 addEventListener('message',e=>{const d=e.data;if(!d||d.appshell!=='np')return;const t=TABS.find(x=>x.fr&&x.fr.contentWindow===e.source);if(!t)return;
   if(!d.has){if(NP?.key===t.key&&!d.on){NP=null;paintFocusBar()}return}
   if(NP&&NP.key!==t.key&&NP.on&&!d.on&&Date.now()-NP.at<5000)return; // çalan sekme duraklatılmış olana yer vermez
-  const was=NP&&NP.t+NP.on;NP={key:t.key,t:String(d.t||''),a:String(d.a||''),img:/^https:\/\//.test(d.img||'')?d.img:'',on:!!d.on,cur:+d.cur||0,dur:+d.dur||0,at:Date.now()};
-  if(was!==NP.t+NP.on||!document.hidden){paintFocusBar();paintPnp()}});
+  const was=NP&&NP.t+NP.on;const prevCol=NP?.img===d.img?NP.col:NPCOL.get(d.img)||'';NP={col:prevCol,key:t.key,t:String(d.t||''),a:String(d.a||''),img:/^https:\/\//.test(d.img||'')?d.img:'',on:!!d.on,cur:+d.cur||0,dur:+d.dur||0,at:Date.now()};
+  npColor(NP.img);if(was!==NP.t+NP.on||!document.hidden){paintFocusBar();paintPnp()}});
 // uygulama açıkken üst şeritte (Alt+P ⏯, Alt+N ⏭): çalan sekme öndeyse gizli — kendi oynatıcısı var
 function paintPnp(){const p=$('#pnp');if(!p)return;const t=npTab(),show=!!(t&&NP.t&&(NP.on||Date.now()-NP.at<30*6e4)&&curTab()!==t);
   if(!show){p.hidden=true;p.innerHTML='';return}const k=NP.t+NP.on+NP.img;if(p.dataset.k===k&&!p.hidden)return;p.dataset.k=k;p.hidden=false;
@@ -2216,13 +2245,31 @@ function paintFocusBar(){const b=$('#focusBar');if(!b)return;const it=islandItem
   if(!it.length||calmOn){b.hidden=true;islKey='';return}
   islIt=it;const top=it[0],key=it.map(x=>x.k+x.t+x.sub+(x.done?1:0)+(x.on?1:0)+(x.img||'')+(x.k==='np'&&NP.dur?Math.round(NP.dur):'')).join('|')+islOpen;
   const vis=!b.hidden,wasOpen=b.classList.contains('open'),r0=vis&&key!==islKey?b.getBoundingClientRect():null;
-  b.hidden=false;b.className='island'+(islOpen?' open':'')+(top.k==='timer'&&STUDY.run?.on?' live':'');
-  if(key===islKey){for(const x of it)if(x.v)b.querySelectorAll(`[data-lv="${x.k}"]`).forEach(e=>e.textContent=x.v);
+  b.hidden=false;b.className='island'+(islOpen?' open':'')+(top.k==='timer'&&STUDY.run?.on?' live':'')+(top.k==='np'&&NP?.on?' np-on':'')+(top.k==='flash'?' flash':'');
+  b.style.setProperty('--npc',NP?.col||'#4ADE80');
+  if(key===islKey){for(const x of it){if(x.v)b.querySelectorAll(`[data-lv="${x.k}"]`).forEach(e=>e.textContent=x.v);if(x.p!=null)document.querySelectorAll(`[data-lp="${x.k}"]`).forEach(e=>e.style.setProperty('--p',x.p.toFixed(4)))}
     const pb=b.querySelector('[data-v=np]');if(pb&&NP?.dur){const c=npCur();pb.style.width=(c/NP.dur*100).toFixed(2)+'%';const tc=b.querySelector('[data-v=npc]');if(tc)tc.textContent=fmtClock(c)}return}
   islKey=key;
-  b.innerHTML=`<div class="is-c">${top.k==='np'?npArt(top):top.ic}<span class="is-t${top.done?' done':''}">${esc(top.t)}</span>${top.k==='np'?npEq(top):''}${top.cact||''}${top.v?`<b class="is-v num" data-lv="${esc(top.k)}">${esc(top.v)}</b>`:''}${it.length>1?`<span class="is-n">+${it.length-1}</span>`:''}</div>
+  b.innerHTML=`<div class="is-c">${top.k==='np'?npArt(top):top.ic}<span class="is-t${top.done?' done':''}">${esc(top.t)}</span>${top.k==='np'?npEq(top):''}${top.cact||''}${top.v?`<b class="is-v num" data-lv="${esc(top.k)}">${esc(top.v)}</b>`:''}${top.p!=null&&top.k!=='np'?ringHTML(top):''}${it.length>1&&top.k!=='flash'?`<span class="is-n">+${it.length-1}</span>`:''}</div>
     <div class="is-l">${it.map(x=>x.k==='np'?npCard(x):`<div class="is-r" data-go="${esc(x.k)}">${x.ic}<span class="is-rt${x.done?' done':''}"><b>${esc(x.t)}</b><small>${esc(x.sub)}</small></span>${x.v&&x.k!=='focus'?`<b class="num is-rv" data-lv="${esc(x.k)}">${esc(x.v)}</b>`:''}${x.act}</div>`).join('')}</div>`;
-  if(r0)islMorph(b,r0,wasOpen!==islOpen)}
+  if(r0)islMorph(b,r0,wasOpen!==islOpen);paintMini(it,top)}
+let miniT=0;
+// ada esnerken ölçü yanıltır: hemen bir kez, esneme bitince (620 ms) bir kez daha yerleştir (top/left geçişi yumuşatır)
+function miniPos(){const m=$('#islMini'),f=$('#focusBar');if(!m||m.hidden)return;const b=f.getBoundingClientRect(),rt=document.body.classList.contains('inworld')&&innerWidth<=600;
+  m.style.top=(b.top+Math.min(b.height,40)/2-20)+'px';m.style.left=(rt?b.left-48:Math.min(innerWidth-48,b.right+8))+'px'}
+const ringHTML=x=>`<i class="is-ring" data-lp="${esc(x.k)}" style="--p:${(x.p||0).toFixed(4)};--c:${esc(x.col||'#fff')}" aria-hidden="true"></i>`;
+/* iPhone “ayrık” görünüm: ikinci bir canlı iş varsa adanın yanında küçük bir baloncuk (dokun → o uygulama, ya da yana kaydır → öne al) */
+function paintMini(it,top){let m=$('#islMini');const L=it.filter(x=>x.live&&x!==top),x=!islOpen&&top.k!=='flash'&&!calmOn?L[0]:null;
+  if(!x){if(m&&!m.hidden&&!m.dataset.off){const mm=m;mm.dataset.off='1';anim(mm,[{opacity:1,scale:'1'},{opacity:0,scale:'.4'}],{duration:220,easing:'ease-in'}).finished.then(()=>{if(mm.dataset.off)mm.hidden=true},()=>{})}return}
+  if(m)delete m.dataset.off;
+  const fresh=!m||m.hidden;if(!m){m=document.createElement('button');m.id='islMini';m.className='isl-mini';document.body.appendChild(m);
+    m.addEventListener('click',()=>islGo(m.dataset.k));
+    m.addEventListener('contextmenu',e=>{e.preventDefault();islSel=m.dataset.k;islKey='';paintFocusBar()})}
+  m.hidden=false;m.dataset.k=x.k;m.title=`${x.t}${x.v?' · '+x.v:''} — aç (sağ tık: öne al)`;m.setAttribute('aria-label',m.title);
+  m.innerHTML=(x.k==='np'?npArt(x):x.ic)+(x.p!=null?ringHTML(x):'');m.classList.toggle('np',x.k==='np');
+  miniPos();clearTimeout(miniT);miniT=setTimeout(miniPos,620);
+  if(fresh)anim(m,[{opacity:0,scale:'.3',translate:document.body.classList.contains('inworld')&&innerWidth<=600?'24px 0':'-24px 0'},{opacity:1,scale:'1',translate:'0 0'}],{duration:520,easing:'cubic-bezier(.3,1.3,.5,1)'})}
+addEventListener('resize',()=>{if(islIt.length){islKey='';paintFocusBar()}});
 {let py=null;$('#focusBar').addEventListener('pointerdown',e=>{py=e.clientY});
   addEventListener('pointermove',e=>{if(py!=null&&e.buttons&&e.clientY-py>34){py=null;islOpen=false;paintFocusBar();window.OS?.open()}},{passive:true});
   addEventListener('pointerup',()=>{py=null})}
@@ -2248,6 +2295,11 @@ $('#focusBar').addEventListener('click',e=>{const fb=e.target.closest('[data-fb]
   if(card&&islGo('np'))return;if(row&&islGo(row.dataset.go))return;
   if(e.target.closest('.is-c')&&islIt[0]&&islGo(islIt[0].k))return;
   if(!matchMedia('(hover:hover)').matches){islOpen=!islOpen;paintFocusBar()}});
+// yana kaydır (parmak ya da fare): canlı işler arasında geç (Samsung Now Bar gibi)
+{let sx=null,sy=0;$('#focusBar').addEventListener('pointerdown',e=>{sx=e.clientX;sy=e.clientY});
+  addEventListener('pointerup',e=>{if(sx==null)return;const dx=e.clientX-sx,dy=e.clientY-sy;sx=null;if(Math.abs(dx)<42||Math.abs(dx)<Math.abs(dy)*1.4)return;
+    const L=islIt.filter(x=>x.live);if(L.length<2)return;islLong=true;setTimeout(()=>islLong=false,350);const i=L.findIndex(x=>x.k===islIt[0].k);islSel=L[(i+(dx<0?1:-1)+L.length)%L.length].k;islKey='';
+    const c=$('#focusBar .is-c');paintFocusBar();const n=$('#focusBar .is-c');if(n)anim(n,[{opacity:0,transform:`translateX(${dx<0?22:-22}px)`},{opacity:1,transform:'none'}],{duration:320,easing:'cubic-bezier(.2,.8,.2,1)'})})}
 // dokunmatik: basılı tut → genişlet (kısa dokunuş uygulamayı açar)
 let islLong=false;{let lt=0;$('#focusBar').addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;clearTimeout(lt);lt=setTimeout(()=>{islLong=true;islOpen=!islOpen;paintFocusBar();try{navigator.vibrate?.(8)}catch{}},420)});
   for(const ev of['pointerup','pointercancel','pointerleave'])$('#focusBar').addEventListener(ev,()=>clearTimeout(lt))}
@@ -3541,7 +3593,7 @@ buildMesh();introStart=performance.now();wake();
 })();
 
 /* ── Arayüz dünyaları için köprü (ui/worlds.js bunu kullanır) ── */
-window.HUB={apps:()=>pub,open:k=>{const a=find(k);if(a)openApp(a,nodes.get(k)?.el)},openNotes:h=>openNotes(h),palette:()=>palette(),
+window.HUB={flash:o=>islFlash(o),apps:()=>pub,open:k=>{const a=find(k);if(a)openApp(a,nodes.get(k)?.el)},openNotes:h=>openNotes(h),palette:()=>palette(),
   items:()=>{try{return islandItems()}catch{return[]}},notes:()=>NOTES,study:()=>STUDY,studyToday:()=>{try{return studyToday()}catch{return 0}},dayKey,
   alert:o=>islAlert(o),np:()=>npTab()?NP:null,npCmd:(c,x)=>npCmd(c,x),openNp:()=>NP&&switchTo(NP.key),island:()=>{islKey='';paintFocusBar()},
   calm:on=>calm(on),calmOn:()=>calmOn,motion:m=>m?applyMotion(m):MOTION,setTier:t=>setTier(t),fs:()=>toggleFS(),
@@ -3570,6 +3622,6 @@ addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.shiftKey&&(e.key==='
 <link rel="stylesheet" href="ui/notify.css?v=20261120d">
 <script src="ui/notify.js?v=20261121b"></script>
 <link rel="stylesheet" href="ui/os.css?v=20261121a">
-<script src="ui/os.js?v=20261121a"></script>
+<script src="ui/os.js?v=20261123a"></script>
 </body>
 </html>

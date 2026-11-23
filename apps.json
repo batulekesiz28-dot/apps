@@ -113,6 +113,13 @@
    "icon": "play",
    "color": "teal",
    "desc": "Film ya da dizi adını yaz; Türkiye'de yasal olarak nerede izlenir — önce bedava seçenekler (reklamlı platformlar, Internet Archive klasikleri), sonra abonelik ve kiralama. Medya, sinema, dizi"
+  },
+  {
+   "slug": "galeri",
+   "name": "Galeri",
+   "icon": "image",
+   "color": "blue",
+   "desc": "Fotoğraf galerisi: telefondan ve bilgisayardan fotoğraf yükle, çekim tarihine, yere ve türe göre (kamera, ekran görüntüsü, belge, kopyalar) kendiliğinden düzenlenir · albümler, favoriler, geçmişte bugün"
   }
  ]
 }

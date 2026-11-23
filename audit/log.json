@@ -5364,5 +5364,42 @@
    }
   },
   "items": []
+ },
+ {
+  "at": "2026-11-23",
+  "change": "Yeni uygulama: Galeri. Telefondan ya da bilgisayardan fotoğraf yükle (Yükle düğmesi, sürükle-bırak, yapıştır; Android'de yüklü AppShell'e Paylaş). Fotoğraflar çekim tarihine göre Yıllar · Aylar · Tümü olarak dizilir; yer (şehir), kamera / ekran görüntüsü / belge / kaydedilen türleri, benzer ve kopya kareler, geçmişte bugün kendiliğinden ayrılır. Albümler, favoriler, 30 gün duran Son silinenler, büyük görüntüleyici (kaydır, yakınlaştır, bilgi). Girişliyken telefonda eklediğin fotoğraf bilgisayarda anında görünür.",
+  "scores": {
+   "Galeri telefon": {
+    "before": 0,
+    "after": 100
+   },
+   "Galeri masaüstü": {
+    "before": 0,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "galeri",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Arama kutusunun dokunma alanı küçüktü",
+    "fix": "kutunun tamamı tıklanır"
+   },
+   {
+    "app": "galeri",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Yıl/ay kartlarında yazı açık renkli fotoğrafın üstünde okunmuyordu",
+    "fix": "koyu zemin + gölge"
+   },
+   {
+    "app": "denetci",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Denetçi alttaki yüzen görünüm çubuğunu altından geçen fotoğraflarla ‘çakışma’ sayıyordu",
+    "fix": "kenara yapışık çubuklar her kuralda aynı şekilde ayrılıyor"
+   }
+  ]
  }
 ]

@@ -106,8 +106,10 @@ function run(doc,opt={}){
   const heads=vis.filter(e=>/^H[1-3]$/.test(e.tagName)&&txt(e));
   const ctrls=vis.filter(e=>e.matches('button,[role=button],select,a.btn,input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=hidden])'));
   // 1) Başlığa yapışık araç: başlık metninin hemen sağında (≤32px) duran, başlığın parçası olmayan kontrol
+  // farklı katman: sabit/yapışık çubuktaki düğme (alt sekme çubuğu) kaydırılan sayfadaki başlığa “yapışık” sayılmaz
+  const layerOf=e=>{for(let p=e;p&&p!==doc.body;p=p.parentElement){const ps=win.getComputedStyle(p).position;if(ps==='fixed'||ps==='sticky')return p}return doc.body};
   const glued=[];for(const h of heads){const rg=doc.createRange();rg.selectNodeContents(h);const tr=rg.getBoundingClientRect();if(!tr.width)continue;
-    for(const c of ctrls){if(h.contains(c))continue;const r=R(c);if(!r.width)continue;const mid=r.top+r.height/2;
+    for(const c of ctrls){if(h.contains(c)||layerOf(c)!==layerOf(h))continue;const r=R(c);if(!r.width)continue;const mid=r.top+r.height/2;
       if(mid>tr.top-4&&mid<tr.bottom+4&&r.left-tr.right>=0&&r.left-tr.right<=32&&r.width<160)glued.push(c)}}
   if(glued.length)addD('yuksek','glued','Düğme başlığın parçası gibi duruyor','Başlığın hemen yanındaki araç, başlığa ait bir şeymiş gibi okunuyor; görsel hiyerarşiyi bozuyor.','Aracı sayfanın sağ üstündeki araç grubuna taşı (sol: başlık · sağ: arama, filtre, görünüm).',glued);
   // 2) Aynı başlık iki kez: başlığın hemen üstünde (≤120px) aynı metin
@@ -144,6 +146,9 @@ function run(doc,opt={}){
   const VW=win.innerWidth,VH=win.innerHeight,inVP=r=>r.width>0&&r.left+r.width/2>0&&r.left+r.width/2<VW&&r.top+r.height/2>0&&r.top+r.height/2<VH;
   const rootOf=e=>{let p=e;while(p&&p!==doc.body){const ps=win.getComputedStyle(p).position;if(ps==='fixed'||ps==='sticky')return p;p=p.parentElement}return doc.body};
   const okLayer=(a,b)=>{const ra=rootOf(a),rb=rootOf(b);if(ra===rb)return true;const r=R(rb===doc.body?ra:rb);return r.width*r.height<VW*VH*.15};
+  // ekranın üst/alt kenarına yapışık çubuk (başlık, alt sekme/görünüm çubuğu): kaydırılan içerik altından geçer, bu çakışma değildir
+  const edgeFix=e=>{const rt=rootOf(e);if(rt===doc.body)return false;if(win.getComputedStyle(rt).position==='sticky')return true;const r=R(rt);return r.top<=24||r.bottom>=VH-24};
+  const passUnder=(a,b)=>rootOf(a)!==rootOf(b)&&(edgeFix(a)||edgeFix(b));
   const allCtrls=all.filter(e=>e.matches('button,a[href],[role=button],input:not([type=hidden]),select,textarea,[tabindex]:not([tabindex="-1"])'));
   // 1) görünmez ama tıklanabilir: opaklığı ~0 ama imleç/parmak yakalıyor (kullanıcı boşluğa basıp bir şey açar)
   const ghost=allCtrls.filter(e=>{const r=R(e);if(r.width<4||r.height<4||!inViewish(e,win))return false;const cs=win.getComputedStyle(e);if(cs.display==='none'||cs.visibility==='hidden'||cs.pointerEvents==='none')return false;
@@ -170,7 +175,7 @@ function run(doc,opt={}){
   // sadece ikisi de gerçekten basılabiliyorsa say: kendi ortasında en üstte olmayan (bir pencerenin ya da sabit çubuğun altında kalan) öğe atlanır
   const onTop=c=>{const r=R(c),h=doc.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return!!h&&(h===c||c.contains(h))};
   const ov=[],vc=ctrls.filter(c=>R(c).width>8&&R(c).bottom>0&&R(c).top<win.innerHeight&&onTop(c));for(let i=0;i<vc.length&&ov.length<20;i++){const a=R(vc[i]);for(let j=i+1;j<vc.length;j++){if(vc[i].contains(vc[j])||vc[j].contains(vc[i]))continue;const b=R(vc[j]),ix=Math.max(0,Math.min(a.right,b.right)-Math.max(a.left,b.left)),iy=Math.max(0,Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)),ar=Math.min(a.width*a.height,b.width*b.height);
-      if(ar>0&&ix*iy/ar>.3&&okLayer(vc[i],vc[j])){ov.push(vc[j]);break}}}
+      if(ar>0&&ix*iy/ar>.3&&okLayer(vc[i],vc[j])&&!passUnder(vc[i],vc[j])){ov.push(vc[j]);break}}}
   if(ov.length)addH('warn','overlap','Üst üste binen düğmeler','İki tıklanabilir öğe aynı yerde; kullanıcı istediğine değil üsttekine basar.','Öğeleri ayır ya da alttakini o sırada devre dışı bırak.',ov);
   // 6) belirsiz düğme adı: ne yapacağını söylemiyor
   const vague=ctrls.filter(c=>/^(tıkla|buraya tıkla|tamam|ok|evet|hayır|git|devam|daha|\.\.\.|…|›|»|>)$/i.test((nameOf(c)||'').trim()));
@@ -210,7 +215,7 @@ function run(doc,opt={}){
   // katman: en yakın sabit (fixed/sticky) ata. Farklı katmandaki BÜYÜK yüzen panel (kart, pencere) üstteki içeriği bilerek örter → sayılmaz;
   // küçük yüzen parça (ada, rozet) altındaki yazıyı örterse sayılır (telefonda ada saatin üstüne binmişti)
   // ekranın üst/alt kenarına yapışık çubuk (başlık, gezinme, alt bar): kaydırılan içeriğin altından geçmesi doğaldır
-  const edgeBar=h=>{const rt=rootOf(h);if(rt===doc.body)return false;if(win.getComputedStyle(rt).position==='sticky')return true;const r=R(rt);return r.top<=24||r.bottom>=VH-24}; // kenara yakın yüzen çubuk (alt sekme çubuğu gibi) da sayılır
+  const edgeBar=edgeFix; // kenara yakın yüzen çubuk (alt sekme çubuğu gibi) da sayılır
   // kaydırılan bir kutunun görünen alanının dışında kalmış (kaydırılıp gizlenmiş) öğe gerçekte görünmüyor
   const clipped=e=>{const r=R(e),cx=r.left+r.width/2,cy=r.top+r.height/2;for(let p=e.parentElement;p&&p!==doc.body;p=p.parentElement){const cs=win.getComputedStyle(p);if(cs.overflowX==='visible'&&cs.overflowY==='visible')continue;const q=R(p);if(cx<q.left||cx>q.right||cy<q.top||cy>q.bottom)return true}return false};
   const coverOf=(e,r)=>{const pts=[[r.left+r.width/2,r.top+r.height/2],[r.left+Math.min(8,r.width/3),r.top+r.height/2],[r.right-Math.min(8,r.width/3),r.top+r.height/2]];let hit=0,by=null;
@@ -236,7 +241,7 @@ function run(doc,opt={}){
     if(!A.contains(h)&&!B.contains(h)&&h!==A&&h!==B&&!h.contains(A)&&!h.contains(B))return true; // ikisinin de üstünde başka bir şey var (görünmüyorlar)
     const top=A.contains(h)||h===A?A:B,low=top===A?B:A,card=opq(top);return!!card&&!card.contains(low)};
   const labs=textEls.filter(e=>{const r=R(e);const t=(e.textContent||'').trim();return t.length>0&&t.length<60&&inVP(r)&&r.width>4&&!animating(e)&&!clipped(e)}).slice(0,350),lo=[];
-  for(let i=0;i<labs.length&&lo.length<12;i++){const a=R(labs[i]);for(let j=i+1;j<labs.length;j++){if(labs[i].contains(labs[j])||labs[j].contains(labs[i])||!okLayer(labs[i],labs[j]))continue;const b=R(labs[j]);
+  for(let i=0;i<labs.length&&lo.length<12;i++){const a=R(labs[i]);for(let j=i+1;j<labs.length;j++){if(labs[i].contains(labs[j])||labs[j].contains(labs[i])||!okLayer(labs[i],labs[j])||passUnder(labs[i],labs[j]))continue;const b=R(labs[j]);
       const ix=Math.max(0,Math.min(a.right,b.right)-Math.max(a.left,b.left)),iy=Math.max(0,Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top));if(ix*iy>Math.min(a.width*a.height,b.width*b.height)*.25&&!occluded(labs[i],labs[j],a,b)){lo.push(labs[j]);break}}}
   if(lo.length)addH('error','textoverlap','Yazılar üst üste binmiş','İki etiket aynı yere düşmüş; ikisi de okunmuyor.','Etiketleri ayır: yerleşimde çakışma kontrolü yap ya da birini kısalt/gizle.',lo);
   // 18) “tak diye” açılan parça: durumla (açık/hover/seçili) görünür olan öğe hiç geçişsiz beliriyor

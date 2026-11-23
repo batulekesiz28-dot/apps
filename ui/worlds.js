@@ -759,6 +759,10 @@ const HR={
       I=WG.islands(WG.G.map(g=>g.apps.length),{x:m?10:80,y:top,w:W-(m?20:160)-(m?0:pw*.5),h:Hh-top-bot},c0,many?26:0,ay,m?2:0),c=I.c;
     T.pk=[];for(let i=0;i<n;i++){const o=I.pos[i],x=o.x-pw*(m?.5:.25)+(prand(i+1)-.5)*c*.06,y=o.y+(prand(i+21)-.5)*c*ay*.12;
       T.pk.push({x,y,a:.75+prand(i+40)*.6,s:Math.min(m?60:90,c*.5)+prand(i+60)*Math.min(m?25:45,c*.22)});const el=T.el[i],lw=el.offsetWidth||120;el.style.left=Math.max(26,Math.min(W-lw+10,x))+'px';el.style.top=y+'px'}
+    // ekran kenarına sıkıştırılan zirveler (telefonda) üst üste binebiliyordu (Denetçi durum gezgini yakaladı): çakışanı aşağı kaydır
+    {const B=T.el.map(e=>({e,x:parseFloat(e.style.left),y:parseFloat(e.style.top),w:e.offsetWidth||120,h:e.offsetHeight||36}));
+      for(let k=0;k<6;k++){let moved=false;for(let i=0;i<B.length;i++)for(let j=0;j<i;j++){const a=B[i],b=B[j];if(a.x<b.x+b.w&&b.x<a.x+a.w&&a.y<b.y+b.h&&b.y<a.y+a.h){a.y=b.y+b.h+4;moved=true}}if(!moved)break}
+      B.forEach((b,i)=>{b.e.style.top=b.y+'px';T.pk[i].y=b.y})}
     root.querySelectorAll('.hr-l').forEach(el=>{const gi=+el.dataset.g,ys=T.pk.filter((_,i)=>HR.list[i].gi===gi).map(p=>p.y),cc=I.ctr[gi];if(!cc||!ys.length){el.hidden=true;return}
       // adın yeri: zirve etiketlerinin gerçek kapladığı alanın ortası
       const ix=T.pk.map((_,i)=>HR.list[i].gi===gi?i:-1).filter(i=>i>=0),lx=Math.min(...ix.map(i=>parseFloat(T.el[i].style.left))),rx=Math.max(...ix.map(i=>parseFloat(T.el[i].style.left)+(T.el[i].offsetWidth||120)));

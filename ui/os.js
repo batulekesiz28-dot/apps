@@ -25,7 +25,8 @@ function tiles(){const h=H();if(!h)return[];const ph=window.Notify?.hasTopic?.()
     {k:'lite',l:'Hafif mod',on:h.tier()===2&&localStorage.getItem('appshell:perf')==='fixed',s:'pil dostu',run:function(){if(this.on){localStorage.removeItem('appshell:perf');h.setTier(0)}else{localStorage.setItem('appshell:perf','fixed');h.setTier(2)}}},
     {k:'mini',l:'Mini pencere',on:!!h.flo(),s:'müzikte otomatik',run:()=>h.flo(!h.flo())},
     {k:'phone',l:'Telefon',on:!!window.Notify?.pc?.(),s:ph?'mesajlar burada':'bağla…',run:()=>{if(!ph){close();window.Notify?.open();return}window.Notify.pc(!window.Notify.pc())}},
-    ...(document.fullscreenEnabled?[{k:'fs',l:'Tam ekran',on:!!document.fullscreenElement,s:'F',run:()=>h.fs()}]:[])]}
+    ...(document.fullscreenEnabled?[{k:'fs',l:'Tam ekran',on:!!document.fullscreenElement,s:'F',run:()=>h.fs()}]:[]),
+    ...(window.OSX?.tiles?.()||[])]}
 let el=null,bat=null,T=[];
 try{navigator.getBattery?.().then(b=>{bat=b;const u=()=>el&&paintHead();b.addEventListener('levelchange',u);b.addEventListener('chargingchange',u)})}catch{}
 function head(){const d=new Date(),hm=d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}),dt=d.toLocaleDateString('tr-TR',{weekday:'long',day:'numeric',month:'long'});
@@ -41,8 +42,8 @@ function notifs(){const l=get('appshell:notifs',[]);
     :'<p class="cc-e">Bildirim yok. Hatırlatıcılar, görevler, odak sayacı ve telefondan gelen mesajlar burada birikir.</p>')}
 function paint(){if(!el)return;T=tiles();
   el.querySelector('.cc').innerHTML=`<header class="cc-h">${head()}</header>
-    <div class="cc-g" role="group" aria-label="Hızlı ayarlar">${T.map((t,i)=>`<button class="cc-t${t.on?' on':''}" data-t="${i}" aria-pressed="${t.on}"><i><svg viewBox="0 0 16 16">${I[t.k]}</svg></i><span>${esc(t.l)}</span><small>${esc(t.s)}</small></button>`).join('')}</div>
-    ${media()}<div class="cc-n">${notifs()}</div><div class="cc-grip" aria-hidden="true"></div>`}
+    <div class="cc-g" role="group" aria-label="Hızlı ayarlar">${T.map((t,i)=>`<button class="cc-t${t.on?' on':''}" data-t="${i}" aria-pressed="${t.on}"><i><svg viewBox="0 0 16 16">${t.ic||I[t.k]}</svg></i><span>${esc(t.l)}</span><small>${esc(t.s)}</small></button>`).join('')}</div>
+    ${window.OSX?.ccRow?.()||''}${media()}<div class="cc-n">${notifs()}</div><div class="cc-grip" aria-hidden="true"></div>`}
 function open(){if(el)return;set('appshell:ccSeen',Date.now());setTimeout(()=>H()?.island?.(),0);el=document.createElement('div');el.className='cc-bg';el.innerHTML='<section class="cc" role="dialog" aria-modal="true" aria-label="Kontrol merkezi"></section>';document.body.appendChild(el);paint();
   if(!calm())requestAnimationFrame(()=>el?.classList.add('on'));else el.classList.add('on');
   el.addEventListener('click',onClick);addEventListener('keydown',onKey,true);
@@ -54,6 +55,7 @@ function close(){if(!el)return;const w=el;el=null;clearInterval(clk);removeEvent
 function onKey(e){if(e.key==='Escape'){e.stopPropagation();close()}}
 function onClick(e){if(e.target===el)return close();const t=e.target.closest('[data-t]');if(t){T[+t.dataset.t]?.run();paint();return}
   const d=e.target.closest('[data-del]');if(d){const l=get('appshell:notifs',[]);l.splice(+d.dataset.del,1);set('appshell:notifs',l);paint();return}
+  const ox=e.target.closest('[data-osx]');if(ox){close();setTimeout(()=>window.OSX?.open?.(ox.dataset.osx),180);return}
   const c=e.target.closest('[data-cc]')?.dataset.cc;if(!c)return;
   if(c==='clear'){set('appshell:notifs',[]);paint();H()?.island?.()}
   else if(c==='np-open'){close();H()?.openNp?.()}
@@ -61,5 +63,5 @@ function onClick(e){if(e.target===el)return close();const t=e.target.closest('[d
 // dokunmatik: ana ekranda en üst kenardan aşağı kaydır (Samsung/iOS gibi)
 {let y0=null;addEventListener('touchstart',e=>{const t=e.touches[0];const w=document.getElementById('win'),app=w&&!w.hidden&&w.style.visibility!=='hidden';y0=(t&&t.clientY<28&&!app&&!el)?t.clientY:null},{passive:true});
   addEventListener('touchmove',e=>{if(y0==null)return;const t=e.touches[0];if(t.clientY-y0>60){y0=null;open()}},{passive:true});addEventListener('touchend',()=>{y0=null},{passive:true})}
-window.OS={open,close,toggle:()=>el?close():open(),paint,dnd,notified:()=>{if(el)paint()}};
+window.OS={open,close,toggle:()=>el?close():open(),paint,dnd,isOpen:()=>!!el,notified:()=>{if(el)paint()}};
 })();

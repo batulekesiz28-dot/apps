@@ -359,3 +359,10 @@ Kullanıcının bugüne kadarki şikâyetlerinden çıkan kurallar (`audit/engin
 - **Kart içinde kart** (tasarım, orta) — Apple sadeliği: kutu yığını yok.
 - Yazı en az 12px telefon / 11px bilgisayar (10px altı hata); İngilizce arayüz sözcüğü ve kesilen yazı artık uyarı; sayfa 2500 öğe üstü hata, açılış 1.8 sn üstü uyarı.
 - Puan: hata 22, uyarı 10, not 4. Erişim/gerçek kullanıcıda hata → toplam en çok 80; gerçek kullanıcıda uyarı → en çok 94.
+
+## Denetçi — “her durumda dene” (2026-11-23)
+Kullanıcı şikâyeti: Mıknatıs'ta arkada açık uygulama varken “Açık” çubuğu alt menünün üstüne bindi. Tek ekranlık tarama bunu göremezdi, çünkü o durum hiç taranmıyordu.
+- **Kural `chromeclash` (hata):** iki sabit katman (alt menü, açık uygulamalar, ada, durum çubuğu, yakınlaştırma, kenar paneli…) üst üste binemez. Biri öbürünün içine yerleşmişse (ada durum çubuğunun ortasında) çubuğun içindeki yazı/düğmelerle karşılaştırılır. Tam ekran bir pencerenin altında kalanlar sayılmaz; küçük bir çubuğun altında kalan menü sayılır.
+- **Durum gezgini `node audit/states.js [dünya] [durum]`:** 10 arayüz × {boş, arkada uygulama, canlı şarkı + sayaç, ada açık, uygulama içinde} × {bilgisayar, telefon} = 100 durum. Her değişiklikten sonra çalıştır; hata varsa çıkış kodu 1.
+- **Hareket avcısı `node audit/motion.js [slug] [m]`:** her uygulamada düğmelere basar, “tak diye” değişen büyük öğeyi bulur.
+- Yeni bir sabit çubuk/panel eklersen: states.js'te onu açan bir durum yoksa ekle.

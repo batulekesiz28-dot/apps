@@ -1,0 +1,85 @@
+/* OS özellikleri (ui/osx.js) — gece ışığı, sıcak köşeler, kenar paneli, performans katmanı, sistem paneli */
+#oxNight{position:fixed;inset:0;z-index:2147483000;pointer-events:none;background:rgb(255,138,30);mix-blend-mode:multiply;opacity:0;transition:opacity 1.4s ease}
+.ox-k{position:fixed;z-index:2147483001;width:4px;height:4px}.ox-k.ox-tl{left:0;top:0}.ox-k.ox-tr{right:0;top:0}.ox-k.ox-bl{left:0;bottom:0}.ox-k.ox-br{right:0;bottom:0}
+.ox-kr{position:fixed;z-index:2147483001;width:120px;height:120px;margin:-60px;border-radius:50%;background:radial-gradient(circle,rgba(120,140,255,.55),transparent 70%);pointer-events:none}
+.ox-kr.ox-tl{left:0;top:0}.ox-kr.ox-tr{left:100%;top:0}.ox-kr.ox-bl{left:0;top:100%}.ox-kr.ox-br{left:100%;top:100%}
+
+/* kenar paneli tutamağı (Samsung Edge): görünür ince çizgi, dokunma alanı geniş */
+.ox-eh{position:fixed;right:0;top:44%;z-index:58;width:24px;height:72px;padding:0;border:0;background:none;cursor:pointer;display:grid;justify-items:end;align-items:center}
+.ox-eh::before{content:'';width:5px;height:56px;border-radius:3px 0 0 3px;background:var(--ink3,#71717A);opacity:.35;transition:opacity .2s,width .25s cubic-bezier(.3,1.3,.5,1)}
+.ox-eh:hover::before,.ox-eh:focus-visible::before{opacity:.75;width:8px}
+body.locked .ox-eh,body.calm .ox-eh{display:none}
+.ox-edge{position:fixed;right:10px;top:50%;z-index:126;width:min(300px,calc(100vw - 20px));max-height:calc(100vh - 40px);overflow:auto;transform:translateY(-50%);padding:14px 12px 12px;border-radius:24px;
+  background:rgba(18,18,20,.86);color:#F4F4F5;backdrop-filter:blur(26px) saturate(1.6);-webkit-backdrop-filter:blur(26px) saturate(1.6);box-shadow:0 26px 60px -20px rgba(0,0,0,.6),0 0 0 .5px rgba(255,255,255,.12);font-family:var(--font)}
+.ox-el{margin:2px 6px 8px;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#A1A1AA}
+.ox-eg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px 2px;margin-bottom:12px}
+.ox-eg button{display:grid;justify-items:center;gap:5px;padding:8px 2px;border-radius:14px;color:inherit;min-width:0}.ox-eg button:hover{background:rgba(255,255,255,.08)}
+.ox-eg .mini{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:15px}.ox-eg .mini svg{width:20px;height:20px}
+.ox-eg small{font-size:12px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ox-et{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.ox-et button{display:flex;align-items:center;gap:9px;min-height:44px;padding:0 12px;border-radius:14px;background:rgba(255,255,255,.07);color:inherit;font-size:13px;font-weight:550;text-align:left}
+.ox-et button:hover{background:rgba(255,255,255,.12)}.ox-et button.on{background:#F4F4F5;color:#0B0B0D}
+.ox-et svg,.cc-ox svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+
+/* performans katmanı (NVIDIA): sol alt, tıklamayı engellemez */
+#oxPerf{position:fixed;left:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:2147482000;pointer-events:none;display:grid;gap:1px;padding:8px 11px;border-radius:12px;background:rgba(0,0,0,.72);color:#D4D4D8;
+  font:500 12px/1.35 'Geist Mono',ui-monospace,Menlo,monospace;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);min-width:150px}
+#oxPerf b{font-size:20px;font-weight:600;color:#76E35B;letter-spacing:-.02em}#oxPerf b small{font-size:12px;margin-left:4px;color:#A1A1AA}#oxPerf b.w{color:#FACC15}#oxPerf b.b{color:#F87171}
+#oxPerf span{display:flex;justify-content:space-between;gap:12px}#oxPerf i{font-style:normal;color:#fff}
+
+/* Kontrol merkezi alt sırası */
+.cc-ox{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:2px 0 12px}
+.cc-ox button{display:flex;align-items:center;gap:7px;flex-shrink:0;height:36px;padding:0 12px;border-radius:999px;background:rgba(255,255,255,.08);color:inherit;font-size:13px;font-weight:550}
+.cc-ox button:hover{background:rgba(255,255,255,.14)}
+
+/* sistem paneli */
+.ox-bg{position:fixed;inset:0;z-index:127;display:grid;place-items:center;padding:20px;background:rgba(0,0,0,.32);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.ox{width:min(620px,100%);max-height:min(720px,calc(100vh - 40px));display:flex;flex-direction:column;border-radius:26px;background:var(--surface,#fff);color:var(--ink,#111);box-shadow:0 30px 80px -24px rgba(0,0,0,.5),0 0 0 .5px var(--line2,rgba(0,0,0,.12));font-family:var(--font);overflow:hidden}
+.ox-h{display:flex;align-items:center;gap:8px;padding:12px 12px 8px 14px}
+.ox-tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;flex:1;padding:3px;border-radius:12px;background:var(--hover,rgba(0,0,0,.05))}
+.ox-tabs button{flex-shrink:0;height:32px;padding:0 12px;border-radius:9px;font-size:13px;font-weight:600;color:var(--ink2,#444)}.ox-tabs button.on{background:var(--surface,#fff);color:var(--ink,#111);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.ox-x{width:36px;height:36px;border-radius:10px;font-size:20px;color:var(--ink3,#666);flex-shrink:0}.ox-x:hover{background:var(--hover)}
+.ox-b{overflow:auto;padding:10px 20px 22px}
+.ox-big{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin:6px 0 14px}.ox-big b{font-size:34px;font-weight:700;letter-spacing:-.03em}.ox-big span{font-size:13px;color:var(--ink3)}
+.ox-wk{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;align-items:end;height:92px;margin-bottom:16px}
+.ox-wk div{display:grid;justify-items:center;gap:6px;align-self:end}.ox-wk i{display:block;width:100%;max-width:34px;border-radius:6px;background:var(--line2,rgba(0,0,0,.14))}.ox-wk i.on{background:var(--accent,#3B82F6)}.ox-wk small{font-size:12px;color:var(--ink3)}
+.ox-ul{list-style:none;display:grid;gap:2px;margin:0;padding:0}
+.ox-ul li{display:grid;grid-template-columns:32px minmax(0,1fr) 90px auto auto;align-items:center;gap:10px;min-height:44px}
+.ox-ul .mini{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;background:var(--hover);font-size:14px}.ox-ul .mini svg{width:16px;height:16px}
+.ox-ul b{font-size:14px;font-weight:550;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ox-ul .num{font-size:13px;color:var(--ink2);text-align:right;min-width:60px}
+.ox-bar{display:block;height:6px;border-radius:3px;background:var(--hover);overflow:hidden}.ox-bar i{display:block;height:100%;border-radius:3px;background:var(--accent,#3B82F6)}
+.ox select,.ox input[type=time]{height:36px;padding:0 8px;border-radius:9px;border:0;background:var(--hover);color:inherit;font:inherit;font-size:13px}
+.ox-e{padding:28px 10px;text-align:center;color:var(--ink3);font-size:13.5px;line-height:1.55}
+.ox-n{font-size:12.5px;color:var(--ink3);line-height:1.5;margin-top:14px}
+.ox-l{font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink3);margin:18px 0 8px}
+.ox-modes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.ox-mode{display:grid;justify-items:start;gap:3px;padding:14px;border-radius:18px;background:var(--hover);text-align:left;color:inherit}.ox-mode .e{font-size:22px}.ox-mode b{font-size:14.5px}.ox-mode small{font-size:12.5px;color:var(--ink3);line-height:1.4}
+.ox-mode.on{background:#5B4BE0;color:#fff}.ox-mode.on small{color:rgba(255,255,255,.8)}
+.ox-btn{margin-top:12px;height:38px;padding:0 14px;border-radius:10px;background:var(--hover);font-weight:600;font-size:13.5px;color:inherit}
+.ox-chips{display:flex;flex-wrap:wrap;gap:6px}
+.ox-chip{height:34px;padding:0 12px;border-radius:999px;background:var(--hover);font-size:13px;font-weight:550;color:inherit}.ox-chip.on{background:var(--ink,#111);color:var(--bg,#fff)}
+.ox-rt{list-style:none;display:grid;gap:8px;margin:0;padding:0}
+.ox-rt li{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 12px;border-radius:16px;background:var(--hover)}.ox-rt li.off{opacity:.55}
+.ox-days{display:flex;gap:2px}.ox-days button{width:30px;height:30px;border-radius:8px;font-size:12px;font-weight:600;color:var(--ink3)}.ox-days button.on{background:var(--ink,#111);color:var(--bg,#fff)}
+.ox-rt select{flex:1;min-width:150px}
+.ox-del{width:32px;height:32px;border-radius:9px;font-size:18px;color:var(--ink3)}.ox-del:hover{color:#DC2626;background:var(--hover)}
+.ox-cl{list-style:none;display:grid;gap:4px;margin:0;padding:0}
+.ox-cl li{display:flex;align-items:center;gap:4px;border-radius:14px;background:var(--hover);padding:2px 4px 2px 2px}
+.ox-ct{flex:1;min-width:0;display:grid;gap:2px;padding:9px 12px;border-radius:12px;text-align:left;color:inherit}.ox-ct:hover{background:var(--hover)}
+.ox-ct span{font-size:13.5px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:pre-wrap;word-break:break-word}.ox-ct small{font-size:12px;color:var(--ink3)}
+.ox-pin{width:32px;height:32px;border-radius:9px;opacity:.35;font-size:13px}.ox-pin.on,.ox-pin:hover{opacity:1}
+.ox-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:.5px solid var(--line,rgba(0,0,0,.08))}
+.ox-row>span:first-child{display:grid;gap:2px;font-size:14px;font-weight:550}.ox-row small{font-size:12.5px;font-weight:400;color:var(--ink3)}
+.ox-row input[type=range]{width:180px}
+.ox-sw{position:relative;flex-shrink:0;width:44px;height:26px}.ox-sw input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer;z-index:1}
+.ox-sw i{position:absolute;inset:0;border-radius:13px;background:var(--line2,rgba(0,0,0,.2));transition:background .2s}.ox-sw i::after{content:'';position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:translate .25s cubic-bezier(.3,1.3,.5,1)}
+.ox-sw input:checked+i{background:#34C759}.ox-sw input:checked+i::after{translate:18px 0}.ox-sw input:focus-visible+i{outline:2px solid var(--accent,#3B82F6);outline-offset:2px}
+.ox-kg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}.ox-kg label{display:grid;gap:6px;font-size:13px;font-weight:550}
+@media (max-width:600px){
+  .ox-bg{place-items:end center;padding:0}.ox{border-radius:26px 26px 0 0;max-height:88vh}.ox-modes{grid-template-columns:1fr}.ox-b{padding:10px 14px 24px}
+  .ox-ul li{grid-template-columns:32px minmax(0,1fr) auto;row-gap:6px;padding:6px 0}.ox-ul .mini{grid-row:1/3;align-self:start}.ox-ul b{grid-column:2;grid-row:1}.ox-ul .num{grid-column:3;grid-row:1}.ox-ul .ox-bar{grid-column:2/4;grid-row:2}.ox-ul select{grid-column:2/4;grid-row:3}.ox-ul li>span:last-child:empty{display:none}
+  .ox-tabs button,.ox-chip,.ox-btn,.cc-ox button{height:40px}.ox-days button,.ox-del,.ox-pin{width:40px;height:40px}.ox select,.ox input[type=time]{height:40px}.ox-kg{grid-template-columns:1fr}
+  .ox-eh{width:40px}
+}
+@media (prefers-reduced-motion:reduce){#oxNight,.ox-sw i,.ox-sw i::after,.ox-eh::before{transition:none}}
+html[data-motion=off] :is(#oxNight,.ox-sw i,.ox-sw i::after,.ox-eh::before){transition:none}

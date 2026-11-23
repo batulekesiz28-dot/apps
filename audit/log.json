@@ -5452,5 +5452,77 @@
     "fix": "panel açıkken galaksi ~4 kare/sn"
    }
   ]
+ },
+ {
+  "at": "2026-11-23",
+  "change": "Büyük OS güncellemesi. 1) Ada artık uygulamaların içinde de çalışıyor: uygulama açıkken en üstte iPhone gibi bir durum çubuğu var (saat · ada · rahatsız etme/internet/pil). 2) Arayüzlerde 'Açık' çubuğu alt menünün üstüne biniyordu: kaldırıldı, açık uygulamalar adada ve kenar panelinde. Telefonda ada arayüzlerde üst ortada, başlık onun altına iniyor. 3) Dev şirketlerden 10 özellik: gece ışığı, sıcak köşeler, pano geçmişi + telefonla ortak pano (Alt+V), ekran süresi + günlük sınır, odak modları (Çalışma/Uyku/Kişisel), rutinler, odak sonrası bildirim özeti, NVIDIA tarzı performans göstergesi (Alt+R), Samsung tarzı kenar paneli (Alt+E), başka cihazda kaldığın yerden devam et. Hepsi Kontrol merkezinde ve Ctrl+K'da. 4) Denetçi her durumu tek tek deniyor: 10 arayüz × 8 durum (boş, arkada uygulama, şarkı+sayaç, ada açık, uygulama içinde, kontrol merkezi, sistem paneli, kenar paneli) × telefon/bilgisayar = 160 ekran; iki çubuğun üst üste binmesini ve yarısı kesilmiş düğmeleri artık hata sayıyor.",
+  "scores": {
+   "Hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Hub masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "hub",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Mıknatıs'ta arkada uygulama varken 'Açık' çubuğu alt menünün üstüne biniyordu",
+    "fix": "arayüzlerde çubuk yok; açık uygulamalar adada"
+   },
+   {
+    "app": "hub",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Telefonda arayüzlerde ada saat/selamlama yazısının üstüne biniyordu",
+    "fix": "ada üst ortada, başlık altına iniyor"
+   },
+   {
+    "app": "hub",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Adanın yanındaki küçük baloncuk ada esnerken adanın üstüne biniyordu",
+    "fix": "esneme sonundaki boya göre yerleşiyor"
+   },
+   {
+    "app": "hub",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Telefonda galakside 'Açık' çubuğu yakınlaştırma çubuğuyla çakışıyordu",
+    "fix": "yakınlaştırma yukarı kalkıyor"
+   },
+   {
+    "app": "hub",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Bilgisayarda ada açılınca 'Ara veya komut' kutusunun üstüne biniyordu",
+    "fix": "kapalı ada aramaya kadar daralır, açık ada başlığın altına iner"
+   },
+   {
+    "app": "hub",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Ada uygulamaların içinde görünmüyordu (sadece ana ekranda çalışıyordu)",
+    "fix": "uygulamalarda üstte durum çubuğu + ada"
+   },
+   {
+    "app": "hub",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Harita arayüzünde telefonda iki uygulama düğmesi üst üste biniyordu",
+    "fix": "çakışan aşağı kayıyor"
+   },
+   {
+    "app": "denetci",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Denetçi iki çubuğun üst üste binmesini göremiyordu, sadece tek ekranı tarıyordu",
+    "fix": "yeni kural + 160 durumluk gezgin + yarısı kesilmiş düğme kuralı"
+   }
+  ]
  }
 ]

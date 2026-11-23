@@ -468,9 +468,16 @@ html[data-motion=off] .world *{transition:none!important}
 
 /* Canlı ada her arayüzde görünür (şarkı, bildirim, sayaç) — dünyaların üstünde */
 body.inworld .island{z-index:45}
-@media (max-width:600px){body.inworld .island{top:calc(16px + env(safe-area-inset-top));left:auto;right:10px;transform:none;min-width:0;max-width:calc(100vw - 150px)}body.inworld .island.open{max-width:calc(100vw - 20px)}}
+/* telefonda iPhone gibi: ada en üstte ortada (durum çubuğu), arayüzün başlığı onun altına iner — eskiden sağ üstteydi ve saat/selamlama yazısının üstüne biniyordu */
+@media (max-width:600px){body.inworld .island{top:calc(10px + env(safe-area-inset-top));max-width:calc(100vw - 110px)}body.inworld .island.open{max-width:calc(100vw - 20px)}
+  body.inworld.has-isl .wx-hd{top:calc(62px + env(safe-area-inset-top))}}
 
 /* telefonda uzun uygulama adları komşusunun üstüne binmesin (Denetçi: “Yazılar üst üste binmiş”) — ad kısalır, tamamı ipucunda */
 @media (max-width:600px){.mg-a>b{max-width:52px;overflow:hidden;text-overflow:ellipsis}.bl-a b{max-width:74px;overflow:hidden;text-overflow:ellipsis}.hr-a b{max-width:52px;overflow:hidden;text-overflow:ellipsis}}
 /* balon adları başka bir balonun üstüne düşünce de okunsun (Denetçi: kontrast) */
 .bl-a b{padding:1px 7px;border-radius:7px;background:rgba(255,255,255,.78);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);text-shadow:none}
+
+/* açık uygulamalar çubuğu (hub #dock) arayüzün alt gezinmesinin üstüne binmesin: bir kat yukarı çıkar, ipucu yazısı o sırada çekilir */
+/* arayüzlerin kendi alt gezinmesi ve yerleşimi var: “Açık uygulamalar” çubuğu orada gösterilmez (Mıknatıs'ta alt menünün üstüne biniyordu).
+   Açık uygulamalar adada (“N uygulama açık” → değiştirici), Shift+Tab / Alt+Q ve kenar panelinde. */
+body.inworld .dock{display:none!important}

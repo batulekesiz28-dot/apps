@@ -216,6 +216,33 @@ function run(doc,opt={}){
   // küçük yüzen parça (ada, rozet) altındaki yazıyı örterse sayılır (telefonda ada saatin üstüne binmişti)
   // ekranın üst/alt kenarına yapışık çubuk (başlık, gezinme, alt bar): kaydırılan içeriğin altından geçmesi doğaldır
   const edgeBar=edgeFix; // kenara yakın yüzen çubuk (alt sekme çubuğu gibi) da sayılır
+  // 13b) iki SABİT katman üst üste (kullanıcı şikâyeti: “Açık uygulamalar” çubuğu arayüzün alt menüsünün üstüne bindi).
+  // Kenar çubukları içerikten geçebilir ama birbirinin üstüne binemez: her sabit kök (küçük, boyalı ya da yazılı) diğerleriyle karşılaştırılır.
+  {const roots=[...new Set(vis.map(rootOf))].filter(r=>{if(r===doc.body||win.getComputedStyle(r).position!=='fixed')return false;if(r.closest('[role=tooltip],.toast,.toasts,.isl-al'))return false;
+      const q=R(r);if(q.width<16||q.height<12||q.width*q.height>VW*VH*.25||!inVP(q)||opacityChain(r,win)<.3||animating(r))return false;
+      if(!(painted(r)||!!(r.innerText||'').trim()))return false;
+      // başka bir katmanın (ör. tam ekran uygulama penceresi) altında tamamen kalmışsa görünmüyor: sayma
+      // küçük bir çubuğun altında kalmışsa (çubuk menüyü örtmüş) bu tam da aranan çakışmadır → say
+      const pts=[[q.left+q.width/2,q.top+q.height/2],[q.left+4,q.top+4],[q.right-4,q.bottom-4]];return pts.some(([x,y])=>{const h=doc.elementFromPoint(x,y);if(!h)return false;if(r.contains(h)||h.contains(r))return true;
+        const hr=R(rootOf(h)===doc.body?h:rootOf(h));return hr.width*hr.height<VW*VH*.25})});
+    const ov=(a,b)=>Math.max(0,Math.min(a.right,b.right)-Math.max(a.left,b.left))*Math.max(0,Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top));
+    const inside=(a,b)=>a.left>=b.left-1&&a.right<=b.right+1&&a.top>=b.top-1&&a.bottom<=b.bottom+1;
+    const cl=[];for(let i=0;i<roots.length;i++)for(let j=i+1;j<roots.length;j++){const A=roots[i],B=roots[j];if(A.contains(B)||B.contains(A))continue;const a=R(A),b=R(B);
+      // biri öbürünün içine yerleşmişse (ada durum çubuğunun ortasında): çubuğun kendisi değil, içindeki yazı/düğmelerle çakışma sayılır
+      if(inside(a,b)||inside(b,a)){const[sm,bg]=inside(a,b)?[A,B]:[B,A],sr=R(sm);const hit=[...bg.querySelectorAll('*')].find(e=>visible(e,win)&&((e.innerText||'').trim()&&!e.children.length||e.matches('button,a,img,[role=button]'))&&ov(R(e),sr)>40);if(hit)cl.push(sm,hit);continue}
+      if(ov(a,b)<150)continue;
+      // görünen içerik: kök kendi zemini boyalıysa kendisi, değilse (şeffaf başlık satırı gibi) içindeki yazı/düğme/görseller
+      const cont=r=>{if((parseColor(win.getComputedStyle(r).backgroundColor)?.a||0)>.35||win.getComputedStyle(r).backgroundImage!=='none')return[r];
+        return[...r.querySelectorAll('*')].filter(e=>visible(e,win)&&(e.matches('button,a,img,input,select,[role=button]')||((e.innerText||'').trim()&&!e.children.length)||(parseColor(win.getComputedStyle(e).backgroundColor)?.a||0)>.35)).slice(0,60)};
+      const CA=cont(A),CB=cont(B);let hit=null;for(const x of CA){const xr=R(x);for(const y of CB){const yr=R(y),o=ov(xr,yr);if(o>60&&o>Math.min(xr.width*xr.height,yr.width*yr.height)*.12){hit=[x,y];break}}if(hit)break}
+      if(hit)cl.push(...hit)}
+    if(cl.length)addH('error','chromeclash','İki sabit çubuk üst üste binmiş','Örnekler ikişer ikişer: çakışan çift. Ekranın kenarındaki iki çubuk (alt menü, açık uygulamalar, ada, yakınlaştırma…) aynı yere düşmüş; biri öbürünü kapatıyor, yazılar karışıyor.','Birini öbürünün üstüne/yanına yerleştir ya da aynı anda görünmesinler (ör. diğeri açılınca yer değiştirsin).',[...new Set(cl)])}
+  // 13c) yarısı kesilmiş düğme: taşması gizlenen bir kutu düğmenin bir kısmını kesiyor (ada daraltılınca “Duraklat”, “Geç” yarım kalmıştı)
+  {const cut=[];for(const c of ctrls){const r=R(c);if(!inVP(r)||r.width<12||r.height<10||animating(c))continue;
+    for(let p=c.parentElement,d=0;p&&p!==doc.body&&d<8;p=p.parentElement,d++){const cs=win.getComputedStyle(p),o=cs.overflowX+' '+cs.overflowY;if(/auto|scroll/.test(o))break;if(!/hidden|clip/.test(o))continue;
+      const q=R(p),v=Math.max(0,Math.min(r.right,q.right)-Math.max(r.left,q.left))*Math.max(0,Math.min(r.bottom,q.bottom)-Math.max(r.top,q.top)),fr=v/(r.width*r.height);
+      if(fr>.12&&fr<.88&&!animating(p))cut.push(c);break}if(cut.length>=10)break}
+    if(cut.length)addH('error','clipctrl','Yarısı kesilmiş düğme','Düğmenin bir kısmı kutunun kenarında kesiliyor; yazısı yarım okunuyor, basılacak yer belirsiz.','Kutuyu genişlet ya da düğmeyi sığdır (daralan panelde içerik kendini yeniden dizmeli).',cut)}
   // kaydırılan bir kutunun görünen alanının dışında kalmış (kaydırılıp gizlenmiş) öğe gerçekte görünmüyor
   const clipped=e=>{const r=R(e),cx=r.left+r.width/2,cy=r.top+r.height/2;for(let p=e.parentElement;p&&p!==doc.body;p=p.parentElement){const cs=win.getComputedStyle(p);if(cs.overflowX==='visible'&&cs.overflowY==='visible')continue;const q=R(p);if(cx<q.left||cx>q.right||cy<q.top||cy>q.bottom)return true}return false};
   const coverOf=(e,r)=>{const pts=[[r.left+r.width/2,r.top+r.height/2],[r.left+Math.min(8,r.width/3),r.top+r.height/2],[r.right-Math.min(8,r.width/3),r.top+r.height/2]];let hit=0,by=null;

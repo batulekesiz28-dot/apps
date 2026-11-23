@@ -5401,5 +5401,56 @@
     "fix": "kenara yapışık çubuklar her kuralda aynı şekilde ayrılıyor"
    }
   ]
+ },
+ {
+  "at": "2026-11-23",
+  "change": "Animasyon ve akıcılık: bütün uygulamalara ortak bir hareket katmanı geldi. Sekme ya da süzgeç değiştirince, liste yenilenince, gizli bir bölüm açılınca içerik artık “tak diye” değil hafifçe belirerek geliyor; düğmeler basınca hafifçe çöküyor, renk değişimleri yumuşak. Sadece senin yaptığın bir şeyin sonucu canlanıyor (sayaç gibi kendi kendine değişenler sakin kalıyor), yazarken titremiyor. Hub'da uygulama sekmeleri yaylanarak geliyor, seçili sekme vurgusu kayarak geçiyor, alttaki dock ve üst şerit kenardan süzülüyor. Kontrol merkezi, komut paleti gibi tam ekran paneller açıkken arkadaki galaksi kendini kısıyor; panel açılışı daha akıcı.",
+  "scores": {
+   "Hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Hub masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "hepsi",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "36 geçişte içerik animasyonsuz değişiyordu (Study Log, İstatistik, Haberler, Münazara, Netleştir, Öneriler, Galeri)",
+    "fix": "ortak hareket katmanı (shared/motion.js)"
+   },
+   {
+    "app": "netlestir",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Bildirim ve ayar penceresi animasyonsuz açılıyordu",
+    "fix": "yaylanarak açılıyor"
+   },
+   {
+    "app": "oneriler",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Bildirim animasyonsuz açılıyordu",
+    "fix": "yaylanarak açılıyor"
+   },
+   {
+    "app": "hub",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Uygulama açınca üst şerit, eve dönünce dock ve sekmeler tak diye beliriyordu",
+    "fix": "kenardan süzülme + kayan sekme vurgusu"
+   },
+   {
+    "app": "hub",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Kontrol merkezi açılırken yavaş cihazda takılma (arkadaki galaksi her karede bulanıklaştırılıyordu)",
+    "fix": "panel açıkken galaksi ~4 kare/sn"
+   }
+  ]
  }
 ]

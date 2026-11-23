@@ -690,6 +690,7 @@ body.locked .island{display:none}
 .tb{position:relative;display:flex;align-items:center;flex-shrink:0;border-radius:9px;transition:background .15s}
 .tb:hover{background:var(--hover)}
 .tb.on{background:var(--hover2,var(--hover));box-shadow:inset 0 0 0 .5px var(--line3)}
+.tb.on.hl-wait{background:transparent;box-shadow:none}.tb-hl{position:fixed;z-index:58;border-radius:9px;background:var(--hover2,var(--hover));box-shadow:inset 0 0 0 .5px var(--line3);pointer-events:none}
 .pill .tb-o{width:auto;height:30px;display:flex;align-items:center;gap:6px;padding:0 6px;border-radius:9px;color:var(--ink2);font-size:12.5px;font-weight:550}
 .tb.on .tb-o{color:var(--ink)}
 .tb .tn{max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -1941,10 +1942,14 @@ function relocateWidgets(){return;if(!wReady||!booted)return;const RG=GX.RG+40;l
     if(Math.hypot(cx,cy)<RG){r.w.w=wSpot(w,h,[RG+60,-RG*.55],r.w.id);moved=true}}
   if(moved)saveMeta()}
 
+const COVER='.cc-bg,.pal-bg,.sheet-scrim,.as-bg,.ts-bg,.rm-bg,.wp-bg';
 function frame(t){
   raf=0;if(paused)return;
   // pacing: ≤60fps even on 120Hz screens; 30fps once the hands are off; ~4fps when nothing at all moves
-  const busy=t-lastInput<2500||linkDrag||cam.go||cam.pan||wDrag||starDrag||meshAwake||introT<1,still=!busy&&(MOTION==='off'||(t-lastInput>8000&&!galaxyOnScreen()));
+  // tam ekran bir panel (kontrol merkezi, palet, sayfa, tema stüdyosu…) galaksiyi bulanık örterken her kare çizmek boşa iş: arkadaki
+  // hareket bulanıkta görünmez ama backdrop-filter her karede yeniden hesaplanır → panel açılırken takılma. Örtülüyken ~4 kare/sn.
+  const covered=!!document.querySelector(COVER);
+  const busy=!covered&&(t-lastInput<2500||linkDrag||cam.go||cam.pan||wDrag||starDrag||meshAwake||introT<1),still=covered||!busy&&(MOTION==='off'||(t-lastInput>8000&&!galaxyOnScreen()));
   const idle=t-lastInput,gap=still?240:busy?(TIER>=2?31:14):idle>30000?66:idle>8000?41:31;
   if(t-lastDraw<gap){raf=requestAnimationFrame(frame);return}
   if(lastDraw&&PERF.auto&&TIER<2&&!document.hidden&&(busy||galaxyOnScreen()))perfSample(t-lastDraw,gap);
@@ -3046,11 +3051,23 @@ function hideAll(){W.el.getAnimations().forEach(x=>x.cancel());$('#scrim').getAn
 function closeAll(){for(const t of TABS.splice(0))dropFrame(t);hideAll()}
 const hideWin=()=>closeAll();
 
-function renderTabs(){const cur=curTab();
+function renderTabs(){const cur=curTab(),tb=$('#tabs'),old=new Set($$('#tabs [data-t]').map(b=>b.dataset.t)),po=tb.querySelector('.tb.on'),pr=po&&po.getBoundingClientRect(),pk=po?.querySelector('[data-t]')?.dataset.t;
   $('#tabs').innerHTML=TABS.map((t,i)=>{const m=miniIcon(t.app),on=t===cur;
     return `<div class="tb${on?' on':''}${t.fr?'':' zz'}"><button class="tb-o" data-t="${esc(t.key)}" role="tab" aria-selected="${on}" title="${esc(t.app.name)}${i<9?` · Alt+${i+1}`:''}"><span class="mini" style="${m.style}">${m.html}</span><span class="tn">${esc(t.app.name)}</span></button><button class="tb-x" data-x="${esc(t.key)}" aria-label="${esc(t.app.name)} uygulamasını kapat" title="Kapat">${XI}</button></div>`}).join('');
   $('#tabs').querySelector('.on')?.scrollIntoView({block:'nearest',inline:'nearest'});
+  tabMotion(tb,old,pr,pk);
   if(cur){$('#wTab').hidden=cur.app.kind==='draft';$('#wFs').hidden=!document.fullscreenEnabled}}
+/* sekme şeridi hareketi: yeni sekme yaylanarak gelir, seçili vurgu eski sekmeden yenisine kayar (iOS bölümlü denetim gibi) */
+function tabMotion(tb,old,pr,pk){if(MOTION!=='full'||REDUCED||!old.size&&!pr)return;
+  tb.querySelectorAll('.tb').forEach(e=>{const k=e.querySelector('[data-t]')?.dataset.t;if(old.size&&!old.has(k))anim(e,[{opacity:0,scale:'.6',filter:'blur(4px)'},{opacity:1,scale:'1',filter:'blur(0)'}],{duration:420,easing:SPRING})});
+  const now=tb.querySelector('.tb.on');if(!now||!pr||!pk||now.querySelector('[data-t]')?.dataset.t===pk||!old.has(now.querySelector('[data-t]')?.dataset.t))return;
+  const nr=now.getBoundingClientRect(),g=document.createElement('i');g.className='tb-hl';g.setAttribute('aria-hidden','true');document.body.appendChild(g);
+  Object.assign(g.style,{left:nr.left+'px',top:nr.top+'px',width:nr.width+'px',height:nr.height+'px'});now.classList.add('hl-wait');
+  anim(g,[{translate:`${pr.left-nr.left}px ${pr.top-nr.top}px`,width:pr.width+'px'},{translate:'0 0',width:nr.width+'px'}],{duration:380,easing:'cubic-bezier(.3,1.2,.5,1)'}).finished.then(()=>{g.remove();now.classList.remove('hl-wait')},()=>{g.remove();now.classList.remove('hl-wait')})}
+// sabit çubuklar (alttaki dock, üstteki şerit ve tutamak) gizliyken açılınca kenarından yaylanarak gelir — artık “tak diye” belirmez
+{const mo=new MutationObserver(ms=>{for(const m of ms){const el=m.target;if(el.hidden||m.oldValue===null||MOTION==='off'||REDUCED)continue;
+    const dy=el.id==='dock'?18:-16;anim(el,[{opacity:0,translate:`0 ${dy}px`,scale:'.94'},{opacity:1,translate:'0 0',scale:'1'}],{duration:460,easing:SPRING})}});
+  for(const id of ['#dock','#pill','#grab'])if($(id))mo.observe($(id),{attributes:true,attributeFilter:['hidden'],attributeOldValue:true})}
 function renderDock(){const d=$('#dock'),L=mru().filter(t=>t!==FL?.t);if(!L.length){d.innerHTML='';d.hidden=true;return} // mini penceredeki zaten görünüyor
   d.innerHTML=`<span class="dk-l">Açık</span>`+L.map(t=>{const m=miniIcon(t.app);
     return `<div class="dk${t.fr?'':' zz'}"><button class="dk-o" data-t="${esc(t.key)}" title="${esc(t.app.name)}"><span class="mini" style="${m.style}">${m.html}</span><span class="t">${esc(t.app.name)}</span></button><button class="dk-x" data-x="${esc(t.key)}" aria-label="${esc(t.app.name)} uygulamasını kapat" title="Kapat">${XI}</button></div>`}).join('')+

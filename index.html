@@ -598,7 +598,7 @@ body.locked .focusbar{display:none}
 .island .is-l{display:none;padding:2px 8px 10px}
 .island.open{border-radius:24px}.island.open .is-c{display:none}.island.open .is-l{display:grid;gap:2px}
 .island .is-r{display:flex;align-items:center;gap:10px;min-height:44px;padding:4px 6px 4px 8px;border-radius:14px}
-.island .is-r:hover{background:rgba(255,255,255,.06)}
+.island .is-r:hover{background:rgba(255,255,255,.06)}.island .is-r[data-go]{cursor:pointer}.island .is-np .np-m{cursor:pointer}
 .island .is-rt{flex:1;min-width:0;display:grid}.island .is-rt b{font-size:13.5px;font-weight:550;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.island .is-rt small{font-size:12px;color:#A1A1AA}
 .island .is-rv{font:600 15px var(--mono);margin-right:4px}
 .island button{min-width:34px;height:32px;padding:0 10px;border-radius:10px;background:rgba(255,255,255,.1);color:#fff;font-size:12.5px;font-weight:550}
@@ -2135,7 +2135,18 @@ function islandItems(){const out=[],r=STUDY.run;
   if(np)out.push({k:'np',pri:np.on?7:3,on:np.on,img:np.img,ic:'',t:np.t,sub:np.a||tabOf(np.key).app.name,v:'',act:''});
   if(TABS.length)out.push({k:'apps',pri:1,ic:'<i class="ico">▣</i>',t:`${TABS.length} uygulama açık`,v:'',sub:'Shift+Tab',act:'<button data-isl="sw">Geç</button>'});
   return out.sort((a,b)=>b.pri-a.pri)}
-let islOpen=false,islKey='';
+let islOpen=false,islKey='',islIt=[];
+/* adaya dokununca o şeyin uygulaması açılır (iPhone Dynamic Island / Samsung Now Bar gibi): şarkı → YouTube Music, sayaç → Study Log… */
+function islGo(k){const x=islIt.find(i=>i.k===k);if(!x)return false;islOpen=false;paintFocusBar();
+  if(k==='np'&&NP&&tabOf(NP.key)){switchTo(NP.key);return true}
+  if(k==='np0'){const t=TABS.find(t=>t.app.win&&t.fr);if(t){switchTo(t.key);return true}}
+  if(k==='timer'){const a=find('p:studylog');if(a){openApp(a,nodes.get(a.key)?.el);return true}}
+  if(k==='today'||k==='task'){openNotes(k==='task'?'#tasks':'#today');return true}
+  if(k==='rem'){window.Notify?.open();return true}
+  if(k==='notif'||k==='dnd'){window.OS?.open();return true}
+  if(k==='apps'){switcher(false,0);return true}
+  if(k==='event'){openNotes('#cal');return true}
+  return false}
 /* Dynamic Island gibi esneme: boyut eski kutudan yenisine yaylanır, açılıp kapanırken içerik bulanıktan netleşir.
    boxMorph(el,r0,büyüdü?,içerik seçici) — ada dışında “geçen süre” penceresi (.slpin) de kullanır */
 function boxMorph(el,r0,grow,inSel){const r1=el.getBoundingClientRect();if(Math.abs(r1.width-r0.width)<2&&Math.abs(r1.height-r0.height)<2)return;
@@ -2203,20 +2214,21 @@ function npCard(x){const d=NP.dur,c=npCur(),app=tabOf(NP.key)?.app.name||'';
     <div class="np-c"><button data-np="prev" aria-label="Önceki" title="Önceki">${NPI.prev}</button><button class="np-pp" data-np="toggle" aria-label="${x.on?'Duraklat':'Oynat'}" title="${x.on?'Duraklat':'Oynat'}">${x.on?NPI.pause:NPI.play}</button><button data-np="next" aria-label="Sonraki" title="Sonraki">${NPI.next}</button></div></div>`}
 function paintFocusBar(){const b=$('#focusBar');if(!b)return;const it=islandItems();
   if(!it.length||calmOn){b.hidden=true;islKey='';return}
-  const top=it[0],key=it.map(x=>x.k+x.t+x.sub+(x.done?1:0)+(x.on?1:0)+(x.img||'')+(x.k==='np'&&NP.dur?Math.round(NP.dur):'')).join('|')+islOpen;
+  islIt=it;const top=it[0],key=it.map(x=>x.k+x.t+x.sub+(x.done?1:0)+(x.on?1:0)+(x.img||'')+(x.k==='np'&&NP.dur?Math.round(NP.dur):'')).join('|')+islOpen;
   const vis=!b.hidden,wasOpen=b.classList.contains('open'),r0=vis&&key!==islKey?b.getBoundingClientRect():null;
   b.hidden=false;b.className='island'+(islOpen?' open':'')+(top.k==='timer'&&STUDY.run?.on?' live':'');
   if(key===islKey){for(const x of it)if(x.v)b.querySelectorAll(`[data-lv="${x.k}"]`).forEach(e=>e.textContent=x.v);
     const pb=b.querySelector('[data-v=np]');if(pb&&NP?.dur){const c=npCur();pb.style.width=(c/NP.dur*100).toFixed(2)+'%';const tc=b.querySelector('[data-v=npc]');if(tc)tc.textContent=fmtClock(c)}return}
   islKey=key;
   b.innerHTML=`<div class="is-c">${top.k==='np'?npArt(top):top.ic}<span class="is-t${top.done?' done':''}">${esc(top.t)}</span>${top.k==='np'?npEq(top):''}${top.cact||''}${top.v?`<b class="is-v num" data-lv="${esc(top.k)}">${esc(top.v)}</b>`:''}${it.length>1?`<span class="is-n">+${it.length-1}</span>`:''}</div>
-    <div class="is-l">${it.map(x=>x.k==='np'?npCard(x):`<div class="is-r">${x.ic}<span class="is-rt${x.done?' done':''}"><b>${esc(x.t)}</b><small>${esc(x.sub)}</small></span>${x.v&&x.k!=='focus'?`<b class="num is-rv" data-lv="${esc(x.k)}">${esc(x.v)}</b>`:''}${x.act}</div>`).join('')}</div>`;
+    <div class="is-l">${it.map(x=>x.k==='np'?npCard(x):`<div class="is-r" data-go="${esc(x.k)}">${x.ic}<span class="is-rt${x.done?' done':''}"><b>${esc(x.t)}</b><small>${esc(x.sub)}</small></span>${x.v&&x.k!=='focus'?`<b class="num is-rv" data-lv="${esc(x.k)}">${esc(x.v)}</b>`:''}${x.act}</div>`).join('')}</div>`;
   if(r0)islMorph(b,r0,wasOpen!==islOpen)}
 {let py=null;$('#focusBar').addEventListener('pointerdown',e=>{py=e.clientY});
   addEventListener('pointermove',e=>{if(py!=null&&e.buttons&&e.clientY-py>34){py=null;islOpen=false;paintFocusBar();window.OS?.open()}},{passive:true});
   addEventListener('pointerup',()=>{py=null})}
-$('#focusBar').addEventListener('pointerenter',e=>{if(e.pointerType==='mouse'){islOpen=true;paintFocusBar()}});
-$('#focusBar').addEventListener('pointerleave',e=>{if(e.pointerType==='mouse'){islOpen=false;paintFocusBar()}});
+{let ht=0;const set=v=>{clearTimeout(ht);ht=setTimeout(()=>{if(islOpen!==v){islOpen=v;paintFocusBar()}},v?140:260)}; // üstünden geçerken açılıp kapanıp titremesin
+  $('#focusBar').addEventListener('pointerenter',e=>{if(e.pointerType==='mouse')set(true)});
+  $('#focusBar').addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')set(false)})}
 $('#focusBar').addEventListener('click',e=>{const fb=e.target.closest('[data-fb]'),is=e.target.closest('[data-isl]'),np=e.target.closest('[data-np]');
   if(np&&NP){const c=np.dataset.np;if(c==='open'){islOpen=false;paintFocusBar();switchTo(NP.key)}
     else if(c==='seek'){if(NP.dur){const r=np.getBoundingClientRect();npCmd('seek',{t:clamp((e.clientX-r.left)/r.width,0,1)*NP.dur})}}else npCmd(c);return}
@@ -2229,7 +2241,16 @@ $('#focusBar').addEventListener('click',e=>{const fb=e.target.closest('[data-fb]
     else if(a==='tdone'&&typeof TK!=='undefined'){const t=TK.tasks.get(id);if(t){TK.setStatus(t,'done');toast('✓ '+t.title,()=>TK.setStatus(TK.tasks.get(id)||t,'todo'))}}
     islKey='';paintFocusBar();return}
   if(is){const a=is.dataset.isl;islOpen=false;if(a==='study'){const s=find('p:studylog');s&&openApp(s,nodes.get(s.key)?.el)}else if(a==='today')openNotes('#today');else if(a==='sw')switcher(false,0);paintFocusBar();return}
+  if(e.target.closest('button,a,input'))return;
+  // satıra / kapalı adaya dokun → uygulamasını aç; parmakla uzun basınca (ya da açık değilken başka bir şey yoksa) genişler
+  if(islLong){islLong=false;return}
+  const row=e.target.closest('[data-go]'),card=e.target.closest('.is-np');
+  if(card&&islGo('np'))return;if(row&&islGo(row.dataset.go))return;
+  if(e.target.closest('.is-c')&&islIt[0]&&islGo(islIt[0].k))return;
   if(!matchMedia('(hover:hover)').matches){islOpen=!islOpen;paintFocusBar()}});
+// dokunmatik: basılı tut → genişlet (kısa dokunuş uygulamayı açar)
+let islLong=false;{let lt=0;$('#focusBar').addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;clearTimeout(lt);lt=setTimeout(()=>{islLong=true;islOpen=!islOpen;paintFocusBar();try{navigator.vibrate?.(8)}catch{}},420)});
+  for(const ev of['pointerup','pointercancel','pointerleave'])$('#focusBar').addEventListener(ev,()=>clearTimeout(lt))}
 $('#focusBar').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.id==='focusBar'){e.preventDefault();islOpen=!islOpen;paintFocusBar()}});
 document.addEventListener('pointerdown',e=>{if(islOpen&&!e.target.closest('#focusBar')){islOpen=false;paintFocusBar()}},true);
 setInterval(()=>{if(!document.hidden&&!(W.app&&!W.min))paintFocusBar()},1000);

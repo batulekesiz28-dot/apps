@@ -5326,5 +5326,28 @@
     "fix": "Bilinen sınır"
    }
   ]
+ },
+ {
+  "at": "2026-11-23T16:59:33",
+  "change": "Üstteki ada artık iPhone/Samsung gibi davranıyor: adaya tıklayınca/dokununca o şeyin uygulaması açılıyor — şarkı çalıyorsa YouTube Music, sayaç varsa Study Log, görev varsa Görevler, hatırlatıcıysa Hatırlatıcı, bildirimse Kontrol merkezi. Açık adada bir satıra ya da şarkı adına tıklamak da aynı şeyi yapar; ⏮ ⏯ ⏭ gibi düğmeler sadece kendi işini yapar. Telefonda basılı tutunca ada genişler. Bilgisayarda üstünden geçerken titreyerek açılıp kapanmıyor (kısa bekleme eklendi).",
+  "scores": {
+   "Hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Hub masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "hub",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Adaya tıklayınca YouTube Music açılmıyordu (sadece küçük kapak açıyordu)",
+    "fix": "Adanın tamamı ve her satır kendi uygulamasını açıyor"
+   }
+  ]
  }
 ]

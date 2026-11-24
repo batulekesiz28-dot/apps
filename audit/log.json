@@ -5656,6 +5656,13 @@
     "status": "fixed",
     "text": "Medya'da internet bir kez gidince eşleştirme ve öneriler elle 'Tekrar dene'ye basılana kadar takılı kalıyordu",
     "fix": "bağlantı/sekme dönüşünde ve dakikada bir kendiliğinden yeniden deniyor"
+   },
+   {
+    "app": "notlar",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Yemek sekmesi eklenince Medya açıkken üst satırda 'Yeni sezonlar' sağdaki bölüm düğmelerinin altında kalıyordu",
+    "fix": "Medya'da bölüm düğmeleri sadece simge; dar ekranda kategori şeridi alt satıra iner"
    }
   ]
  }

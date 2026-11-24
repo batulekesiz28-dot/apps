@@ -439,17 +439,17 @@ kbd{font:500 11px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radius:
 @media (max-width:760px){.pgb{min-height:58px}.tw,.tw0{width:36px;height:40px}.ni.tr{padding-left:calc(2px + var(--dp,0)*14px)}.sub-add{height:44px}.crumb .cr{height:40px;max-width:120px}.pgn{display:none}.mv-q{height:40px}}
 </style>
 <script>/* mat cam tasarımı: bir kereliğine koyu temaya geç (sonra tema düğmesi serbest) */try{if(!localStorage.getItem('notlar:glass1')){localStorage.setItem('notlar:glass1','1');localStorage.setItem('notlar:theme','"dark"')}}catch(e){}</script>
-<script src="../../shared/skin.js?v=20261124d"></script>
-<link rel="stylesheet" href="player.css?v=20261124d">
-<link rel="stylesheet" href="library.css?v=20261124d">
-<link rel="stylesheet" href="brain.css?v=20261124d">
-<link rel="stylesheet" href="media.css?v=20261124d">
-<link rel="stylesheet" href="time.css?v=20261124d">
-<link rel="stylesheet" href="tasks.css?v=20261124d">
-<link rel="stylesheet" href="daypick.css?v=20261124d">
-<link rel="stylesheet" href="food.css?v=20261124d">
-<link rel="stylesheet" href="tables.css?v=20261124d">
-<link rel="stylesheet" href="ders.css?v=20261124d">
+<script src="../../shared/skin.js?v=20261124e"></script>
+<link rel="stylesheet" href="player.css?v=20261124e">
+<link rel="stylesheet" href="library.css?v=20261124e">
+<link rel="stylesheet" href="brain.css?v=20261124e">
+<link rel="stylesheet" href="media.css?v=20261124e">
+<link rel="stylesheet" href="time.css?v=20261124e">
+<link rel="stylesheet" href="tasks.css?v=20261124e">
+<link rel="stylesheet" href="daypick.css?v=20261124e">
+<link rel="stylesheet" href="food.css?v=20261124e">
+<link rel="stylesheet" href="tables.css?v=20261124e">
+<link rel="stylesheet" href="ders.css?v=20261124e">
 <style id="tnavCss">
 /* ── Üst gezinme (sol menü yerine) — ince cam şerit, kayan seçili vurgu ── */
 .app,.app[data-mode=lib],.app[data-mode=brain]{grid-template-columns:1fr}
@@ -564,7 +564,7 @@ kbd{font:500 11px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radius:
 @media (prefers-reduced-motion:reduce){.txt a[href^="http"]::after{transition:none}.lkpv-ld i{animation:none}}
 html[data-motion=off] .txt a[href^="http"]::after{transition:none}
 </style>
-<link rel="stylesheet" href="glass.css?v=20261124d">
+<link rel="stylesheet" href="glass.css?v=20261124e">
 <style id="docsCss">
 /* ── Docs gibi biçim: vurgu kalemi, yazı rengi, hizalama ── */
 mark.hl-y{background:#FFF1A8;color:inherit}mark.hl-g{background:#C9F2D0;color:inherit}mark.hl-b{background:#CFE4FF;color:inherit}mark.hl-p{background:#FFD6E8;color:inherit}mark.hl-o{background:#FFDDB5;color:inherit}
@@ -630,7 +630,7 @@ body.rsz,body.rsz *{cursor:ew-resize!important;user-select:none}
       <div id="topAct" style="display:flex;gap:2px"></div>
       <a class="tb tai" id="topAi" href="#brain" title="AI Center — Second Brain" aria-label="AI Center"><svg class="i" viewBox="0 0 16 16"><path d="M8 1.8l1.5 3.7 3.7 1.5-3.7 1.5L8 12.2 6.5 8.5 2.8 7l3.7-1.5z"/><path d="M12.8 11.3l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z"/></svg></a>
       <button class="tb tsrch" id="topSrch" title="Ara (⌘K)" aria-label="Ara"><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg></button>
-      <nav class="modes" id="modes" aria-label="Bölümler" translate="no"><i class="mk"></i><a href="#home" data-mode="ws"><svg class="li" viewBox="0 0 16 16"><path d="M4 2h5.5L12 4.5V14H4z"/><path d="M9.5 2v2.5H12M6 8h4M6 10.5h4"/></svg><span>Workspace</span></a><a href="#lib" data-mode="lib"><svg class="li" viewBox="0 0 16 16"><path d="M2.5 13.5V3M5.5 13.5V3M8.5 13.5l-1-10 3-.4 1.3 10.2z"/><path d="M1.5 13.5h13"/></svg><span>Library</span></a><a href="#food" data-mode="food"><svg class="li" viewBox="0 0 16 16"><path d="M5 2v4.5a1.5 1.5 0 0 0 3 0V2M6.5 6v8M11 14V2c-1.6 1-2 3-2 5h2"/></svg><span>Yemek</span></a></nav>
+      <nav class="modes" id="modes" aria-label="Bölümler" translate="no"><i class="mk"></i><a href="#home" data-mode="ws" title="Workspace" aria-label="Workspace"><svg class="li" viewBox="0 0 16 16"><path d="M4 2h5.5L12 4.5V14H4z"/><path d="M9.5 2v2.5H12M6 8h4M6 10.5h4"/></svg><span>Workspace</span></a><a href="#lib" data-mode="lib" title="Library" aria-label="Library"><svg class="li" viewBox="0 0 16 16"><path d="M2.5 13.5V3M5.5 13.5V3M8.5 13.5l-1-10 3-.4 1.3 10.2z"/><path d="M1.5 13.5h13"/></svg><span>Library</span></a><a href="#food" data-mode="food" title="Yemek" aria-label="Yemek"><svg class="li" viewBox="0 0 16 16"><path d="M5 2v4.5a1.5 1.5 0 0 0 3 0V2M6.5 6v8M11 14V2c-1.6 1-2 3-2 5h2"/></svg><span>Yemek</span></a></nav>
     </header>
     <div class="scroll" id="scroll"><div class="crumbbar"><div class="crumb" id="crumb"></div></div><div class="view" id="view"></div></div>
   </main>
@@ -647,17 +647,17 @@ body.rsz,body.rsz *{cursor:ew-resize!important;user-select:none}
   </div>
 </div>
 <div class="toasts" id="toasts"></div>
-<script src="player.js?v=20261124d"></script>
-<script src="kb.js?v=20261124d"></script>
-<script src="library.js?v=20261124d"></script>
-<script src="media.js?v=20261124d"></script>
-<script src="brain.js?v=20261124d"></script>
-<script src="time.js?v=20261124d"></script>
-<script src="daypick.js?v=20261124d"></script>
-<script src="food.js?v=20261124d"></script>
-<script src="tables.js?v=20261124d"></script>
-<script src="tasks.js?v=20261124d"></script>
-<script src="ders.js?v=20261124d"></script>
+<script src="player.js?v=20261124e"></script>
+<script src="kb.js?v=20261124e"></script>
+<script src="library.js?v=20261124e"></script>
+<script src="media.js?v=20261124e"></script>
+<script src="brain.js?v=20261124e"></script>
+<script src="time.js?v=20261124e"></script>
+<script src="daypick.js?v=20261124e"></script>
+<script src="food.js?v=20261124e"></script>
+<script src="tables.js?v=20261124e"></script>
+<script src="tasks.js?v=20261124e"></script>
+<script src="ders.js?v=20261124e"></script>
 
 <script>
 'use strict';

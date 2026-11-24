@@ -413,8 +413,8 @@ body.mset-drag{cursor:grabbing;user-select:none}
 /* alt kapsüller: ortada; taşarsa kaydırılır (soldan kesilmez) */
 .mc-sub>a:first-child{margin-left:auto}.mc-sub>a:last-child{margin-right:auto}
 @media (max-width:1240px){.mc-r .mc-vw{display:none}}
-/* dar ekran: kategori kapsülü ikinci satırda, yine ortada */
-@media (max-width:1000px){
+/* dar ekran: kategori kapsülü ikinci satırda, yine ortada (Notlar'ın sağdaki bölüm grubuna binmesin diye 1200px'te) */
+@media (max-width:1200px){
   .mc-nav{grid-template-columns:auto minmax(0,1fr);height:auto;padding-top:10px;padding-bottom:8px;row-gap:10px;position:relative}
   .mc-nav>.mc-tabs{grid-column:1/-1;grid-row:2;justify-self:center;justify-content:flex-start;max-width:100%;order:0;width:auto}
   .mc-tabs>a:first-child{margin-left:auto}.mc-tabs>a:last-child{margin-right:auto}
@@ -867,3 +867,6 @@ html[data-motion=off] .mpk-bg,html[data-motion=off] .mpk-r.in .mpk-c{animation:n
   background:rgba(20,20,22,.92);color:#F4F4F5;font-size:13px;line-height:1.4;box-shadow:0 14px 40px -14px rgba(0,0,0,.6),0 0 0 .5px rgba(255,255,255,.1);animation:mcOffIn .4s cubic-bezier(.3,1.2,.5,1)}
 .mc-offl i{width:8px;height:8px;border-radius:50%;background:#F59E0B;flex-shrink:0;box-shadow:0 0 0 4px rgba(245,158,11,.2)}.mc-offl.out{opacity:0;transition:opacity .25s}
 @keyframes mcOffIn{from{opacity:0;translate:0 12px}}@media (prefers-reduced-motion:reduce){.mc-offl{animation:none}}html[data-motion=off] .mc-offl{animation:none}
+
+/* Medya açıkken üst satır kalabalık (kategori şeridi + bölümler): bölüm sekmeleri sadece simge — kategori şeridine binmesin */
+.app.mc-on .modes a span{display:none}.app.mc-on .modes a{padding-left:10px;padding-right:10px}

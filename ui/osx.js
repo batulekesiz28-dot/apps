@@ -209,9 +209,18 @@ function onChange(e){const t=e.target,R=get('appshell:routines',[]);
 /* ═════ kısayollar, Kontrol merkezi, komutlar ═════ */
 function keys(e){if(!e.altKey||e.ctrlKey||e.metaKey)return;const k=e.code;
   if(k==='KeyV'){e.preventDefault();e.stopPropagation();open('pano')}else if(k==='KeyR'){e.preventDefault();e.stopPropagation();perfOn(!pf)}else if(k==='KeyE'){e.preventDefault();e.stopPropagation();edgeOpen()}}
+/* ═════ erişilebilirlik / görünüm ayarları (iOS Erişilebilirlik · Samsung Görünürlük): uygulamalara skin.js taşır ═════ */
+const A11=()=>({solid:false,contrast:false,zoom:1,...get('appshell:a11y',{})});
+function setA11(p){const o={...A11(),...p};set('appshell:a11y',o);paintA11()}
+function paintA11(){const o=A11(),r=document.documentElement;r.toggleAttribute('data-solid',!!o.solid);r.toggleAttribute('data-contrast',!!o.contrast);
+  // hub kendi zoom'unu almaz (tuval koordinatları bozulur); açık uygulamalara storage olayı gitmez (aynı sekme) → çerçevelere elle uygula
+  for(const fr of H()?.frames?.()||[]){try{const d=fr.contentDocument;if(d){d.documentElement.toggleAttribute('data-solid',!!o.solid);d.documentElement.toggleAttribute('data-contrast',!!o.contrast);d.documentElement.style.zoom=o.zoom!==1?String(o.zoom):''}}catch{}}}
 const tiles=()=>[{k:'ox-night',ic:IC.night,l:'Gece ışığı',on:nightOn(),s:NC().auto?NC().from+'–'+NC().to:nightOn()?'açık':'kapalı',run:()=>setNight({on:!nightOn()})},
   {k:'ox-focus',ic:IC.focus,l:'Odak',on:!!FO(),s:FO()?MODES[FO().m].n:'kapalı',run:()=>{const order=[null,'calis','uyku','kisisel'],i=order.indexOf(FO()?.m||null);setFocus(order[(i+1)%order.length])}},
-  {k:'ox-perf',ic:IC.perf,l:'Performans',on:!!pf,s:'FPS katmanı',run:()=>perfOn(!pf)}];
+  {k:'ox-perf',ic:IC.perf,l:'Performans',on:!!pf,s:'FPS katmanı',run:()=>perfOn(!pf)},
+  {k:'ox-solid',ic:'<rect x="2.5" y="2.5" width="11" height="11" rx="2.5" fill="currentColor" opacity=".35"/><rect x="2.5" y="2.5" width="11" height="11" rx="2.5"/>',l:'Saydamlığı azalt',on:A11().solid,s:A11().solid?'açık':'cam yok',run:()=>setA11({solid:!A11().solid})},
+  {k:'ox-con',ic:'<circle cx="8" cy="8" r="5.5"/><path d="M8 2.5v11a5.5 5.5 0 0 0 0-11z" fill="currentColor"/>',l:'Yüksek kontrast',on:A11().contrast,s:A11().contrast?'açık':'kapalı',run:()=>setA11({contrast:!A11().contrast})},
+  {k:'ox-zoom',ic:'<path d="M2.5 12.5L6 3.5l3.5 9M3.8 9.5h4.4M11 12.5V7M9.5 8.5H13"/>',l:'Yazı boyutu',on:A11().zoom!==1,s:'uygulamalar %'+Math.round(A11().zoom*100),run:()=>{const z=[1,1.1,1.2,1.3,.9],i=z.indexOf(A11().zoom);setA11({zoom:z[(i+1)%z.length]})}}];
 const ccRow=()=>`<div class="cc-ox" role="group" aria-label="Sistem">${[['ekran','Ekran süresi',IC.time],['odak','Odak',IC.focus],['rutin','Rutinler',IC.rt],['pano','Pano',IC.clip],['kose','Köşeler',IC.corner]].map(([k,l,i])=>`<button data-osx="${k}">${SV(i)}<span>${l}</span></button>`).join('')}</div>`;
 const cmds=ic=>[{ic,l:'Ekran süresi',sub:'Bugün hangi uygulamada ne kadar · günlük sınır',run:()=>open('ekran')},{ic,l:'Odak modu',sub:'Çalışma · Uyku · Kişisel',run:()=>open('odak')},
   {ic,l:'Rutinler',sub:'Saatinde kendiliğinden odak, tema, gece ışığı…',run:()=>open('rutin')},{ic,l:'Pano geçmişi',sub:'Kopyaladıkların · telefonla ortak',k:'⌥V',run:()=>open('pano')},
@@ -222,8 +231,8 @@ const cmds=ic=>[{ic,l:'Ekran süresi',sub:'Bugün hangi uygulamada ne kadar · g
 function cloud(){const fs=H()?.cloud?.();if(!fs||clipDoc)return;try{
   clipDoc=fs.collection('hub').doc('clip');clipDoc.onSnapshot(d=>{const D=d.data()||{};clipRemote=Object.entries(D).filter(([k])=>k!=='d_'+DEV.id).flatMap(([,v])=>Array.isArray(v)?v:[]).slice(0,30);if($('.ox-bg[data-v=pano]'))render()},()=>{});
   hoDoc=fs.collection('hub').doc('handoff');hoDoc.onSnapshot(d=>hoSeeOthers(d.data()),()=>{})}catch{}}
-function start(){if(window.OSX.started)return;window.OSX.started=true;paintNight();corners();edgeHandle();if(get('appshell:perfov',false))perfOn(true);hookDoc(document,'Ana ekran');
-  setInterval(()=>{useTick();hookFrames();hoTick();sumTick();if(!H()?.cloud?.()||!clipDoc)cloud()},10000);setInterval(()=>{rtTick();paintNight()},20000);setTimeout(()=>{rtTick();sumTick();cloud();hookFrames()},1500)}
+function start(){if(window.OSX.started)return;window.OSX.started=true;paintNight();paintA11();corners();edgeHandle();if(get('appshell:perfov',false))perfOn(true);hookDoc(document,'Ana ekran');
+  setInterval(()=>{useTick();hookFrames();if(A11().zoom!==1||A11().solid||A11().contrast)paintA11();hoTick();sumTick();if(!H()?.cloud?.()||!clipDoc)cloud()},10000);setInterval(()=>{rtTick();paintNight()},20000);setTimeout(()=>{rtTick();sumTick();cloud();hookFrames()},1500)}
 window.OSX={open,close,gate,tiles,ccRow,cmds,focus:()=>{const f=FO();return f?{m:f.m,...MODES[f.m]}:null},night:v=>v==null?nightOn():setNight({on:v}),perf:perfOn,edge:edgeOpen,clip:clipAll,usage:usageDay,start};
 if(document.readyState==='loading')addEventListener('DOMContentLoaded',start);else start();
 })();

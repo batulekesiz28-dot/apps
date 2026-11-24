@@ -439,13 +439,14 @@ kbd{font:500 11px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radius:
 @media (max-width:760px){.pgb{min-height:58px}.tw,.tw0{width:36px;height:40px}.ni.tr{padding-left:calc(2px + var(--dp,0)*14px)}.sub-add{height:44px}.crumb .cr{height:40px;max-width:120px}.pgn{display:none}.mv-q{height:40px}}
 </style>
 <script>/* mat cam tasarımı: bir kereliğine koyu temaya geç (sonra tema düğmesi serbest) */try{if(!localStorage.getItem('notlar:glass1')){localStorage.setItem('notlar:glass1','1');localStorage.setItem('notlar:theme','"dark"')}}catch(e){}</script>
-<script src="../../shared/skin.js?v=20261123a"></script>
+<script src="../../shared/skin.js?v=20261124a"></script>
 <link rel="stylesheet" href="player.css?v=20261122f">
 <link rel="stylesheet" href="library.css?v=20261122f">
 <link rel="stylesheet" href="brain.css?v=20261122f">
 <link rel="stylesheet" href="media.css?v=20261122f">
 <link rel="stylesheet" href="time.css?v=20261122f">
 <link rel="stylesheet" href="tasks.css?v=20261122f">
+<link rel="stylesheet" href="daypick.css?v=20261124c">
 <link rel="stylesheet" href="ders.css?v=20261122f">
 <style id="tnavCss">
 /* ── Üst gezinme (sol menü yerine) — ince cam şerit, kayan seçili vurgu ── */
@@ -650,6 +651,7 @@ body.rsz,body.rsz *{cursor:ew-resize!important;user-select:none}
 <script src="media.js?v=20261122f"></script>
 <script src="brain.js?v=20261122f"></script>
 <script src="time.js?v=20261122f"></script>
+<script src="daypick.js?v=20261124c"></script>
 <script src="tasks.js?v=20261122f"></script>
 <script src="ders.js?v=20261122f"></script>
 
@@ -842,7 +844,7 @@ const sorted=()=>[...pages.values()].sort((a,b)=>b.updated-a.updated);
 
 /* ── Router ───────────────────────────────────────────────── */
 /* sayfa değişince geçici arayüz (açılır menü, palet, düzenleyici, panel) kalmasın; bölümün geçici durumu taşınmasın */
-function dismissTransient(next){hideFloat(true);closePal();Media.dismiss();Time.dismiss();Library.dismiss();
+function dismissTransient(next){hideFloat(true);closePal();Media.dismiss();Time.dismiss();Library.dismiss();if(DayPick.isOpen())DayPick.close();
   if(next!=='tasks'&&Tasks.open){Tasks.open=null}}
 function route(){
   const h=decodeURIComponent(location.hash.slice(1))||'home';const[v,id]=h.split('/');dismissTransient(v);
@@ -1047,7 +1049,7 @@ function renderCal(dir,quiet){
     cells+=`<div class="cd${dd.getMonth()!==m?' out':''}${s===t?' today':''}${s===selDay?' sel':''}${i%7>4?' wk':''}" data-day="${s}"><span class="dn">${dd.getDate()}</span><div class="chips">${Time.monthChips(s)}${Tasks.monthChips(s)}${its.slice(0,3).map(p=>`<div class="c2" draggable="true" data-pid="${p.id}" title="${esc(titleOf(p))}">${iconOf(p)}<span>${esc(titleOf(p))}</span></div>`).join('')}${its.length>3?`<div class="more">+${its.length-3}</div>`:''}${fdn?`<div class="more fdn">📌 ${fdn} tarihli satır</div>`:''}</div></div>`}
   const isCur=y===new Date().getFullYear()&&m===new Date().getMonth();
   $('#view').innerHTML=`<div class="wide cal"><div>
-    <div class="cal-h"><h1><button class="cal-mj" data-mjump aria-haspopup="dialog" title="Ay ya da yıl seç">${MONTHS[m]} <em>${y}</em><svg class="li" viewBox="0 0 16 16" aria-hidden="true"><path d="m4.5 6.5 3.5 3.5 3.5-3.5"/></svg></button></h1>${Time.navGrp('cal','Önceki ay','Sonraki ay',isCur)}${Time.modeSeg()}</div>
+    <div class="cal-h"><h1><button class="cal-mj" data-mjump aria-haspopup="dialog" title="Tarih seç — bir güne git, etkinlik ekle">${MONTHS[m]} <em>${y}</em><svg class="li" viewBox="0 0 16 16" aria-hidden="true"><path d="m4.5 6.5 3.5 3.5 3.5-3.5"/></svg></button></h1>${Time.navGrp('cal','Önceki ay','Sonraki ay',isCur)}${Time.modeSeg()}</div>
     <div class="dow">${DOW.map(d=>`<span>${d}</span>`).join('')}</div>
     <div class="grid" id="grid" style="--wk:${weeks}">${cells}</div></div>
     <aside class="dp" id="dp"></aside></div>`;
@@ -1055,12 +1057,7 @@ function renderCal(dir,quiet){
   if(dir)anim($('#grid'),[{opacity:0,transform:`translateX(${dir*28}px)`},{opacity:1,transform:'none'}],{duration:480,easing:OUT});
   else if(!quiet)stagger('.cd');
 }
-// ay/yıl seçici: başlığa tıkla → yılı ‹ › ile değiştir, aya tıkla (ileri tarihlere hızlı gitmek için)
-function monthJump(anchor){let yy=calM.getFullYear();const draw=()=>`<div class="mj"><div class="mj-y"><button class="tb" data-mjy="-1" aria-label="Önceki yıl">${IC.chevL}</button><b>${yy}</b><button class="tb" data-mjy="1" aria-label="Sonraki yıl">${IC.chevR}</button></div>
-    <div class="mj-g">${MONTHS.map((n,i)=>`<button data-mjm="${i}" class="${yy===calM.getFullYear()&&i===calM.getMonth()?'on':''}${yy===new Date().getFullYear()&&i===new Date().getMonth()?' now':''}">${n.slice(0,3)}</button>`).join('')}</div></div>`;
-  const pop=float(anchor,draw(),{w:264});
-  pop.addEventListener('click',e=>{const y=e.target.closest('[data-mjy]');if(y){yy+=+y.dataset.mjy;pop.innerHTML=draw();return}
-    const m=e.target.closest('[data-mjm]');if(m){const nm=new Date(yy,+m.dataset.mjm,1),dir=nm>calM?1:-1;calM=nm;const sd=new Date(selDay+'T00:00');selDay=ymd(new Date(yy,+m.dataset.mjm,Math.min(sd.getDate(),new Date(yy,+m.dataset.mjm+1,0).getDate())));hideFloat();renderCal(dir)}})}
+// başlıktaki tarihe basınca: animasyonlu tarih seçici + gün ekranı (daypick.js) — eski ay/yıl açılır kutusu (monthJump) kaldırıldı
 function renderDay(animate){
   const its=[...pages.values()].filter(p=>p.date===selDay).sort((a,b)=>a.created-b.created);
   const quick=['daily','meet','todo','client','class','week'];
@@ -1081,7 +1078,7 @@ $('#view').addEventListener('click',e=>{
   const lx=e.target.closest('[data-lkx]');if(lx&&P){e.preventDefault();e.stopPropagation();const b=blockOf(lx.closest('.blk').dataset.id);if(b){const u=b.url;Object.assign(b,{t:'p',h:`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(b.title&&b.kind!=='image'?b.title:u)}</a>`});['url','title','desc','img','site','fav','yt','kind','ld'].forEach(k=>delete b[k]);relinkNode(b);edited()}return}
   const yp=e.target.closest('[data-lkplay]');if(yp&&!yp.querySelector('.vp')){const v=yp.dataset.lkplay;yp.append(VP.make({yt:v,title:yp.querySelector('.lk-ycap b')?.textContent||'YouTube videosu'}).el);yp.classList.add('on');return}
   if(e.target.closest('[data-bday]')){Time.newBday(selDay);return}
-  const mj=e.target.closest('[data-mjump]');if(mj){monthJump(mj);return}
+  const mj=e.target.closest('[data-mjump]');if(mj){DayPick.open(mj);return}
   if(e.target.closest('[data-act=new]')){go('#p/'+newPage().id);return}
   const tp=e.target.closest('[data-tpl]');if(tp){const p=newPage({tpl:tp.dataset.tpl});go('#p/'+p.id);return}
   const cv=e.target.closest('[data-cal]');if(cv){const d=+cv.dataset.cal;if(d===0){const n=new Date();calM=new Date(n.getFullYear(),n.getMonth(),1);selDay=today();renderCal(1)}else{calM=new Date(calM.getFullYear(),calM.getMonth()+d,1);renderCal(d)}return}

@@ -5524,5 +5524,48 @@
     "fix": "yeni kural + 160 durumluk gezgin + yarısı kesilmiş düğme kuralı"
    }
   ]
+ },
+ {
+  "at": "2026-11-24",
+  "change": "Yeni: başlangıç rehberi (ilk açılışta hoş geldin + ekranın önemli yerlerini ışıkla gösteren kısa tur; Ctrl+K “Başlangıç rehberi”). Tema stüdyosunda Renkler: kendi 4 rengini seç ya da iki temayı kaydırıcıyla karıştır; bütün uygulamalara geçer. Kontrol merkezinde yeni ayarlar: saydamlığı azalt, yüksek kontrast, uygulama yazı boyutu. Takvimde üstteki tarihe basınca animasyonlu tarih seçici açılıyor; bir güne basınca o günün ekranı: Workflowy gibi satır satır etkinlik yaz (Enter yeni, Tab alt not, saat/süre/doğum günü kendiliğinden anlaşılır), altta o günün görevleri ve günlük notu.",
+  "scores": {
+   "Notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Hub telefon": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Takvim başlığındaki tarih düğmesi kenardan kesiliyordu",
+    "fix": "başlık taşmayı kesmiyor"
+   },
+   {
+    "app": "notlar",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Tarih seçicide ayın dışındaki günler okunmayacak kadar soluktu",
+    "fix": "koyulaştırıldı"
+   },
+   {
+    "app": "hub",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Tema karıştırma kaydırıcısının dokunma alanı küçüktü",
+    "fix": "28px (telefonda 40px)"
+   },
+   {
+    "app": "hub",
+    "sev": "warn",
+    "status": "open",
+    "text": "Tema stüdyosundaki küçük tema önizlemelerinde 'Günün odağı' yazısı 12px'in altında (minyatür önizleme)"
+   }
+  ]
  }
 ]

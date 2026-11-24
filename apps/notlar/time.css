@@ -301,10 +301,6 @@
 /* ay/yıl seçici */
 .cal-mj{display:inline-flex;align-items:center;gap:6px;font:inherit;letter-spacing:inherit;color:inherit;padding:2px 8px;margin:-2px -8px;border-radius:10px;transition:background .2s}
 .cal-mj:hover{background:var(--hover)}.cal-mj .li{width:16px;height:16px;color:var(--ink3);fill:none;stroke:currentColor;stroke-width:1.6}
-.mj{padding:6px}.mj-y{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.mj-y b{font-size:15px;font-weight:600;font-variant-numeric:tabular-nums}
-.mj-g{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
-.mj-g button{height:38px;border-radius:9px;font-size:13.5px;color:var(--ink2);transition:background .15s}.mj-g button:hover{background:var(--hover);color:var(--ink)}
-.mj-g button.now{color:var(--accent);font-weight:600}.mj-g button.on{background:var(--ink);color:var(--bg)}
 
 /* anime yayın takvimi (Medya) — sadece gösterim */
 .tm-mc.is-air,.tm-chip.is-air{--c:#7C5CFF;display:flex;align-items:center;gap:5px;width:100%;text-align:left;font:inherit;cursor:pointer}

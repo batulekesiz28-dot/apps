@@ -1,0 +1,56 @@
+/* Tarih seçici + gün ekranı (daypick.js) */
+.dpk-bg{position:fixed;inset:0;z-index:240;display:grid;place-items:center;padding:20px;background:rgba(10,10,12,.34);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.dpk{width:min(560px,100%);max-height:min(760px,calc(100vh - 40px));display:flex;flex-direction:column;overflow:hidden;border-radius:28px;background:var(--card,var(--surface,#fff));color:var(--ink);
+  box-shadow:0 40px 90px -30px rgba(0,0,0,.55),0 0 0 .5px var(--line2)}
+.dpk-grow{position:fixed;z-index:241;background:var(--card,var(--surface,#fff));pointer-events:none;box-shadow:0 30px 70px -24px rgba(0,0,0,.45)}
+.dpk-pk{padding:16px 18px 14px;display:flex;flex-direction:column;gap:10px}
+.dpk-h{display:flex;align-items:center;gap:6px}
+.dpk-t{flex:1;text-align:center;font-size:24px;font-weight:700;letter-spacing:-.02em}.dpk-t em{font-style:normal;color:var(--ink3);font-weight:500}
+.dpk-ib{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:var(--ink2);flex-shrink:0}.dpk-ib:hover{background:var(--hover);color:var(--ink)}.dpk-ib svg{width:18px;height:18px}
+.dpk-x{width:40px;height:40px;border-radius:12px;font-size:22px;color:var(--ink3);flex-shrink:0}.dpk-x:hover{background:var(--hover);color:var(--ink)}
+.dpk-q{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.dpk-q>button{height:34px;padding:0 12px;border-radius:999px;background:var(--hover);font-size:13px;font-weight:550;color:var(--ink2)}.dpk-q>button:hover{color:var(--ink);background:var(--line2)}
+.dpk-ys{margin-left:auto;display:inline-flex;align-items:center;gap:2px;padding:2px;border-radius:999px;background:var(--hover)}.dpk-ys b{min-width:46px;text-align:center;font-size:13.5px}
+.dpk-ys button{width:32px;height:32px;border-radius:50%;font-size:16px;color:var(--ink2)}.dpk-ys button:hover{background:var(--surface);color:var(--ink)}
+.dpk-dow{display:grid;grid-template-columns:repeat(7,1fr);font-size:12px;font-weight:600;color:var(--ink3);text-align:center;margin-top:4px}
+.dpk-g{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;touch-action:pan-y}
+.dpk-d{position:relative;aspect-ratio:1;max-height:64px;border-radius:16px;display:grid;place-items:center;align-content:center;gap:3px;font-size:16px;color:var(--ink);transition:background .15s,scale .2s}
+.dpk-d b{font-weight:550}.dpk-d:hover{background:var(--hover)}.dpk-d:active{scale:.94}.dpk-d.out{color:var(--ink3)}.dpk-d.out b{font-weight:400}.dpk-d.wk:not(.out){color:var(--ink2)}
+.dpk-d.now b{color:var(--accent,#2563EB);font-weight:700}.dpk-d.on{background:var(--ink);color:var(--bg)}.dpk-d.on b{color:var(--bg)}
+.dpk-d:focus-visible{outline:2px solid var(--accent,#2563EB);outline-offset:1px}
+.dpk-dots{display:flex;gap:3px;height:5px}.dpk-dots i,.dpk-lg i{width:5px;height:5px;border-radius:50%}
+.dpk-dots .e,.dpk-lg .e{background:var(--accent,#2563EB)}.dpk-dots .t,.dpk-lg .t{background:#F59E0B}.dpk-dots .n,.dpk-lg .n{background:var(--ink3)}
+.dpk-d.on .dpk-dots i{background:var(--bg)}
+.dpk-lg{display:flex;align-items:center;gap:6px;justify-content:center;font-size:12px;color:var(--ink3)}.dpk-lg i{display:inline-block;margin-left:8px}
+
+/* gün ekranı */
+.dsc{display:flex;flex-direction:column;min-height:0;flex:1}
+.dsc-h{display:flex;align-items:center;gap:4px;padding:14px 14px 10px}
+.dsc-t{flex:1;min-width:0;padding:0 4px}.dsc-t small{font-size:12.5px;color:var(--ink3);font-weight:550}.dsc-t h2{font-size:26px;font-weight:700;letter-spacing:-.02em;line-height:1.15}.dsc-t em{font-style:normal;color:var(--ink3);font-weight:500}
+.dsc-b{overflow:auto;padding:4px 22px 22px;flex:1}
+.dsc-sec{display:flex;align-items:center;justify-content:space-between;margin:14px 0 6px;font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3)}
+.dsc-lk{font-size:12.5px;letter-spacing:0;text-transform:none;color:var(--accent,#2563EB);font-weight:550;min-height:32px;padding:0 6px;border-radius:8px}.dsc-lk:hover{background:var(--hover)}
+.dsc-list{display:grid;gap:1px;cursor:text;min-height:40px}
+.dsc-r{display:flex;align-items:flex-start;gap:10px;min-height:36px;padding:3px 0}.dsc-r.sub{padding-left:30px}
+.dsc-ck{flex-shrink:0;width:30px;height:30px;margin:0 -3px;display:grid;place-items:center;border-radius:50%}.dsc-ck::before{content:'';width:22px;height:22px;border-radius:50%;box-shadow:inset 0 0 0 2px var(--c);transition:background .2s}
+.dsc-ck:hover::before{background:color-mix(in srgb,var(--c) 18%,transparent)}.dsc-r.done .dsc-ck::before{background:var(--c)}.dsc-r.done .dsc-l{color:var(--ink3);text-decoration:line-through;text-decoration-color:var(--ink4)}
+.dsc-bl{flex-shrink:0;width:24px;height:30px;display:grid;place-items:center}.dsc-bl::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--ink3)}.dsc-r.sub .dsc-bl::before{width:5px;height:5px;background:var(--ink4)}
+.dsc-l{flex:1;min-width:0;padding:4px 2px;font-size:15.5px;line-height:1.5;outline:0;border-radius:6px;word-break:break-word}.dsc-r.sub .dsc-l{font-size:14.5px;color:var(--ink2)}
+.dsc-l:focus{background:var(--hover)}.dsc-l[data-new]:empty::before{content:attr(data-ph);color:var(--ink3)}.dsc-l.bd{color:var(--ink2)}
+.dsc-hint{font-size:12.5px;color:var(--ink3);margin-top:8px;line-height:1.6}.dsc-hint i{font-style:normal;color:var(--ink2);white-space:nowrap;display:inline-block}
+.dsc-tk{list-style:none;display:grid;gap:2px;margin:0;padding:0}
+.dsc-tk li{display:flex;align-items:center;gap:10px;min-height:36px;font-size:14.5px}.dsc-tk li small{margin-left:auto;color:var(--ink3);font-size:12.5px}
+.dsc-tk button{width:22px;height:22px;border-radius:6px;box-shadow:inset 0 0 0 2px var(--ink4);flex-shrink:0}.dsc-tk li.done span{text-decoration:line-through;color:var(--ink3)}.dsc-tk li.done button{background:var(--ink3)}
+.dsc-note{display:flex;align-items:flex-end;gap:12px;width:100%;text-align:left;padding:12px 14px;border-radius:16px;background:var(--hover);color:var(--ink2);font-size:14px;line-height:1.55}
+.dsc-note span{flex:1;min-width:0}.dsc-note .ph{color:var(--ink2)}.dsc-note b{color:var(--ink);font-weight:600;white-space:nowrap}.dsc-note:hover{background:var(--line2)}
+@media (max-width:600px){
+  .dpk-bg{place-items:end center;padding:0}.dpk{border-radius:28px 28px 0 0;max-height:94vh}.dpk-t{font-size:21px}
+  .dpk-d{border-radius:14px;font-size:15px}.dsc-b{padding:4px 16px 24px}.dsc-t h2{font-size:22px}.dsc-ck{width:40px;height:40px;margin:-4px -8px}.dsc-ck::before{width:26px;height:26px}.dsc-tk button{width:40px;height:40px;box-shadow:none;display:grid;place-items:center}
+  .dsc-tk button::before{content:'';width:22px;height:22px;border-radius:6px;box-shadow:inset 0 0 0 2px var(--ink4)}.dsc-tk li.done button{background:none}.dsc-tk li.done button::before{background:var(--ink3)}
+  .dsc-h [data-dnav]{display:none} /* telefonda gün değiştirmek: yana kaydır */
+  .dpk-q>button,.dpk-ys button{height:40px}.dpk-ys button{width:40px}.dsc-lk{min-height:40px}
+}
+@media (prefers-reduced-motion:reduce){.dpk-d,.dsc-ck{transition:none}}html[data-motion=off] :is(.dpk-d,.dsc-ck){transition:none}
+
+/* takvim başlığındaki tarih düğmesi (bas → tarih seçici) h1'in taşma kesmesine takılmasın */
+.cal-h h1:has(.cal-mj){overflow:visible}

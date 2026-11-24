@@ -864,8 +864,12 @@ body,.btn,.mi,.pal-in,input,textarea,button{font-family:var(--font)}
 .lk-sw{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.lk-sw button{width:28px;height:28px;border-radius:50%;background:var(--c);font-size:12px;font-weight:700;color:var(--ink2);box-shadow:inset 0 0 0 1px var(--line3)}.lk-sw button.on{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--ink)}
 .lk-cu{position:relative;width:28px;height:28px;border-radius:50%;overflow:hidden;background:conic-gradient(#E5484D,#CA8A04,#16A34A,#0D9488,#2563EB,#7C3AED,#DB2777,#E5484D);cursor:pointer}.lk-cu input{position:absolute;inset:0;opacity:0;cursor:pointer}
 .lk-f{flex-wrap:wrap}.lk-p{display:flex;flex-wrap:wrap;gap:6px}.lk-pi{display:inline-flex;align-items:center;border-radius:9px;background:var(--hover)}.lk-pi button{height:32px;padding:0 10px;font-size:13px;color:var(--ink)}.lk-pi button+button{padding:0 8px;color:var(--ink3)}.lk-pi svg{width:10px;height:10px;stroke:currentColor;stroke-width:1.6}
+.lk-own{display:flex;gap:10px;flex-wrap:wrap}.lk-own label{display:grid;justify-items:center;gap:4px;font-size:12px;color:var(--ink2)}.lk-own input{width:44px;height:44px;border:0;border-radius:12px;padding:0;background:none;cursor:pointer}
+.lk-mix{display:flex;align-items:center;gap:10px;flex-wrap:wrap;flex:1}.lk-mix select{height:36px;padding:0 8px;border-radius:9px;border:0;background:var(--hover);color:var(--ink);font:inherit;font-size:13px}
+.lk-mix input[type=range]{flex:1;min-width:140px;height:28px;appearance:none;background:linear-gradient(90deg,var(--a),var(--b)) center/100% 10px no-repeat;border-radius:5px}
+.lk-mix input[type=range]::-webkit-slider-thumb{appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.35)}
 .lk-add{height:32px;padding:0 12px;border-radius:9px;font-size:13px;color:var(--ink2);box-shadow:inset 0 0 0 1px var(--line2)}.lk-add:hover{color:var(--ink)}
-@media (max-width:600px){.lk-sw button,.lk-cu{width:40px;height:40px}.lk-pi button,.lk-add{height:40px}}
+@media (max-width:600px){.lk-mix input[type=range]{height:40px}.lk-sw button,.lk-cu{width:40px;height:40px}.lk-pi button,.lk-add{height:40px}}
 .ts-mo{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:22px;padding-top:18px;border-top:.5px solid var(--line2)}
 .ts-mo b{font-size:13.5px;font-weight:600;color:var(--ink)}.ts-mo small{font-size:12px;color:var(--ink3);flex-basis:100%}
 .ts-seg{display:flex;gap:4px;padding:3px;border-radius:12px;background:var(--hover)}
@@ -1039,11 +1043,53 @@ const LOOK_FONTS={'':['Tema yazı tipi',''],geist:['Geist','Geist:wght@300..800'
 const LOOK_ACC=['','#2563EB','#7C3AED','#DB2777','#E5484D','#EA580C','#CA8A04','#16A34A','#0D9488'];
 function applyLook(l=store.get('appshell:look',{})){let st=$('#lookCss');if(!st){st=document.createElement('style');st.id='lookCss';document.head.appendChild(st)}
   const f=LOOK_FONTS[l.font]?.[1];if(f&&!document.querySelector(`link[data-look="${l.font}"]`)){const k=document.createElement('link');k.rel='stylesheet';k.dataset.look=l.font;k.href='https://fonts.googleapis.com/css2?family='+f+'&display=swap';document.head.appendChild(k)}
-  st.textContent=(/^#[0-9a-f]{6}$/i.test(l.accent||'')?`html{--accent:${l.accent}!important;--acc:${l.accent}!important}`:'')+(f?`html{--font:'${LOOK_FONTS[l.font][0].split(' (')[0]}',system-ui,sans-serif!important;--display:var(--font)!important}`:'')}
+  st.textContent=(window.SkinPal?SkinPal(l.colors):'')+(/^#[0-9a-f]{6}$/i.test(l.accent||'')?`html{--accent:${l.accent}!important;--acc:${l.accent}!important}`:'')+(f?`html{--font:'${LOOK_FONTS[l.font][0].split(' (')[0]}',system-ui,sans-serif!important;--display:var(--font)!important}`:'')}
 function setLook(patch){const l={...store.get('appshell:look',{}),...patch};store.set('appshell:look',l);applyLook(l)}
+/* ── Renk sistemi: kendi renklerin ya da iki temayı karıştır (Material You / One UI renk paleti gibi). Sonuç look.colors'a yazılır,
+   hub ve skin.js (bütün uygulamalar) aynı palette() ile 4 renkten bütün tonları türetir. ── */
+function SkinPal(c){if(!c||!/^#[0-9a-f]{6}$/i.test(c.bg||''))return'';var L=function(h){var v=[1,3,5].map(function(i){var x=parseInt(h.substr(i,2),16)/255;return x<=.03928?x/12.92:Math.pow((x+.055)/1.055,2.4)});return .2126*v[0]+.7152*v[1]+.0722*v[2]},dk=L(c.bg)<.4,m=function(p,a,b){return'color-mix(in srgb,'+a+' '+p+'%,'+(b||'transparent')+')'};
+  return'html{--bg:'+c.bg+'!important;--bg2:'+m(94,c.bg,c.ink)+'!important;--surface:'+c.surface+'!important;--panel:'+c.surface+'!important;--card:'+c.surface+'!important;--surface2:'+m(93,c.surface,c.ink)+'!important;--tint:'+m(94,c.surface,c.ink)+'!important;'+
+    '--ink:'+c.ink+'!important;--ink2:'+m(78,c.ink,c.bg)+'!important;--ink3:'+m(66,c.ink,c.bg)+'!important;--ink4:'+m(22,c.ink,c.bg)+'!important;'+
+    '--line:'+m(8,c.ink)+'!important;--line2:'+m(12,c.ink)+'!important;--line3:'+m(17,c.ink)+'!important;--hover:'+m(7,c.ink)+'!important;--hover2:'+m(11,c.ink)+'!important;'+
+    '--menu:'+m(90,c.surface)+'!important;--glass:'+m(78,c.surface)+'!important;--scrim:'+m(50,c.bg)+'!important;--labelbg:'+m(90,c.bg)+'!important;'+
+    (/^#[0-9a-f]{6}$/i.test(c.accent||'')?'--accent:'+c.accent+'!important;--acc:'+c.accent+'!important;':'')+'color-scheme:'+(dk?'dark':'light')+'}body{background-color:'+c.bg+'}'}
+const ROOT_LIGHT={bg:'#FFFFFF',surface:'#FFFFFF',ink:'#18181B',accent:'#2563EB'};
+const hexOk=c=>/^#[0-9a-f]{6}$/i.test(c||'');
+const toHex=c=>{c=String(c||'').trim();if(hexOk(c))return c;const m=c.match(/\d+(\.\d+)?/g);return m&&m.length>=3?'#'+m.slice(0,3).map(v=>Math.round(+v).toString(16).padStart(2,'0')).join(''):'#808080'};
+const TCOL={};
+function themeColors(k){if(k==='light')return{...ROOT_LIGHT};if(TCOL[k])return{...TCOL[k]};
+  // dış kutu aydınlık varsayılanları taşır (satır içi stil temanın kuralını ezmesin diye iç kutuda değil), iç kutu temanın kuralını alır
+  const w=document.createElement('div'),p=document.createElement('div');w.style.cssText='position:absolute;width:0;height:0;visibility:hidden;'+Object.entries(ROOT_LIGHT).map(([n,v])=>`--${n}:${v}`).join(';');
+  p.dataset.theme=k;if(THEMES[k]?.dark)p.dataset.family='dark';w.appendChild(p);document.body.appendChild(w);
+  const cs=getComputedStyle(p),g=n=>toHex(cs.getPropertyValue('--'+n));const o={bg:g('bg'),surface:g('surface'),ink:g('ink'),accent:g('accent')};w.remove();TCOL[k]=o;
+  if(THEMES[k]?.dark&&o.bg==='#ffffff'){o.bg=THEMES[k].bg;o.surface='#18181B';o.ink='#EDEDEF'}return o}
+const mixHex=(a,b,t)=>'#'+[0,2,4].map(i=>Math.round(parseInt(a.slice(1+i,3+i),16)*(1-t)+parseInt(b.slice(1+i,3+i),16)*t).toString(16).padStart(2,'0')).join('');
+// düz karıştırma açık + koyu temada gri-gri, okunmaz renk veriyordu: ton ve doygunluk karışır, açıklık baskın temadan gelir, yazı-zemin kontrastı korunur
+const hsl=h=>{const[r,g,b]=[1,3,5].map(i=>parseInt(h.substr(i,2),16)/255),mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn;let H=0,S=0;
+  if(d){S=d/(1-Math.abs(2*l-1));H=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;H=(H*60+360)%360}return[H,S,l]};
+const hex3=(H,S,l)=>{const c=(1-Math.abs(2*l-1))*S,x=c*(1-Math.abs((H/60)%2-1)),m=l-c/2;const[r,g,b]=H<60?[c,x,0]:H<120?[x,c,0]:H<180?[0,c,x]:H<240?[0,x,c]:H<300?[x,0,c]:[c,0,x];
+  return'#'+[r,g,b].map(v=>Math.round(Math.min(1,Math.max(0,v+m))*255).toString(16).padStart(2,'0')).join('')};
+function mixSmart(a,b,t){const A=hsl(a),B=hsl(b);let h;if(A[1]<.06)h=B[0];else if(B[1]<.06)h=A[0];else{let d=B[0]-A[0];if(d>180)d-=360;if(d<-180)d+=360;h=(A[0]+d*t+360)%360}
+  const s=A[1]*(1-t)+B[1]*t,D=t<.5?A[2]:B[2],O=t<.5?B[2]:A[2],k=Math.min(t,1-t)*.3;return hex3(h,s,D*(1-k)+O*k)}
+const relL=h=>{const v=[1,3,5].map(i=>{const x=parseInt(h.substr(i,2),16)/255;return x<=.03928?x/12.92:Math.pow((x+.055)/1.055,2.4)});return .2126*v[0]+.7152*v[1]+.0722*v[2]};
+const contrast=(a,b)=>{const x=relL(a),y=relL(b);return(Math.max(x,y)+.05)/(Math.min(x,y)+.05)};
+function palColors(pal){if(!pal||!pal.mode)return null;if(pal.mode==='own')return pal.own||null;const A=themeColors(pal.a||'light'),B=themeColors(pal.b||'dark'),t=(pal.t??50)/100;
+  const o=Object.fromEntries(Object.keys(A).map(k=>[k,mixSmart(A[k],B[k],t)]));
+  for(const k of ['bg','surface']){const[H,S,L]=hsl(o[k]);if(S>.45&&(L>.8||L<.2))o[k]=hex3(H,.45,L)} // zemin göz yormasın: çok açık/koyu zeminde doygunluk sınırı
+  // yazı zemine en az 7:1; değilse yazıyı açıklığın uç ucuna it
+  if(contrast(o.ink,o.bg)<7){const[H,S]=hsl(o.ink),dark=relL(o.bg)<.3;for(let l=dark?.86:.16;dark?l<=.99:l>=.02;l+=dark?.03:-.03){const c=hex3(H,Math.min(S,.25),l);if(contrast(c,o.bg)>=7){o.ink=c;break}}}
+  return o}
+function setPal(patch){const l=store.get('appshell:look',{}),pal={...(l.pal||{}),...patch};const c=palColors(pal);setLook({pal,colors:c||null})}
 const lookSnap=()=>({theme:store.get('appshell:theme','light'),motion:MOTION,look:store.get('appshell:look',{}),world:store.get('appshell:world',null)});
 function lookHTML(){const l=store.get('appshell:look',{}),P=store.get('appshell:profiles',[]);
-  return`<div class="ts-mo"><b>Vurgu rengi</b><div class="lk-sw" role="radiogroup" aria-label="Vurgu rengi">${LOOK_ACC.map(c=>`<button data-acc="${c}" role="radio" aria-checked="${(l.accent||'')===c}" class="${(l.accent||'')===c?'on':''}" style="--c:${c||'var(--ink4)'}" title="${c||'Temanın kendi rengi'}" aria-label="${c||'Temanın kendi rengi'}">${c?'':'A'}</button>`).join('')}<label class="lk-cu" title="Özel renk"><input type="color" data-accc value="${/^#/.test(l.accent||'')?l.accent:'#2563EB'}" aria-label="Özel vurgu rengi"></label></div></div>
+  const pal=l.pal||{},mode=pal.mode||'',own=pal.own||themeColors(document.documentElement.dataset.theme||'light'),TH=Object.keys(THEMES),tn=k=>THEMES[k]?.n||k;
+  const colors=`<div class="ts-mo"><b>Renkler</b><div class="ts-seg" role="radiogroup" aria-label="Renk kaynağı">${[['','Tema'],['own','Kendi renklerim'],['mix','İki temayı karıştır']].map(([k,n])=>`<button data-pm="${k}" role="radio" aria-checked="${mode===k}" class="${mode===k?'on':''}">${n}</button>`).join('')}</div>
+    ${mode==='own'?`<div class="lk-own">${[['bg','Zemin'],['surface','Yüzey'],['ink','Yazı'],['accent','Vurgu']].map(([k,n])=>`<label><input type="color" data-pc="${k}" value="${toHex(own[k])}" aria-label="${n} rengi"><span>${n}</span></label>`).join('')}</div>`:''}
+    ${mode==='mix'?`<div class="lk-mix"><select data-pa aria-label="Birinci tema">${TH.map(k=>`<option value="${k}"${(pal.a||'light')===k?' selected':''}>${esc(tn(k))}</option>`).join('')}</select>
+      <input type="range" min="0" max="100" value="${pal.t??50}" data-pt aria-label="Karışım oranı" style="--a:${themeColors(pal.a||'light').bg};--b:${themeColors(pal.b||'dark').bg}">
+      <select data-pb aria-label="İkinci tema">${TH.map(k=>`<option value="${k}"${(pal.b||'dark')===k?' selected':''}>${esc(tn(k))}</option>`).join('')}</select></div>`:''}
+    <small>${mode==='own'?'Dört renkten bütün tonlar (ikincil yazı, çizgiler, cam) kendiliğinden türetilir.':mode==='mix'?'Kaydırıcıyla iki temanın zemin, yüzey, yazı ve vurgu renklerini istediğin oranda karıştır.':'Temanın kendi renkleri.'} Bütün uygulamalara geçer.</small></div>`;
+  return colors+`<div class="ts-mo"><b>Vurgu rengi</b><div class="lk-sw" role="radiogroup" aria-label="Vurgu rengi">${LOOK_ACC.map(c=>`<button data-acc="${c}" role="radio" aria-checked="${(l.accent||'')===c}" class="${(l.accent||'')===c?'on':''}" style="--c:${c||'var(--ink4)'}" title="${c||'Temanın kendi rengi'}" aria-label="${c||'Temanın kendi rengi'}">${c?'':'A'}</button>`).join('')}<label class="lk-cu" title="Özel renk"><input type="color" data-accc value="${/^#/.test(l.accent||'')?l.accent:'#2563EB'}" aria-label="Özel vurgu rengi"></label></div></div>
     <div class="ts-mo"><b>Yazı tipi</b><div class="ts-seg lk-f" role="radiogroup" aria-label="Yazı tipi">${Object.entries(LOOK_FONTS).map(([k,[n]])=>`<button data-font="${k}" role="radio" aria-checked="${(l.font||'')===k}" class="${(l.font||'')===k?'on':''}">${n.split(' (')[0]}</button>`).join('')}</div><small>Seçimin hub'a ve bütün uygulamalara anında geçer.</small></div>
     <div class="ts-mo"><b>Görünüm profilleri</b><div class="lk-p">${P.map((p,i)=>`<span class="lk-pi"><button data-prof="${i}" title="Uygula">${esc(p.name)}</button><button data-pdel="${i}" aria-label="${esc(p.name)} profilini sil" title="Sil">${XI}</button></span>`).join('')}<button class="lk-add" data-psave>+ Şu anki görünümü kaydet</button><button class="lk-add" data-preset>Varsayılana dön</button></div><small>Profil; temayı, animasyonu, vurgu rengini, yazı tipini ve arayüz dünyasını birlikte saklar.</small></div>`}
 function themeStudio(){if(tsEl)return;const saved=document.documentElement.dataset.theme;Object.keys(FONTS).forEach(loadFont);
@@ -1064,12 +1110,15 @@ function themeStudio(){if(tsEl)return;const saved=document.documentElement.datas
     const m=e.target.closest('[data-mo]');if(m){applyMotion(m.dataset.mo);tsEl.querySelectorAll('[data-mo]').forEach(x=>{x.classList.toggle('on',x===m);x.setAttribute('aria-checked',x===m)});return}
     const ac=e.target.closest('[data-acc]');if(ac){setLook({accent:ac.dataset.acc});$('#lookBox').innerHTML=lookHTML();return}
     const fo=e.target.closest('[data-font]');if(fo){setLook({font:fo.dataset.font});$('#lookBox').innerHTML=lookHTML();return}
+    const pm=e.target.closest('[data-pm]');if(pm){const m=pm.dataset.pm;if(m==='own'&&!(store.get('appshell:look',{}).pal?.own))setPal({mode:m,own:themeColors(document.documentElement.dataset.theme||'light')});else setPal({mode:m});$('#lookBox').innerHTML=lookHTML();return}
     if(e.target.closest('[data-psave]')){const n=prompt('Profil adı',`Profil ${store.get('appshell:profiles',[]).length+1}`);if(!n)return;const P=store.get('appshell:profiles',[]);P.push({name:n.slice(0,30),...lookSnap()});store.set('appshell:profiles',P.slice(-12));$('#lookBox').innerHTML=lookHTML();toast(`“${n}” kaydedildi`);return}
     if(e.target.closest('[data-preset]')){store.set('appshell:look',{});applyLook({});applyMotion('full');setTheme('light');cur='light';$('#lookBox').innerHTML=lookHTML();tsEl.querySelectorAll('[data-mo]').forEach(x=>{x.classList.toggle('on',x.dataset.mo==='full')});toast('Varsayılan görünüme dönüldü');return}
     const pr=e.target.closest('[data-prof]');if(pr){const p=store.get('appshell:profiles',[])[+pr.dataset.prof];if(!p)return;store.set('appshell:look',p.look||{});applyLook(p.look||{});applyMotion(p.motion||'full');setTheme(p.theme);cur=p.theme;if(p.world&&window.Worlds&&store.get('appshell:world',null)!==p.world){store.set('appshell:world',p.world);toast(`“${p.name}” uygulandı — arayüz dünyası için sayfayı yenile`)}else toast(`“${p.name}” uygulandı`);$('#lookBox').innerHTML=lookHTML();tsEl.querySelectorAll('.tp').forEach(x=>x.classList.toggle('on',x.dataset.tk===p.theme));return}
     const pd=e.target.closest('[data-pdel]');if(pd){const P=store.get('appshell:profiles',[]);P.splice(+pd.dataset.pdel,1);store.set('appshell:profiles',P);$('#lookBox').innerHTML=lookHTML();return}
     if(e.target===tsEl||e.target.closest('[data-tsx]'))closeStudio()});
-  tsEl.addEventListener('input',e=>{if(e.target.matches('[data-accc]'))setLook({accent:e.target.value})});tsEl.addEventListener('change',e=>{if(e.target.matches('[data-accc]'))$('#lookBox').innerHTML=lookHTML()});
+  tsEl.addEventListener('input',e=>{const t=e.target;if(t.matches('[data-accc]'))setLook({accent:t.value});
+    else if(t.matches('[data-pc]')){const own={...(store.get('appshell:look',{}).pal?.own||{}),[t.dataset.pc]:t.value};setPal({own})}
+    else if(t.matches('[data-pt]'))setPal({t:+t.value});else if(t.matches('[data-pa]')){setPal({a:t.value});$('#lookBox').innerHTML=lookHTML()}else if(t.matches('[data-pb]')){setPal({b:t.value});$('#lookBox').innerHTML=lookHTML()}});tsEl.addEventListener('change',e=>{if(e.target.matches('[data-accc]'))$('#lookBox').innerHTML=lookHTML()});
   tsEl.addEventListener('keydown',e=>{if(e.key==='Escape'){e.stopPropagation();closeStudio()}});setTimeout(()=>tsEl.querySelector('.tp.on')?.focus(),60)}
 function closeStudio(){if(!tsEl)return;const el=tsEl;tsEl=null;const want=store.get('appshell:theme',null);if(want&&document.documentElement.dataset.theme!==want)applyTheme(want);anim(el,[{opacity:1},{opacity:0}],{duration:160,easing:EASE}).finished.then(()=>el.remove(),()=>el.remove())}
 
@@ -1954,7 +2003,7 @@ function relocateWidgets(){return;if(!wReady||!booted)return;const RG=GX.RG+40;l
     if(Math.hypot(cx,cy)<RG){r.w.w=wSpot(w,h,[RG+60,-RG*.55],r.w.id);moved=true}}
   if(moved)saveMeta()}
 
-const COVER='.cc-bg,.pal-bg,.sheet-scrim,.as-bg,.ts-bg,.rm-bg,.wp-bg,.ox-bg';
+const COVER='.cc-bg,.pal-bg,.sheet-scrim,.as-bg,.ts-bg,.rm-bg,.wp-bg,.ox-bg,.tr-bg';
 function frame(t){
   raf=0;if(paused)return;
   // pacing: ≤60fps even on 120Hz screens; 30fps once the hands are off; ~4fps when nothing at all moves
@@ -3367,6 +3416,7 @@ function palette(){
     ...(document.documentElement.dataset.appshellGom&&GOMV()<1.2?[{ic:UI.dl,l:'Eklentiyi güncelle',sub:'YouTube Music şarkı adı ve ⏮ ⏯ ⏭ üstteki adada görünsün',run:()=>{const a=find('p:ytmusic')||find('p:youtube');if(a)gomSheet(a)}}]:[]),
     {ic:UI.fit,l:'Kontrol merkezi',sub:'Hızlı ayarlar ve bildirimler · adayı aşağı çek',k:'⌥A',run:()=>window.OS?.open()},
     ...(window.OSX?.cmds?.(UI.fit)||[]),
+    {ic:UI.fit,l:'Başlangıç rehberi',sub:'Önemli yerleri adım adım göster',run:()=>window.Tour?.start()},
     {ic:UI.fit,l:'Rahatsız etme'+(dndOn()?' ✓':''),sub:'Bildirimler inmez, sessiz durur',run:()=>window.OS?.dnd(!dndOn())},
     ...(W.app&&!W.min&&TABS.length>1?[{ic:UI.fit,l:SPLIT?'Yan yanadan çık':'Yan yana aç',k:'⌥S',run:splitToggle}]:[]),
     {ic:UI.fit,l:'Müzik/video ana ekranda mini pencere olsun'+(floCfg().auto?' ✓':''),sub:'Kapalıyken arkada çalar, şarkı üstteki adada görünür',run:()=>{floSet({auto:!floCfg().auto});toast(floCfg().auto?'Açık — ana ekrana dönünce köşede küçük pencere olur':'Kapalı — arkada çalar, şarkı üstteki adada görünür')}},
@@ -3687,6 +3737,6 @@ addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.shiftKey&&(e.key==='
 <script src="ui/notify.js?v=20261121b"></script>
 <link rel="stylesheet" href="ui/os.css?v=20261121a">
 <script src="ui/os.js?v=20261123b"></script>
-<link rel="stylesheet" href="ui/osx.css?v=20261123b"><script src="ui/osx.js?v=20261123b"></script>
+<link rel="stylesheet" href="ui/osx.css?v=20261124d"><script src="ui/osx.js?v=20261124a"></script><script src="ui/tour.js?v=20261124b"></script>
 </body>
 </html>

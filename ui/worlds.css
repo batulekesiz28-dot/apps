@@ -251,7 +251,7 @@ body.locked .world{display:none}
 .mg-menu,.mg-cm{position:fixed;z-index:8;display:flex;flex-direction:column;gap:2px;min-width:220px;padding:8px;border-radius:16px;background:rgba(255,255,255,.86);
   -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);box-shadow:0 0 0 .5px rgba(0,0,0,.08),0 20px 50px -16px rgba(0,0,0,.35);color:var(--fg)}
 .mg-menu{left:50%;bottom:76px;transform:translateX(-50%);width:260px}.mg-menu[hidden]{display:none}
-.mg-mk{margin:2px 8px 6px;font-size:11px;font-weight:650;letter-spacing:.06em;text-transform:uppercase;color:var(--fg2)}
+.mg-mk{margin:2px 8px 6px;font-size:12px;font-weight:650;letter-spacing:.06em;text-transform:uppercase;color:var(--fg2)}
 .mg-mh{margin:8px 8px 2px;font-size:12px;line-height:1.45;color:var(--fg2)}
 .mg-tg,.mg-cm button,.mg-rs{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:36px;padding:0 10px;border-radius:10px;font-size:13.5px;font-weight:500;text-align:left}
 .mg-tg:hover,.mg-cm button:hover,.mg-rs:hover{background:rgba(0,0,0,.06)}
@@ -455,7 +455,7 @@ html[data-motion=off] .world *{transition:none!important}
 .w-harita .hr-l i{display:none}
 /* küme adları uygulama katmanının ÜSTÜNDE (çift tıkla yeniden adlandırılabilsin); katmanın kendisi tıklamayı geçirir */
 .rz-gl,.pt-gl,.km-gl,.bl-gl,.kd-gl,.ds-gl,.hr-gl{position:absolute;inset:0;pointer-events:none;z-index:6}
-.mg-cm{z-index:300}
+.mg-cm{z-index:300;--fg:#1C1C1F;--fg2:rgba(28,28,31,.68);color:var(--fg)} /* zemini her arayüzde açık cam: yazı da her zaman koyu (Deste/Kadran gibi koyu arayüzlerde açık yazı okunmuyordu) */
 @media (max-width:759px){.mg-wb small{font-size:12px}}
 /* zar: her girişte rastgele arayüz (açıkken dolu) */
 .wx-dice{width:36px;padding:0!important;display:grid;place-items:center}.wx-dice svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.3}

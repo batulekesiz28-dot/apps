@@ -5853,6 +5853,13 @@
     "sev": "uyari",
     "status": "fixed",
     "text": "Durum gezgini yeni kontroller: ana ekranda odak gizli uygulamada kalmasın, sağ tık menüsü ekrana sığsın (sagtik durumu); açılır menüler çubuk çakışması sayılmaz"
+   },
+   {
+    "app": "hub",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Koyu arayüzlerde (Deste, Kadran…) uygulamaya sağ tıklayınca menü yazısı açık zemin üstünde açık renkteydi, okunmuyordu",
+    "fix": "Menü yazısı her arayüzde koyu"
    }
   ]
  }

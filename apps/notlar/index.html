@@ -439,17 +439,18 @@ kbd{font:500 11px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radius:
 @media (max-width:760px){.pgb{min-height:58px}.tw,.tw0{width:36px;height:40px}.ni.tr{padding-left:calc(2px + var(--dp,0)*14px)}.sub-add{height:44px}.crumb .cr{height:40px;max-width:120px}.pgn{display:none}.mv-q{height:40px}}
 </style>
 <script>/* mat cam tasarımı: bir kereliğine koyu temaya geç (sonra tema düğmesi serbest) */try{if(!localStorage.getItem('notlar:glass1')){localStorage.setItem('notlar:glass1','1');localStorage.setItem('notlar:theme','"dark"')}}catch(e){}</script>
-<script src="../../shared/skin.js?v=20261124e"></script>
-<link rel="stylesheet" href="player.css?v=20261124e">
-<link rel="stylesheet" href="library.css?v=20261124e">
-<link rel="stylesheet" href="brain.css?v=20261124e">
-<link rel="stylesheet" href="media.css?v=20261124e">
-<link rel="stylesheet" href="time.css?v=20261124e">
-<link rel="stylesheet" href="tasks.css?v=20261124e">
-<link rel="stylesheet" href="daypick.css?v=20261124e">
-<link rel="stylesheet" href="food.css?v=20261124e">
-<link rel="stylesheet" href="tables.css?v=20261124e">
-<link rel="stylesheet" href="ders.css?v=20261124e">
+<script src="../../shared/skin.js?v=20261124f"></script>
+<link rel="stylesheet" href="player.css?v=20261124f">
+<link rel="stylesheet" href="library.css?v=20261124f">
+<link rel="stylesheet" href="brain.css?v=20261124f">
+<link rel="stylesheet" href="media.css?v=20261124f">
+<link rel="stylesheet" href="time.css?v=20261124f">
+<link rel="stylesheet" href="yearly.css?v=20261124f">
+<link rel="stylesheet" href="tasks.css?v=20261124f">
+<link rel="stylesheet" href="daypick.css?v=20261124f">
+<link rel="stylesheet" href="food.css?v=20261124f">
+<link rel="stylesheet" href="tables.css?v=20261124f">
+<link rel="stylesheet" href="ders.css?v=20261124f">
 <style id="tnavCss">
 /* ── Üst gezinme (sol menü yerine) — ince cam şerit, kayan seçili vurgu ── */
 .app,.app[data-mode=lib],.app[data-mode=brain]{grid-template-columns:1fr}
@@ -564,7 +565,7 @@ kbd{font:500 11px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radius:
 @media (prefers-reduced-motion:reduce){.txt a[href^="http"]::after{transition:none}.lkpv-ld i{animation:none}}
 html[data-motion=off] .txt a[href^="http"]::after{transition:none}
 </style>
-<link rel="stylesheet" href="glass.css?v=20261124e">
+<link rel="stylesheet" href="glass.css?v=20261124f">
 <style id="docsCss">
 /* ── Docs gibi biçim: vurgu kalemi, yazı rengi, hizalama ── */
 mark.hl-y{background:#FFF1A8;color:inherit}mark.hl-g{background:#C9F2D0;color:inherit}mark.hl-b{background:#CFE4FF;color:inherit}mark.hl-p{background:#FFD6E8;color:inherit}mark.hl-o{background:#FFDDB5;color:inherit}
@@ -647,17 +648,18 @@ body.rsz,body.rsz *{cursor:ew-resize!important;user-select:none}
   </div>
 </div>
 <div class="toasts" id="toasts"></div>
-<script src="player.js?v=20261124e"></script>
-<script src="kb.js?v=20261124e"></script>
-<script src="library.js?v=20261124e"></script>
-<script src="media.js?v=20261124e"></script>
-<script src="brain.js?v=20261124e"></script>
-<script src="time.js?v=20261124e"></script>
-<script src="daypick.js?v=20261124e"></script>
-<script src="food.js?v=20261124e"></script>
-<script src="tables.js?v=20261124e"></script>
-<script src="tasks.js?v=20261124e"></script>
-<script src="ders.js?v=20261124e"></script>
+<script src="player.js?v=20261124f"></script>
+<script src="kb.js?v=20261124f"></script>
+<script src="library.js?v=20261124f"></script>
+<script src="media.js?v=20261124f"></script>
+<script src="brain.js?v=20261124f"></script>
+<script src="time.js?v=20261124f"></script>
+<script src="daypick.js?v=20261124f"></script>
+<script src="yearly.js?v=20261124f"></script>
+<script src="food.js?v=20261124f"></script>
+<script src="tables.js?v=20261124f"></script>
+<script src="tasks.js?v=20261124f"></script>
+<script src="ders.js?v=20261124f"></script>
 
 <script>
 'use strict';
@@ -1054,7 +1056,7 @@ function renderCal(dir,quiet){
     cells+=`<div class="cd${dd.getMonth()!==m?' out':''}${s===t?' today':''}${s===selDay?' sel':''}${i%7>4?' wk':''}" data-day="${s}"><span class="dn">${dd.getDate()}</span><div class="chips">${Time.monthChips(s)}${Tasks.monthChips(s)}${its.slice(0,3).map(p=>`<div class="c2" draggable="true" data-pid="${p.id}" title="${esc(titleOf(p))}">${iconOf(p)}<span>${esc(titleOf(p))}</span></div>`).join('')}${its.length>3?`<div class="more">+${its.length-3}</div>`:''}${fdn?`<div class="more fdn">📌 ${fdn} tarihli satır</div>`:''}</div></div>`}
   const isCur=y===new Date().getFullYear()&&m===new Date().getMonth();
   $('#view').innerHTML=`<div class="wide cal"><div>
-    <div class="cal-h"><h1><button class="cal-mj" data-mjump aria-haspopup="dialog" title="Tarih seç — bir güne git, etkinlik ekle">${MONTHS[m]} <em>${y}</em><svg class="li" viewBox="0 0 16 16" aria-hidden="true"><path d="m4.5 6.5 3.5 3.5 3.5-3.5"/></svg></button></h1>${Time.navGrp('cal','Önceki ay','Sonraki ay',isCur)}${Time.modeSeg()}</div>
+    <div class="cal-h"><h1><button class="cal-mj" data-mjump aria-haspopup="dialog" title="Tarih seç — bir güne git, etkinlik ekle">${MONTHS[m]} <em>${y}</em><svg class="li" viewBox="0 0 16 16" aria-hidden="true"><path d="m4.5 6.5 3.5 3.5 3.5-3.5"/></svg></button></h1>${Time.yrBtn()}${Time.navGrp('cal','Önceki ay','Sonraki ay',isCur)}${Time.modeSeg()}</div>
     <div class="dow">${DOW.map(d=>`<span>${d}</span>`).join('')}</div>
     <div class="grid" id="grid" style="--wk:${weeks}">${cells}</div></div>
     <aside class="dp" id="dp"></aside></div>`;
@@ -1066,13 +1068,13 @@ function renderCal(dir,quiet){
 function renderDay(animate){
   const its=[...pages.values()].filter(p=>p.date===selDay).sort((a,b)=>a.created-b.created);
   const quick=['daily','meet','todo','client','class','week'];
-  const up=TM.upcoming(120).slice(0,6),dl=n=>n===0?'bugün':n===1?'yarın':`${n} gün sonra`;
+  const up=TM.upcoming(120,true).slice(0,6),dl=n=>n===0?'bugün':n===1?'yarın':`${n} gün sonra`;
   $('#dp').innerHTML=`${Time.qaHTML('Yeni etkinlik — ör. “Spor 18:00 yarın” ya da “Ayşe doğum günü 12 mart”',selDay)}${Time.calMode!=='month'?Time.miniCal(selDay):''}
     <div class="dp-h"><div class="wd">${esc(fmtWd(selDay))}${selDay===today()?' · bugün':''}</div><h2>${esc(fmtShort(selDay))}</h2></div>
     ${Time.dayPanelExtra(selDay)}<div class="ag-sec"><div class="ag-h">Notlar</div><div class="lst">${its.length?its.map(p=>`<button class="row" data-pid="${p.id}"><span class="e">${iconOf(p)}</span><b>${esc(titleOf(p))}</b><small>${rel(p.updated)}</small></button>`).join(''):'<div class="ag-none">Bu güne bağlı not yok.</div>'}</div></div>
     ${(()=>{const e=dateIndex().get(selDay);return e&&e.blocks.length?`<div class="sh"><span>Bu güne tarihli satırlar</span><span class="rule"></span></div><div class="lst">${e.blocks.slice(0,8).map(o=>`<button class="row" data-pid="${o.p.id}"><span class="e">${o.b.t==='todo'?(o.b.c?'☑️':'⬜'):'📌'}</span><b>${esc(plain(o.b.h).slice(0,60))}</b><small>${esc(titleOf(o.p))}</small></button>`).join('')}</div>`:''})()}
-    ${up.length?`<div class="ag-sec bd-up"><div class="ag-h">Yaklaşan doğum günleri</div><div class="lst">${up.map(({a,d,diff})=>`<button class="row" data-act-open="${a.id}"><span class="e">🎂</span><b>${esc(a.title)}${a.byear?` <small>· ${+d.slice(0,4)-a.byear}</small>`:''}</b><small>${esc(new Date(d+'T00:00').toLocaleDateString('tr-TR',{day:'numeric',month:'short'}))} · ${dl(diff)}</small></button>`).join('')}</div></div>`:''}
-    <div class="dp-f"><button class="dp-a" data-bday>🎂 Doğum günü</button><button class="dp-a" data-day-open="${selDay}">${IC.plus} Günün notu</button><button class="dp-a" data-addday="">${IC.plus} Boş sayfa</button><button class="dp-a" data-addmore>Şablon…</button></div>`;
+    ${up.length?`<div class="ag-sec bd-up"><div class="ag-h">Yaklaşan özel günler</div><div class="lst">${up.map(({a,d,diff})=>`<button class="row" data-yearly="${a.id}"><span class="e">${a.kind==='bday'?'🎂':'⭐'}</span><b>${esc(a.title)}${a.byear&&+d.slice(0,4)>a.byear?` <small>· ${+d.slice(0,4)-a.byear}${a.kind==='bday'?'':'. yıl'}</small>`:''}</b><small>${esc(new Date(d+'T00:00').toLocaleDateString('tr-TR',{day:'numeric',month:'short'}))} · ${dl(diff)}</small></button>`).join('')}</div></div>`:''}
+    <div class="dp-f"><button class="dp-a" data-yearly>↻ Her yıl</button><button class="dp-a" data-day-open="${selDay}">${IC.plus} Günün notu</button><button class="dp-a" data-addday="">${IC.plus} Boş sayfa</button><button class="dp-a" data-addmore>Şablon…</button></div>`;
   if(animate)anim($('#dp'),[{opacity:.3,transform:'translateY(4px)'},{opacity:1,transform:'none'}],{duration:360,easing:OUT});
 }
 function addOnDay(k,day){const t=TPL.find(x=>x.k===k);const p=newPage({tpl:k||undefined,date:day,title:k==='daily'?fmtLong(day):undefined});go('#p/'+p.id)}
@@ -1082,6 +1084,7 @@ $('#view').addEventListener('click',e=>{
   const g=e.target.closest('[data-go]');if(g){go(g.dataset.go);return}
   const lx=e.target.closest('[data-lkx]');if(lx&&P){e.preventDefault();e.stopPropagation();const b=blockOf(lx.closest('.blk').dataset.id);if(b){const u=b.url;Object.assign(b,{t:'p',h:`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(b.title&&b.kind!=='image'?b.title:u)}</a>`});['url','title','desc','img','site','fav','yt','kind','ld'].forEach(k=>delete b[k]);relinkNode(b);edited()}return}
   const yp=e.target.closest('[data-lkplay]');if(yp&&!yp.querySelector('.vp')){const v=yp.dataset.lkplay;yp.append(VP.make({yt:v,title:yp.querySelector('.lk-ycap b')?.textContent||'YouTube videosu'}).el);yp.classList.add('on');return}
+  const yb=e.target.closest('[data-yearly]');if(yb){Yearly.open(yb.dataset.yearly||null,selDay);return}
   if(e.target.closest('[data-bday]')){Time.newBday(selDay);return}
   const mj=e.target.closest('[data-mjump]');if(mj){DayPick.open(mj);return}
   if(e.target.closest('[data-act=new]')){go('#p/'+newPage().id);return}

@@ -374,6 +374,7 @@ body.linking,body.linking .node,body.linking #stage{cursor:crosshair}
 .prog{position:absolute;left:0;right:0;top:0;height:2px;z-index:2;background:var(--ink);transform-origin:left;transform:scaleX(0);opacity:0}
 .hot{position:fixed;left:25%;right:25%;top:0;height:10px;z-index:56}
 .osbar{position:fixed;left:0;right:0;top:0;z-index:55;height:calc(48px + env(safe-area-inset-top));padding:env(safe-area-inset-top) 18px 0;display:flex;align-items:center;justify-content:space-between;background:var(--bg);color:var(--ink);font-size:13.5px;font-weight:600;touch-action:none;user-select:none;cursor:grab}
+.osbar :is(.ob-t,.ob-r){transition:opacity .25s var(--ease)}@media (max-width:600px){body.isl-open .osbar :is(.ob-t,.ob-r){opacity:0;visibility:hidden;transition:opacity .2s var(--ease),visibility 0s .2s}} /* ada açılınca saat/pil yer açar (iPhone gibi) */
 .osbar[hidden]{display:none}.ob-t{letter-spacing:-.01em}.ob-r{display:flex;align-items:center;gap:8px;font-size:13px}.ob-r i{font-style:normal}.ob-r .ob-off{color:#D97706}.ob-r small{font-size:12px;color:var(--ink2)}
 .ob-bat{position:relative;display:inline-flex;align-items:center;width:24px;height:12px;border-radius:3.5px;box-shadow:inset 0 0 0 1.2px var(--ink2);padding:2px}.ob-ch{font-size:12px;font-style:normal}.ob-bat::after{content:'';position:absolute;right:-3px;top:4px;width:2px;height:4px;border-radius:0 1px 1px 0;background:var(--ink2)}
 .ob-bat b{display:block;height:100%;width:var(--p);border-radius:1.5px;background:var(--ink)}.ob-bat.low b{background:#DC2626}
@@ -666,12 +667,12 @@ body.inworld .isl-mini{z-index:45}
 /* ── Uygulama şeridi (macOS pencere çubuğu + iPadOS): ⌂ · ışıklar · uygulama adı ▾ · açık uygulamalar simge olarak ── */
 .pill{gap:6px;padding:0 6px;height:44px;border-radius:22px}
 .pill .pl-home{width:32px;height:32px;border-radius:50%}
-.pl-lights{display:inline-flex;align-items:center;gap:7px;padding:0 6px 0 4px}
-.pill .pl-l{width:13px;height:13px;border-radius:50%;padding:0;display:grid;place-items:center;color:transparent;transition:filter .15s,transform .25s var(--spring);position:relative}
-.pill .pl-l::before{content:'';position:absolute;inset:-7px;border-radius:50%} /* dokunma alanı */
-.pill .pl-l svg{width:9px;height:9px;stroke-width:1.6}.pl-l.r{background:#FF5F57}.pl-l.y{background:#FEBC2E}.pl-l.g{background:#28C840}
-.pl-lights:hover .pl-l{color:rgba(0,0,0,.6)}.pill .pl-l:hover{background:var(--c);filter:brightness(.92)}.pill .pl-l.r:hover{background:#FF5F57}.pill .pl-l.y:hover{background:#FEBC2E}.pill .pl-l.g:hover{background:#28C840}
-.pill .pl-l.g[aria-pressed=true]{box-shadow:0 0 0 2px var(--menu),0 0 0 3.5px #28C840}
+.pl-lights{display:inline-flex;align-items:center;gap:0;padding:0 2px 0 0}
+.pill .pl-l{width:24px;height:24px;border-radius:50%;padding:0;display:grid;place-items:center;color:transparent;background:none;transition:filter .15s,transform .25s var(--spring);position:relative} /* 24px dokunma alanı, görünen nokta 13px */
+.pill .pl-l::before{content:'';position:absolute;inset:5.5px;border-radius:50%;background:var(--dot)}.pill .pl-l:hover{background:none}
+.pill .pl-l svg{position:relative;width:9px;height:9px;stroke-width:1.6}.pl-l.r{--dot:#FF5F57}.pl-l.y{--dot:#FEBC2E}.pl-l.g{--dot:#28C840}
+.pl-lights:hover .pl-l{color:rgba(0,0,0,.6)}.pill .pl-l:hover::before{filter:brightness(.92)}
+.pill .pl-l.g[aria-pressed=true]::before{box-shadow:0 0 0 2px var(--menu),0 0 0 3.5px #28C840}
 .pill .pl-title{width:auto;height:32px;display:flex;align-items:center;gap:7px;padding:0 8px 0 5px;border-radius:16px;color:var(--ink);font-size:13px;font-weight:650;max-width:min(260px,40vw)}
 .pill .pl-title b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:650}.pill .pl-title .mini{width:22px;height:22px;border-radius:7px;flex-shrink:0}.pl-chev{width:12px!important;height:12px!important;color:var(--ink3);flex-shrink:0}
 .pill .tabs{gap:4px;padding:0 2px 0 6px;border-left:.5px solid var(--line3);max-width:min(40vw,320px)}
@@ -2024,7 +2025,7 @@ function relocateWidgets(){return;if(!wReady||!booted)return;const RG=GX.RG+40;l
     if(Math.hypot(cx,cy)<RG){r.w.w=wSpot(w,h,[RG+60,-RG*.55],r.w.id);moved=true}}
   if(moved)saveMeta()}
 
-const COVER='.cc-bg,.pal-bg,.sheet-scrim,.as-bg,.ts-bg,.rm-bg,.wp-bg,.ox-bg,.tr-bg';
+const COVER='.cc-bg,.pal-bg,.sheet-scrim,.as-bg,.ts-bg,.rm-bg,.wp-bg,.ox-bg,.tr-bg,.sn-bg';
 function frame(t){
   raf=0;if(paused)return;
   // pacing: ≤60fps even on 120Hz screens; 30fps once the hands are off; ~4fps when nothing at all moves
@@ -2332,11 +2333,11 @@ function npCard(x){const d=NP.dur,c=npCur(),app=tabOf(NP.key)?.app.name||'';
     <div class="np-tm num"><span data-v="npc">${fmtClock(c)}</span><span>${fmtClock(d)}</span></div>`:''}
     <div class="np-c"><button data-np="prev" aria-label="Önceki" title="Önceki">${NPI.prev}</button><button class="np-pp" data-np="toggle" aria-label="${x.on?'Duraklat':'Oynat'}" title="${x.on?'Duraklat':'Oynat'}">${x.on?NPI.pause:NPI.play}</button><button data-np="next" aria-label="Sonraki" title="Sonraki">${NPI.next}</button></div></div>`}
 function paintFocusBar(){const b=$('#focusBar');if(!b)return;const it=islandItems();
-  if(!it.length||calmOn){b.hidden=true;islKey='';document.body.classList.remove('has-isl');pillAvoid(null);return}
+  if(!it.length||calmOn){b.hidden=true;islKey='';document.body.classList.remove('has-isl','isl-open');pillAvoid(null);return}
   document.body.classList.add('has-isl');islFit();islIt=it;const top=it[0],key=it.map(x=>x.k+x.t+x.sub+(x.done?1:0)+(x.on?1:0)+(x.img||'')+(x.k==='np'&&NP.dur?Math.round(NP.dur):'')).join('|')+islOpen;
   const vis=!b.hidden,wasOpen=b.classList.contains('open'),r0=vis&&key!==islKey?b.getBoundingClientRect():null;
   b.hidden=false;b.className='island'+(islOpen?' open':'')+(top.k==='timer'&&STUDY.run?.on?' live':'')+(top.k==='np'&&NP?.on?' np-on':'')+(top.k==='flash'?' flash':'');
-  b.style.setProperty('--npc',NP?.col||'#4ADE80');b.toggleAttribute('data-popover',islOpen); // açık ada geçici açılır katman (menü gibi): altındaki içeriği bilerek örter
+  b.style.setProperty('--npc',NP?.col||'#4ADE80');b.toggleAttribute('data-popover',islOpen);document.body.classList.toggle('isl-open',!!islOpen); // açık ada geçici açılır katman (menü gibi): altındaki içeriği bilerek örter
   if(key===islKey){for(const x of it){if(x.v)b.querySelectorAll(`[data-lv="${x.k}"]`).forEach(e=>e.textContent=x.v);if(x.p!=null)document.querySelectorAll(`[data-lp="${x.k}"]`).forEach(e=>e.style.setProperty('--p',x.p.toFixed(4)))}
     const pb=b.querySelector('[data-v=np]');if(pb&&NP?.dur&&!pb.parentElement.classList.contains('drag')){const c=npCur();pb.style.width=(c/NP.dur*100).toFixed(2)+'%';const tc=b.querySelector('[data-v=npc]');if(tc)tc.textContent=fmtClock(c)}return}
   islKey=key;
@@ -3479,6 +3480,7 @@ function palette(){
     {ic:UI.bell||UI.chk,l:'Hatırlatıcı kur',sub:'Kendine bildirim · tarayıcı ve telefon',run:()=>window.Notify?.open()},
     {ic:UI.bell||UI.chk,l:'Kendime bildirim gönder',sub:'Hemen · telefonuna da (ntfy)',run:()=>window.Notify?.open(true)},
     {ic:UI.chk,l:'Bugünün görevleri',sub:'Sabah planı · tahmini süreler',run:()=>window.DayCard?.open('plan')},
+    {ic:UI.chk,l:'Yaklaşan özel günler',sub:'Doğum günleri, yıldönümleri — her yıl tekrarlananlar',run:()=>window.Soon?.open(true)},
     {ic:UI.chk,l:'Günü kapat',sub:'Bitenler, kalanları yarına taşı',run:()=>window.DayCard?.open('close')},
     {ic:UI.dl,l:'Verilerimi yedekle (indir)',sub:'Notlar, görevler, takvim, kütüphane, Study Log — tek dosya',run:backupAll},
     {ic:UI.dl,l:'Yedekten geri yükle',sub:'İndirdiğin yedek dosyasını seç — önce şu anki hâlin yedeklenir',run:restoreAll},
@@ -3737,7 +3739,7 @@ applyTheme(document.documentElement.dataset.theme);applyLook();
 buildMesh();introStart=performance.now();wake();
 (async()=>{
   const mp=loadManifest();
-  if(!CLOUD){S=Local;drafts=await Local.load();await mp;mountWidgets();syncNodes();booted=true;GX.key='';seedWidgets();seedMore();autoClusters();ensureNotes();window.Worlds?.boot();window.DayCard?.start(null);window.Notify?.start();requestAnimationFrame(bootIntro);return}
+  if(!CLOUD){S=Local;drafts=await Local.load();await mp;mountWidgets();syncNodes();booted=true;GX.key='';seedWidgets();seedMore();autoClusters();ensureNotes();window.Worlds?.boot();window.DayCard?.start(null);window.Notify?.start();window.Soon?.start(null);requestAnimationFrame(bootIntro);return}
   gate('loading');
   try{await loadFirebase()}catch{return gate('error','Firebase yüklenemedi. İnternet bağlantını kontrol et.')}
   if(!firebase.apps.length)firebase.initializeApp(FB);
@@ -3749,7 +3751,7 @@ buildMesh();introStart=performance.now();wake();
     gate('loading','Yükleniyor…');await mp;S=Cloud;await Cloud.start(fs);
     const me=$('#me');me.hidden=false;me.innerHTML=u.photoURL?`<img src="${esc(u.photoURL)}" alt="" referrerpolicy="no-referrer">`:esc(mono(u.displayName||u.email));
     await ungate();introStart=performance.now();introT=0;wakeMesh();
-    mountWidgets();syncNodes();booted=true;GX.key='';seedWidgets();seedMore();migrateLocal();autoClusters();ensureNotes();window.Worlds?.boot();window.DayCard?.start(fs);window.Notify?.start();requestAnimationFrame(bootIntro);
+    mountWidgets();syncNodes();booted=true;GX.key='';seedWidgets();seedMore();migrateLocal();autoClusters();ensureNotes();window.Worlds?.boot();window.DayCard?.start(fs);window.Notify?.start();window.Soon?.start(fs);requestAnimationFrame(bootIntro);
   });
 })();
 
@@ -3786,6 +3788,7 @@ addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.shiftKey&&(e.key==='
 <script src="ui/day.js?v=20261120c"></script>
 <link rel="stylesheet" href="ui/notify.css?v=20261120d">
 <script src="ui/notify.js?v=20261121b"></script>
+<link rel="stylesheet" href="ui/soon.css?v=20261124a"><script src="ui/soon.js?v=20261124a"></script>
 <link rel="stylesheet" href="ui/os.css?v=20261121a">
 <script src="ui/os.js?v=20261123b"></script>
 <link rel="stylesheet" href="ui/osx.css?v=20261124d"><script src="ui/osx.js?v=20261124a"></script><script src="ui/tour.js?v=20261124b"></script>

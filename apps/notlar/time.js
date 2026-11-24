@@ -19,7 +19,8 @@ const TM=(()=>{
   function norm(o){const a={id:String(o.id),title:String(o.title||'').slice(0,160),cat:String(o.cat||'diger'),date:/^\d{4}-\d{2}-\d{2}$/.test(o.date||'')?o.date:new Date().toISOString().slice(0,10),
       start:hm(o.start)!=null?o.start.padStart(5,'0'):'',end:hm(o.end)!=null?o.end.padStart(5,'0'):'',dur:Math.max(0,Math.round(+o.dur||0)),desc:String(o.desc||'').slice(0,2000),note:String(o.note||'').slice(0,8000),
       status:['plan','doing','done'].includes(o.status)?o.status:'plan',page:String(o.page||''),created:+o.created||now(),updated:+o.updated||now(),
-      rep:o.rep==='yearly'||o.kind==='bday'?'yearly':'',kind:o.kind==='bday'?'bday':'',byear:o.kind==='bday'&&+o.byear>1900&&+o.byear<3000?Math.round(+o.byear):0};
+      rep:o.rep==='yearly'||o.kind==='bday'?'yearly':'',kind:o.kind==='bday'?'bday':'',byear:(o.kind==='bday'||o.rep==='yearly')&&+o.byear>1900&&+o.byear<3000?Math.round(+o.byear):0,
+      warn:o.rep==='yearly'||o.kind==='bday'?(o.warn==null||o.warn===''?3:Math.max(0,Math.min(30,Math.round(+o.warn)||0))):0}; // her yıl tekrarlananlar: kaç gün önce hatırlatılsın (hub “Yaklaşıyor” ekranı + bildirim)
     if(a.kind==='bday'){a.start='';a.end='';a.dur=0;a.status='plan'}
     a.dur=durOf(a);return a}
   const normCat=c=>({id:String(c.id),name:String(c.name||'Kategori').slice(0,30),color:/^#[0-9a-f]{6}$/i.test(c.color||'')?c.color:'#71717A',icon:String(c.icon||'').slice(0,4)});
@@ -48,9 +49,9 @@ const TM=(()=>{
   const onDay=d=>[...acts.values()].filter(a=>a.date===d||yearlyOn(a,d)).map(a=>a.date===d?a:{...a,occ:d,status:'plan'}).sort((a,b)=>(hm(a.start)??-1)-(hm(b.start)??-1)||a.created-b.created);
   const between=(a,b)=>[...acts.values()].filter(x=>x.date>=a&&x.date<=b);
   // görünen ad: doğum günlerinde 🎂 ve (yıl biliniyorsa) o gün kaçıncı yaşı
-  const label=(a,d)=>a.kind==='bday'?`🎂 ${a.title}${a.byear&&d?` · ${+String(d).slice(0,4)-a.byear}`:''}`:a.title;
+  const label=(a,d)=>a.kind==='bday'?`🎂 ${a.title}${a.byear&&d?` · ${+String(d).slice(0,4)-a.byear}`:''}`:a.rep==='yearly'&&a.byear&&d&&+String(d).slice(0,4)>a.byear?`${a.title} · ${+String(d).slice(0,4)-a.byear}. yıl`:a.title;
   // yaklaşan doğum günleri (bugünden itibaren n gün)
-  function upcoming(n=120){const t=new Date(),out=[];for(const a of acts.values()){if(a.kind!=='bday')continue;const md=a.date.slice(5);
+  function upcoming(n=120,all){const t=new Date(),out=[];for(const a of acts.values()){if(all?a.rep!=='yearly':a.kind!=='bday')continue;const md=a.date.slice(5);
       for(const y of[t.getFullYear(),t.getFullYear()+1]){let d=`${y}-${md}`;if(md==='02-29'&&!leap(y))d=`${y}-02-28`;const diff=Math.round((new Date(d+'T00:00')-new Date(t.toDateString()))/864e5);if(diff>=0&&diff<=n&&d>=a.date){out.push({a,d,diff});break}}}
     return out.sort((x,y)=>x.diff-y.diff)}
   return{label,upcoming,acts,get cats(){return cats},get mode(){return mode},get ready(){return ready},get ver(){return ver},startLocal,startCloud,stop,add,save,del,restore,setCats,cat,onDay,between,durOf,hm,fmtHM,norm,on:f=>{subs.add(f);return()=>subs.delete(f)}}})();
@@ -134,7 +135,8 @@ const Time=(()=>{
   function newBday(date){editor(TM.norm({id:'A_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),title:'',kind:'bday',date:date||selDayOr()}),true)}
   function newAct(o={}){const c=o.cat||lsg('time:lastcat','diger');editor(TM.norm({id:'A_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),title:'',cat:c,date:o.date||selDayOr(),start:o.start||'',end:o.end||'',status:o.status||'plan'}),true)}
   const selDayOr=()=>typeof selDay!=='undefined'&&selDay?selDay:today();
-  function open(id){const a=TM.acts.get(id);if(a)editor({...a},false)}
+  function open(id){const a=TM.acts.get(id);if(!a)return;if(a.rep==='yearly'&&typeof Yearly!=='undefined')return Yearly.open(id);editor({...a},false)} // her yıl tekrarlananlar kendi penceresinde
+  function edit(id){const a=TM.acts.get(id);if(a)editor({...a},false)}
   function catManager(after){const el=document.createElement('div');el.className='tm-ed-bg';let list=TM.cats.map(c=>({...c}));
     const draw=()=>`<div class="tm-ed" role="dialog" aria-modal="true" aria-label="Kategoriler"><div class="tm-ed-h"><b class="tm-ed-tt">Kategoriler</b><button type="button" class="tm-ib" data-x aria-label="Kapat">${I.x}</button></div>
       <div class="tm-cl">${list.map((c,i)=>`<div class="tm-ci"><input class="tm-ce" data-i="${i}" data-f="icon" value="${E(c.icon)}" aria-label="Simge" maxlength="4"><input type="color" data-i="${i}" data-f="color" value="${c.color}" aria-label="Renk"><input class="tm-cn" data-i="${i}" data-f="name" value="${E(c.name)}" aria-label="Ad"><span class="tm-cc">${[...TM.acts.values()].filter(a=>a.cat===c.id).length}</span>${c.id==='diger'?'':`<button class="tm-ib" data-rm="${i}" aria-label="${E(c.name)} kategorisini sil">${I.trash}</button>`}</div>`).join('')}</div>
@@ -173,7 +175,7 @@ const Time=(()=>{
         return`<div class="tm-ev st-${a.status}" data-ev="${a.id}" style="--c:${c.color};top:${s*PX}px;height:${du*PX-2}px" tabindex="0" title="${E(a.title)} · ${a.start}${a.end?'–'+a.end:''}"><b>${E(a.title)}</b><small>${a.start}${a.end?'–'+a.end:''} · ${E(c.name)}</small><i class="tm-rs" data-rs></i></div>`}).join('')}
         ${d===t?`<div class="tm-now" style="top:${(new Date().getHours()*60+new Date().getMinutes())*PX}px"></div>`:''}</div>`}
     $('#view').innerHTML=`<div class="wide cal tm-cal"><div class="tm-gwrap">
-      <div class="cal-h"><h1>${title}</h1>${navGrp('gnav',calMode==='day'?'Önceki gün':'Önceki hafta',calMode==='day'?'Sonraki gün':'Sonraki hafta',days.includes(t))}${modeSeg()}</div>
+      <div class="cal-h"><h1>${title}</h1>${yrBtn()}${navGrp('gnav',calMode==='day'?'Önceki gün':'Önceki hafta',calMode==='day'?'Sonraki gün':'Sonraki hafta',days.includes(t))}${modeSeg()}</div>
       <div class="tm-g${days.length>1?' wk':''}" style="--n:${days.length}"><div class="tm-gh"><span></span>${days.map(d=>`<button class="tm-dh${d===t?' today':''}${d===sd?' sel':''}" data-gpick="${d}"><small>${DOW[(pd(d).getDay()+6)%7]}</small><b>${pd(d).getDate()}</b></button>`).join('')}</div>
         <div class="tm-ad"><span>tüm gün</span>${days.map(d=>`<div class="tm-adc" data-gday-ad="${d}">${allday(d)}</div>`).join('')}</div>
         <div class="tm-gs" id="tmScroll"><div class="tm-gb" style="height:${1440*PX}px"><div class="tm-hrs">${(()=>{const n=new Date(),nm=n.getHours()*60+n.getMinutes(),on=days.includes(t);return[...Array(24)].map((_,h)=>`<span style="top:${h*60*PX}px"${on&&Math.abs(h*60-nm)<14?' class="hide"':''}>${String(h).padStart(2,'0')}:00</span>`).join('')+(on?`<span class="now" style="top:${nm*PX}px">${TM.fmtHM(nm)}</span>`:'')})()}</div>${cols}</div></div></div></div>
@@ -204,6 +206,7 @@ const Time=(()=>{
       h+=`<button class="tmc-d${o?' out':''}${d===t?' today':''}${d===sel?' sel':''}" data-mpick="${d}" aria-label="${E(fmtShort(d))}"${d===sel?' aria-current="date"':''}>${pd(d).getDate()}${has?'<i></i>':''}</button>`}
     return`<div class="tmc"><div class="tmc-h"><b>${MONTHS[m]} <em>${y}</em></b><button class="tb" data-mnav="-1" aria-label="Önceki ay">${I.l}</button><button class="tb" data-mnav="1" aria-label="Sonraki ay">${I.r}</button></div>
       <div class="tmc-w">${DOW.map(x=>`<span>${x.slice(0,2)}</span>`).join('')}</div><div class="tmc-g">${h}</div></div>`}
+  const yrBtn=()=>`<button class="tm-yrb" data-yearly title="Her yıl tekrarlanan gün ekle — doğum günü, yıldönümü…">${SV('<path d="M12.5 6.5A4.75 4.75 0 0 0 4 5M3.5 9.5A4.75 4.75 0 0 0 12 11"/><path d="M4 2.5V5h2.5M12 13.5V11H9.5"/>')}<span>Her yıl</span></button>`;
   const navGrp=(k,pl,nl,isNow)=>`<div class="cal-nav"><button class="tb" data-${k}="-1" title="${pl}" aria-label="${pl}">${I.l}</button><button class="tb${isNow?' now':''}" data-${k}="0">Bugün</button><button class="tb" data-${k}="1" title="${nl}" aria-label="${nl}">${I.r}</button></div>`;
   function dayPanelExtra(d){const L=TM.onDay(d).sort((a,b)=>(a.start||'').localeCompare(b.start||'')),tk=tasks().filter(o=>o.date===d),tot=L.reduce((s,a)=>s+(a.status==='done'?a.dur:0),0);
     return`<div class="ag-sec"><div class="ag-h">Etkinlikler${tot?`<span>${fm(tot)} tamamlandı</span>`:''}</div>
@@ -274,5 +277,5 @@ const Time=(()=>{
   const airChip=(x,cls)=>`<button class="${cls} is-air" data-go="#lib/i/${E(x.iid)}" title="${E(x.title)} · ${x.ep}. bölüm · ${x.hm}"><i></i><span><em>${x.hm}</em> ${E(x.title)} · ${x.ep}. bölüm</span></button>`;
   function monthChips(d){const L=TM.onDay(d),A=air(d);if(!L.length&&!A.length)return'';if(!L.length)return A.slice(0,3).map(x=>airChip(x,'tm-mc')).join('')+(A.length>3?`<div class="more">+${A.length-3} bölüm</div>`:'');
     const room=Math.max(0,3-L.length);return L.slice(0,3).map(a=>{return`<div class="tm-mc st-${a.status}${a.kind?' is-bd':''}" draggable="${!a.rep}" ${a.rep?'':`data-mact="${a.id}" `}data-act-open="${a.id}" style="--c:${colOf(a)}" title="${E(TM.label(a,d))}${a.start?' · '+a.start:''}${a.rep?' · her yıl':''}"><i></i><span>${a.start?`<em>${a.start}</em> `:''}${E(TM.label(a,d))}</span></div>`}).join('')+A.slice(0,room).map(x=>airChip(x,'tm-mc')).join('')+(L.length+A.length>3?`<div class="more">+${L.length+A.length-Math.min(3,L.length)-Math.min(room,A.length)} daha</div>`:'')}
-  function dismiss(){const e=document.querySelector('.tm-ed-bg');if(e){e.remove();busy=false}}
-  return{newBday,dismiss,get calMode(){return calMode},renderGrid,dayPanelExtra,monthChips,miniCal,navGrp,qaHTML,renderTasks,renderStats,bind,newAct,quickAdd,parse,tasks,modeSeg}})();
+  function dismiss(){document.querySelectorAll('.tm-ed-bg').forEach(e=>e.remove());busy=false;if(typeof Yearly!=='undefined')Yearly.close(true)}
+  return{yrBtn,edit,newBday,dismiss,get calMode(){return calMode},renderGrid,dayPanelExtra,monthChips,miniCal,navGrp,qaHTML,renderTasks,renderStats,bind,newAct,quickAdd,parse,tasks,modeSeg}})();

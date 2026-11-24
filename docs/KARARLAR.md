@@ -124,3 +124,5 @@ Son güncelleme: 2026-11-15
 - **Arayüzlerde “Açık” çubuğu yok:** arayüzlerin kendi alt gezinmesi var; açık uygulamalar adada, kenar panelinde ve Shift+Tab'da. (Mıknatıs'ta alt menünün üstüne biniyordu.)
 - **OS özellikleri (docs/OS.md):** gece ışığı, sıcak köşeler, pano geçmişi, ekran süresi, odak modları, rutinler, bildirim özeti, performans katmanı, kenar paneli, devam et — hepsi ayrı modülde (ui/osx.js), varsayılan olarak sessiz; sadece kenar tutamağı ve sağ alt köşe (Hızlı not) baştan açık.
 - **Uygulama şeridi:** macOS pencere çubuğu düzeni — ışıklar (kapat/mini/yan yana), uygulama adı menüsü, açık uygulamalar simge. Yazılı sekmeler ve 8 düğmelik sıra kaldırıldı (kullanıcı: “hiç OS gibi değil, karışık”).
+- **Her yıl günleri:** doğum günü/yıldönümü takvimde tek “Her yıl” düğmesinden; tarih kaydırmalı tekerlekle ya da yazarak. Yaklaşınca hub açılışında günde bir kez “Yaklaşıyor” ekranı, sonra bildirim (hatırlatma günü + günün kendisi 09:00).
+- **Ada açılınca:** uygulama şeridi adanın altına kayar; telefonda durum çubuğundaki saat/pil solar (iPhone gibi). Pencere ışıkları görünen 13px, dokunma alanı 24px.

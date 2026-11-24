@@ -5725,5 +5725,62 @@
     "fix": "pillAvoid: şerit adanın altına kayar; durum gezginine 'serit' durumu eklendi"
    }
   ]
+ },
+ {
+  "at": "2026-11-24T19:40:00+03:00",
+  "change": "Takvime “Her yıl” düğmesi geldi: bas → gün/ay/yıl tekerleklerini kaydırarak ya da “15 mart 2004” yazarak tarihi seç, doğum günü ya da özel gün olarak kaydet, kaç gün önce hatırlatılacağını seç. Hepsi aynı pencerede listeli, dokununca düzenlenir. Gün yaklaşınca AppShell açılışında “Yaklaşıyor” ekranı çıkar, sonra bildirim gelir. Ctrl+K “Yaklaşan özel günler”.",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "hub telefon": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Tekerlekteki uzak sayılar çok soluktu",
+    "fix": "Görünmeyenler gizlenir, kalanlar okunur kalır"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Telefonda tür düğmeleri küçüktü",
+    "fix": "40px"
+   },
+   {
+    "app": "hub",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Takvim yaprağındaki ay adı kontrastı sınırdaydı",
+    "fix": "Koyu kırmızı"
+   },
+   {
+    "app": "notlar",
+    "sev": "uyari",
+    "status": "open",
+    "text": "Koyu temada takvimdeki “Bugün” düğmesi kontrastı sınırda (eski)"
+   },
+   {
+    "app": "hub",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Telefonda açık ada durum çubuğundaki saat ve pilin üstüne biniyordu",
+    "fix": "Ada açılınca saat/pil solar"
+   },
+   {
+    "app": "hub",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Pencere ışıklarının (kapat/mini/yan yana) dokunma alanı çok küçüktü",
+    "fix": "24px alan, nokta aynı boyda"
+   }
+  ]
  }
 ]

@@ -234,7 +234,9 @@ function run(doc,opt={}){
       // görünen içerik: kök kendi zemini boyalıysa kendisi, değilse (şeffaf başlık satırı gibi) içindeki yazı/düğme/görseller
       const cont=r=>{if((parseColor(win.getComputedStyle(r).backgroundColor)?.a||0)>.35||win.getComputedStyle(r).backgroundImage!=='none')return[r];
         return[...r.querySelectorAll('*')].filter(e=>visible(e,win)&&(e.matches('button,a,img,input,select,[role=button]')||((e.innerText||'').trim()&&!e.children.length)||(parseColor(win.getComputedStyle(e).backgroundColor)?.a||0)>.35)).slice(0,60)};
-      const CA=cont(A),CB=cont(B);let hit=null;for(const x of CA){const xr=R(x);for(const y of CB){const yr=R(y),o=ov(xr,yr);if(o>60&&o>Math.min(xr.width*xr.height,yr.width*yr.height)*.12){hit=[x,y];break}}if(hit)break}
+      // açılır katman (açık ada, menü) çubuğun boş zeminini örtebilir; sadece çubuğun yazı/düğmeleriyle çakışması sayılır
+      const pop=e=>e.matches('[data-popover],[role=menu]'),only=r=>[...r.querySelectorAll('*')].filter(e=>visible(e,win)&&(e.matches('button,a,img,input,select,[role=button]')||((e.innerText||'').trim()&&!e.children.length))).slice(0,60);
+      const CA=pop(B)&&!pop(A)?only(A):cont(A),CB=pop(A)&&!pop(B)?only(B):cont(B);let hit=null;for(const x of CA){const xr=R(x);for(const y of CB){const yr=R(y),o=ov(xr,yr);if(o>60&&o>Math.min(xr.width*xr.height,yr.width*yr.height)*.12){hit=[x,y];break}}if(hit)break}
       if(hit)cl.push(...hit)}
     if(cl.length)addH('error','chromeclash','İki sabit çubuk üst üste binmiş','Örnekler ikişer ikişer: çakışan çift. Ekranın kenarındaki iki çubuk (alt menü, açık uygulamalar, ada, yakınlaştırma…) aynı yere düşmüş; biri öbürünü kapatıyor, yazılar karışıyor.','Birini öbürünün üstüne/yanına yerleştir ya da aynı anda görünmesinler (ör. diğeri açılınca yer değiştirsin).',[...new Set(cl)])}
   // 13c) yarısı kesilmiş düğme: taşması gizlenen bir kutu düğmenin bir kısmını kesiyor (ada daraltılınca “Duraklat”, “Geç” yarım kalmıştı)

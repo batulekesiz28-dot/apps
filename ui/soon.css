@@ -1,0 +1,18 @@
+/* “Yaklaşıyor” ekranı (ui/soon.js) — her yıl tekrarlanan gün yaklaşınca açılışta bir kez; hub teması */
+.sn-bg{position:fixed;inset:0;z-index:118;display:grid;place-items:center;padding:16px;background:var(--scrim);-webkit-backdrop-filter:blur(14px) saturate(1.2);backdrop-filter:blur(14px) saturate(1.2)}
+.sn{width:min(400px,100%);max-height:calc(100dvh - 32px);overflow:auto;display:flex;flex-direction:column;align-items:center;text-align:center;padding:30px 24px 20px;border-radius:28px;background:var(--surface);color:var(--ink);font-family:var(--font);box-shadow:0 0 0 .5px var(--line3),0 40px 90px -30px rgba(0,0,0,.5)}
+.sn-tile{width:84px;height:88px;margin-bottom:18px;display:flex;flex-direction:column;border-radius:20px;overflow:hidden;background:var(--surface2,var(--hover));box-shadow:0 0 0 .5px var(--line2),0 12px 30px -12px rgba(0,0,0,.35)}
+.sn-tile small{height:26px;display:grid;place-items:center;background:#DC2626;color:#fff;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.sn-tile b{flex:1;display:grid;place-items:center;font-size:38px;font-weight:650;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.sn-tile.today{box-shadow:0 0 0 .5px var(--line2),0 0 0 6px color-mix(in srgb,#E5484D 22%,transparent),0 12px 30px -12px rgba(0,0,0,.35)}
+.sn-k{margin:0;font-size:13px;font-weight:650;color:var(--ink2);letter-spacing:.01em}
+.sn-t{margin:6px 0 0;font-family:var(--display,var(--font));font-size:28px;font-weight:650;letter-spacing:-.025em;line-height:1.15;overflow-wrap:anywhere}
+.sn-s{margin:8px 0 0;font-size:14px;line-height:1.5;color:var(--ink2)}
+.sn-l{align-self:stretch;display:flex;flex-direction:column;gap:2px;margin-top:20px;padding-top:12px;border-top:1px solid var(--line)}
+.sn-r{display:flex;align-items:center;gap:10px;min-height:36px;padding:0 6px;text-align:left}.sn-r b{flex:1;min-width:0;font-size:14px;font-weight:550;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sn-r small{font-size:12.5px;color:var(--ink3);white-space:nowrap}
+.sn-h{margin:18px 0 0;font-size:12.5px;color:var(--ink3)}
+.sn-f{align-self:stretch;display:flex;gap:8px;margin-top:16px}
+.sn-b{flex:1;height:44px;border-radius:14px;font:inherit;font-size:14.5px;font-weight:600;color:var(--ink);background:var(--hover);transition:background .2s,scale .2s}
+.sn-b:hover{background:var(--line2)}.sn-b:active{scale:.97}.sn-b.pri{background:var(--ink);color:var(--bg)}.sn-b.pri:hover{opacity:.9}
+.sn-b:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.sn-b{transition:none}}html[data-motion=off] .sn-b{transition:none}

@@ -1,0 +1,31 @@
+/* “Her yıl” penceresi (yearly.js) — iOS tarzı kaydırmalı tarih tekerlekleri */
+.tm-yrb{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 10px;margin-right:4px;border-radius:9px;font-size:13px;font-weight:550;color:var(--ink);background:color-mix(in srgb,var(--ink) 5%,transparent);transition:background .2s,scale .2s}
+.tm-yrb:hover{background:color-mix(in srgb,var(--ink) 9%,transparent)}.tm-yrb:active{scale:.96}.tm-yrb svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.yr{width:min(480px,100%);gap:12px}
+.yr .tm-kind{margin:0}
+.yr-t{flex:none;width:100%;padding:2px 0}
+.yr-pick{position:relative;display:grid;grid-template-columns:.8fr 1.4fr 1.1fr;gap:6px;padding:0 6px;border-radius:14px;background:color-mix(in srgb,var(--ink) 3.5%,transparent)}
+.yr-band{position:absolute;left:6px;right:6px;top:calc(26px + 80px);height:40px;border-radius:10px;background:var(--card);box-shadow:0 0 0 .5px var(--line2),0 1px 4px rgba(0,0,0,.08);pointer-events:none}
+.yr-col{position:relative;display:flex;flex-direction:column;min-width:0}
+.yr-col small{height:26px;display:flex;align-items:flex-end;justify-content:center;font-size:12px;font-weight:600;color:var(--ink2)}
+.yr-w{height:200px;overflow-y:auto;scroll-snap-type:y mandatory;padding:80px 0;box-sizing:border-box;scrollbar-width:none;perspective:420px;outline:0;border-radius:10px;
+  -webkit-mask-image:linear-gradient(transparent,#000 32%,#000 68%,transparent);mask-image:linear-gradient(transparent,#000 32%,#000 68%,transparent);overscroll-behavior:contain}
+.yr-w::-webkit-scrollbar{display:none}
+.yr-w:focus-visible{box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--accent) 55%,transparent)}
+.yr-i{height:40px;display:grid;place-items:center;scroll-snap-align:center;font-size:17px;font-variant-numeric:tabular-nums;color:var(--ink);cursor:pointer;user-select:none;transform-origin:50% 50%;white-space:nowrap}
+.yr-i.on{color:var(--ink);font-weight:650}.yr-i.off{color:var(--ink4,var(--ink3));text-decoration:line-through;opacity:.35!important}
+.yr-type{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--ink3)}
+.yr-type input{flex:1;min-width:0;height:36px;padding:0 12px;border-radius:9px;border:0;outline:0;font:inherit;font-size:14px;color:var(--ink);background:color-mix(in srgb,var(--ink) 5%,transparent);transition:box-shadow .2s}
+.yr-type input:focus{box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--accent) 55%,transparent)}.yr-type input.bad{box-shadow:inset 0 0 0 2px #DC2626}
+.yr-pv{margin:0;font-size:13.5px;color:var(--ink2);line-height:1.5}.yr-pv b{color:var(--ink);font-weight:650}
+.yr-warn{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.yr-warn>span{font-size:12.5px;color:var(--ink3)}
+.yr-chips{display:flex;gap:4px;flex-wrap:wrap}
+.yr-chips button{height:30px;padding:0 11px;border-radius:15px;font-size:12.5px;font-weight:500;color:var(--ink2);background:color-mix(in srgb,var(--ink) 5%,transparent);transition:background .2s,color .2s}
+.yr-chips button:hover{color:var(--ink)}.yr-chips button.on{background:var(--ink);color:var(--bg)}
+.yr .tm-hint{margin:0}
+.yr-list{display:flex;flex-direction:column;gap:1px;margin-top:4px;padding-top:12px;border-top:1px solid var(--line)}
+.yr-list .ag-h{font-size:12px;font-weight:600;color:var(--ink3);margin:0 0 6px}
+.yr-r{display:flex;align-items:center;gap:10px;min-height:38px;padding:0 10px;border-radius:9px;text-align:left;color:var(--ink);transition:background .15s}
+.yr-r:hover,.yr-r.on{background:var(--hover)}.yr-r .e{width:20px;text-align:center}.yr-r b{flex:1;min-width:0;font-weight:500;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.yr-r small{font-size:12.5px;color:var(--ink3);white-space:nowrap}
+@media (max-width:700px){.tm-yrb{height:40px}.yr .tm-kind button{height:40px}.tm-yrb{padding:0 12px}.yr-chips button{height:40px}.yr-type input{height:42px}.yr-r{min-height:44px}.yr-i{font-size:16px}}
+@media (prefers-reduced-motion:reduce){.tm-yrb,.yr-chips button,.yr-r{transition:none}}html[data-motion=off] :is(.tm-yrb,.yr-chips button,.yr-r){transition:none}

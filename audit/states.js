@@ -3,8 +3,8 @@
 // Kullanıcı şikâyetinden doğdu: “Açık uygulamalar” çubuğu Mıknatıs'ın alt menüsünün üstüne bindi — tek ekran taraması bunu göremezdi.
 // Kullanım: python3 -m http.server 8766 &  node audit/states.js [dünya] [durum]   → sadece hata ve insan uyarılarını yazar; çıkış kodu = hata sayısı>0
 const {chromium}=require('playwright');const path=require('path');
-const WORLDS=['galaksi','mekansal','miknatis','ruzgar','petek','kum','balon','kadran','deste','harita'];
-const STATES=['bos','arkada','canli','ada','uygulama','serit','merkez','sistem','kenar'];
+const WORLDS=['galaksi','mekansal','miknatis','ruzgar','petek','kum','balon','kadran','deste','harita','pencere'];
+const STATES=['bos','arkada','canli','ada','uygulama','serit','sagtik','merkez','sistem','kenar'];
 const fw=process.argv[2]&&WORLDS.includes(process.argv[2])?[process.argv[2]]:WORLDS,fs=process.argv[3]&&STATES.includes(process.argv[3])?[process.argv[3]]:STATES;
 const SIZES=[['pc',{viewport:{width:1366,height:800}}],['tel',{viewport:{width:390,height:844},hasTouch:true,isMobile:true}]];
 const BAD=new Set(['chromeclash','textoverlap','textcover','buried','offscreen','overlap','fontsize0']);
@@ -33,6 +33,12 @@ const BAD=new Set(['chromeclash','textoverlap','textcover','buried','offscreen',
     if(st==='merkez'){await p.evaluate(()=>window.OS?.open());await p.waitForTimeout(700)}
     if(st==='sistem'){await p.evaluate(()=>{const d=new Date(),k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');localStorage.setItem('appshell:usage',JSON.stringify({[k]:{notlar:3200,studylog:1500,_home:900,haberler:420}}));OSX.open('ekran')});await p.waitForTimeout(700)}
     if(st==='kenar'){await p.evaluate(()=>OSX.edge());await p.waitForTimeout(700)}
+    // ana ekrana dönünce klavye odağı gizlenen uygulamanın çerçevesinde kalmamalı (kısayollar ölür)
+    if(st==='arkada'){const fo=await p.evaluate(()=>{const a=document.activeElement;return a&&a.tagName==='IFRAME'&&!document.body.classList.contains('os-app')});if(fo){errs++;console.log(w,sz,st,'[error] ana ekranda klavye odağı gizli uygulamada kaldı')}}
+    // sağ tık: boş alana masaüstü menüsü açılmalı, ekrana sığmalı
+    if(st==='sagtik'){await p.mouse.click(sz==='tel'?195:683,sz==='tel'?600:520,{button:'right'});await p.waitForTimeout(600);
+      const mr=await p.evaluate(()=>{const m=document.querySelector('.menu,.mg-cm,.sp-menu');if(!m)return null;const r=m.getBoundingClientRect();return{n:m.querySelectorAll('button').length,out:r.left<0||r.top<0||r.right>innerWidth||r.bottom>innerHeight}});
+      if(!mr)console.log(w,sz,st,'[uyarı] sağ tık menüsü açılmadı (bu noktada uygulama olabilir)');else if(mr.out){errs++;console.log(w,sz,st,'[error] sağ tık menüsü ekrandan taşıyor')}}
     await p.waitForTimeout(700);
     await p.addScriptTag({path:path.join(__dirname,'engine.js')});
     const r=await p.evaluate(m=>Audit.run(document,{mobile:m}),sz==='tel');runs++;

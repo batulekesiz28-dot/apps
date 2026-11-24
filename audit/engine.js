@@ -227,7 +227,8 @@ function run(doc,opt={}){
         const hr=R(rootOf(h)===doc.body?h:rootOf(h));return hr.width*hr.height<VW*VH*.25})});
     const ov=(a,b)=>Math.max(0,Math.min(a.right,b.right)-Math.max(a.left,b.left))*Math.max(0,Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top));
     const inside=(a,b)=>a.left>=b.left-1&&a.right<=b.right+1&&a.top>=b.top-1&&a.bottom<=b.bottom+1;
-    const cl=[];for(let i=0;i<roots.length;i++)for(let j=i+1;j<roots.length;j++){const A=roots[i],B=roots[j];if(A.contains(B)||B.contains(A))continue;const a=R(A),b=R(B);
+    const cl=[];for(let i=0;i<roots.length;i++)for(let j=i+1;j<roots.length;j++){const A=roots[i],B=roots[j];if(A.contains(B)||B.contains(A))continue;
+      if(A.matches('[role=menu],.menu')||B.matches('[role=menu],.menu'))continue; /* sağ tık/açılır menü geçici; çubukların üstüne açılması doğal */const a=R(A),b=R(B);
       // biri öbürünün içine yerleşmişse (ada durum çubuğunun ortasında): çubuğun kendisi değil, içindeki yazı/düğmelerle çakışma sayılır
       if(inside(a,b)||inside(b,a)){const[sm,bg]=inside(a,b)?[A,B]:[B,A],sr=R(sm);const hit=[...bg.querySelectorAll('*')].find(e=>visible(e,win)&&((e.innerText||'').trim()&&!e.children.length||e.matches('button,a,img,[role=button]'))&&ov(R(e),sr)>40);if(hit)cl.push(sm,hit);continue}
       if(ov(a,b)<150)continue;

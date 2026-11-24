@@ -5805,5 +5805,55 @@
     "fix": "Tam ekran katmanın altındakiler atlanır"
    }
   ]
+ },
+ {
+  "at": "2026-11-24T22:45:00+03:00",
+  "change": "Sağ tık artık çok daha zengin: uygulamaya sağ tık → aç/öne getir, açık uygulamayla yan yana, mini pencere, tarayıcıda aç, adresi kopyala, yeniden yükle, kapat (galakside ve bütün arayüzlerde aynı). Boş masaüstüne sağ tık → arama, yeni not, görevler, hatırlatıcı, widget, arayüz, rastgele arayüz, tema, kişiselleştir, açık uygulamalar, kontrol merkezi, sistem, sakin mod. Menüler ok tuşlarıyla gezilebiliyor. Yeni 11. arayüz “Pencere”: Windows tarzı masaüstü simgeleri, altta görev çubuğu, Başlat menüsü (arama + bütün uygulamalar + son sayfalar), seçim kutusu, çift tıkla aç, yazınca arama, Win tuşu.",
+  "scores": {
+   "hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "hub masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "hub",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Uygulamadan ana ekrana dönünce klavye odağı gizlenen uygulamada kalıyordu; arayüzlerde ok tuşları/kısayollar çalışmıyordu",
+    "fix": "goHome odağı ana ekrana alır; arayüzler küçültülmüş pencereyi “açık” saymaz"
+   },
+   {
+    "app": "hub",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Arayüz seçicide klavye odağı hep ilk karta gidiyordu",
+    "fix": "Şu anki arayüzün kartına gider"
+   },
+   {
+    "app": "hub",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Pencere: telefonda görev çubuğundaki simge yarım görünüyordu, çalan şarkı uygulaması adayla birlikte iki kez görünüyordu",
+    "fix": "Sığmayan sabitler düşer, çalan uygulama sadece adada"
+   },
+   {
+    "app": "hub",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Pencere: Başlat arama kutusu dokunma alanı küçüktü, uzun adlar kesiliyordu",
+    "fix": "Tam yükseklik, iki satır ad"
+   },
+   {
+    "app": "denetci",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Durum gezgini yeni kontroller: ana ekranda odak gizli uygulamada kalmasın, sağ tık menüsü ekrana sığsın (sagtik durumu); açılır menüler çubuk çakışması sayılmaz"
+   }
+  ]
  }
 ]

@@ -15,7 +15,8 @@ const WORLDS=[
   ['balon','Balon','İpe bağlı balonlar; imleç iter, çarpışıp süzülürler'],
   ['kadran','Kadran','Saat kadranı; altın ibre imleci izler, gösterdiğini açar'],
   ['deste','Deste','Yelpaze deste; imlecin altındaki kart kalkar, komşular açılır'],
-  ['harita','Harita','Topografik harita; imleç arazide tepe kabartır']];
+  ['harita','Harita','Topografik harita; imleç arazide tepe kabartır'],
+  ['pencere','Pencere','Masaüstü, görev çubuğu ve Başlat; imleç simgelerde ışıldar']];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const strip=h=>String(h||'').replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/\s+/g,' ').trim();
 const motion=()=>document.documentElement.dataset.motion||'full';
@@ -36,6 +37,8 @@ function toggleRand(){const on=!rnd();try{on?localStorage.setItem(RKEY,'1'):loca
   document.querySelectorAll('[data-wrand]').forEach(b=>b.setAttribute('aria-checked',on));const tb=document.getElementById('randBtn');if(tb){tb.setAttribute('aria-pressed',on);tb.classList.toggle('on',on)}
   H().toast(on?'Her girişte rastgele bir arayüz açılacak':'Rastgele kapalı — seçtiğin arayüz açılır')}
 addEventListener('click',e=>{const b=e.target.closest?.('[data-wrand]');if(!b)return;e.preventDefault();e.stopPropagation();toggleRand()},true);
+// arayüzde boş alana sağ tık → hub masaüstü menüsü. Pencere düzeyinde ve en son: arayüzün kendi sağ tığı (uygulama/küme menüsü) preventDefault ettiyse karışmaz
+addEventListener('contextmenu',e=>{if(e.defaultPrevented||!e.target.closest?.('#world')||e.target.closest('[data-app],input,textarea,[contenteditable],.mg-cm,.sp-menu'))return;e.preventDefault();H().deskMenu?.(e.clientX,e.clientY)});
 function randWorld(){let last='';try{last=localStorage.getItem(RKEY+':last')||''}catch{}
   const pool=WORLDS.map(w=>w[0]).filter(w=>w!==last&&w!==cur),w=pool[Math.floor(Math.random()*pool.length)]||'galaksi';try{localStorage.setItem(RKEY+':last',w)}catch{}return w}
 
@@ -215,9 +218,9 @@ const SP={deg:0,f:0,n:1,sel:0,buf:'',G:[],list:[],ang:[],pos:[],
   menu(root,i,x,y){SP.closeMenu();const a=SP.list[i];if(!a)return;const cur=SP.G[a.gi];
     const bh=a.key===H().bh,opts=bh?[]:SP.G.filter(g=>g!==cur&&!(g.id==='_ai'&&!a.ai)&&!(g.id==='_other'&&a.ai));
     const m=document.createElement('div');m.className='sp-menu';m.setAttribute('role','menu');
-    m.innerHTML=`<p>${esc(a.name)}</p><button role="menuitem" data-m="open">Aç</button>${opts.length?'<p>Taşı</p>':''}${opts.map(g=>`<button role="menuitem" data-m="${esc(g.id)}" style="--gc:${esc(g.color)}"><i></i>${esc(g.name)}</button>`).join('')}${bh?'<p>Galaksinin merkezi, taşınmaz</p>':'<button role="menuitem" data-m="_new">＋ Yeni grup</button>'}${cur.id[0]!=='_'&&!bh?'<button role="menuitem" data-m="_out">Gruptan çıkar</button>':''}`;
+    m.innerHTML=`<p>${esc(a.name)}</p>${WG.acts(a).replace(/data-cm="a:/g,'data-m="a:')}${opts.length?'<p>Taşı</p>':''}${opts.map(g=>`<button role="menuitem" data-m="${esc(g.id)}" style="--gc:${esc(g.color)}"><i></i>${esc(g.name)}</button>`).join('')}${bh?'<p>Galaksinin merkezi, taşınmaz</p>':'<button role="menuitem" data-m="_new">＋ Yeni grup</button>'}${cur.id[0]!=='_'&&!bh?'<button role="menuitem" data-m="_out">Gruptan çıkar</button>':''}`;
     root.querySelector('.sp').appendChild(m);const W=m.offsetWidth,Hh=m.offsetHeight;m.style.left=Math.min(x,innerWidth-W-12)+'px';m.style.top=Math.min(y,innerHeight-Hh-12)+'px';
-    m.addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(!b)return;const k=b.dataset.m;SP.closeMenu();if(k==='open')H().open(a.key);else if(k==='_out'){SP.keep=a.key;H().setGroup(a.key,null);H().toast(`${a.name} gruptan çıktı`)}else SP.move(root,i,k)});
+    m.addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(!b)return;const k=b.dataset.m;SP.closeMenu();if(k.startsWith('a:'))H().appAct(a.key,k.slice(2));else if(k==='_out'){SP.keep=a.key;H().setGroup(a.key,null);H().toast(`${a.name} gruptan çıktı`)}else SP.move(root,i,k)});
     m.querySelector('button').focus();setTimeout(()=>addEventListener('pointerdown',SP.mOut=e=>{if(!e.target.closest('.sp-menu'))SP.closeMenu()},true),0)},
   closeMenu(){document.querySelector('.world .sp-menu')?.remove();if(SP.mOut){removeEventListener('pointerdown',SP.mOut,true);SP.mOut=null}},
   rename(root,gi,el){const g=SP.G[gi];if(!g)return;if(g.id[0]==='_'){H().toast('Bu grup otomatik; adı değişmez');return}
@@ -350,17 +353,19 @@ const WG={G:[],sig:'',
     h.toast(`${a.name} → ${tg?tg.name:(name||'Yeni küme')}`,()=>{h.setGroup(a.key,prev);setTimeout(rebuild,0)});setTimeout(rebuild,0)},
   // sağ tık / basılı tut menüsü
   menu(root,a,x,y){root.querySelector('.mg-cm')?.remove();const src=WG.G[a.gi],m=document.createElement('div');m.className='mg-cm';m.setAttribute('role','menu');m.setAttribute('aria-label',a.name);
-    m.innerHTML=`<p class="mg-mk">${esc(a.name)}</p><button role="menuitem" data-cm="open">Aç</button>${WG.G.filter(g=>g!==src).map(g=>`<button role="menuitem" data-cm="g:${esc(g.id)}"><i style="--gc:${esc(g.color)}"></i>${esc(g.name)} kümesine taşı</button>`).join('')}
+    m.innerHTML=`<p class="mg-mk">${esc(a.name)}</p>${WG.acts(a)}<hr>${WG.G.filter(g=>g!==src).map(g=>`<button role="menuitem" data-cm="g:${esc(g.id)}"><i style="--gc:${esc(g.color)}"></i>${esc(g.name)} kümesine taşı</button>`).join('')}
       <button role="menuitem" data-cm="new">Yeni küme…</button>${src&&src.id[0]!=='_'?'<button role="menuitem" data-cm="out">Kümeden çıkar</button>':''}`;
     root.appendChild(m);const r=m.getBoundingClientRect();m.style.left=Math.max(8,Math.min(innerWidth-r.width-8,x))+'px';m.style.top=Math.max(8,Math.min(innerHeight-r.height-8,y))+'px';
     const close=()=>{m.remove();removeEventListener('pointerdown',out,true)},out=e=>{if(!m.contains(e.target))close()};setTimeout(()=>addEventListener('pointerdown',out,true),0);
     m.addEventListener('keydown',e=>{if(e.key==='Escape'){e.stopPropagation();close()}});
     m.addEventListener('click',e=>{e.stopPropagation();const b=e.target.closest('[data-cm]');if(!b)return;const k=b.dataset.cm;
-      if(k==='open'){close();H().open(a.key);return}if(k==='out'){close();H().setGroup(a.key,null);H().toast(`${a.name} kümeden çıktı`);setTimeout(rebuild,0);return}
+      if(k.startsWith('a:')){close();H().appAct(a.key,k.slice(2));return}if(k==='out'){close();H().setGroup(a.key,null);H().toast(`${a.name} kümeden çıktı`);setTimeout(rebuild,0);return}
       if(k==='new'){m.innerHTML=`<p class="mg-mk">Yeni küme adı</p><input class="mg-in" maxlength="40" placeholder="ör. Oyunlar" aria-label="Yeni küme adı">`;const inp=m.querySelector('input');inp.focus();
         inp.addEventListener('keydown',ev=>{if(ev.key==='Enter'){const n=inp.value.trim();close();WG.move(a,null,n||'Yeni küme')}});return}
       close();WG.move(a,WG.G.find(g=>'g:'+g.id===k))});
     m.querySelector('button')?.focus()},
+  // hub'ın uygulama işlemleri (aç/öne getir, yan yana, mini pencere, tarayıcıda aç, adres, yeniden yükle, kapat) — galaksiyle aynı liste
+  acts(a){const L=H().appActs?.(a.key)||[['open','Aç','']];return L.map(([k,l,kb])=>`<button role="menuitem" data-cm="a:${k}"${k==='close'?' class="dg"':''}>${esc(l)}${kb?`<kbd>${esc(kb)}</kbd>`:''}</button>`).join('')},
   // arayüze bağla: sağ tık, dokunmatikte basılı tut (520 ms, kıpırdamadan), küme adına çift tık
   wire(root,list){const at=el=>list.find(a=>a.key===el.dataset.app);
     root.addEventListener('contextmenu',e=>{const el=e.target.closest('[data-app]:not(.mg-wb)');const a=el&&at(el);if(!a)return;e.preventDefault();WG.menu(root,a,e.clientX,e.clientY)});
@@ -788,7 +793,102 @@ const HR={
   unmount(){HR.L?.stop();HR.L=null},
   resize(root){HR.lay(root);HR.draw();HR.L?.go()}};
 
-const R={mekansal:SP,miknatis:MG,ruzgar:RZ,petek:PT,kum:KM,balon:BL,kadran:KD,deste:DS,harita:HR};
+/* ═════════════ PENCERE (Windows tarzı masaüstü) ═════════════
+   Masaüstü simgeleri (küme küme sütunlara akar) · altta görev çubuğu (Başlat, Ara, sabit + açık uygulamalar, saat) · Başlat menüsü
+   (arama, kümelere göre bütün uygulamalar, son sayfalar). Windows/ChromeOS alışkanlıkları: fareyle tek tık seçer, çift tık ya da Enter açar
+   (dokunmatikte tek dokunuş açar), boş masaüstünde sürükle → seçim kutusu, yazmaya başla → Başlat aramada açılır, Win tuşu → Başlat.
+   İmleç: yaylı “ışık” imleci izler, yakındaki simgelerin kenarı ışıldar (Fluent “reveal”); görev çubuğu simgeleri imlece yaklaştıkça yaylı büyür.
+   Sabitler: en çok kullanılanlar (ekran süresi appshell:usage), yoksa listenin başı. */
+const PN={sel:new Set(),last:-1,
+  pins(list){let u={};try{u=JSON.parse(localStorage.getItem('appshell:usage')||'{}')}catch{}const tot={};Object.values(u).forEach(d=>Object.entries(d||{}).forEach(([s,v])=>{if(s[0]!=='_')tot[s]=(tot[s]||0)+v}));
+    const by=Object.entries(tot).sort((a,b)=>b[1]-a[1]).map(([s])=>list.find(a=>a.key==='p:'+s)).filter(Boolean);
+    return[...new Set([...by,...list])].slice(0,mobile()?3:6)},
+  html:d=>{const{G,list}=WG.of(d);PN.list=list;const m=mobile();
+    return`<div class="pn"><i class="pn-glow" aria-hidden="true"></i>
+    <div class="pn-desk" role="listbox" aria-label="Masaüstü" aria-multiselectable="true">${G.map((g,gi)=>`${WG.many()?WG.lab(g,gi,'pn-l'):''}${list.map((a,i)=>a.gi!==gi?'':`<button class="pn-i" role="option" aria-selected="false" data-i="${i}" data-app="${esc(a.key)}" title="${esc(a.name)}${a.desc?' — '+esc(a.desc):''}">${appIcon(a)}<b>${esc(a.name)}</b></button>`).join('')}`).join('')}</div>
+    <i class="pn-sel" hidden aria-hidden="true"></i>
+    <section class="pn-start" hidden role="dialog" aria-label="Başlat"><label class="pn-q"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5l3 3"/></svg><input type="search" placeholder="Uygulama ya da sayfa ara" aria-label="Ara" autocomplete="off"></label>
+      <div class="pn-sb"><div class="pn-sa" data-live="pnall"></div><div class="pn-sr" data-live="pnrec"></div></div>
+      <footer class="pn-sf"><button data-pn="cc"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="11" height="11" rx="3"/><circle cx="6" cy="6.5" r="1.3"/><path d="M8.5 6.5h2.5M5 10h2.5"/><circle cx="10" cy="10" r="1.3"/></svg>Kontrol merkezi</button><span></span><button data-act="world"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.5"/><path d="M2.5 8h11M8 2.5c2 2 2 9 0 11M8 2.5c-2 2-2 9 0 11"/></svg>Arayüz</button>${dice()}</footer></section>
+    <nav class="pn-bar" aria-label="Görev çubuğu"><div class="pn-mid">
+      <button class="pn-tb pn-st" data-pn="start" aria-label="Başlat" aria-expanded="false" title="Başlat · Win"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="3" width="6" height="6" rx="1.8"/><rect x="11" y="3" width="6" height="6" rx="3"/><rect x="3" y="11" width="6" height="6" rx="3"/><rect x="11" y="11" width="6" height="6" rx="1.8"/></svg></button>
+      ${m?'':`<button class="pn-tb pn-find" data-pn="find" title="Ara · Ctrl+K"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5l3 3"/></svg><span>Ara</span></button>`}
+      <span class="pn-apps" data-live="pnbar"></span></div>
+      <div class="pn-tray"><button class="pn-tb pn-clk" data-pn="cc" title="Kontrol merkezi · Alt+A"><b data-clock="hm"></b>${m?'':`<small>${esc(trDate(d.now,{day:'numeric',month:'numeric',year:'numeric'}))}</small>`}</button></div></nav></div>`},
+  live:{
+    pnbar:d=>{const np=H().npShown?.(),open=(H().tabList?.()||[]).filter(t=>t.key!==np),ok=new Set(open.map(t=>t.key)),L=PN.list||[],pins=PN.pins(L).filter(a=>a.key!==np),extra=open.map(t=>L.find(a=>a.key===t.key)).filter(a=>a&&!pins.includes(a));
+      // arkada çalan uygulama sadece adada (hub kuralı); sığmazsa önce açık olmayan sabitler düşer, yarım simge kalmaz
+      const it=[...pins,...extra],cap=Math.max(2,Math.floor((innerWidth-(mobile()?120:430))/48));for(let i=it.length-1;it.length>cap&&i>=0;i--)if(!ok.has(it[i].key))it.splice(i,1);
+      return it.slice(0,cap).map(a=>`<button class="pn-tb pn-ap${ok.has(a.key)?' on':''}" data-app="${esc(a.key)}" title="${esc(a.name)}${ok.has(a.key)?' · açık':''}" aria-label="${esc(a.name)}${ok.has(a.key)?' (açık)':''}">${appIcon(a)}</button>`).join('')},
+    pnall:d=>{const q=(PN.q||'').toLocaleLowerCase('tr'),L=(PN.list||[]).filter(a=>!q||(a.name+' '+a.desc).toLocaleLowerCase('tr').includes(q));
+      if(q)return L.length?`<p class="pn-h">Uygulamalar</p><div class="pn-g">${L.map(a=>`<button class="pn-sa1" data-app="${esc(a.key)}">${appIcon(a)}<b>${esc(a.name)}</b></button>`).join('')}</div>`:`<p class="pn-none">“${esc(PN.q)}” için uygulama yok · Enter → her yerde ara</p>`;
+      return WG.G.map((g,gi)=>`<p class="pn-h"><i style="--gc:${esc(g.color)}"></i>${esc(g.name)}</p><div class="pn-g">${L.filter(a=>a.gi===gi).map(a=>`<button class="pn-sa1" data-app="${esc(a.key)}">${appIcon(a)}<b>${esc(a.name)}</b></button>`).join('')}</div>`).join('')},
+    pnrec:d=>{const q=(PN.q||'').toLocaleLowerCase('tr'),N=d.notes.filter(n=>!q||(n.title+' '+n.ex).toLocaleLowerCase('tr').includes(q)).slice(0,5);
+      return`<p class="pn-h">Son sayfalar</p>${N.length?N.map(n=>`<button class="pn-rc" data-note="${esc(n.id)}"><span class="pn-ri">${esc(n.icon||'📄')}</span><span><b>${esc(n.title)}</b><small>${esc(ago(n.up))}</small></span></button>`).join(''):`<p class="pn-none">${q?'Eşleşen sayfa yok':'Henüz sayfa yok'}</p>`}`}},
+  // seçim
+  pick(i,add){const T=PN.T;if(!T)return;if(!add)PN.sel.clear();if(i>=0){add&&PN.sel.has(i)?PN.sel.delete(i):PN.sel.add(i);PN.last=i}
+    T.ic.forEach((e,j)=>e.setAttribute('aria-selected',PN.sel.has(j)))},
+  openSel(){[...PN.sel].slice(0,4).forEach((i,k)=>setTimeout(()=>H().open(PN.list[i].key),k*350))},
+  start(on,q){const T=PN.T;if(!T)return;const s=T.st,b=T.root.querySelector('.pn-st');on=on??s.hidden;if(on===!s.hidden)return;
+    b.setAttribute('aria-expanded',on);if(on){PN.q=q||'';T.inp.value=PN.q;fillPN();s.hidden=false;T.root.classList.add('pn-so');T.inp.focus({preventScroll:true});T.inp.setSelectionRange(PN.q.length,PN.q.length);
+      if(!calmMotion())s.animate([{opacity:0,transform:'translate(-50%,24px) scale(.97)'},{opacity:1,transform:'translate(-50%,0)'}],{duration:420,easing:'cubic-bezier(.3,1.25,.5,1)'})}
+    else{T.root.classList.remove('pn-so');if(calmMotion()){s.hidden=true;return}s.animate([{opacity:1,transform:'translate(-50%,0)'},{opacity:0,transform:'translate(-50%,16px) scale(.98)'}],{duration:180,easing:'ease-in'}).finished.then(()=>{s.hidden=T.root.classList.contains('pn-so')?false:true})}},
+  mount(root){const dk=()=>root.querySelector('.pn')?.classList.toggle('dk',!!H().dark?.());dk();PN.mo=new MutationObserver(dk);PN.mo.observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+    const T=PN.T={root,ic:[...root.querySelectorAll('.pn-i')],st:root.querySelector('.pn-start'),inp:root.querySelector('.pn-q input'),glow:root.querySelector('.pn-glow'),selb:root.querySelector('.pn-sel'),desk:root.querySelector('.pn-desk')};
+    PN.sel.clear();WG.wire(root,PN.list);
+    let pt='mouse';root.addEventListener('pointerdown',e=>{pt=e.pointerType},true);
+    // masaüstü: tek tık seçer, çift tık açar (dokunmatikte tek dokunuş açar)
+    T.desk.addEventListener('click',e=>{const b=e.target.closest('.pn-i');e.stopPropagation();if(!b){if(!T.band)PN.pick(-1);return}const i=+b.dataset.i;
+      if(pt!=='mouse'){H().open(PN.list[i].key);return}
+      if(e.shiftKey&&PN.last>=0){const[a,z]=[Math.min(PN.last,i),Math.max(PN.last,i)];PN.sel.clear();for(let j=a;j<=z;j++)PN.sel.add(j);PN.pick(-1,true);return}PN.pick(i,e.ctrlKey||e.metaKey)});
+    T.desk.addEventListener('dblclick',e=>{const b=e.target.closest('.pn-i');if(b){e.stopPropagation();H().open(PN.list[+b.dataset.i].key)}});
+    // boş masaüstünde sürükle → seçim kutusu
+    T.desk.addEventListener('pointerdown',e=>{if(e.button!==0||e.pointerType!=='mouse'||e.target.closest('.pn-i,.wg-l'))return;const x0=e.clientX,y0=e.clientY,add=e.ctrlKey||e.metaKey,base=new Set(add?PN.sel:[]);T.band=false;
+      const R0=T.ic.map(el=>el.getBoundingClientRect());
+      const mv=ev=>{const x=Math.min(x0,ev.clientX),y=Math.min(y0,ev.clientY),w=Math.abs(ev.clientX-x0),h=Math.abs(ev.clientY-y0);if(!T.band&&w+h<6)return;
+        if(!T.band){T.band=true;T.desk.setPointerCapture(e.pointerId);T.selb.hidden=false}
+        Object.assign(T.selb.style,{left:x+'px',top:y+'px',width:w+'px',height:h+'px'});PN.sel=new Set(base);R0.forEach((r,j)=>{if(r.right>x&&r.left<x+w&&r.bottom>y&&r.top<y+h)PN.sel.add(j)});PN.pick(-1,true)};
+      const up=()=>{T.desk.removeEventListener('pointermove',mv);T.desk.removeEventListener('pointerup',up);T.desk.removeEventListener('pointercancel',up);T.selb.hidden=true;setTimeout(()=>T.band=false,0)};
+      T.desk.addEventListener('pointermove',mv);T.desk.addEventListener('pointerup',up);T.desk.addEventListener('pointercancel',up)});
+    root.addEventListener('click',e=>{const p=e.target.closest('[data-pn]');
+      if(p){const k=p.dataset.pn;e.stopPropagation();if(k==='start')PN.start();else if(k==='find'){PN.start(false);H().palette()}else if(k==='cc'){PN.start(false);window.OS?.open()}return}
+      if(!T.st.hidden&&(e.target.closest('[data-app],[data-note],[data-act]')||!e.target.closest('.pn-start')))PN.start(false)},true);
+    T.inp.addEventListener('input',()=>{PN.q=T.inp.value;fillPN()});
+    T.inp.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation();PN.start(false);return}
+      if(e.key==='Enter'){e.preventDefault();const f=T.st.querySelector('.pn-sa1,.pn-rc');if(f)f.click();else{PN.start(false);H().palette()}}
+      if(e.key==='ArrowDown'){e.preventDefault();T.st.querySelector('.pn-sa1,.pn-rc')?.focus()}});
+    T.st.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation();PN.start(false);root.querySelector('.pn-st').focus()}});
+    // Win tuşu tek başına → Başlat
+    let solo=false;addEventListener('keydown',PN.kd=e=>{solo=e.key==='Meta'||e.key==='OS'},true);addEventListener('keyup',PN.ku=e=>{if((e.key==='Meta'||e.key==='OS')&&solo&&PN.T&&!document.querySelector('.wp-bg,.pal-bg,.menu')&&!document.body.classList.contains('os-app')){e.preventDefault();PN.start()}solo=false},true);
+    // açık uygulamalar değişince görev çubuğu
+    PN.sig='';PN.iv=setInterval(()=>{const s=(H().tabList?.()||[]).map(t=>t.key).join()+'|'+(H().npShown?.()||'');if(s!==PN.sig){PN.sig=s;const b=root.querySelector('[data-live=pnbar]');if(b){b.innerHTML=PN.live.pnbar(D());PN.bars()}}},1200);
+    PN.bars=()=>{T.tb=[...root.querySelectorAll('.pn-bar .pn-tb')];T.ts=T.tb.map(()=>({s:1,v:0}))};PN.bars();
+    if(calmMotion())return;
+    // yaylı ışık + görev çubuğu büyümesi
+    const G={x:innerWidth/2,y:innerHeight/2,vx:0,vy:0,a:0,va:0},L=PN.L=wxLoop(dt=>{const P=PN.P,k=170,c=2*Math.sqrt(k)*.72,ta=P.in?1:0;
+        G.vx+=((P.x-G.x)*k-G.vx*c)*dt;G.vy+=((P.y-G.y)*k-G.vy*c)*dt;G.x+=G.vx*dt;G.y+=G.vy*dt;G.va+=((ta-G.a)*90-G.va*15)*dt;G.a=Math.max(0,Math.min(1,G.a+G.va*dt));
+        T.glow.style.transform=`translate(${G.x.toFixed(1)}px,${G.y.toFixed(1)}px)`;T.glow.style.opacity=(G.a*.9).toFixed(3);
+        let busy=Math.abs(P.x-G.x)+Math.abs(P.y-G.y)>.4||Math.abs(G.vx)+Math.abs(G.vy)>2||Math.abs(ta-G.a)>.01;
+        for(const el of T.ic){const r=el.getBoundingClientRect(),nx=Math.max(r.left,Math.min(G.x,r.right)),ny=Math.max(r.top,Math.min(G.y,r.bottom)),li=G.a*Math.max(0,1-Math.hypot(G.x-nx,G.y-ny)/150);
+          el.style.setProperty('--lx',(G.x-r.left).toFixed(0)+'px');el.style.setProperty('--ly',(G.y-r.top).toFixed(0)+'px');el.style.setProperty('--li',li.toFixed(3))}
+        const bar=T.tb[0]?.parentElement?.getBoundingClientRect(),near=P.in&&bar&&P.y>bar.top-70;
+        T.tb.forEach((el,i)=>{const r=el.getBoundingClientRect(),s=T.ts[i],d=Math.abs(P.x-(r.left+r.width/2)),tg=near?1+.2*Math.max(0,1-d/110):1;
+          s.v+=((tg-s.s)*260-s.v*22)*dt;s.s+=s.v*dt;el.style.scale=s.s.toFixed(4);if(Math.abs(tg-s.s)>.002||Math.abs(s.v)>.01)busy=true});
+        return busy});
+    PN.P=wxPtr(root,L);L.go()},
+  key(root,e){const T=PN.T;if(!T||!T.st.hidden)return;const k=e.key,n=T.ic.length;
+    if(k==='Enter'&&PN.sel.size){e.preventDefault();PN.openSel();return}
+    if(k==='Escape'&&PN.sel.size){e.preventDefault();PN.pick(-1);return}
+    if(k.length===1&&/\S/.test(k)){e.preventDefault();PN.start(true,k);return} // yazmaya başla → Başlat'ta ara
+    const dv={ArrowRight:[1,0],ArrowLeft:[-1,0],ArrowDown:[0,1],ArrowUp:[0,-1]}[k];if(!dv||!n)return;e.preventDefault();
+    const cur=PN.last>=0?PN.last:0,R0=T.ic.map(el=>el.getBoundingClientRect()),c=R0[cur];let best=PN.last<0?0:-1,bd=1e9;
+    if(PN.last>=0)R0.forEach((r,i)=>{if(i===cur)return;const dx=r.left-c.left,dy=r.top-c.top,along=dx*dv[0]+dy*dv[1];if(along<=1)return;const sc=along+Math.abs(dx*dv[1]-dy*dv[0])*2.5;if(sc<bd){bd=sc;best=i}});
+    if(best>=0){PN.pick(best,false);T.ic[best].focus({preventScroll:true})}},
+  unmount(){PN.L?.stop();PN.L=null;PN.mo?.disconnect();clearInterval(PN.iv);removeEventListener('keydown',PN.kd,true);removeEventListener('keyup',PN.ku,true);PN.T=null},
+  resize(root){PN.T&&PN.bars?.()}};
+function fillPN(){const T=PN.T;if(!T)return;const d=D();T.root.querySelectorAll('.pn-start [data-live]').forEach(el=>{el.innerHTML=PN.live[el.dataset.live](d)})}
+
+const R={mekansal:SP,miknatis:MG,ruzgar:RZ,petek:PT,kum:KM,balon:BL,kadran:KD,deste:DS,harita:HR,pencere:PN};
 
 /* ── Çekirdek: dünyayı kur / yenile / değiştir ── */
 let cur='galaksi',root=null,clockT=0,rq=0,started=false;
@@ -808,11 +908,11 @@ function set(w,instant){try{localStorage.setItem(KEY,JSON.stringify(w))}catch{}
   document.documentElement.classList.add('w-vt');const t=document.startViewTransition(()=>apply(w));t.finished.finally(()=>document.documentElement.classList.remove('w-vt'))}
 function refresh(){if(!root||rq)return;rq=requestAnimationFrame(()=>{rq=0;if(!root)return;R[cur].refresh?R[cur].refresh(root):fillLive()})}
 addEventListener('keydown',e=>{if(!root||!R[cur].key||e.metaKey||e.ctrlKey||e.altKey)return;if(e.target.closest?.('input,textarea,[contenteditable]'))return;
-  if(document.querySelector('.wp-bg,.pal-bg,.menu,.radial')||[...document.querySelectorAll('.win')].some(w=>!w.hidden))return;R[cur].key(root,e);if(e.defaultPrevented)e.stopPropagation()},true);
+  if(document.querySelector('.wp-bg,.pal-bg,.menu,.radial')||document.body.classList.contains('os-app'))return; /* uygulama önde değilse (küçültülmüş pencere görünmez) arayüz klavyeyi alır */R[cur].key(root,e);if(e.defaultPrevented)e.stopPropagation()},true);
 function rebuild(){if(!root||cur==='galaksi')return;const sc=root.scrollTop;apply(cur);if(root)root.scrollTop=sc}
 SP.rebuild=rebuild;
 // kümeler değişince (galaksiden, başka sekmeden, buluttan) açık arayüz yeniden çizilir
-const GROUPED=new Set(['ruzgar','petek','kum','balon','kadran','deste','harita']);
+const GROUPED=new Set(['ruzgar','petek','kum','balon','kadran','deste','harita','pencere']);
 function regroup(){if(GROUPED.has(cur)&&root&&H()?.groups){let g;try{g=JSON.stringify(H().groups())}catch{return}if(g!==WG.sig&&!root.querySelector('.mg-cm,.wg-l [contenteditable=true]'))rebuild();return}
   if(cur==='miknatis'&&root&&H()?.groups){let g;try{g=JSON.stringify(H().groups())}catch{return}if(g!==MG.sig&&!MG.S?.pd?.on&&!root.querySelector('.mg-gl [contenteditable=true],.mg-cm'))rebuild();return}
   if(cur!=='mekansal'||!root||!H()?.groups)return;let g;try{g=JSON.stringify(H().groups())}catch{return}if(g===SP.sig)return;
@@ -832,11 +932,12 @@ const MINI={
   kadran:'<i class="m-dial"></i><i class="m-hand"></i>',
   deste:'<i class="m-cd d1"></i><i class="m-cd d2"></i><i class="m-cd d3"></i><i class="m-cd d4"></i><i class="m-cd d5"></i>',
   harita:'<i class="m-tp t1"></i><i class="m-tp t2"></i><i class="m-tp t3"></i><i class="m-tp t4"></i><i class="m-tp t5"></i>',
+  pencere:'<i class="m-ds d1"></i><i class="m-ds d2"></i><i class="m-ds d3"></i><i class="m-ds d4"></i><i class="m-tbar"></i><i class="m-stm"></i>',
   petek:'<i class="m-hx h0"></i><i class="m-hx h1"></i><i class="m-hx h2"></i><i class="m-hx h3"></i><i class="m-hx h4"></i><i class="m-hx h5"></i><i class="m-hx h6"></i>'};
 let pk=null;
 function picker(){if(pk)return;const el=document.createElement('div');el.className='wp-bg';el.innerHTML=`<div class="wp" role="dialog" aria-modal="true" aria-labelledby="wpT">
   <header><div><h2 id="wpT">Arayüz</h2><p>Aynı uygulamalar ve veriler, ${WORLDS.length} ayrı dünya; her birinde imleç sahneyi canlandırır. Renk teması Galaksi'de ve uygulamalarda geçerli.</p></div><button class="wp-x" aria-label="Kapat">✕</button></header>
-  <div class="wp-g">${WORLDS.map(([k,n,ds],i)=>`<button class="wpc${k===cur?' on':''}" data-w="${k}" aria-pressed="${k===cur}"><div class="wpv pv-${k}" aria-hidden="true">${MINI[k]}</div><span class="wpn"><b>${n}</b><kbd>${(i+1)%10}</kbd></span><span class="wpd">${ds}</span></button>`).join('')}</div>
+  <div class="wp-g">${WORLDS.map(([k,n,ds],i)=>`<button class="wpc${k===cur?' on':''}" data-w="${k}" aria-pressed="${k===cur}"><div class="wpv pv-${k}" aria-hidden="true">${MINI[k]}</div><span class="wpn"><b>${n}</b>${i<10?`<kbd>${(i+1)%10}</kbd>`:''}</span><span class="wpd">${ds}</span></button>`).join('')}</div>
   <footer><button class="wp-rand" role="switch" data-wrand aria-checked="${rnd()}"><i aria-hidden="true"></i>Her girişte rastgele arayüz</button><span>1–9 ve 0 ile seç · R rastgele · Esc kapatır</span></footer></div>`;
   document.body.appendChild(el);pk=el;
   const close=()=>{if(!pk)return;pk=null;removeEventListener('keydown',key,true);if(calmMotion())return el.remove();el.classList.add('out');setTimeout(()=>el.remove(),220)};
@@ -845,12 +946,12 @@ function picker(){if(pk)return;const el=document.createElement('div');el.classNa
     else if((e.key==='r'||e.key==='R')&&!e.metaKey&&!e.ctrlKey&&!e.altKey){e.preventDefault();e.stopPropagation();close();const w=randWorld();if(w!==cur)apply(w)}};
   addEventListener('keydown',key,true);
   el.addEventListener('click',e=>{const c=e.target.closest('[data-w]');if(c)return pick(c.dataset.w);if(e.target===el||e.target.closest('.wp-x'))close()});
-  requestAnimationFrame(()=>el.classList.add('on'));setTimeout(()=>el.querySelector('.wpc.on,.wpc')?.focus({preventScroll:true}),40)}
+  requestAnimationFrame(()=>el.classList.add('on'));setTimeout(()=>(el.querySelector('.wpc.on')||el.querySelector('.wpc'))?.focus({preventScroll:true}),40)}
 
 function topBtn(){const t=document.getElementById('themeBtn');if(!t||document.getElementById('worldBtn'))return;
   const d=document.createElement('button');d.className='ib'+(rnd()?' on':'');d.id='randBtn';d.dataset.wrand='';d.title='Her girişte rastgele arayüz';d.setAttribute('aria-label','Her girişte rastgele arayüz');d.setAttribute('aria-pressed',rnd());d.innerHTML=DICE;t.before(d);const b=document.createElement('button');b.className='ib';b.id='worldBtn';b.title='Arayüz (⇧⌘U)';b.setAttribute('aria-label','Arayüzü değiştir');
   b.innerHTML='<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/><path d="M2.5 8h11M8 2.5c2 2 2 9 0 11M8 2.5c-2 2-2 9 0 11"/></svg>';b.onclick=e=>{e.stopPropagation();picker()};t.before(b)}
 function boot(){topBtn();if(started)return refresh();started=true;const w=rnd()?randWorld():read();if(w!=='galaksi'&&R[w])apply(w)}
 topBtn();
-window.Worlds={boot,refresh,regroup,picker,set,get:()=>cur,list:WORLDS.map(w=>w[0])};
+window.Worlds={boot,refresh,regroup,picker,set,random:()=>set(randWorld()),get:()=>cur,list:WORLDS.map(w=>w[0])};
 })();

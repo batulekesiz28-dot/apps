@@ -447,6 +447,7 @@ kbd{font:500 11px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radius:
 <link rel="stylesheet" href="time.css?v=20261122f">
 <link rel="stylesheet" href="tasks.css?v=20261122f">
 <link rel="stylesheet" href="daypick.css?v=20261124c">
+<link rel="stylesheet" href="food.css?v=20261124c">
 <link rel="stylesheet" href="ders.css?v=20261122f">
 <style id="tnavCss">
 /* ── Üst gezinme (sol menü yerine) — ince cam şerit, kayan seçili vurgu ── */
@@ -628,7 +629,7 @@ body.rsz,body.rsz *{cursor:ew-resize!important;user-select:none}
       <div id="topAct" style="display:flex;gap:2px"></div>
       <a class="tb tai" id="topAi" href="#brain" title="AI Center — Second Brain" aria-label="AI Center"><svg class="i" viewBox="0 0 16 16"><path d="M8 1.8l1.5 3.7 3.7 1.5-3.7 1.5L8 12.2 6.5 8.5 2.8 7l3.7-1.5z"/><path d="M12.8 11.3l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z"/></svg></a>
       <button class="tb tsrch" id="topSrch" title="Ara (⌘K)" aria-label="Ara"><svg class="i" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg></button>
-      <nav class="modes" id="modes" aria-label="Bölümler" translate="no"><i class="mk"></i><a href="#home" data-mode="ws"><svg class="li" viewBox="0 0 16 16"><path d="M4 2h5.5L12 4.5V14H4z"/><path d="M9.5 2v2.5H12M6 8h4M6 10.5h4"/></svg><span>Workspace</span></a><a href="#lib" data-mode="lib"><svg class="li" viewBox="0 0 16 16"><path d="M2.5 13.5V3M5.5 13.5V3M8.5 13.5l-1-10 3-.4 1.3 10.2z"/><path d="M1.5 13.5h13"/></svg><span>Library</span></a></nav>
+      <nav class="modes" id="modes" aria-label="Bölümler" translate="no"><i class="mk"></i><a href="#home" data-mode="ws"><svg class="li" viewBox="0 0 16 16"><path d="M4 2h5.5L12 4.5V14H4z"/><path d="M9.5 2v2.5H12M6 8h4M6 10.5h4"/></svg><span>Workspace</span></a><a href="#lib" data-mode="lib"><svg class="li" viewBox="0 0 16 16"><path d="M2.5 13.5V3M5.5 13.5V3M8.5 13.5l-1-10 3-.4 1.3 10.2z"/><path d="M1.5 13.5h13"/></svg><span>Library</span></a><a href="#food" data-mode="food"><svg class="li" viewBox="0 0 16 16"><path d="M5 2v4.5a1.5 1.5 0 0 0 3 0V2M6.5 6v8M11 14V2c-1.6 1-2 3-2 5h2"/></svg><span>Yemek</span></a></nav>
     </header>
     <div class="scroll" id="scroll"><div class="crumbbar"><div class="crumb" id="crumb"></div></div><div class="view" id="view"></div></div>
   </main>
@@ -652,6 +653,7 @@ body.rsz,body.rsz *{cursor:ew-resize!important;user-select:none}
 <script src="brain.js?v=20261122f"></script>
 <script src="time.js?v=20261122f"></script>
 <script src="daypick.js?v=20261124c"></script>
+<script src="food.js?v=20261124c"></script>
 <script src="tasks.js?v=20261122f"></script>
 <script src="ders.js?v=20261122f"></script>
 
@@ -844,7 +846,7 @@ const sorted=()=>[...pages.values()].sort((a,b)=>b.updated-a.updated);
 
 /* ── Router ───────────────────────────────────────────────── */
 /* sayfa değişince geçici arayüz (açılır menü, palet, düzenleyici, panel) kalmasın; bölümün geçici durumu taşınmasın */
-function dismissTransient(next){hideFloat(true);closePal();Media.dismiss();Time.dismiss();Library.dismiss();if(DayPick.isOpen())DayPick.close();
+function dismissTransient(next){hideFloat(true);closePal();Media.dismiss();Time.dismiss();Library.dismiss();Food.dismiss();if(DayPick.isOpen())DayPick.close();
   if(next!=='tasks'&&Tasks.open){Tasks.open=null}}
 function route(){
   const h=decodeURIComponent(location.hash.slice(1))||'home';const[v,id]=h.split('/');dismissTransient(v);
@@ -860,11 +862,11 @@ function route(){
   else if(v==='tpl'){view='tpl';openId=null}
   else if(v==='work'){view='home';openId=null}
   else if(v==='ders'){view='ders';openId=null}
-  else if(v==='lib'||v==='brain'){const parts=h.split('/').slice(1);
-    if(view===v&&(v==='lib'?Library.soft(parts):Brain.soft(parts)))return;
+  else if(v==='lib'||v==='brain'||v==='food'){const parts=h.split('/').slice(1);
+    if(view===v&&(v==='lib'?Library.soft(parts):v==='food'?Food.soft(parts):Brain.soft(parts)))return;
     const was=view;view=v;openId=null;secParts=parts;setMode(v,was);return}
   else{view='home';openId=null}
-  if(view!=='lib'&&view!=='brain')lastWs=location.hash||'#home';
+  if(view!=='lib'&&view!=='brain'&&view!=='food')lastWs=location.hash||'#home';
   setMode('ws');renderSide();renderView();closeDrawer();
 }
 /* ── Bölümler: Workspace · Library · Second Brain ── */
@@ -875,7 +877,7 @@ function setMode(m,was){const app=$('#app'),prev=curMode;curMode=m;app.dataset.m
   if(m!=='lib'){Library.closeAll();app.classList.remove('mc-on')}
   if(m!=='brain'&&prev==='brain')Brain.stop();
   if(m==='ws')return;
-  const paint=()=>{hideFloat(true);closeDrawer();m==='lib'?Library.render(secParts):Brain.render(secParts);$('#scroll').scrollTop=0;onScroll()};
+  const paint=()=>{hideFloat(true);closeDrawer();m==='lib'?Library.render(secParts):m==='food'?Food.render(secParts):Brain.render(secParts);$('#scroll').scrollTop=0;onScroll()};
   if(prev!==m&&document.startViewTransition&&!REDUCED&&document.documentElement.dataset.motion!=='off')document.startViewTransition(paint);else{paint();if(prev===m||was===m)return;anim($('#view'),[{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'none'}],{duration:460,easing:OUT})}}
 function modeMark(){const on=$('#modes a.on'),mk=$('#modes .mk');if(mk)mk.style.opacity=on?1:0;tnavPaint();if(!on||!mk)return;mk.style.width=on.offsetWidth+'px';mk.style.transform=`translateX(${on.offsetLeft}px)`}
 addEventListener('resize',modeMark);
@@ -1917,7 +1919,7 @@ $('#me').onclick=e=>{const u=firebase.auth().currentUser;if(!u)return;const p=fl
 function start(){applyTheme();welcome();if(!started){started=true;Time.bind();Tasks.bind();Ders.bind();Ders.on(()=>{if(curMode==='ws'&&view==='ders')renderView(true)})}route()}
 (async()=>{
   applyTheme();
-  if(!CLOUD){S=Local;KB.startLocal();TM.startLocal();TK.startLocal();Ders.startLocal();Local.load().forEach(p=>{const n=norm(p);pages.set(n.id,n)});$('#saved').title='Bu tarayıcıda kayıtlı';start();return}
+  if(!CLOUD){S=Local;KB.startLocal();Food.startLocal();TM.startLocal();TK.startLocal();Ders.startLocal();Local.load().forEach(p=>{const n=norm(p);pages.set(n.id,n)});$('#saved').title='Bu tarayıcıda kayıtlı';start();return}
   gate('loading');
   try{await loadFirebase()}catch{return gate('error','Firebase yüklenemedi. İnternet bağlantını kontrol et.')}
   if(!firebase.apps.length)firebase.initializeApp(FB);
@@ -1926,7 +1928,7 @@ function start(){applyTheme();welcome();if(!started){started=true;Time.bind();Ta
   firebase.auth().onAuthStateChanged(async u=>{
     if(!u){Cloud.stop();KB.stop();TM.stop();TK.stop();Ders.stop();pages.clear();P=null;$('#view').innerHTML='';$('#nav').innerHTML='';$('#me').hidden=true;closePal();hideFloat(true);return gate('signin')}
     if((u.email||'').toLowerCase()!==OWNER){Cloud.stop();return gate('denied',`<b>${esc(u.email)}</b> bu deftere erişemez.`)}
-    gate('loading','Notlar yükleniyor…');S=Cloud;pages.clear();await Cloud.start(fs);await KB.startCloud(fs);await TM.startCloud(fs);await TK.startCloud(fs);await Ders.startCloud(fs);
+    gate('loading','Notlar yükleniyor…');S=Cloud;pages.clear();await Cloud.start(fs);await KB.startCloud(fs);await Food.startCloud(fs);await TM.startCloud(fs);await TK.startCloud(fs);await Ders.startCloud(fs);
     pinRef=fs.collection('hub').doc('notes');pinRef.onSnapshot(d=>{const v=d.data();if(v&&Array.isArray(v.pins)&&(+v.pinsAt||0)>pinsAt){PINS=v.pins;pinsAt=+v.pinsAt;try{localStorage.setItem('notlar:pins',JSON.stringify(PINS));localStorage.setItem('notlar:pinsAt',pinsAt)}catch{}tnavPins()}},()=>{});
     const me=$('#me');me.hidden=false;me.innerHTML=u.photoURL?`<img src="${esc(u.photoURL)}" alt="" referrerpolicy="no-referrer">`:esc((u.displayName||u.email)[0].toUpperCase());
     start();await ungate();

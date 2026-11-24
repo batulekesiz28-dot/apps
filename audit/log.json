@@ -5567,5 +5567,41 @@
     "text": "Tema stüdyosundaki küçük tema önizlemelerinde 'Günün odağı' yazısı 12px'in altında (minyatür önizleme)"
    }
   ]
+ },
+ {
+  "at": "2026-11-24",
+  "change": "Notlar'a yeni bölüm: Yemek (Workspace ve Library'nin yanında). Sevdiğin tatlıları ve yemekleri fotoğrafıyla kaydet; bir tarif sitesinin bağlantısını yapıştırınca malzemeler, adımlar, süre ve porsiyon kendiliğinden geliyor. Porsiyonu artırıp azaltınca malzeme miktarları değişiyor; pişirme modunda adımlar büyük yazıyla tek tek geliyor ve ekran kararmıyor. Favori, puan, 'denedim/denenecek', kategori, arama ve kendi notun.",
+  "scores": {
+   "Notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Yemek başlığı Notlar'daki başka bir sınıf adıyla çakışıp kategori çipleriyle üst üste biniyordu",
+    "fix": "kendi önekine (yk-) taşındı"
+   },
+   {
+    "app": "notlar",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Boş yıldızlar ve malzeme kutucukları çok soluk/küçüktü",
+    "fix": "koyulaştı, kutucuk 24px"
+   },
+   {
+    "app": "notlar",
+    "sev": "warn",
+    "status": "kabul",
+    "text": "Telefonda malzeme kutucuğu 24px (bütün satır dokunulabilir olduğu için bırakıldı)"
+   }
+  ]
  }
 ]

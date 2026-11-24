@@ -5603,5 +5603,41 @@
     "text": "Telefonda malzeme kutucuğu 24px (bütün satır dokunulabilir olduğu için bırakıldı)"
    }
   ]
+ },
+ {
+  "at": "2026-11-24",
+  "change": "Notlar'a tablolar geldi: '/' yazıp 'tablo' de — 10 çeşit: Tablo, Çizgili, Karşılaştırma (✓ ✗), Takip (durum hapları), Bütçe (otomatik toplam), Haftalık plan, İlerleme (yüzde çubuğu), Sıralama (madalyalı), Ders programı, Okuma listesi. Sütun başındaki ⋯ ile sütun türünü değiştir (metin, sayı, onay, durum, ilerleme, tarih), sırala, sütun ekle/sil; sağ tıkla satır ekle/sil. Tab ile hücre hücre gez, Excel/Sheets'ten yapıştırınca hücrelere dağılır.",
+  "scores": {
+   "Notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Yeni tabloda imleç başlık satırına gidiyordu (ilk yazılan satır sütun adı oluyordu)",
+    "fix": "ilk hücreye gider"
+   },
+   {
+    "app": "notlar",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Onay sütunundaki boş işaret okunmayacak kadar soluktu; düğmeler hücreden taşıyordu",
+    "fix": "koyulaştı, hücreye sığıyor"
+   },
+   {
+    "app": "notlar",
+    "sev": "warn",
+    "status": "open",
+    "text": "Sayfanın ortasına kaydırılmış test anında Denetçi onay düğmelerini 'altta kalmış' sayıyor; elle ölçümde çakışma yok — incelenecek"
+   }
+  ]
  }
 ]

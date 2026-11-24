@@ -1,0 +1,44 @@
+/* Tablo bloğu (tables.js) — ince çizgiler, yuvarlak kap, yatay kaydırma; sütun türlerine göre görünüm */
+.blk[data-t=table]{display:block}
+.ntb-w{overflow-x:auto;border-radius:12px;box-shadow:0 0 0 1px var(--line2);margin:4px 0 2px;scrollbar-width:thin}
+.ntb{border-collapse:collapse;width:100%;min-width:max-content;font-size:14.5px;line-height:1.45}
+.ntb th,.ntb td{border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:0;vertical-align:top;min-width:110px;max-width:340px;position:relative}
+.ntb th:last-child,.ntb td:last-child{border-right:0}.ntb tbody tr:last-child td{border-bottom:0}
+.ntb thead th{background:var(--tint,var(--hover));text-align:left;font-weight:600;color:var(--ink2);font-size:13px}
+.ntb-h{display:flex;align-items:center}.ntb-h .ntb-c{flex:1}
+.ntb-c{padding:8px 10px;min-height:38px;outline:0;white-space:pre-wrap;word-break:break-word}
+.ntb-c:focus{background:color-mix(in srgb,var(--accent) 9%,transparent);box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--accent) 55%,transparent)}
+.ntb th .ntb-c:empty::before{content:attr(data-ph);color:var(--ink3)}
+.ntb-cm{width:28px;height:28px;margin-right:4px;border-radius:7px;color:var(--ink3);opacity:0;flex-shrink:0;transition:opacity .15s}.ntb th:hover .ntb-cm,.ntb-cm:focus-visible{opacity:1}.ntb-cm:hover{background:var(--hover2);color:var(--ink)}
+.ntb.z tbody tr:nth-child(even) td{background:var(--hover)}
+.ntb.hc tbody td:first-child{background:var(--tint,var(--hover));font-weight:600;color:var(--ink2)}
+.ntb tbody tr:hover td{background:color-mix(in srgb,var(--ink) 3%,transparent)}
+.t-num .ntb-c,.ntb-s{text-align:right;font-variant-numeric:tabular-nums}
+.t-dt .ntb-c{color:var(--ink2);font-variant-numeric:tabular-nums}
+.ntb tfoot td{border-top:1.5px solid var(--line2);border-bottom:0;background:var(--tint,var(--hover));font-weight:700;padding:8px 10px}.ntb-sl{color:var(--ink2);font-weight:600!important}
+/* onay hücresi: ✓ ✗ ~ */
+.t-ck{text-align:center}.ntb-cy{box-sizing:border-box;display:block;min-height:38px;width:100%;padding:0 10px;font-size:15px;font-weight:700;border-radius:0}
+.ntb-cy.ck0{color:var(--ink3);font-weight:400}.ntb-cy.ck1{color:#16A34A}.ntb-cy.ck2{color:#DC2626}.ntb-cy.ck3{color:#D97706}
+[data-theme=dark] .ntb-cy.ck1{color:#4ADE80}[data-theme=dark] .ntb-cy.ck2{color:#F87171}[data-theme=dark] .ntb-cy.ck3{color:#FBBF24}
+.ntb-cy:hover{background:var(--hover)}
+/* durum hapı */
+.ntb-cy[class*=st]{display:flex;align-items:center;justify-content:flex-start;font-size:12.5px;font-weight:600}
+.ntb-cy[class*=st]::before{content:'';width:8px;height:8px;border-radius:50%;margin-right:7px;background:currentColor}
+.ntb-cy.st0{color:var(--ink3)}.ntb-cy.st0::before{background:var(--ink4)}.ntb-cy.st1{color:#6B7280}.ntb-cy.st2{color:#2563EB}.ntb-cy.st3{color:#16A34A}.ntb-cy.st4{color:#D97706}
+[data-theme=dark] .ntb-cy.st1{color:#A1A1AA}[data-theme=dark] .ntb-cy.st2{color:#60A5FA}[data-theme=dark] .ntb-cy.st3{color:#4ADE80}[data-theme=dark] .ntb-cy.st4{color:#FBBF24}
+/* ilerleme */
+.t-pg{min-width:160px}.ntb-bar{position:absolute;left:6px;right:6px;bottom:6px;height:5px;border-radius:3px;background:var(--hover2)}
+.ntb-bar::after{content:'';position:absolute;inset:0 auto 0 0;width:var(--p);border-radius:3px;background:linear-gradient(90deg,#22C55E,#16A34A);transition:width .4s var(--out)}
+.t-pg .ntb-c{padding-bottom:14px;font-variant-numeric:tabular-nums}.t-pg .ntb-c:not(:empty)::after{content:' %';color:var(--ink3)}
+/* sıralama madalyaları */
+.ntb.rk tbody tr:nth-child(1) td:first-child .ntb-c::before{content:'🥇 '}.ntb.rk tbody tr:nth-child(2) td:first-child .ntb-c::before{content:'🥈 '}.ntb.rk tbody tr:nth-child(3) td:first-child .ntb-c::before{content:'🥉 '}
+/* alt çubuk: satır / sütun / çeşit */
+.ntb-bar2{display:flex;gap:4px;margin:4px 0 6px;opacity:0;transition:opacity .2s}.blk[data-t=table]:hover .ntb-bar2,.blk[data-t=table]:focus-within .ntb-bar2{opacity:1}
+.ntb-bar2 button{display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 10px;border-radius:8px;font-size:12.5px;font-weight:550;color:var(--ink2)}.ntb-bar2 button:hover{background:var(--hover);color:var(--ink)}.ntb-bar2 svg{width:12px;height:12px}
+.ntb-menu{position:fixed;z-index:260;min-width:220px;max-height:min(460px,80vh);overflow:auto;padding:5px;border-radius:12px;background:var(--card);color:var(--ink);box-shadow:var(--shadow),0 18px 50px -18px rgba(0,0,0,.35)}
+.ntb-menu p{font-size:12px;font-weight:600;color:var(--ink3);padding:6px 10px 2px}.ntb-menu hr{border:0;height:1px;background:var(--line);margin:4px 6px}
+.ntb-menu button{display:flex;align-items:center;width:100%;min-height:34px;padding:0 10px;border-radius:8px;font-size:13.5px;text-align:left}.ntb-menu button:hover,.ntb-menu button:focus-visible{background:var(--hover);outline:0}
+.ntb-menu button.on::after{content:'✓';margin-left:auto;color:var(--accent);font-weight:700}.ntb-menu button.red{color:#B91C1C}[data-theme=dark] .ntb-menu button.red{color:#F87171}
+@media (hover:none){.ntb-cm,.ntb-bar2{opacity:1}}
+@media (max-width:700px){.ntb th,.ntb td{min-width:96px}.ntb-cy,.ntb-c{min-height:40px}.ntb-cm{width:40px;height:40px}.ntb-bar2 button{height:40px}.ntb-menu button{min-height:42px}}
+@media (prefers-reduced-motion:reduce){.ntb-bar::after,.ntb-bar2,.ntb-cm{transition:none}}html[data-motion=off] :is(.ntb-bar::after,.ntb-bar2,.ntb-cm){transition:none}

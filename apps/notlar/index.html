@@ -448,6 +448,7 @@ kbd{font:500 11px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radius:
 <link rel="stylesheet" href="tasks.css?v=20261122f">
 <link rel="stylesheet" href="daypick.css?v=20261124c">
 <link rel="stylesheet" href="food.css?v=20261124c">
+<link rel="stylesheet" href="tables.css?v=20261124c">
 <link rel="stylesheet" href="ders.css?v=20261122f">
 <style id="tnavCss">
 /* ── Üst gezinme (sol menü yerine) — ince cam şerit, kayan seçili vurgu ── */
@@ -654,6 +655,7 @@ body.rsz,body.rsz *{cursor:ew-resize!important;user-select:none}
 <script src="time.js?v=20261122f"></script>
 <script src="daypick.js?v=20261124c"></script>
 <script src="food.js?v=20261124c"></script>
+<script src="tables.js?v=20261124b"></script>
 <script src="tasks.js?v=20261122f"></script>
 <script src="ders.js?v=20261122f"></script>
 
@@ -749,6 +751,7 @@ const TYPES=[
 ];
 const ACTIONS=[
   {k:'@lib',l:'Kaynak',d:'Library’den bir PDF, kitap, video ya da site göm',kw:'kaynak library kütüphane pdf kitap video makale link source',b:SV('<path d="M2.5 13.5V3M5.5 13.5V3M8.5 13.5l-1-10 3-.4 1.3 10.2z"/><path d="M1.5 13.5h13"/>')},
+  ...Tables.actions(),
   {k:'@img',l:'Fotoğraf',d:'Bilgisayardan ya da telefondan fotoğraf ekle',kw:'foto fotograf resim gorsel image img picture kamera',b:SV('<rect x="2" y="3" width="12" height="10" rx="2"/><circle cx="6" cy="7" r="1.3"/><path d="M14 11l-3.5-3.5L4 13"/>')},
   {k:'@page',l:'Sayfa',d:'Bu sayfanın içinde yeni bir sayfa aç',kw:'sayfa page alt link subpage içinde',b:SV('<path d="M4 2h5.5L12 4.5V14H4z"/><path d="M9.5 2v2.5H12"/>')},
   {k:'@date',l:'Bugünün tarihi',d:'Metne bugünün tarihini yaz',kw:'tarih date bugun',b:SV('<rect x="2" y="3" width="12" height="11" rx="2"/><path d="M2 6.5h12"/>')},
@@ -846,7 +849,7 @@ const sorted=()=>[...pages.values()].sort((a,b)=>b.updated-a.updated);
 
 /* ── Router ───────────────────────────────────────────────── */
 /* sayfa değişince geçici arayüz (açılır menü, palet, düzenleyici, panel) kalmasın; bölümün geçici durumu taşınmasın */
-function dismissTransient(next){hideFloat(true);closePal();Media.dismiss();Time.dismiss();Library.dismiss();Food.dismiss();if(DayPick.isOpen())DayPick.close();
+function dismissTransient(next){hideFloat(true);closePal();Media.dismiss();Time.dismiss();Library.dismiss();Food.dismiss();Tables.dismiss();if(DayPick.isOpen())DayPick.close();
   if(next!=='tasks'&&Tasks.open){Tasks.open=null}}
 function route(){
   const h=decodeURIComponent(location.hash.slice(1))||'home';const[v,id]=h.split('/');dismissTransient(v);
@@ -1308,6 +1311,7 @@ function blockHTML(b){
   if(b.t==='lib')return`<div class="blk" data-id="${b.id}" data-t="lib">${hd}${Library.libCard(b)}</div>`;
   if(b.t==='link')return`<div class="blk" data-id="${b.id}" data-t="link">${hd}${linkCard(b)}</div>`;
   if(b.t==='img')return imgBlockHTML(b,hd);
+  if(b.t==='table')return Tables.html(b,hd);
   if(b.t==='kv')return`<div class="blk" data-id="${b.id}" data-t="kv">${hd}<div class="kv"><div class="txt k" contenteditable="true" data-f="h" data-ph="Alan adı">${clean(b.h)}</div><div class="txt v" contenteditable="true" data-f="v" data-ph="Boş">${clean(b.v)}</div></div></div>`;
   const txt=`<div class="txt" contenteditable="true" data-f="h" data-ph="${ph}" spellcheck="${b.t==='code'?'false':'true'}">${b.t==='code'?esc(plain(b.h)):clean(b.h)}</div>`;
   if(b.t==='callout')return`<div class="blk" data-id="${b.id}" data-t="callout"${al}>${hd}<div class="cw"><span class="co" data-act="co">${b.e||'💡'}</span>${txt}</div></div>`;
@@ -1360,7 +1364,7 @@ const collapsed=()=>{const s=getSelection();return s.rangeCount&&s.getRangeAt(0)
 function caretRect(){const s=getSelection();if(!s.rangeCount)return null;const r=s.getRangeAt(0).cloneRange();r.collapse(true);const rs=r.getClientRects();return rs[0]||null}
 function onFirstLine(el){const c=caretRect();if(!c)return true;const lh=parseFloat(getComputedStyle(el).lineHeight)||24;return c.top-el.getBoundingClientRect().top<lh*.85}
 function onLastLine(el){const c=caretRect();if(!c)return true;const lh=parseFloat(getComputedStyle(el).lineHeight)||24;return el.getBoundingClientRect().bottom-c.bottom<lh*.85}
-function focusBlock(b,off,f){if(!b)return;if(b.t==='divider'){nodeOf(b)?.querySelector('.div')?.focus();return}if(b.t==='page'||b.t==='lib'||b.t==='link'||b.t==='img'){nodeOf(b)?.querySelector('.pgb')?.focus();return}setCaret(txtOf(b,f||(b.t==='kv'&&off==null?'v':'h')),off)}
+function focusBlock(b,off,f){if(!b)return;if(b.t==='table'){const n=nodeOf(b);(n?.querySelector('[data-r="0"][data-c="0"]')||n?.querySelector('[data-hc="0"]'))?.focus();return}if(b.t==='divider'){nodeOf(b)?.querySelector('.div')?.focus();return}if(b.t==='page'||b.t==='lib'||b.t==='link'||b.t==='img'){nodeOf(b)?.querySelector('.pgb')?.focus();return}setCaret(txtOf(b,f||(b.t==='kv'&&off==null?'v':'h')),off)}
 
 /* Block ops */
 const idx=b=>P.blocks.indexOf(b);
@@ -1562,6 +1566,9 @@ function applySlash(i){
       const nx=P.blocks[idx(nb)+1];nx?focusBlock(nx,0):insertAfter(nb,B('p'))});return}
   if(t.k==='@page'){b.h=normHTML(el.innerHTML);addSubpage(b,{replaceEmpty:true});return}
   if(t.k==='@img'){b.h=normHTML(el.innerHTML);pickImages(b);return}
+  if(t.k.startsWith('@tbl:')){b.h=normHTML(el.innerHTML);const nb=Tables.create(t.k.slice(5));
+    if(!plain(b.h).trim()&&b.t==='p'){nb.id=b.id;P.blocks[idx(b)]=nb;replaceNode(nb);animIn(nodeOf(nb));focusBlock(nb);edited()}else insertAfter(b,nb);
+    if(!P.blocks[idx(nb)+1]){const pb=B('p');P.blocks.splice(idx(nb)+1,0,pb);const tmp=document.createElement('div');tmp.innerHTML=blockHTML(pb);nodeOf(nb).after(tmp.firstChild)}return}
   if(t.k==='divider'){if(!el.textContent){b.t='divider';b.h='';replaceNode(b);insertAfter(b,B('p'))}else insertAfter(b,B('divider')),insertAfter(P.blocks[idx(b)+1],B('p'));return}
   if(t.k==='kv'&&el.textContent){insertAfter(b,B('kv','',{v:''}));return}
   setType(b,t.k,start);

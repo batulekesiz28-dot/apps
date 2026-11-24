@@ -5639,5 +5639,24 @@
     "text": "Sayfanın ortasına kaydırılmış test anında Denetçi onay düğmelerini 'altta kalmış' sayıyor; elle ölçümde çakışma yok — incelenecek"
    }
   ]
+ },
+ {
+  "at": "2026-11-24",
+  "change": "Medya her an bağlanabilir: internet kopup geri gelince ya da sekmeye geri dönünce Medya kendini toparlıyor — duran poster eşleştirmesi, alınamayan öneriler, yayın takvimi ve yüklenemeyen kapaklar kendiliğinden yeniden deneniyor, 'Tekrar dene'ye basmana gerek yok. Çevrimdışıyken altta sakin bir not çıkıyor; bağlantı gelince kayboluyor.",
+  "scores": {
+   "Notlar telefon": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Medya'da internet bir kez gidince eşleştirme ve öneriler elle 'Tekrar dene'ye basılana kadar takılı kalıyordu",
+    "fix": "bağlantı/sekme dönüşünde ve dakikada bir kendiliğinden yeniden deniyor"
+   }
+  ]
  }
 ]

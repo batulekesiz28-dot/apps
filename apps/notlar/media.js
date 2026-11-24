@@ -1311,4 +1311,20 @@ const Media=(()=>{
         (d?.Page?.media||[]).forEach(m=>{const iid=byMal.get(m.idMal);(m.airingSchedule?.nodes||[]).forEach(n=>got.push({iid,t:n.airingAt,ep:n.episode}))})}
       const seen=new Set(),list=[...keep,...got].filter(x=>{const q=x.iid+':'+x.ep;if(seen.has(q))return false;seen.add(q);return true});lss('mc:air',{at:Date.now(),list});return true}
     catch(e){return false}finally{airBusy=false}}
-  return{airing,airRefresh,netTest,render,refresh,detail,close,imgErr,imgOk,fyNoImg,queue,addSheet,rateHTML,dismiss,patchCards,isMedia:t=>MT.includes(t),get st(){return st},get R(){return R},_rank:rank,_cleanG:cleanG,_yt:ytIds}})();
+  /* ── Her an bağlanabilir: internet kopup geri gelince (ya da sekme yeniden öne gelince) Medya kendiliğinden toparlanır.
+     Duran eşleştirme kuyruğu, alınamayan öneriler (Sana özel, anime), yayın takvimi ve yüklenemeyen kapaklar yeniden denenir;
+     kullanıcı “Tekrar dene”ye basmak zorunda kalmaz. Çevrimdışıyken altta sakin bir not: kayıtlı listen görünür, gelince yenilenir. ── */
+  let lastHeal=0;
+  const inMedia=()=>!!q('#view>.mc');
+  function offNote(on){let n=document.getElementById('mcOff');if(!on){if(n){n.classList.add('out');setTimeout(()=>n.remove(),260)}return}if(n||!inMedia())return;
+    n=document.createElement('div');n.id='mcOff';n.className='mc-offl';n.setAttribute('role','status');n.innerHTML=`<i aria-hidden="true"></i>Çevrimdışısın — kayıtlı listen görünüyor. Bağlantı gelince kendiliğinden yenilenecek.`;document.body.appendChild(n)}
+  function heal(why){if(navigator.onLine===false){offNote(true);return}if(Date.now()-lastHeal<5000)return;lastHeal=Date.now();onlineAt=0;offNote(false);
+    const broken=R.off||arecErr||fyErr==='net'||fyPart||!!qa('#view>.mc .noimg').length;R.off=false;
+    try{queue()}catch{}try{airRefresh()}catch{}
+    if(!broken||!inMedia())return;
+    Promise.all([arecErr?arecLoad(true).catch(()=>{}):0,(fyErr==='net'||fyPart)?fyLoad(true).catch(()=>{}):0]).then(()=>{if(inMedia()){refresh();if(why==='online')say('Bağlantı geri geldi — Medya yenilendi')}})}
+  addEventListener('online',()=>heal('online'));addEventListener('offline',()=>offNote(true));
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)heal('vis')});
+  // hata kalmışsa sayfa açıkken dakikada bir sessizce yeniden dene (servis geçici yanıt vermediyse)
+  setInterval(()=>{if(!document.hidden&&inMedia()&&(R.off||arecErr||fyErr==='net'||fyPart))heal('tick')},60000);
+  return{heal,airing,airRefresh,netTest,render,refresh,detail,close,imgErr,imgOk,fyNoImg,queue,addSheet,rateHTML,dismiss,patchCards,isMedia:t=>MT.includes(t),get st(){return st},get R(){return R},_rank:rank,_cleanG:cleanG,_yt:ytIds}})();

@@ -5665,5 +5665,35 @@
     "fix": "Medya'da bölüm düğmeleri sadece simge; dar ekranda kategori şeridi alt satıra iner"
    }
   ]
+ },
+ {
+  "at": "2026-11-24",
+  "change": "Ada: çalan şarkının çubuğuna gelince çubuk kalınlaşıyor, tutamak çıkıyor ve imlecin olduğu yerin zamanı yukarıda baloncukta görünüyor; basılı tutup sürükleyince bıraktığın saniyeye atlıyor. Uygulama açıkken üstteki şerit yeniden tasarlandı (macOS/iPadOS gibi): solda ana ekran, renkli pencere ışıkları (kırmızı kapat, sarı mini pencere, yeşil yan yana), ortada uygulamanın adı (bas → yenile, yeni sekme, tam ekran… menüsü), sağda açık uygulamalar sadece simge olarak (öndeki altında nokta). Telefonda ışıklar yok, her şey adın menüsünde.",
+  "scores": {
+   "Hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "Hub masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "hub",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Adadaki şarkı çubuğunda sarma tutamağı ve zaman göstergesi yoktu",
+    "fix": "üstüne gelince tutamak + zaman baloncuğu, sürükleyerek sarma"
+   },
+   {
+    "app": "hub",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Uygulama şeridi kalabalıktı: 8 düğme + yazılı sekmeler yan yana",
+    "fix": "ışıklar + uygulama adı menüsü + simge sekmeler"
+   }
+  ]
  }
 ]

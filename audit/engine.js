@@ -247,7 +247,8 @@ function run(doc,opt={}){
   const clipped=e=>{const r=R(e),cx=r.left+r.width/2,cy=r.top+r.height/2;for(let p=e.parentElement;p&&p!==doc.body;p=p.parentElement){const cs=win.getComputedStyle(p);if(cs.overflowX==='visible'&&cs.overflowY==='visible')continue;const q=R(p);if(cx<q.left||cx>q.right||cy<q.top||cy>q.bottom)return true}return false};
   const coverOf=(e,r)=>{const pts=[[r.left+r.width/2,r.top+r.height/2],[r.left+Math.min(8,r.width/3),r.top+r.height/2],[r.right-Math.min(8,r.width/3),r.top+r.height/2]];let hit=0,by=null;
     for(const[x,y]of pts){const h=doc.elementFromPoint(x,y);if(!h||h===e||e.contains(h)||h.contains(e)||overlay(h)||!painted(h)||!okLayer(e,h))continue;
-      if(h.closest('[role=tooltip],.toast,.toasts')||opacityChain(h,win)<.08||edgeBar(h))continue;hit++;by=h}return hit>=2?by:null};
+      // açılır katman (açık ada, menü): kullanıcı açtı, geçici — altındaki içeriği bilerek örter
+      if(h.closest('[role=tooltip],.toast,.toasts,[data-popover],[role=menu],.menu')||opacityChain(h,win)<.08||edgeBar(h))continue;hit++;by=h}return hit>=2?by:null};
   if(!modal){
     // 14) yazının üstüne başka bir şey binmiş (kadran ibresi, ada saatin üstünde…)
     const tc=[];for(const e of textEls.slice(0,700)){const r=R(e);if(!inVP(r)||r.width<6||animating(e)||clipped(e))continue;const by=coverOf(e,r);if(by){tc.push(e);if(tc.length>=15)break}}

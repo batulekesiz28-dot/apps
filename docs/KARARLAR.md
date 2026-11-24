@@ -122,3 +122,4 @@ Son güncelleme: 2026-11-15
 - **OS durum çubuğu:** uygulama açıkken üstte saat · ada · durum simgeleri; ada artık uygulamaların içinde de çalışır. Uygulama penceresi çubuğun altından başlar (48px).
 - **Arayüzlerde “Açık” çubuğu yok:** arayüzlerin kendi alt gezinmesi var; açık uygulamalar adada, kenar panelinde ve Shift+Tab'da. (Mıknatıs'ta alt menünün üstüne biniyordu.)
 - **OS özellikleri (docs/OS.md):** gece ışığı, sıcak köşeler, pano geçmişi, ekran süresi, odak modları, rutinler, bildirim özeti, performans katmanı, kenar paneli, devam et — hepsi ayrı modülde (ui/osx.js), varsayılan olarak sessiz; sadece kenar tutamağı ve sağ alt köşe (Hızlı not) baştan açık.
+- **Uygulama şeridi:** macOS pencere çubuğu düzeni — ışıklar (kapat/mini/yan yana), uygulama adı menüsü, açık uygulamalar simge. Yazılı sekmeler ve 8 düğmelik sıra kaldırıldı (kullanıcı: “hiç OS gibi değil, karışık”).

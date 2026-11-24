@@ -54,7 +54,16 @@ const Yearly=(()=>{
     el.querySelectorAll('.yr-w[data-w=d] .yr-i').forEach((e,i)=>e.classList.toggle('off',i+1>mx));preview()}
   function wire(){for(const k of['d','m','y']){const w=W(k);let t=0,raf=0;
       w.addEventListener('scroll',()=>{if(!raf)raf=requestAnimationFrame(()=>{raf=0;shade(w)});clearTimeout(t);t=setTimeout(()=>{const i=Math.max(0,Math.min(w.children.length-1,Math.round(w.scrollTop/RH)));if(i!==idxOf(k))pick(k,i)},90)},{passive:true});
-      w.addEventListener('click',e=>{const it=e.target.closest('.yr-i');if(it)scrollTo(k,+it.dataset.i,true)});
+      w.addEventListener('click',e=>{if(w._drag){w._drag=0;return}const it=e.target.closest('.yr-i');if(it)scrollTo(k,+it.dataset.i,true)});
+      // fareyle tut-sürükle: yukarı/sağa çek → sayı büyür, aşağı/sola → küçülür; bırakınca hızına göre kayıp en yakın satıra oturur
+      w.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse'||e.button!==0)return;e.preventDefault();w.focus({preventScroll:true});
+        const y0=e.clientY,x0=e.clientX,s0=w.scrollTop;let moved=false,last=[[performance.now(),s0]];
+        const mv=ev=>{const d=(y0-ev.clientY)+(ev.clientX-x0);if(!moved&&Math.abs(d)<4)return;if(!moved){moved=true;w.setPointerCapture(e.pointerId);w.classList.add('drag')}
+          w.scrollTop=s0+d;last.push([performance.now(),w.scrollTop]);if(last.length>6)last.shift()};
+        const up=()=>{w.removeEventListener('pointermove',mv);w.removeEventListener('pointerup',up);w.removeEventListener('pointercancel',up);if(!moved)return;w._drag=1;
+          const[a,b]=[last[0],last[last.length-1]],v=b[0]-a[0]>0&&performance.now()-b[0]<80?(b[1]-a[1])/(b[0]-a[0]):0; // px/ms
+          const i=Math.max(0,Math.min(w.children.length-1,Math.round((w.scrollTop+v*160)/RH)));w.classList.remove('drag');pick(k,i);scrollTo(k,i,true);setTimeout(()=>w._drag=0,0)};
+        w.addEventListener('pointermove',mv);w.addEventListener('pointerup',up);w.addEventListener('pointercancel',up)});
       w.addEventListener('keydown',e=>{const d=e.key==='ArrowDown'?1:e.key==='ArrowUp'?-1:e.key==='PageDown'?5:e.key==='PageUp'?-5:0;if(!d)return;e.preventDefault();
         const i=Math.max(0,Math.min(w.children.length-1,idxOf(k)+d));pick(k,i);scrollTo(k,i,true)})}
     for(const k of['d','m','y']){scrollTo(k,idxOf(k));shade(W(k))}

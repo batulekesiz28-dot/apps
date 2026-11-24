@@ -5782,5 +5782,20 @@
     "fix": "24px alan, nokta aynı boyda"
    }
   ]
+ },
+ {
+  "at": "2026-11-24T20:10:00+03:00",
+  "change": "“Her yıl” penceresindeki gün/ay/yıl tekerlekleri artık fareyle tutup sürüklenerek ayarlanıyor: yukarı ya da sağa çek → büyür, aşağı ya da sola → küçülür; hızlı fırlatınca kayıp en yakın sayıya oturur.",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "notlar masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": []
  }
 ]

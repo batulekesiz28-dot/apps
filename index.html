@@ -379,12 +379,12 @@ body.linking,body.linking .node,body.linking #stage{cursor:crosshair}
 .ob-bat b{display:block;height:100%;width:var(--p);border-radius:1.5px;background:var(--ink)}.ob-bat.low b{background:#DC2626}
 body.os-app .win{top:calc(48px + env(safe-area-inset-top))}
 body.os-app #focusBar{z-index:56;top:calc(4px + env(safe-area-inset-top));left:50%;right:auto;transform:translateX(-50%)}body.os-app #islMini{z-index:56}
-body.os-app .pill{top:calc(54px + env(safe-area-inset-top))}
+body.os-app .pill{top:calc(54px + env(safe-area-inset-top))}body.os-app .pill .pnp{display:none} /* şarkı zaten durum çubuğundaki adada */
 body.os-app :is(header.top,.wx-hd,.zbar,#searchBtn){visibility:hidden} /* uygulama açıkken hub'ın kendi başlığı durum çubuğunun altında boşuna durmasın */
 @media (max-width:700px){body.has-dock:not(.inworld) .zbar{bottom:calc(86px + env(safe-area-inset-bottom))}} /* telefonda “Açık” çubuğu yakınlaştırmanın üstüne binmesin */
 .zbar{transition:bottom .35s var(--out)}
 @media (max-width:600px){body.os-app #focusBar:not(.open){max-width:calc(100vw - 172px)}body.os-app .ob-r small{display:none}body.os-app #islMini{display:none}}body.os-app .grab,body.os-app .hot{display:none}
-.pill{position:fixed;top:calc(10px + env(safe-area-inset-top));left:50%;z-index:57;display:flex;align-items:center;gap:2px;height:38px;padding:0 4px 0 9px;border-radius:13px;background:var(--menu);box-shadow:var(--shadow);backdrop-filter:blur(24px) saturate(1.6);-webkit-backdrop-filter:blur(24px) saturate(1.6);transform:translateX(-50%);transition:transform .55s var(--out),opacity .3s var(--ease)}
+.pill{position:fixed;top:calc(10px + env(safe-area-inset-top));left:50%;z-index:57;display:flex;align-items:center;gap:2px;height:38px;padding:0 4px 0 9px;border-radius:13px;background:var(--menu);box-shadow:var(--shadow);backdrop-filter:blur(24px) saturate(1.6);-webkit-backdrop-filter:blur(24px) saturate(1.6);transform:translateX(-50%);translate:0 var(--pldy,0px);transition:transform .55s var(--out),opacity .3s var(--ease),translate .5s var(--spring)}
 .pill.hide{transform:translateX(-50%) translateY(calc(-100% - 20px));opacity:0;pointer-events:none}
 .pill .pname{font-size:12.5px;font-weight:550;color:var(--ink);max-width:28vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:0 4px 0 7px}
 .pill .src{font:500 9.5px/1 var(--mono);color:var(--ink3);letter-spacing:.06em;text-transform:uppercase;margin-right:2px}
@@ -2304,16 +2304,18 @@ addEventListener('keydown',e=>{if(e.key==='Escape'&&AL?.e){e.stopPropagation();a
    {appshell:'np',t,a,img,on,cur,dur,has} yollar; ⏮ ⏯ ⏭ {appshell:'np-cmd',c} ile geri gider. NP={key,t,a,img,on,cur,dur,at} ── */
 let NP=null;
 addEventListener('message',e=>{const d=e.data;if(!d||d.appshell!=='np')return;const t=TABS.find(x=>x.fr&&x.fr.contentWindow===e.source);if(!t)return;
-  if(!d.has){if(NP?.key===t.key&&!d.on){NP=null;paintFocusBar()}return}
+  if(!d.has){if(NP?.key===t.key&&!d.on){NP=null;paintFocusBar();npSync()}return}
   if(NP&&NP.key!==t.key&&NP.on&&!d.on&&Date.now()-NP.at<5000)return; // çalan sekme duraklatılmış olana yer vermez
   const was=NP&&NP.t+NP.on;const prevCol=NP?.img===d.img?NP.col:NPCOL.get(d.img)||'';NP={col:prevCol,key:t.key,t:String(d.t||''),a:String(d.a||''),img:/^https:\/\//.test(d.img||'')?d.img:'',on:!!d.on,cur:+d.cur||0,dur:+d.dur||0,at:Date.now()};
-  npColor(NP.img);if(was!==NP.t+NP.on||!document.hidden){paintFocusBar();paintPnp()}});
+  npColor(NP.img);if(was!==NP.t+NP.on||!document.hidden){paintFocusBar();paintPnp()}npSync()});
 // uygulama açıkken üst şeritte (Alt+P ⏯, Alt+N ⏭): çalan sekme öndeyse gizli — kendi oynatıcısı var
 function paintPnp(){const p=$('#pnp');if(!p)return;const t=npTab(),show=!!(t&&NP.t&&(NP.on||Date.now()-NP.at<30*6e4)&&curTab()!==t);
   if(!show){p.hidden=true;p.innerHTML='';return}const k=NP.t+NP.on+NP.img;if(p.dataset.k===k&&!p.hidden)return;p.dataset.k=k;p.hidden=false;
   p.innerHTML=`<button class="pnp-o" data-np="open" title="${esc(NP.t)}${NP.a?' · '+esc(NP.a):''} — aç">${npArt(NP)}<span>${esc(NP.t)}</span></button><button data-np="toggle" aria-label="${NP.on?'Duraklat':'Oynat'}" title="${NP.on?'Duraklat':'Oynat'} · Alt+P">${NP.on?NPI.pause:NPI.play}</button><button data-np="next" aria-label="Sonraki" title="Sonraki · Alt+N">${NPI.next}</button>`}
 $('#pnp')?.addEventListener('click',e=>{const b=e.target.closest('[data-np]');if(!b||!NP)return;e.stopPropagation();const c=b.dataset.np;if(c==='open')switchTo(NP.key);else npCmd(c);paintPnp()});
 const npTab=()=>{const t=NP&&tabOf(NP.key);return t&&t.fr?t:null};
+const npShown=()=>{const t=npTab();return t&&NP.t&&(NP.on||Date.now()-NP.at<30*6e4)?t:null}; // adada gösterilen çalan sekme
+let npSK='';function npSync(){const k=npShown()?.key||'';if(k===npSK)return;npSK=k;renderTabs();renderDock()}
 const npCur=()=>NP?Math.min(NP.dur||1e9,NP.cur+(NP.on?(Date.now()-NP.at)/1000:0)):0;
 function npCmd(c,x){const t=npTab();if(!t)return;let o='*';try{o=new URL(t.app.url).origin}catch{}
   try{t.fr.contentWindow.postMessage(Object.assign({appshell:'np-cmd',c},x||{}),o)}catch{}
@@ -2330,7 +2332,7 @@ function npCard(x){const d=NP.dur,c=npCur(),app=tabOf(NP.key)?.app.name||'';
     <div class="np-tm num"><span data-v="npc">${fmtClock(c)}</span><span>${fmtClock(d)}</span></div>`:''}
     <div class="np-c"><button data-np="prev" aria-label="Önceki" title="Önceki">${NPI.prev}</button><button class="np-pp" data-np="toggle" aria-label="${x.on?'Duraklat':'Oynat'}" title="${x.on?'Duraklat':'Oynat'}">${x.on?NPI.pause:NPI.play}</button><button data-np="next" aria-label="Sonraki" title="Sonraki">${NPI.next}</button></div></div>`}
 function paintFocusBar(){const b=$('#focusBar');if(!b)return;const it=islandItems();
-  if(!it.length||calmOn){b.hidden=true;islKey='';document.body.classList.remove('has-isl');return}
+  if(!it.length||calmOn){b.hidden=true;islKey='';document.body.classList.remove('has-isl');pillAvoid(null);return}
   document.body.classList.add('has-isl');islFit();islIt=it;const top=it[0],key=it.map(x=>x.k+x.t+x.sub+(x.done?1:0)+(x.on?1:0)+(x.img||'')+(x.k==='np'&&NP.dur?Math.round(NP.dur):'')).join('|')+islOpen;
   const vis=!b.hidden,wasOpen=b.classList.contains('open'),r0=vis&&key!==islKey?b.getBoundingClientRect():null;
   b.hidden=false;b.className='island'+(islOpen?' open':'')+(top.k==='timer'&&STUDY.run?.on?' live':'')+(top.k==='np'&&NP?.on?' np-on':'')+(top.k==='flash'?' flash':'');
@@ -2340,7 +2342,12 @@ function paintFocusBar(){const b=$('#focusBar');if(!b)return;const it=islandItem
   islKey=key;
   b.innerHTML=`<div class="is-c">${top.k==='np'?npArt(top):top.ic}<span class="is-t${top.done?' done':''}">${esc(top.t)}</span>${top.k==='np'?npEq(top):''}${top.cact||''}${top.v?`<b class="is-v num" data-lv="${esc(top.k)}">${esc(top.v)}</b>`:''}${top.p!=null&&top.k!=='np'?ringHTML(top):''}${it.length>1&&top.k!=='flash'?`<span class="is-n">+${it.length-1}</span>`:''}</div>
     <div class="is-l">${it.map(x=>x.k==='np'?npCard(x):`<div class="is-r" data-go="${esc(x.k)}">${x.ic}<span class="is-rt${x.done?' done':''}"><b>${esc(x.t)}</b><small>${esc(x.sub)}</small></span>${x.v&&x.k!=='focus'?`<b class="num is-rv" data-lv="${esc(x.k)}">${esc(x.v)}</b>`:''}${x.act}</div>`).join('')}</div>`;
-  if(r0)islMorph(b,r0,wasOpen!==islOpen);paintMini(it,top)}
+  if(r0)islMorph(b,r0,wasOpen!==islOpen);paintMini(it,top);pillAvoid(r0?b._r1:b.getBoundingClientRect())}
+/* ada açılıp uzayınca uygulama şeridi (#pill) onun altına kayar, kapanınca geri çıkar — üst üste binmez (iOS'ta bildirim adası gibi) */
+function pillAvoid(r){const p=$('#pill');if(!p)return;const t=parseFloat(getComputedStyle(p).top)||0,pr=p.getBoundingClientRect();
+  const dy=r&&r.width&&r.left<pr.right&&r.right>pr.left?Math.max(0,Math.round(r.bottom+8-t)):0,o=parseFloat(p.style.getPropertyValue('--pldy'))||0;if(dy===o)return;
+  p.style.transition=dy>o?'':'transform .55s var(--out),opacity .3s var(--ease),translate .4s var(--out)'; // inerken yaylı, çıkarken yumuşak (ada küçülürken üstüne sıçramasın)
+  p.style.setProperty('--pldy',dy+'px')}
 /* galakside ada başlık satırının ortasında: sağdaki arama + düğmelere binmesin (Denetçi durum gezgini: ada açılınca “Ara veya komut”un üstüne biniyordu).
    Ada en fazla aramaya kadar genişler; yer çok darsa başlığın altına iner. */
 function islFit(){const b=$('#focusBar');if(!b)return;const free=!document.body.classList.contains('os-app')&&!document.body.classList.contains('inworld')&&innerWidth>600;
@@ -3173,7 +3180,8 @@ function closeAll(){for(const t of TABS.splice(0))dropFrame(t);hideAll()}
 const hideWin=()=>closeAll();
 
 function renderTabs(){const cur=curTab(),tb=$('#tabs'),old=new Set($$('#tabs [data-t]').map(b=>b.dataset.t)),po=tb.querySelector('.tb.on'),pr=po&&po.getBoundingClientRect(),pk=po?.querySelector('[data-t]')?.dataset.t;
-  $('#tabs').innerHTML=TABS.map((t,i)=>{const m=miniIcon(t.app),on=t===cur;
+  const npS=npShown();$('#tabs').innerHTML=TABS.map((t,i)=>{if(t===npS&&t!==cur)return ''; // arkada çalan uygulama sadece adada (iPhone gibi) — şeritte tekrar görünmez
+    const m=miniIcon(t.app),on=t===cur;
     return `<div class="tb${on?' on':''}${t.fr?'':' zz'}"><button class="tb-o" data-t="${esc(t.key)}" role="tab" aria-selected="${on}" title="${esc(t.app.name)}${i<9?` · Alt+${i+1}`:''}"><span class="mini" style="${m.style}">${m.html}</span><span class="tn">${esc(t.app.name)}</span></button><button class="tb-x" data-x="${esc(t.key)}" aria-label="${esc(t.app.name)} uygulamasını kapat" title="Kapat">${XI}</button></div>`}).join('');
   $('#tabs').querySelector('.on')?.scrollIntoView({block:'nearest',inline:'nearest'});
   tabMotion(tb,old,pr,pk);paintOsBar();
@@ -3189,7 +3197,7 @@ function tabMotion(tb,old,pr,pk){if(MOTION!=='full'||REDUCED||!old.size&&!pr)ret
 {const mo=new MutationObserver(ms=>{document.body.classList.toggle('has-dock',!$('#dock').hidden);for(const m of ms){const el=m.target;if(el.hidden||m.oldValue===null||MOTION==='off'||REDUCED)continue;
     const dy=el.id==='dock'?18:-16;anim(el,[{opacity:0,translate:`0 ${dy}px`,scale:'.94'},{opacity:1,translate:'0 0',scale:'1'}],{duration:460,easing:SPRING})}});
   for(const id of ['#dock','#pill','#grab'])if($(id))mo.observe($(id),{attributes:true,attributeFilter:['hidden'],attributeOldValue:true})}
-function renderDock(){const d=$('#dock'),L=mru().filter(t=>t!==FL?.t);if(!L.length){d.innerHTML='';d.hidden=true;return} // mini penceredeki zaten görünüyor
+function renderDock(){const d=$('#dock'),npS=npShown(),L=mru().filter(t=>t!==FL?.t&&t!==npS);if(!L.length){d.innerHTML='';d.hidden=true;return} // mini penceredeki zaten görünüyor
   d.innerHTML=`<span class="dk-l">Açık</span>`+L.map(t=>{const m=miniIcon(t.app);
     return `<div class="dk${t.fr?'':' zz'}"><button class="dk-o" data-t="${esc(t.key)}" title="${esc(t.app.name)}"><span class="mini" style="${m.style}">${m.html}</span><span class="t">${esc(t.app.name)}</span></button><button class="dk-x" data-x="${esc(t.key)}" aria-label="${esc(t.app.name)} uygulamasını kapat" title="Kapat">${XI}</button></div>`}).join('')+
     `<button class="dk-sw" data-sw aria-label="Uygulama değiştirici" title="Değiştirici · Shift+Tab ya da Alt+Q"><svg viewBox="0 0 16 16"><rect x="2.5" y="3.5" width="5" height="9" rx="1.5"/><rect x="9.5" y="3.5" width="4" height="9" rx="1.5"/></svg></button>`}

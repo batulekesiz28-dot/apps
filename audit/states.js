@@ -1,10 +1,10 @@
 // Durum gezgini — Denetçi'nin “her şeyi her durumda dene” kolu. Hub'ı gerçek kullanımdaki durumlara sokar ve her birinde
-// katı motoru (engine.js) çalıştırır: 10 arayüz × {boş, arkada açık uygulama, canlı şarkı + sayaç, ada açık, uygulama içinde, kontrol merkezi, sistem paneli, kenar paneli} × {bilgisayar, telefon}.
+// katı motoru (engine.js) çalıştırır: 10 arayüz × {boş, arkada açık uygulama, canlı şarkı + sayaç, ada açık, uygulama içinde, uygulama içinde ada açık + şerit, kontrol merkezi, sistem paneli, kenar paneli} × {bilgisayar, telefon}.
 // Kullanıcı şikâyetinden doğdu: “Açık uygulamalar” çubuğu Mıknatıs'ın alt menüsünün üstüne bindi — tek ekran taraması bunu göremezdi.
 // Kullanım: python3 -m http.server 8766 &  node audit/states.js [dünya] [durum]   → sadece hata ve insan uyarılarını yazar; çıkış kodu = hata sayısı>0
 const {chromium}=require('playwright');const path=require('path');
 const WORLDS=['galaksi','mekansal','miknatis','ruzgar','petek','kum','balon','kadran','deste','harita'];
-const STATES=['bos','arkada','canli','ada','uygulama','merkez','sistem','kenar'];
+const STATES=['bos','arkada','canli','ada','uygulama','serit','merkez','sistem','kenar'];
 const fw=process.argv[2]&&WORLDS.includes(process.argv[2])?[process.argv[2]]:WORLDS,fs=process.argv[3]&&STATES.includes(process.argv[3])?[process.argv[3]]:STATES;
 const SIZES=[['pc',{viewport:{width:1366,height:800}}],['tel',{viewport:{width:390,height:844},hasTouch:true,isMobile:true}]];
 const BAD=new Set(['chromeclash','textoverlap','textcover','buried','offscreen','overlap','fontsize0']);
@@ -18,12 +18,17 @@ const BAD=new Set(['chromeclash','textoverlap','textcover','buried','offscreen',
    await p.evaluate(()=>{document.documentElement.dataset.appshellGom='1.2';document.documentElement.dataset.appshellGomHosts='music.youtube.com'});
    try{
     if(st!=='bos'){await p.evaluate(()=>HUB.open('p:saat'));await p.waitForTimeout(900)}
-    if(st==='canli'||st==='ada'||st==='uygulama'){await p.evaluate(()=>HUB.open('p:ytmusic'));await p.waitForTimeout(900);
+    if(st==='canli'||st==='ada'||st==='uygulama'||st==='serit'){await p.evaluate(()=>HUB.open('p:ytmusic'));await p.waitForTimeout(900);
       await p.evaluate(()=>{NP={key:'p:ytmusic',t:'Uzun bir şarkı adı denemesi',a:'Sanatçı',img:'',on:true,cur:40,dur:200,at:Date.now()};const t=tmOf('st1');t.end=Date.now()+600e3;t.dur=1500;t.on=true})}
-    if(st!=='bos'&&st!=='uygulama'){await p.evaluate(()=>goHome());await p.waitForTimeout(1300)}
-    if(st==='uygulama'){await p.evaluate(()=>HUB.open('p:saat'));await p.waitForTimeout(1300)}
+    if(st!=='bos'&&st!=='uygulama'&&st!=='serit'){await p.evaluate(()=>goHome());await p.waitForTimeout(1300)}
+    if(st==='uygulama'||st==='serit'){await p.evaluate(()=>HUB.open('p:saat'));await p.waitForTimeout(1300)}
     await p.evaluate(()=>{islKey='';paintFocusBar()});
     if(st==='ada'){await p.evaluate(()=>{islOpen=true;islKey='';paintFocusBar()});await p.waitForTimeout(800)}
+    // uygulama içinde ada açık + şerit görünür: şerit adanın altına kaymalı (üst üste binmesin)
+    if(st==='serit'){await p.evaluate(()=>{islOpen=true;islKey='';paintFocusBar();showPill(0)});await p.waitForTimeout(900);
+      const ov=await p.evaluate(()=>{const a=$('#focusBar').getBoundingClientRect(),b=$('#pill').getBoundingClientRect();return a.bottom>b.top+1&&a.top<b.bottom&&a.left<b.right&&a.right>b.left});
+      if(ov){errs++;console.log(w,sz,'serit','[error] açık ada uygulama şeridinin üstüne biniyor')}
+      if(await p.evaluate(()=>[...document.querySelectorAll('#tabs [data-t]')].some(e=>e.dataset.t==='p:ytmusic')))console.log(w,sz,'serit','[uyarı] çalan uygulama hem adada hem şeritte')}
     // açılır paneller de birer durum: kontrol merkezi, sistem paneli (ekran süresi verili), kenar paneli
     if(st==='merkez'){await p.evaluate(()=>window.OS?.open());await p.waitForTimeout(700)}
     if(st==='sistem'){await p.evaluate(()=>{const d=new Date(),k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');localStorage.setItem('appshell:usage',JSON.stringify({[k]:{notlar:3200,studylog:1500,_home:900,haberler:420}}));OSX.open('ekran')});await p.waitForTimeout(700)}

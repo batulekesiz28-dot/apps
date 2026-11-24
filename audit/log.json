@@ -5695,5 +5695,35 @@
     "fix": "ışıklar + uygulama adı menüsü + simge sekmeler"
    }
   ]
+ },
+ {
+  "at": "2026-11-24T19:00:00+03:00",
+  "change": "Çalan uygulama (ör. YouTube Music) artık sadece adada görünüyor; üstteki uygulama şeridinde ve alttaki “Açık” çubuğunda tekrar çıkmıyor (içindeyken başlıkta durur). Ada açılıp uzayınca uygulama şeridi yaylanarak onun altına kayıyor, kapanınca geri çıkıyor — artık üst üste binmiyorlar.",
+  "scores": {
+   "hub telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "hub masaüstü": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "hub",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "YouTube Music simgesi hem adada hem şeritte görünüp kafa karıştırıyordu",
+    "fix": "Arkada çalan sekme şeritte/çubukta gizlenir (npShown)"
+   },
+   {
+    "app": "hub",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Açık ada uygulama şeridinin üstüne biniyordu",
+    "fix": "pillAvoid: şerit adanın altına kayar; durum gezginine 'serit' durumu eklendi"
+   }
+  ]
  }
 ]

@@ -29,7 +29,7 @@ try:
 except Exception:
     pass
 
-VERSION = "2026.11.25e"
+VERSION = "2026.11.25f"
 ROOT = pathlib.Path(__file__).resolve().parent
 CFG = ROOT / "ayarlar.json"
 MEM = ROOT / "hafiza.json"
@@ -80,7 +80,7 @@ def api_key():
 # Ücretsiz sağlayıcılar (hepsi OpenAI uyumlu sohbet + araç çağırma). Model adları sık değiştiği için sabit yazılmaz:
 # anahtarın erişebildiği modeller listelenir, en iyisi seçilir; kota yoksa sıradakine geçilir.
 FREE = {
-    "gemini": {"name": "Gemini", "url": "https://generativelanguage.googleapis.com/v1beta/openai/", "vision": True},
+    "gemini": {"name": "Gemini", "url": "https://generativelanguage.googleapis.com/v1beta/", "vision": True},  # Google'ın kendi yolu: "AIza…" ve yeni "AQ.…" anahtarlar
     "groq": {"name": "Groq", "url": "https://api.groq.com/openai/v1/", "vision": False},
     "openrouter": {"name": "OpenRouter", "url": "https://openrouter.ai/api/v1/", "vision": False},
 }
@@ -1032,7 +1032,8 @@ def _sse(url, headers, body, put, stop):
             err = err if isinstance(err, dict) else {"message": str(err)}
         except Exception:
             err = {"message": raw.decode("utf-8", "replace")[:300]}
-        x = ApiErr(e.code, str(err.get("type") or err.get("status") or ""), str(err.get("message") or e))
+        reasons = " ".join(str(d.get("reason", "")) for d in (err.get("details") or []) if isinstance(d, dict))
+        x = ApiErr(e.code, str(err.get("type") or err.get("status") or ""), (str(err.get("message") or e) + " " + reasons).strip())
         try:
             x.retry = float(e.headers.get("retry-after") or 0)
         except Exception:
@@ -1224,7 +1225,7 @@ MODELS, BADM = {}, {}  # sağlayıcı → (zaman, sıralı modeller) · model �
 
 
 def oa_base(p):
-    return os.environ.get("JARVIS_OA_URL") or FREE[p]["url"]
+    return (os.environ.get("JARVIS_GEM_URL") if p == "gemini" else os.environ.get("JARVIS_OA_URL")) or FREE[p]["url"]
 
 
 def rank_models(p, ids):
@@ -1244,10 +1245,16 @@ def rank_models(p, ids):
 
 
 def _models_http(p, key):
-    req = urllib.request.Request(oa_base(p) + "models", headers={"authorization": f"Bearer {key}"})
+    if p == "gemini":
+        req = urllib.request.Request(oa_base(p) + "models?pageSize=200", headers={"x-goog-api-key": key})
+    else:
+        req = urllib.request.Request(oa_base(p) + "models", headers={"authorization": f"Bearer {key}"})
     op = LOCAL if urllib.parse.urlparse(req.full_url).hostname in ("127.0.0.1", "localhost") else urllib.request.build_opener()
     with op.open(req, timeout=8) as r:
-        return [m.get("id", "") for m in json.loads(r.read()).get("data", [])]
+        j = json.loads(r.read())
+    if p == "gemini":
+        return [m.get("name", "") for m in j.get("models", []) if "generateContent" in (m.get("supportedGenerationMethods") or ["generateContent"])]
+    return [m.get("id", "") for m in j.get("data", [])]
 
 
 async def model_list(p, key):
@@ -1257,7 +1264,11 @@ async def model_list(p, key):
             ids = await asyncio.get_running_loop().run_in_executor(None, _models_http, p, key)
         except urllib.error.HTTPError as e:
             if e.code in (400, 401, 403):
-                raise ApiErr(401, "auth", "anahtar geçersiz")
+                try:
+                    why = (e.read() or b"").decode("utf-8", "replace")[:800]  # ayrıntılar (ör. ACCESS_TOKEN_TYPE_UNSUPPORTED) da içinde
+                except Exception:
+                    why = ""
+                raise ApiErr(401, "auth", "anahtar geçersiz " + why)
             ids = []
         except Exception:
             ids = []
@@ -1329,6 +1340,96 @@ async def oa_once(sess, rid, p, model, msgs):
     return text, L, fin
 
 
+def gem_contents(msgs):
+    """Ortak (OpenAI biçimli) geçmiş → Gemini'nin kendi biçimi (systemInstruction + contents)."""
+    sysi, out = None, []
+
+    def add_user(parts, fr=False):
+        if out and out[-1]["role"] == "user":
+            out[-1]["parts"] += parts  # art arda kullanıcı parçaları (araç sonuçları + ekran görüntüsü) tek mesajda
+        else:
+            out.append({"role": "user", "parts": parts})
+    for m in msgs:
+        r, c = m["role"], m.get("content")
+        if r == "system":
+            sysi = {"parts": [{"text": c}]}
+        elif r == "tool":
+            add_user([{"functionResponse": {"name": m.get("name") or "arac", "response": {"result": c}}}])
+        elif r == "assistant":
+            parts = [{"text": c}] if c and c != "…" else []
+            for tc in m.get("tool_calls") or []:
+                try:
+                    args = json.loads(tc["function"]["arguments"] or "{}")
+                except ValueError:
+                    args = {}
+                pt = {"functionCall": {"name": tc["function"]["name"], "args": args if isinstance(args, dict) else {}}}
+                sig = ((tc.get("extra_content") or {}).get("google") or {}).get("thought_signature")
+                if sig:
+                    pt["thoughtSignature"] = sig  # Gemini 3: araç çağrısının imzası aynen geri gönderilmeli
+                parts.append(pt)
+            out.append({"role": "model", "parts": parts or [{"text": "…"}]})
+        elif isinstance(c, str):
+            add_user([{"text": c}])
+        else:
+            parts = []
+            for x in c or []:
+                if x.get("type") == "text":
+                    parts.append({"text": x["text"]})
+                elif x.get("type") == "image_url":
+                    mt, _, d = x["image_url"]["url"].partition(";base64,")
+                    parts.append({"inlineData": {"mimeType": mt[5:], "data": d}})
+            add_user(parts or [{"text": "…"}])
+    return sysi, out
+
+
+GEM_TOOLS = [{"functionDeclarations": [t["function"] for t in OA_TOOLS]}]
+
+
+async def gem_once(sess, rid, model, msgs):
+    """Gemini'nin kendi akış yolu (x-goog-api-key başlığı; AQ. anahtarlar burada çalışır)."""
+    sysi, contents = gem_contents(msgs)
+    ef = cfg.get("effort", "low")
+    think = {"includeThoughts": True}
+    if model.startswith("gemini-3"):
+        think["thinkingLevel"] = "low" if ef == "low" else "high"
+    body = {"contents": contents, "tools": GEM_TOOLS, "generationConfig": {"maxOutputTokens": 4096, "thinkingConfig": think}}
+    if sysi:
+        body["systemInstruction"] = sysi
+    text, calls, fin, reas, got = "", [], None, "", False
+    try:
+        async for ev in sse_stream(f"{oa_base('gemini')}models/{model}:streamGenerateContent?alt=sse", {"x-goog-api-key": key_of("gemini")}, body):
+            if ev.get("error"):
+                e = ev["error"]; raise ApiErr(int(e.get("code") or 500), str(e.get("status") or ""), e.get("message", "akış hatası"))
+            br = (ev.get("promptFeedback") or {}).get("blockReason")
+            if br:
+                raise ApiErr(400, "blocked", f"istek engellendi ({br})")
+            for cand in ev.get("candidates") or []:
+                for part in (cand.get("content") or {}).get("parts") or []:
+                    if part.get("thought"):
+                        if part.get("text"):
+                            reas += part["text"]; got = True
+                            await sess.send(t="note", id=rid, nid="r", text=reas[-700:])
+                    elif "functionCall" in part:
+                        got = True
+                        fc = part["functionCall"]
+                        c = {"id": fc.get("id") or f"call_{secrets.token_hex(4)}", "type": "function",
+                             "function": {"name": fc.get("name", ""), "arguments": json.dumps(fc.get("args") or {}, ensure_ascii=False)}}
+                        if part.get("thoughtSignature"):
+                            c["extra_content"] = {"google": {"thought_signature": part["thoughtSignature"]}}
+                        calls.append(c)
+                    elif part.get("text"):
+                        text += part["text"]; got = True
+                        await sess.send(t="delta", id=rid, text=part["text"])
+                fr = cand.get("finishReason")
+                if fr:
+                    fin = "length" if fr == "MAX_TOKENS" else "stop" if fr == "STOP" else fr.lower()
+    except ApiErr as e:
+        e.got = got
+        raise
+    return text, calls, fin
+
+
+
 async def oa_turn(sess, rid, p, msgs):
     key = key_of(p)
     for attempt in range(8):
@@ -1338,7 +1439,7 @@ async def oa_turn(sess, rid, p, msgs):
         model = models[0]
         sess.model = model
         try:
-            return await oa_once(sess, rid, p, model, msgs)
+            return await (gem_once(sess, rid, model, msgs) if p == "gemini" else oa_once(sess, rid, p, model, msgs))
         except ApiErr as e:
             msg = str(e)
             if getattr(e, "got", False) or e.status == 401:
@@ -1372,7 +1473,7 @@ def oa_trim_images(hist, keep=2):
 
 
 async def oa_agent(sess: Session, rid, text, p):
-    if MOCK and not os.environ.get("JARVIS_OA_URL"):
+    if MOCK and not (os.environ.get("JARVIS_OA_URL") or os.environ.get("JARVIS_GEM_URL")):
         return await mock_agent(sess, rid, text)
     if not key_of(p):
         await sess.send(t="error", id=rid, msg=f"{PNAME[p]} anahtarı yok. Jarvis ekranındaki Ayarlar'dan ücretsiz anahtar ekle.")
@@ -1464,7 +1565,8 @@ async def handle_say(sess: Session, rid, text):
         msg = str(e)
         if isinstance(e, ApiErr):
             n = PNAME[prov()]
-            msg = {401: f"{n} anahtarı geçersiz. Ayarlar'dan yeniden gir.", 403: f"{n} anahtarının bu modele izni yok.",
+            msg = {401: (f"Google bu anahtarı kabul etmedi (yeni “AQ.” anahtarlarda bazı hesaplarda oluyor). AI Studio'da yeni bir anahtar oluştur; olmazsa Ayarlar'dan Groq'u seç."
+                         if "ACCESS_TOKEN_TYPE" in str(e) else f"{n} anahtarı geçersiz. Ayarlar'dan yeniden gir."), 403: f"{n} anahtarının bu modele izni yok.",
                    429: f"{n} ücretsiz kullanım sınırı doldu; biraz sonra tekrar dene ya da Ayarlar'dan başka ücretsiz sağlayıcı seç."
                    if prov() != "claude" else "Çok sık istek; birkaç saniye sonra tekrar dene.",
                    529: f"{n} şu an çok yoğun; biraz sonra tekrar dene."}.get(e.status, f"{n} hatası ({e.status}): {e}")

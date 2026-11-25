@@ -12,7 +12,7 @@ Python'un kendi, imzalı parçalarını kullanır.)
    Jarvis kullanıcı klasöründeki `Jarvis` klasörüne iner, masaüstüne **Jarvis** kısayolu konur ve başlar.
    (Mac/Linux: Terminal'de `py` yerine `python3`.)
 3. Açılan pencerede **6 haneli eşleştirme kodu** yazar. AppShell → **Jarvis**'i aç, kodu gir.
-4. Jarvis ekranında **Ayarlar**'dan yapay zekâyı seç ve anahtarını yapıştır. **Ücretsiz:** Gemini (önerilen — https://aistudio.google.com/apikey, Google hesabı yeter), Groq, OpenRouter. Ücretli: Claude.
+4. Jarvis ekranında **Ayarlar**'dan yapay zekâyı seç ve anahtarını yapıştır. **Ücretsiz:** Gemini (önerilen — https://aistudio.google.com/apikey, Google hesabı yeter; “AIza…” ya da yeni “AQ.…” anahtarlar ikisi de olur), Groq, OpenRouter. Ücretli: Claude.
 
 Sonraki seferlerde masaüstündeki **Jarvis**'e çift tıkla. Jarvis her açılışta yeni sürüm var mı bakar, varsa kendini günceller.
 

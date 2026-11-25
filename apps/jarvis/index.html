@@ -131,7 +131,7 @@ function connect(){clearTimeout(retryT);try{ws=new WebSocket(URL_WS)}catch{retur
   ws.onerror=()=>{}}
 function later(){clearTimeout(retryT);retryT=setTimeout(connect,Math.min(8000,1500+retry++*1000))}
 const send=m=>{if(ws&&ws.readyState===1){ws.send(JSON.stringify(m));return true}return false};
-const NEED='2026.11.25e',OLDMSG='Bilgisayarındaki Jarvis programı eski sürüm, Gemini’yi tanımıyor. Jarvis’in siyah penceresini kapat, masaüstündeki Jarvis’e çift tıkla: kendini güncelleyip açılır.';let updAsked=0;
+const NEED='2026.11.25f',OLDMSG='Bilgisayarındaki Jarvis programı eski sürüm, Gemini’yi tanımıyor. Jarvis’in siyah penceresini kapat, masaüstündeki Jarvis’e çift tıkla: kendini güncelleyip açılır.';let updAsked=0;
 function setSt(s,t){const e=$('#st');e.dataset.s=s;e.querySelector('span').textContent=t}
 
 function on(m){
@@ -236,7 +236,7 @@ function showConn(mode){const c=$('#conn .card');if(mode==='pair'){c.innerHTML=`
 /* ── ayarlar ── */
 function showSets(firstKey){$('#sets').hidden=false;paintSets(firstKey)}
 $('#setB').addEventListener('click',()=>{if(!ok)return showConn();$('#sets').hidden?showSets():($('#sets').hidden=true)});
-const PV={gemini:{n:'Gemini',tag:'ücretsiz',key:'https://aistudio.google.com/apikey',ph:'AIza…',info:'Ücretsiz; Google hesabı yeter, kart istemez. Ekranı görebilir. Ücretsiz kullanımda Google konuşmaları ürünlerini geliştirmek için kullanabilir.'},
+const PV={gemini:{n:'Gemini',tag:'ücretsiz',key:'https://aistudio.google.com/apikey',ph:'AIza… ya da AQ.…',info:'Ücretsiz; Google hesabı yeter, kart istemez. Ekranı görebilir. Ücretsiz kullanımda Google konuşmaları ürünlerini geliştirmek için kullanabilir.'},
   groq:{n:'Groq',tag:'ücretsiz',key:'https://console.groq.com/keys',ph:'gsk_…',info:'Ücretsiz ve çok hızlı. Ekranı göremez; dakikalık sınırı düşük, uzun işlerde bekleyebilir.'},
   openrouter:{n:'OpenRouter',tag:'ücretsiz',key:'https://openrouter.ai/keys',ph:'sk-or-…',info:'Ücretsiz modeller arasından uygun olanı seçer; hız ve kalite değişken.'},
   claude:{n:'Claude',tag:'ücretli',key:'https://console.anthropic.com/settings/keys',ph:'sk-ant-…',info:'En akıllısı; karmaşık işlerde en iyisi. Kullandıkça ücret alır.'}};

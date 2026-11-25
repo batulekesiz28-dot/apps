@@ -6156,5 +6156,28 @@
     "fix": "Eski sürüm algılanıp yapılacak tek adım gösteriliyor; program çalışırken de kendini güncelliyor"
    }
   ]
+ },
+ {
+  "at": "2026-11-25T22:11:10",
+  "change": "Jarvis: Google'ın yeni “AQ.” ile başlayan Gemini anahtarları artık çalışıyor (Gemini, Google'ın kendi bağlantı yoluna taşındı; eski “AIza” anahtarlar da çalışmaya devam ediyor). Google bir anahtarı reddederse ne yapacağın açıkça yazıyor.",
+  "scores": {
+   "jarvis telefon": {
+    "before": 94,
+    "after": 94
+   },
+   "jarvis masaüstü": {
+    "before": 94,
+    "after": 94
+   }
+  },
+  "items": [
+   {
+    "app": "jarvis",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "“AQ.” ile başlayan yeni Gemini anahtarları reddediliyordu",
+    "fix": "Gemini kendi yolundan (x-goog-api-key) bağlanıyor"
+   }
+  ]
  }
 ]

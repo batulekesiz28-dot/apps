@@ -201,26 +201,35 @@ const S={items:new Map(),albums:[],fs:null,ready:false};
 const live=()=>[...S.items.values()].filter(x=>!x.del).sort((a,b)=>b.at-a.at);
 const b2url=b=>new Promise(ok=>{const r=new FileReader();r.onload=()=>ok(r.result);r.readAsDataURL(b)});
 const Store={
-  col:()=>S.fs.collection('hub').doc('gallery').collection('items'),full:()=>S.fs.collection('hub').doc('gallery').collection('full'),meta:()=>S.fs.collection('hub').doc('gallery'),
+  col:()=>S.fs.collection('hub').doc('gallery').collection('items'),fullc:()=>S.fs.collection('hub').doc('gallery').collection('full'), // DİKKAT: ad 'full' OLMAZ — aşağıdaki full(id) yükleyicisiyle çakışıp sonsuz döngüye giriyordu (yükleme takılıyordu)meta:()=>S.fs.collection('hub').doc('gallery'),
   async start(fs){S.fs=fs;
     if(!fs){for(const it of await IDB.all().catch(()=>[]))S.items.set(it.id,it);S.albums=lsg('galeri:albums',[]);S.ready=true;purge();render();return}
     this.meta().onSnapshot(d=>{S.albums=d.data()?.albums||[];if(S.ready)render()},()=>{});
     this.col().onSnapshot(q=>{const first=!S.ready;const added=[];q.docChanges().forEach(c=>{if(c.type==='removed')S.items.delete(c.doc.id);else{if(!first&&c.type==='added'&&!S.items.has(c.doc.id))added.push(c.doc.id);S.items.set(c.doc.id,c.doc.data())}});
       S.ready=true;if(first)purge();render(added);if(added.length&&!UP.busy)toast(`${added.length} yeni fotoğraf geldi`,'başka bir cihazdan',['Göster',()=>{go('ph');openV(added[0])}])},
       e=>{$('#main').innerHTML=emptyHTML('Galeri okunamadı',E(e.code||e.message),'')})},
+  // fotoğraf hemen bu cihazda görünür; bulut gönderimi arka planda sıraya girer (önce küçük kayıt → diğer cihazlarda hemen görünür, sonra tam boy)
   async put(it,full){S.items.set(it.id,it);if(full)IDB.setBlob(it.id,full).catch(()=>{});
-    if(!S.fs){await IDB.put(it);return}
-    // yazma sunucuya ulaşınca biter; internet zayıfsa 20 sn sonra sıradakine geçilir (Firestore arkada göndermeye devam eder, bu cihazda zaten görünür)
-    const wait=(pr,ms=20000)=>Promise.race([pr,new Promise(ok=>setTimeout(()=>ok('slow'),ms))]);let slow=false;
-    if(full){const r=await wait(this.full().doc(it.id).set({d:await b2url(full),at:Date.now()})).catch(e=>e);if(r==='slow')slow=true;else if(r instanceof Error){it.nofull=1;UP.why.add(fsWhy(r))}}
-    const r=await wait(this.col().doc(it.id).set(it));if(r==='slow')slow=true;if(slow)UP.slow++},
+    if(!S.fs){await IDB.put(it);return}CQ.push({it,full});CQ.n++;cloudPump()},
   async patch(id,p){const it=S.items.get(id);if(!it)return;Object.assign(it,p);if(!S.fs)return IDB.put(it);return this.col().doc(id).set(p,{merge:true}).catch(e=>toast('Kaydedilemedi',e.code||e.message))},
-  async kill(id){S.items.delete(id);IDB.delBlob(id).catch(()=>{});if(!S.fs)return IDB.del(id);await Promise.all([this.col().doc(id).delete(),this.full().doc(id).delete()]).catch(()=>{})},
+  async kill(id){S.items.delete(id);IDB.delBlob(id).catch(()=>{});if(!S.fs)return IDB.del(id);await Promise.all([this.col().doc(id).delete(),this.fullc().doc(id).delete()]).catch(()=>{})},
   async full(id){let b=await IDB.blob(id).catch(()=>null);if(b)return b;
-    if(S.fs){try{const d=(await this.full().doc(id).get()).data();if(d?.d){b=await(await fetch(d.d)).blob();IDB.setBlob(id,b).catch(()=>{});return b}}catch{}}return null},
+    if(S.fs){try{const d=(await this.fullc().doc(id).get()).data();if(d?.d){b=await(await fetch(d.d)).blob();IDB.setBlob(id,b).catch(()=>{});return b}}catch{}}return null},
   saveAlbums(){if(!S.fs)return lss('galeri:albums',S.albums);this.meta().set({albums:S.albums},{merge:true}).catch(()=>{})}};
 // 30 günden eski silinenler kalıcı gider (Apple “Son Silinenler” gibi)
 function purge(){const lim=Date.now()-30*864e5;for(const it of S.items.values())if(it.del&&it.del<lim)Store.kill(it.id)}
+
+/* ── bulut gönderim sırası: 2 paralel, takılırsa sıradakine geçer (Firestore yarım kalanı arkada/sonraki açılışta tamamlar) ── */
+const CQ=[];CQ.n=0;CQ.run=0;CQ.err=new Set();
+function cloudPump(){while(CQ.run<2&&CQ.length){const j=CQ.shift();CQ.run++;
+    (async()=>{const wait=(pr,ms=45000)=>Promise.race([pr,new Promise(ok=>setTimeout(()=>ok('slow'),ms))]);
+      try{const r=await wait(Store.col().doc(j.it.id).set(j.it));if(r instanceof Error)throw r;
+        if(j.full){const f=await wait(Store.fullc().doc(j.it.id).set({d:await b2url(j.full),at:Date.now()}));if(f instanceof Error){CQ.err.add(fsWhy(f));Store.col().doc(j.it.id).set({nofull:1},{merge:true}).catch(()=>{})}}}
+      catch(e){CQ.err.add(fsWhy(e))}
+      finally{CQ.run--;CQ.n--;cloudNote();cloudPump()}})()}cloudNote()}
+let cnT=null;function cloudNote(){if(UP.busy)return progress();let t=$('#cnT');
+  if(CQ.n>0){CQ.shown=1;if(!t){t=toast('','',null,0);t.id='cnT'}t.querySelector('.m').innerHTML=`Buluta gönderiliyor · ${CQ.n} kaldı<small>fotoğraflar bu cihazda hazır; sayfayı kapatsan da sonra devam eder</small>`;return}
+  if(t||CQ.shown){t?.remove();CQ.shown=0;toast(CQ.err.size?'Bazı fotoğraflar buluta gidemedi':'Hepsi buluta gönderildi ✓',CQ.err.size?[...CQ.err].slice(0,2).join(' · '):'diğer cihazlarında da görünür');CQ.err.clear()}}
 
 /* ── EXIF (JPEG APP1): çekim zamanı, kamera, GPS ── */
 function exif(buf){const v=new DataView(buf);if(v.byteLength<4||v.getUint16(0)!==0xFFD8)return{};let o=2;
@@ -266,13 +275,13 @@ const fsWhy=e=>{const c=e?.code||'';return c==='permission-denied'?'bulut izni y
 function upload(files){files=[...files].filter(f=>/^image\//.test(f.type)||/\.(heic|heif|jpe?g|png|webp|gif|avif)$/i.test(f.name));if(!files.length)return toast('Fotoğraf bulunamadı','sadece resim dosyaları eklenir');
   UP.q.push(...files);UP.total+=files.length;if(!UP.busy)pump()}
 async function pump(){UP.busy=true;progress();
-  while(UP.q.length){const f=UP.q.shift();try{const r=await addOne(f);if(r==='dupe')UP.dupes++;else UP.added.push(r)}catch(e){if(e.message==='heic'||e.message==='heicnet'){UP.heic++;if(e.message==='heicnet')UP.why.add('HEIC çevirici yüklenemedi (internet?)')}else{UP.errs++;UP.why.add(e.code?fsWhy(e):e.message==='decode'?`${f.name.slice(0,30)} açılamadı (desteklenmeyen biçim)`:fsWhy(e));console.warn('galeri',f.name,e)}}UP.done++;progress()}
+  while(UP.q.length){const f=UP.q.shift();try{const r=await addOne(f);if(r==='dupe')UP.dupes++;else{UP.added.push(r);render([r])}}catch(e){if(e.message==='heic'||e.message==='heicnet'){UP.heic++;if(e.message==='heicnet')UP.why.add('HEIC çevirici yüklenemedi (internet?)')}else{UP.errs++;UP.why.add(e.code?fsWhy(e):e.message==='decode'?`${f.name.slice(0,30)} açılamadı (desteklenmeyen biçim)`:fsWhy(e));console.warn('galeri',f.name,e)}}UP.done++;progress()}
   const a=UP.added.slice(),sum={};a.forEach(id=>{const k=S.items.get(id)?.kind;if(k)sum[k]=(sum[k]||0)+1});
   const parts=Object.entries(sum).filter(([k])=>k!=='kamera').map(([k,n])=>`${n} ${KIND1[k]}`);
-  if(UP.dupes)parts.push(`${UP.dupes} zaten vardı`);if(UP.heic)parts.push(`${UP.heic} HEIC açılamadı`);if(UP.errs)parts.push(`${UP.errs} eklenemedi`);if(UP.slow)parts.push(`${UP.slow} tanesi internet gelince buluta gidecek`);if(UP.why.size)parts.push([...UP.why].slice(0,2).join(' · '));
+  if(UP.dupes)parts.push(`${UP.dupes} zaten vardı`);if(UP.heic)parts.push(`${UP.heic} HEIC açılamadı`);if(UP.errs)parts.push(`${UP.errs} eklenemedi`);if(UP.why.size)parts.push([...UP.why].slice(0,2).join(' · '));
   UP.busy=false;$('#upT')?.remove();Object.assign(UP,{q:[],done:0,total:0,added:[],dupes:0,errs:0,heic:0,slow:0,why:new Set()});
   toast(a.length?`${a.length} fotoğraf eklendi`:'Yeni fotoğraf eklenmedi',parts.join(' · ')||'tarihe göre yerleştirildi',a.length?['Göster',()=>{go('ph');openV(a[0])}]:null,a.length?6000:7000);
-  render(a);geoAll();aiAll()}
+  render(a);geoAll();aiAll();setTimeout(cloudNote,6500)}
 /* Fotoğrafı aç: (1) çok büyük dosyalar (50–200 MP telefon fotoğrafları) telefonda belleği taşırıp sekmeyi çökertiyordu → önce küçülterek çöz;
    (2) HEIC/HEIF (iPhone, bazı Samsung) Chrome'da açılmıyordu → gerekince heic2any ile JPEG'e çevir (sadece bu cihazda, ilk HEIC'te bir kez yüklenir). */
 let HEIC=null;const heicLib=()=>HEIC||(HEIC=new Promise((ok,no)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js';sc.onload=()=>ok(window.heic2any);sc.onerror=()=>{HEIC=null;no(new Error('heiclib'))};document.head.appendChild(sc)}));
@@ -289,11 +298,11 @@ async function addOne(f){const ex=await f.slice(0,262144).arrayBuffer().then(b=>
   const bmp=await decode(f);
   const a=analyze(bmp),w=bmp.width,h=bmp.height,at=ex.at||nameDate(f.name)||f.lastModified||Date.now();
   if(live().some(x=>x.hash===a.hash&&x.w===w&&x.h===h&&Math.abs(x.at-at)<2000)){bmp.close?.();return'dupe'}
-  const[full,thumb]=await Promise.all([shrink(bmp,2048,700e3),toBlob(draw(bmp,360),.72)]);bmp.close?.();
+  const[full,thumb]=await Promise.all([shrink(bmp,1800,480e3),toBlob(draw(bmp,360),.72)]);bmp.close?.();
   const it={id:rid(),name:f.name.slice(0,120),at,up:Date.now(),w,h,kind:kindOf(f,ex,w,h,a),cam:ex.cam||'',gps:ex.gps||null,place:null,hash:a.hash,col:a.col,fav:false,albums:[],tags:[],cap:'',size:full.size,t:await b2url(thumb),del:0,src:/-WA\d+/i.test(f.name)?'WhatsApp':''};
   await Store.put(it,full);return it.id}
 function progress(){let t=$('#upT');if(!UP.busy){t?.remove();return}
-  if(!t){t=toast('','',null,0);t.id='upT'}t.querySelector('.m').innerHTML=`Yükleniyor ${UP.done}/${UP.total}<small>tarih, yer ve türe göre düzenleniyor</small><div class="pg"><i style="width:${UP.total?UP.done/UP.total*100:0}%"></i></div>`}
+  if(!t){t=toast('','',null,0);t.id='upT'}t.querySelector('.m').innerHTML=`Hazırlanıyor ${UP.done}/${UP.total}<small>${CQ.n?`${CQ.n} tanesi buluta gidiyor · `:''}hazır olan hemen görünür</small><div class="pg"><i style="width:${UP.total?UP.done/UP.total*100:0}%"></i></div>`}
 
 /* ── yer adları (GPS → şehir) ── */
 const GEO=lsg('galeri:geo',{});let geoBusy=false;

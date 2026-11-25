@@ -5970,5 +5970,38 @@
     "text": "Tema stüdyosunda çok yazı tipi görünüyor — yazı tipi seçicisi örnekleri bilerek"
    }
   ]
+ },
+ {
+  "at": "2026-11-25T22:30:00+03:00",
+  "change": "Galeri: girişliyken fotoğrafların buluta hiç yüklenmemesinin asıl sebebi bulundu ve düzeltildi (iki işlev aynı adı taşıyordu, yükleme bitmeyen bir döngüye giriyordu). Artık fotoğraf hazırlanır hazırlanmaz galeride görünüyor (yarım saniye), buluta gönderme arkada 2'şer 2'şer sürüyor, gönderilen dosya yarı boyutta (ekranda fark edilmez), bitince “Hepsi buluta gönderildi ✓” yazıyor.",
+  "scores": {
+   "galeri telefon": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "galeri",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Girişliyken yükleme sonsuz döngüye girip hiç bitmiyordu (Store.full adı çakışması); silme ve tam boy açma da etkileniyordu",
+    "fix": "Bulut koleksiyonu fullc adını aldı"
+   },
+   {
+    "app": "galeri",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Fotoğraflar, hepsi buluta gidene kadar galeride görünmüyordu",
+    "fix": "Hazırlanan her fotoğraf hemen görünür; bulut sırası arkada"
+   },
+   {
+    "app": "galeri",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Tam boy fotoğraf ~930 KB gönderiliyordu",
+    "fix": "1800 px / ≤480 KB — yükleme yaklaşık yarıya indi"
+   }
+  ]
  }
 ]

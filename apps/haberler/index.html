@@ -31,7 +31,7 @@
   .lead h2{font-family:var(--serif);font-size:28px;line-height:1.18;font-weight:700;letter-spacing:-.01em}
   .lead p{margin-top:10px;font-size:15px;line-height:1.55;color:var(--ink2);display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
   .meta{display:flex;align-items:center;gap:6px;margin-top:10px;font-size:12.5px;color:var(--ink3)}.meta b{font-weight:650;color:var(--ink2)}
-  .tag{padding:2px 8px;border-radius:999px;font-size:11.5px;font-weight:650;background:var(--hover);color:var(--ink2)}
+  .tag{padding:2px 8px;border-radius:999px;font-size:12px;font-weight:650;background:var(--hover);color:var(--ink2)}
   .list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 28px}
   .it{display:flex;gap:14px;padding:16px 0;border-bottom:1px solid var(--line);align-items:flex-start}
   .it:hover h3{text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--ink3)}
@@ -52,8 +52,15 @@
 </style>
 <script>try{var f=JSON.parse(localStorage.getItem('notlar:theme'));if(f)document.documentElement.dataset.theme=f}catch(e){}</script>
 <script src="../../shared/skin.js?v=20261124a"></script>
+<link rel="stylesheet" href="feed.css?v=20261125d">
+<script src="../../shared/newswatch.js?v=20261125c"></script>
 </head>
 <body>
+<header class="hb" id="hb"><div class="hb-seg" role="group" aria-label="Görünüm"><button data-mode="feed" aria-pressed="true">Akış</button><button data-mode="list" aria-pressed="false">Liste</button></div>
+  <form class="hb-sr" id="hbF" role="search"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5l3 3"/></svg><input id="hbIn" type="search" placeholder="Haber ara" aria-label="Haber ara" enterkeyhint="search" autocomplete="off"></form>
+  <button class="hb-w" id="hbW" title="Haber takibi: şu olunca haber ver"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 11.5V7a4 4 0 0 1 8 0v4.5l1 1H3z"/><path d="M6.5 14h3"/></svg><span>Takip</span><b id="hbN" hidden></b></button></header>
+<section class="rl" id="feed" aria-label="Haber akışı" data-surface></section>
+<div class="ws-bg" id="ws" hidden><div class="ws" role="dialog" aria-modal="true" aria-labelledby="wsT"></div></div>
 <div class="wrap">
   <header><div><h1>Bugünkü Haberler</h1><p class="dt" id="dt"></p></div>
     <div class="tools"><span class="st" id="st" aria-live="polite"></span>
@@ -63,6 +70,7 @@
   <main id="main" aria-live="polite"></main>
   <p class="src">Başlıklar haber sitelerinin herkese açık RSS akışlarından ve Google Haberler'den gelir; habere tıklayınca kaynağında açılır. Okudukların soluk görünür.</p>
 </div>
+<script src="feed.js?v=20261125c"></script>
 <script>
 /* Bugünkü Haberler — konu başlıklarına göre güncel haberler (RSS).
    Çekme sırası: kaynağın kendisi → rss2json → allorigins (CORS izin vermeyen siteler için). Önbellek haberler:cache (15 dk), okunanlar haberler:read,
@@ -126,11 +134,59 @@ $('#cats').addEventListener('click',e=>{const d=e.target.closest('[data-del]');i
   cur=b.dataset.c;lss('haberler:cat',cur);paint();load(cur);scrollTo({top:0,behavior:'smooth'})});
 $('#cats').addEventListener('keydown',e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;const bs=[...document.querySelectorAll('.cat')],i=bs.indexOf(document.activeElement);if(i<0)return;e.preventDefault();bs[(i+(e.key==='ArrowRight'?1:-1)+bs.length)%bs.length].focus()});
 $('#add').addEventListener('submit',e=>{e.preventDefault();const v=$('#q').value.trim();if(!v)return;const t=TOP();if(!t.includes(v))lss('haberler:topics',[...t,v]);$('#q').value='';$('#add').hidden=true;cur='t:'+v;lss('haberler:cat',cur);paint();load(cur,true)});
-$('#main').addEventListener('click',e=>{const a=e.target.closest('a[href]');if(!a)return;READ.add(a.getAttribute('href'));lss('haberler:read',[...READ].slice(-600));setTimeout(()=>a.classList.add('read'),300)});
+$('#main').addEventListener('click',e=>{const a=e.target.closest('a[href]');if(!a)return;const li=Object.values(C).flatMap(v=>v.items||[]).find(i=>i.link===a.getAttribute('href'));if(li)Feed.learnClick(li);READ.add(a.getAttribute('href'));lss('haberler:read',[...READ].slice(-600));setTimeout(()=>a.classList.add('read'),300)});
 $('#ref').addEventListener('click',()=>load(cur,true));
-addEventListener('keydown',e=>{if(e.target.closest('input'))return;if(e.key==='r'||e.key==='R')load(cur,true)});
+addEventListener('keydown',e=>{if(!$('#ws').hidden){if(e.key==='Escape'){e.preventDefault();wsClose()}return}if(e.target.closest('input'))return;if(VIEW==='feed'){Feed.key(e);return}if(e.key==='r'||e.key==='R')load(cur,true)});
 $('#dt').textContent=new Date().toLocaleDateString('tr-TR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 paint();load(cur);setInterval(()=>{if(!document.hidden)load(cur)},15*6e4);
+
+/* ── görünüm: Akış (reels, seni tanır) / Liste ── */
+let VIEW=lsg('haberler:view','feed'),fed=false;
+function setView(v){VIEW=v;lss('haberler:view',v);document.body.classList.toggle('feed',v==='feed');$('#feed').hidden=v!=='feed';
+  document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===v));
+  if(v==='feed'&&!fed){fed=true;Feed.mount($('#feed'))}if(v==='feed')Feed.focus()}
+$('#hb').addEventListener('click',e=>{const m=e.target.closest('[data-mode]');if(m)setView(m.dataset.mode)});
+$('#hbF').addEventListener('submit',e=>{e.preventDefault();const v=$('#hbIn').value.trim();if(!v)return;$('#hbIn').blur();setView('feed');Feed.search(v)});
+$('#hbIn').addEventListener('keydown',e=>{if(e.key==='Escape'){e.target.value='';e.target.blur();if(Feed.searching)Feed.endSearch()}});
+setView(VIEW);
+
+/* ── Haber takibi (“şu olunca haber ver”): kurallar shared/newswatch.js; hub içindeysek kontrolü ve bildirimi hub yapar ── */
+const PW=(()=>{try{return parent!==window&&parent.NewsWatch?parent:null}catch{return null}})();
+const NWc=()=>(PW||window).NewsWatch;
+if(!PW)NewsWatch.start(null); // tek başına açıldıysa kontrolü burada yap
+const EX=['Galatasaray yeni teknik direktör açıklarsa','Merkez Bankası faiz indirirse','GTA 6 çıkış tarihi açıklanınca','iPhone 18 tanıtılınca','Deprem olursa İstanbul'];
+const agoW=t=>t?ago(t):'henüz kontrol edilmedi';
+function wsPaint(){const box=$('#ws .ws'),L=NewsWatch.list(),N=PW?.Notify,ph=N?.hasTopic?.(),pm=typeof Notification!=='undefined'?Notification.permission:'unsupported';
+  $('#hbN').hidden=!L.filter(r=>r.on).length;$('#hbN').textContent=L.filter(r=>r.on).length;if($('#ws').hidden)return;
+  const keep=box.querySelector('#wsIn')?.value||'',hadF=document.activeElement?.id==='wsIn'||document.activeElement===document.body;
+  box.innerHTML=`<button class="ws-x" data-w="x" aria-label="Kapat">✕</button><h2 id="wsT">Haber takibi</h2><p class="ws-p">Bir konuyu ve ne olunca haber almak istediğini yaz. Olay gerçekleşince telefona ve bilgisayara bildirim gelir; dokununca haber açılır.</p>
+    <form class="ws-f" id="wsF"><input id="wsIn" placeholder="ör. Galatasaray yeni teknik direktör açıklarsa haber ver" aria-label="Takip cümlesi" autocomplete="off" maxlength="160"><button class="ib" type="submit">Takip et</button></form>
+    <p class="ws-pv" id="wsPv" aria-live="polite"></p><div class="ws-ex">${EX.map(x=>`<button data-ex="${esc(x)}">${esc(x)}</button>`).join('')}</div>
+    <div class="ws-st"><div>💻 Bilgisayar: ${pm==='granted'?'bildirim açık ✓':pm==='denied'?'tarayıcıda bildirim engelli (adres çubuğundaki kilitten aç)':'izin gerekiyor'}${pm==='default'?'<button data-w="perm">İzin ver</button>':''}</div>
+      <div>📱 Telefon: ${PW?ph?'bağlı ✓':'bağlı değil':'hub üzerinden bağlanır'}${PW&&!ph?'<button data-w="phone">Telefonu bağla</button>':''}</div>
+      <div>Kontrol: ${PW?'AppShell açıkken her 10 dakikada bir (hangi cihazda açıksa). Kurallar her cihazda aynı.':'bu sayfa açıkken her 10 dakikada bir.'}</div></div>
+    <div class="ws-l"><p class="ws-h"><span>Takip ettiklerin · ${L.length}</span>${L.length?'<button data-w="chk">Şimdi kontrol et</button>':''}</p>
+    ${L.length?L.slice().reverse().map(r=>`<div class="ws-r${r.on?'':' off'}"><header><b>${esc(r.q)}${r.ev?` <span>· ${esc(r.ev)}</span>`:''}</b><button class="ws-sw" role="switch" aria-checked="${!!r.on}" data-sw="${r.id}" aria-label="${esc(r.q)} takibi açık/kapalı"></button><button class="ws-del" data-del="${r.id}" aria-label="${esc(r.q)} takibini sil" title="Sil">✕</button></header>
+      <small>${r.on?'Son kontrol: '+agoW(r.chk):'Duraklatıldı'}${r.hits?.length?` · ${r.hits.length} haber bulundu`:''}</small>${r.hits?.length?`<ul class="ws-hits">${r.hits.slice(0,3).map(h=>`<li><a href="${esc(h.link)}" target="_blank" rel="noopener">${esc(h.t)}</a><span>${esc(h.src||'')} · ${ago(h.at)}</span></li>`).join('')}</ul>`:''}</div>`).join(''):'<p class="ws-none">Henüz takip yok. Yukarıya bir cümle yaz ya da örneklerden birini seç.</p>'}</div>`;
+  const i=box.querySelector('#wsIn');i.value=keep;if(hadF)i.focus({preventScroll:true});pv()}
+function pv(){const v=$('#wsIn')?.value.trim(),p=$('#wsPv');if(!p)return;if(!v){p.textContent='';return}const r=NewsWatch.split(v);p.innerHTML=`Konu: <b>${esc(r.q)}</b>${r.ev?` · Ne olunca: <b>${esc(r.ev)}</b>`:' · konuyla ilgili her yeni haber'}`}
+function wsOpen(){$('#ws').hidden=false;wsPaint();setTimeout(()=>$('#wsIn')?.focus(),40);const d=$('#ws .ws');if(!matchMedia('(prefers-reduced-motion: reduce)').matches)d.animate([{opacity:0,transform:'translateY(14px) scale(.97)'},{opacity:1,transform:'none'}],{duration:380,easing:'cubic-bezier(.3,1.2,.5,1)'})}
+function wsClose(){$('#ws').hidden=true;(VIEW==='feed'?Feed.focus():$('#hbW').focus())}
+$('#hbW').addEventListener('click',wsOpen);
+$('#ws').addEventListener('click',async e=>{if(e.target.id==='ws')return wsClose();const t=e.target;
+  const w=t.closest('[data-w]')?.dataset.w;if(w==='x')return wsClose();
+  if(w==='perm'){try{await Notification.requestPermission()}catch{}return wsPaint()}
+  if(w==='phone'){try{PW.Notify.open()}catch{}return}
+  if(w==='chk'){t.textContent='Kontrol ediliyor…';const n=await NWc().check(true);t.textContent=n?`${n} yeni haber bildirildi`:'Yeni haber yok';setTimeout(wsPaint,1800);return}
+  const ex=t.closest('[data-ex]');if(ex){$('#wsIn').value=ex.dataset.ex;pv();$('#wsIn').focus();return}
+  const sw=t.closest('[data-sw]');if(sw){const r=NewsWatch.list().find(x=>x.id===sw.dataset.sw);NewsWatch.patch(r.id,{on:!r.on});wsPaint();return}
+  const dl=t.closest('[data-del]');if(dl){NewsWatch.remove(dl.dataset.del);wsPaint()}});
+$('#ws').addEventListener('input',e=>{if(e.target.id==='wsIn')pv()});
+$('#ws').addEventListener('submit',e=>{e.preventDefault();const v=$('#wsIn').value.trim();if(!v)return;const r=NewsWatch.add({q:v});if(!r)return;$('#wsIn').value='';wsPaint();
+  if(PW)setTimeout(()=>PW.NewsWatch.check(true,r.id).then(wsPaint),600)}); // ilk kontrol: mevcut haberleri kaydeder (eski haber bildirilmez)
+$('#ws').addEventListener('keydown',e=>{if(e.key==='Escape'){e.stopPropagation();wsClose()}});
+addEventListener('storage',e=>{if(e.key==='haberler:watch')wsPaint()});addEventListener('newswatch',wsPaint);
+wsPaint();
 </script>
 </body>
 </html>

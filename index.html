@@ -3780,7 +3780,7 @@ applyTheme(document.documentElement.dataset.theme);applyLook();
 buildMesh();introStart=performance.now();wake();
 (async()=>{
   const mp=loadManifest();
-  if(!CLOUD){S=Local;drafts=await Local.load();await mp;mountWidgets();syncNodes();booted=true;GX.key='';seedWidgets();seedMore();autoClusters();ensureNotes();window.Worlds?.boot();window.DayCard?.start(null);window.Notify?.start();window.Soon?.start(null);requestAnimationFrame(bootIntro);return}
+  if(!CLOUD){S=Local;drafts=await Local.load();await mp;mountWidgets();syncNodes();booted=true;GX.key='';seedWidgets();seedMore();autoClusters();ensureNotes();window.Worlds?.boot();window.DayCard?.start(null);window.Notify?.start();window.Soon?.start(null);window.NewsWatch?.start(null);requestAnimationFrame(bootIntro);return}
   gate('loading');
   try{await loadFirebase()}catch{return gate('error','Firebase yüklenemedi. İnternet bağlantını kontrol et.')}
   if(!firebase.apps.length)firebase.initializeApp(FB);
@@ -3792,7 +3792,7 @@ buildMesh();introStart=performance.now();wake();
     gate('loading','Yükleniyor…');await mp;S=Cloud;await Cloud.start(fs);
     const me=$('#me');me.hidden=false;me.innerHTML=u.photoURL?`<img src="${esc(u.photoURL)}" alt="" referrerpolicy="no-referrer">`:esc(mono(u.displayName||u.email));
     await ungate();introStart=performance.now();introT=0;wakeMesh();
-    mountWidgets();syncNodes();booted=true;GX.key='';seedWidgets();seedMore();migrateLocal();autoClusters();ensureNotes();window.Worlds?.boot();window.DayCard?.start(fs);window.Notify?.start();window.Soon?.start(fs);requestAnimationFrame(bootIntro);
+    mountWidgets();syncNodes();booted=true;GX.key='';seedWidgets();seedMore();migrateLocal();autoClusters();ensureNotes();window.Worlds?.boot();window.DayCard?.start(fs);window.Notify?.start();window.Soon?.start(fs);window.NewsWatch?.start(fs);requestAnimationFrame(bootIntro);
   });
 })();
 
@@ -3829,8 +3829,9 @@ addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.shiftKey&&(e.key==='
 <script src="apps/notlar/tasks.js?v=20261120a"></script>
 <script src="ui/day.js?v=20261120c"></script>
 <link rel="stylesheet" href="ui/notify.css?v=20261120d">
-<script src="ui/notify.js?v=20261121b"></script>
+<script src="ui/notify.js?v=20261125a"></script>
 <link rel="stylesheet" href="ui/soon.css?v=20261124a"><script src="ui/soon.js?v=20261124a"></script>
+<script src="shared/newswatch.js?v=20261125c"></script>
 <link rel="stylesheet" href="ui/os.css?v=20261121a">
 <script src="ui/os.js?v=20261123b"></script>
 <link rel="stylesheet" href="ui/osx.css?v=20261124d"><script src="ui/osx.js?v=20261124a"></script><script src="ui/tour.js?v=20261124b"></script>

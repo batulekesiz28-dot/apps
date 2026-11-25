@@ -184,7 +184,7 @@ function run(doc,opt={}){
   const tab=all.filter(e=>+e.getAttribute('tabindex')>0);
   if(tab.length)addH('warn','tabindex','Klavye sırası elle bozulmuş','tabindex>0 olan öğeler Tab sırasını sayfa akışından kopartıyor; klavyeyle gezen kaybolur.','tabindex="0" kullan, sırayı DOM düzeniyle ver.',tab);
   // 8) ekranın büyük kısmını kapatan sabit öğe (diyalog değil)
-  const vw=win.innerWidth*win.innerHeight,cover=vis.filter(e=>{const cs=getComputedStyle(e);if(cs.position!=='fixed'&&cs.position!=='sticky')return false;if(e.closest('[role=dialog],[aria-modal=true],.world,#world'))return false;const r=R(e);return r.width*r.height>vw*.3&&parseColor(cs.backgroundColor)?.a>.5});
+  const vw=win.innerWidth*win.innerHeight,cover=vis.filter(e=>{const cs=getComputedStyle(e);if(cs.position!=='fixed'&&cs.position!=='sticky')return false;if(e.closest('[role=dialog],[aria-modal=true],.world,#world,[data-surface]'))return false; /* data-surface: sayfanın kendisi olan tam ekran yüzey (ör. haber akışı) */const r=R(e);return r.width*r.height>vw*.3&&parseColor(cs.backgroundColor)?.a>.5});
   if(cover.length)addH('warn','cover','Ekranın büyük kısmını kapatan sabit katman','Kaydırınca yerinde duran büyük bir katman içeriğin üçte birinden fazlasını örtüyor.','Sabit alanı incelt, kaydırınca gizle ya da yarı saydam yap.',cover);
   // 9) sıkışık okuma: küçük yazı + dar satır aralığı
   const cramp=textEls.filter(e=>{const cs=getComputedStyle(e),fs=parseFloat(cs.fontSize),lh=cs.lineHeight==='normal'?fs*1.2:parseFloat(cs.lineHeight);return(e.textContent||'').trim().length>90&&fs<14&&lh/fs<1.32});

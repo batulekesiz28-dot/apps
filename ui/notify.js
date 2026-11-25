@@ -40,24 +40,24 @@ async function ntfyR(text,at,title){const t=topic();if(!t)return{ok:false,how:'k
   const u=`https://ntfy.sh/${encodeURIComponent(t)}?${q}`;
   try{const r=await fetch(u,{method:'POST',body:text});return r.ok?{ok:true,how:'ok'}:{ok:false,how:'http '+r.status}}
   catch{try{await fetch(u,{method:'POST',body:text,mode:'no-cors'});return{ok:true,how:'blind'}}catch{return{ok:false,how:'net'}}}}
-async function ntfy(text,at,title){const t=topic();if(!t)return false;
-  const q=new URLSearchParams({title:title||'AppShell',tags:'bell'});if(at&&at>Date.now()+15e3)q.set('delay',String(Math.floor(at/1000)));
+async function ntfy(text,at,title,url){const t=topic();if(!t)return false;
+  const q=new URLSearchParams({title:title||'AppShell',tags:'bell'});if(at&&at>Date.now()+15e3)q.set('delay',String(Math.floor(at/1000)));if(url&&/^https:\/\//.test(url))q.set('click',url); // bildirime dokununca habere gider
   const u=`https://ntfy.sh/${encodeURIComponent(t)}?${q}`;
   try{const r=await fetch(u,{method:'POST',body:text});return r.ok}
   catch{try{await fetch(u,{method:'POST',body:text,mode:'no-cors'});return true}catch{return false}}} // CORS yanıtı okunamasa da istek gider
 
 /* ── hatırlatıcı ekle / zamanı gelenleri yak ── */
-async function add(text,at,{br=true,ph=cfg().ph&&!!topic()}={}){text=String(text||'').trim().slice(0,300);if(!text)return null;
-  const r={id:'R'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),text,at:Math.max(at,Date.now()),br,ph,phSent:false,fired:false};
-  if(ph&&r.at-Date.now()<MAXPH)r.phSent=await ntfy(text,r.at,'Hatırlatıcı');
+async function add(text,at,{br=true,ph=cfg().ph&&!!topic(),url='',title=''}={}){text=String(text||'').trim().slice(0,300);if(!text)return null;
+  const r={id:'R'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),text,at:Math.max(at,Date.now()),br,ph,phSent:false,fired:false,url:/^https?:\/\//.test(url)?url:'',title:String(title||'').slice(0,60)};
+  if(ph&&r.at-Date.now()<MAXPH)r.phSent=await ntfy(text,r.at,r.title||'Hatırlatıcı',r.url);
   const l=list();l.push(r);save(l);tick();return r}
 const alert=o=>{const a=H()?.alert;if(a){a(o);return true}return false};
-function fire(r,late){const body=late?'Kaçırdığın hatırlatıcı · '+when(r.at):'AppShell hatırlatıcı';
-  if(r.br&&document.hidden)brShow(r.text,body,r.id); // sayfa önündeyse adadaki bildirim yeter (çift olmasın)
-  if(!alert({ic:'⏰',t:r.text,sub:late?'Kaçırdığın · '+when(r.at):'Hatırlatıcı',sound:!late,key:'rem'+r.id,
-    acts:[['10 dk sonra',()=>{add(r.text,Date.now()+6e5,{br:r.br,ph:r.ph&&!!topic()});toast('10 dakika sonra tekrar hatırlatırım')}],['Tamam',()=>{},1]]}))toast((late?'⏰ Kaçırdığın: ':'⏰ ')+r.text)}
+function fire(r,late){const body=late?'Kaçırdığın hatırlatıcı · '+when(r.at):r.title?'AppShell · '+r.title:'AppShell hatırlatıcı';
+  if(r.br&&document.hidden)brShow(r.text,body,r.id,r.url||undefined); // sayfa önündeyse adadaki bildirim yeter (çift olmasın)
+  const acts=r.url?[['Aç',()=>window.open(r.url,'_blank','noopener'),1],['Tamam',()=>{}]]:[['10 dk sonra',()=>{add(r.text,Date.now()+6e5,{br:r.br,ph:r.ph&&!!topic()});toast('10 dakika sonra tekrar hatırlatırım')}],['Tamam',()=>{},1]];
+  if(!alert({ic:r.url?'📰':'⏰',t:r.text,sub:late?'Kaçırdığın · '+when(r.at):r.title||'Hatırlatıcı',sound:!late,key:'rem'+r.id,acts}))toast((late?'⏰ Kaçırdığın: ':'⏰ ')+r.text)}
 function tick(){const now=Date.now(),l=list();let ch=false;
-  for(const r of l){if(r.ph&&!r.phSent&&!r.fired&&r.at-now<MAXPH&&r.at>now){r.phSent=true;ch=true;ntfy(r.text,r.at,'Hatırlatıcı')} // 3 günden uzak olanlar yaklaşınca telefona gönderilir
+  for(const r of l){if(r.ph&&!r.phSent&&!r.fired&&r.at-now<MAXPH&&r.at>now){r.phSent=true;ch=true;ntfy(r.text,r.at,r.title||'Hatırlatıcı',r.url)} // 3 günden uzak olanlar yaklaşınca telefona gönderilir
     if(!r.fired&&r.at<=now){r.fired=true;ch=true;if(now-r.at<12*36e5)fire(r,now-r.at>9e4)}}
   if(ch)save(l.filter(r=>!r.fired||now-r.at<7*864e5));taskTick();if(el)paintList()}
 // saatli görevler: saati gelince tarayıcıya; telefona açılışta zamanlı gönderilir
@@ -71,7 +71,7 @@ function taskTick(){if(!cfg().tasks||typeof TK==='undefined'||!TK.ready)return;c
    Hub'ın kendi gönderdikleri (tag bell + bizim başlıklar) atlanır — onları zaten tick gösteriyor.
    Kaçırılanlar: son görülen mesaj kimliği appshell:ntfy.last → since=<id> (ntfy.sh 12 sa saklar). */
 let es=null,esT=null;const seen=new Set();
-const ours=m=>(m.tags||[]).includes('bell')&&/^(AppShell|Hatırlatıcı|Görev · )/.test(m.title||'');
+const ours=m=>(m.tags||[]).includes('bell')&&/^(AppShell|Hatırlatıcı|Görev · |Haber takibi)/.test(m.title||'');
 const isUrl=s=>/^https?:\/\/\S+$/i.test(s);
 function incoming(m,late){if(!m||m.event!=='message'||seen.has(m.id))return;seen.add(m.id);
   const n=get('appshell:ntfy',{});set('appshell:ntfy',Object.assign(n,{last:m.id}));if(ours(m))return;

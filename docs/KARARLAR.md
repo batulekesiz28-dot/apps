@@ -128,3 +128,4 @@ Son güncelleme: 2026-11-15
 - **Ada açılınca:** uygulama şeridi adanın altına kayar; telefonda durum çubuğundaki saat/pil solar (iPhone gibi). Pencere ışıkları görünen 13px, dokunma alanı 24px.
 - **Sağ tık:** her yerde aynı iki menü — uygulamada uygulama işlemleri (+ o arayüzün küme seçenekleri), boş alanda masaüstü menüsü (Windows/macOS masaüstü gibi). Galakside fareyle liste menü, dokunmatikte basılı tut → radyal.
 - **Pencere arayüzü (11.):** Windows alışkanlıkları — tek tık seçer, çift tık açar (dokunmatikte tek dokunuş), seçim kutusu, yazınca Başlat araması, Win tuşu. Görev çubuğunda çalan uygulama yok (adada).
+- **Haberler akışı:** varsayılan görünüm reels gibi tam ekran Akış (Liste duruyor). Öğrenme sadece cihazda/kendi bulutunda; her kartta neden gösterildiği yazar; “Daha az” ile azaltılır. Takip bildirimleri hub'ın Notify'ı üzerinden (ada + tarayıcı + telefon), dokununca haber açılır.

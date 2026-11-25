@@ -5902,5 +5902,48 @@
     "fix": "Boyut sınırı her zaman tutulur; hata sebebi yazılır"
    }
   ]
+ },
+ {
+  "at": "2026-11-25T20:30:00+03:00",
+  "change": "Haberler yenilendi: “Akış” — reels gibi tam ekran, kaydırdıkça bitmeyen haberler. Hangi haberde ne kadar durduğunu, neyi beğendiğini, açtığını ve hızlı geçtiğini öğrenip sana göre sıralıyor (arada keşif için yeni konular da gösteriyor; her kartta “neden görüyorum” yazıyor). Üstteki kutudan istediğin haberi arayabilirsin. “Takip” ile “Galatasaray yeni teknik direktör açıklarsa haber ver” gibi bir cümle yaz; olay gerçekleşince telefona ve bilgisayara bildirim gelir, dokununca haber açılır. Kurallar ve seni tanıyan profil her cihazda aynı.",
+  "scores": {
+   "haberler telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "hub telefon": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "haberler",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Akış modunda “Liste” düğmesi zor okunuyordu",
+    "fix": "Üst çubuk zemini koyulaştırıldı"
+   },
+   {
+    "app": "haberler",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Telefonda Takip düğmesi ekrandan taşıyordu, konu etiketleri 11.5px'ti",
+    "fix": "Arama kutusu daralır, etiket 12px"
+   },
+   {
+    "app": "haberler",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Klavyede L (beğen) iki kez işlenip geri alınıyordu",
+    "fix": "Tek dinleyici"
+   },
+   {
+    "app": "haberler",
+    "sev": "uyari",
+    "status": "open",
+    "text": "Takip kontrolü sadece AppShell (ya da Haberler) bir cihazda açıkken çalışır; tarayıcı tamamen kapalıyken bildirim gelmez (sunucu gerekir)"
+   }
+  ]
  }
 ]

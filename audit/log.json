@@ -6066,5 +6066,35 @@
     "fix": "Bilerek: bağlantı yokken yapılacak tek şey kurulum"
    }
   ]
+ },
+ {
+  "at": "2026-11-25T21:41:44",
+  "change": "Jarvis artık Windows'un Akıllı Uygulama Denetimi'ne takılmıyor: .bat dosyası ve ek paket (pip) kaldırıldı, sadece Python'un kendisiyle çalışıyor. Kurulum tek satır (Win+R'ye yapıştır), masaüstüne Jarvis kısayolu koyuyor ve kendini güncelliyor.",
+  "scores": {
+   "jarvis telefon": {
+    "before": 94,
+    "after": 94
+   },
+   "jarvis masaüstü": {
+    "before": 94,
+    "after": 94
+   }
+  },
+  "items": [
+   {
+    "app": "jarvis",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Akıllı Uygulama Denetimi baslat.bat'ı ve pip paketlerinin imzasız parçalarını engelliyordu",
+    "fix": "Ek paketsiz çekirdek: klavye/fare/ekran Windows'un kendi çağrılarıyla, tarayıcı Chrome/Edge'in kendi kontrol kanalıyla, Claude Python'un kendi bağlantısıyla; kurulum Win+R tek satır"
+   },
+   {
+    "app": "jarvis",
+    "sev": "uyari",
+    "status": "kabul",
+    "text": "Program çalışmıyorken kurulum ekranı bütün sayfayı kaplıyor",
+    "fix": "Bilerek: bağlantı yokken yapılacak tek şey kurulum"
+   }
+  ]
  }
 ]

@@ -37,10 +37,18 @@ Yazı ────────────────────────�
                                                   │                                                                         └─ ajan: Claude Opus 5.5 + araçlar (akış, ilerleme notları)
 ```
 
-- **Çekirdek** Python (Windows öncelikli; macOS/Linux'ta da çalışır): `websockets`, `anthropic`, `pyautogui`, `pillow`, isteğe bağlı `playwright`.
+- **Çekirdek** Python (Windows öncelikli; macOS/Linux'ta da çalışır), **ek paket yok** — sadece standart kütüphane.
+  Sebep: Windows 11'in Akıllı Uygulama Denetimi internetten inen `.bat`'ları ve pip paketlerinin imzasız `.pyd`/DLL parçalarını
+  (pydantic-core, pillow, greenlet…) engelliyor; python.org'un Python'u imzalı olduğu için sorun çıkarmaz.
+  - Klavye/fare: Windows `SendInput` (ctypes; Türkçe karakterler Unicode olayıyla), DPI farkında (`SetProcessDpiAwareness`).
+  - Ekran görüntüsü: GDI `StretchBlt` (HALFTONE küçültme) → PNG (zlib).
+  - Tarayıcı: Chrome/Edge `--remote-debugging-port=9223` + ayrı profil, DevTools protokolü (kendi WebSocket istemcimiz, `CDP`).
+  - Claude: `urllib` ile akışlı Messages API (SSE), `anthropic-version: 2026-10-21`.
+  - AppShell bağlantısı: `asyncio.start_server` + kendi WebSocket sunucumuz (Origin denetimi).
+  - Kurulum: Win+R → `py -c "…exec(urlopen('…/jarvis/kur.py'))"` → `%USERPROFILE%\Jarvis`, masaüstüne `Jarvis.cmd`; açılışta kendini günceller (`VERSION`).
 - **Hızlı yol** (`quick`): "google aç", "youtube'da lofi aç", "hesap makinesi aç", "sesi kıs", "sonraki şarkı", "ekran görüntüsü al", "bilgisayarı kilitle", "X'i ara".
   Eşleşmezse ajana gider. Hızlı yolun yaptığı da sohbete yazılır.
-- **Ajan:** Messages API, kendi döngümüz (WebSocket'e akış + onay + iptal için), `claude-opus-5-5`, düşünme her zaman açık (Opus 5.5), `effort: low` (sesli asistan için hız; ayardan yükseltilebilir),
+- **Ajan:** Messages API (ham HTTP akışı), kendi döngümüz (WebSocket'e akış + onay + iptal için), `claude-opus-5-5`, düşünme her zaman açık (Opus 5.5), `effort: low` (sesli asistan için hız; ayardan yükseltilebilir),
   `display: "updates"` → model araçlar arasında "şimdi şunu yapıyorum" notları yazar, sohbette canlı adım olur. `fallbacks: "default"` (güvenlik reddinde yedek model).
   Önbellek: sabit sistem + araçlar → istekler ucuz ve hızlı.
 - **Araçlar:** `open_target` (site/uygulama/dosya), `web_search` (Anthropic sunucu aracı), tarayıcı (`browser_go`, `browser_look`, `browser_click`, `browser_type`, `browser_keys`) — ayrı Jarvis profili,

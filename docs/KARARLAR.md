@@ -85,6 +85,7 @@ Son güncelleme: 2026-11-15
 - Çekirdek kullanıcının bilgisayarında (`jarvis/jarvis.py`), arayüz AppShell'de (`apps/jarvis`); bağlantı sadece 127.0.0.1 + AppShell adresi + eşleştirme kodu.
 - Geri alınamaz işler (komut çalıştırma, gönder/yorum/satın al/sil/randevu onayla) kodda onaya bağlı — sadece isteme bırakılmaz.
 - Giriş gereken siteler için ayrı tarayıcı profili (Chrome ana profile dışarıdan bağlanmaya izin vermiyor).
+- Çekirdek ek paket kullanmaz (sadece Python standart kütüphanesi) ve .bat ile başlatılmaz: Windows Akıllı Uygulama Denetimi bunları engelliyor. Kurulum tek satır (Win+R), güncelleme kendiliğinden.
 - Anahtar sadece bilgisayardaki `jarvis/ayarlar.json`'da; repoya girmez. Hız için varsayılan düşünme seviyesi düşük, Hızlı mod kapalı.
 
 ## Açık sorular (kullanıcı seçecek)

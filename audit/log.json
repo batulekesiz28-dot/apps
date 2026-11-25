@@ -6133,5 +6133,28 @@
     "fix": "Bilerek: açılır pencere"
    }
   ]
+ },
+ {
+  "at": "2026-11-25T22:09:01",
+  "change": "Jarvis: bilgisayardaki program eski sürüm kaldığında Gemini seçilemiyor ve anahtar kaydolmuyordu. Artık ekran bunu açıkça söylüyor (pencereyi kapat, masaüstündeki Jarvis'e çift tıkla), program da bundan sonra açıkken bile 20 dakikada bir kendini güncelliyor.",
+  "scores": {
+   "jarvis telefon": {
+    "before": 94,
+    "after": 94
+   },
+   "jarvis masaüstü": {
+    "before": 94,
+    "after": 94
+   }
+  },
+  "items": [
+   {
+    "app": "jarvis",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Eski Jarvis programıyla Gemini/Groq seçilemiyor, anahtar kaydolmuyor, sürekli “Claude anahtarı ekle” diyordu",
+    "fix": "Eski sürüm algılanıp yapılacak tek adım gösteriliyor; program çalışırken de kendini güncelliyor"
+   }
+  ]
  }
 ]

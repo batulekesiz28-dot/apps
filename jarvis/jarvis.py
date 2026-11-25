@@ -29,7 +29,7 @@ try:
 except Exception:
     pass
 
-VERSION = "2026.11.25d"
+VERSION = "2026.11.25e"
 ROOT = pathlib.Path(__file__).resolve().parent
 CFG = ROOT / "ayarlar.json"
 MEM = ROOT / "hafiza.json"
@@ -1486,6 +1486,7 @@ async def send_ready(sess):
 
 async def handler(ws):
     sess = Session(ws)
+    SESS.add(sess)
     authed = False
     await sess.send(t="hello", name="JARVIS", os=OS, mock=MOCK, v=VERSION)
     async for raw in ws:
@@ -1539,6 +1540,10 @@ async def handler(ws):
             await send_ready(sess)
         elif k == "new":
             sess.hist = []
+        elif k == "update":
+            v = await try_update(force=bool(m.get("now")))
+            await sess.send(t="upd", v=v or "", cur=VERSION)
+    SESS.discard(sess)
     if sess.task and not sess.task.done():
         sess.task.cancel()
 
@@ -1576,31 +1581,76 @@ async def on_conn(r, w):
             pass
 
 
-def self_update():
-    """Kurulu Jarvis (git klasörü değilse): sitede yeni sürüm varsa indirir ve yeniden başlar."""
-    if MOCK or "--guncelleme-yok" in sys.argv or (ROOT.parent / ".git").exists():
-        return
+def fetch_update():
+    """Sitede daha yeni Jarvis varsa indirip yazar → yeni sürüm adı; yoksa None. (Git klasöründe / sahte modda çalışmaz.)"""
+    if MOCK or (ROOT.parent / ".git").exists():
+        return None
     try:
-        src = urllib.request.urlopen(HUB + "jarvis/jarvis.py", timeout=4).read()
+        t = int(time.time())
+        src = urllib.request.urlopen(f"{HUB}jarvis/jarvis.py?t={t}", timeout=6).read()  # ?t= → önbellekteki eski kopya gelmesin
         m = re.search(rb'^VERSION = "([^"]+)"', src, re.M)
         if not m or m.group(1).decode() <= VERSION:
-            return
+            return None
         compile(src, "jarvis.py", "exec")  # bozuk dosya yazılmasın
         (ROOT / "jarvis.py").write_bytes(src)
         try:
-            (ROOT / "ui.html").write_bytes(urllib.request.urlopen(HUB + "apps/jarvis/index.html", timeout=4).read())
+            (ROOT / "ui.html").write_bytes(urllib.request.urlopen(f"{HUB}apps/jarvis/index.html?t={t}", timeout=6).read())
         except Exception:
             pass
-        print(f"  Jarvis güncellendi → {m.group(1).decode()}\n", flush=True)
-        sys.exit(subprocess.call([sys.executable, str(ROOT / "jarvis.py"), "--guncelleme-yok"] + sys.argv[1:]))
-    except SystemExit:
-        raise
+        return m.group(1).decode()
     except Exception:
-        pass
+        return None
+
+
+def restart():
+    """Yeni sürümle yeniden başla (aynı pencerede); eski süreç kapanır, yenisi kapı boşalınca açılır."""
+    args = [a for a in sys.argv[1:] if a not in ("--guncelleme-yok", "--bekle")]
+    subprocess.Popen([sys.executable, str(ROOT / "jarvis.py"), "--guncelleme-yok", "--bekle"] + args, cwd=str(ROOT))
+    os._exit(0)
+
+
+def self_update():
+    """Açılışta: yeni sürüm varsa indir ve onunla başla."""
+    if "--guncelleme-yok" in sys.argv:
+        return
+    v = fetch_update()
+    if v:
+        print(f"  Jarvis güncellendi → {v}\n", flush=True)
+        restart()
+
+
+SESS = set()
+
+
+async def try_update(force=False):
+    """Çalışırken güncelleme: iş yokken yeni sürüme geç (bağlı ekranlara haber verir, onlar kendiliğinden yeniden bağlanır)."""
+    if any(s.task and not s.task.done() for s in SESS) and not force:
+        return None
+    v = await asyncio.get_running_loop().run_in_executor(None, fetch_update)
+    if v:
+        log(f"Yeni sürüm ({v}) indirildi, yeniden başlıyor…")
+        for s in list(SESS):
+            await s.send(t="updating", v=v)
+        await asyncio.sleep(0.3)
+        restart()
+    return v
+
+
+async def update_loop():
+    while True:
+        await asyncio.sleep(20 * 60)
+        await try_update()
 
 
 async def main():
-    srv = await asyncio.start_server(on_conn, "127.0.0.1", PORT)
+    for i in range(60 if "--bekle" in sys.argv else 1):  # güncellemeden sonra: eski süreç kapıyı bırakana kadar bekle
+        try:
+            srv = await asyncio.start_server(on_conn, "127.0.0.1", PORT); break
+        except OSError:
+            if i == (59 if "--bekle" in sys.argv else 0):
+                raise
+            await asyncio.sleep(0.25)
+    asyncio.create_task(update_loop())
     print("\n  ╭──────────────────────────────╮\n  │   J A R V I S   hazır        │\n  ╰──────────────────────────────╯")
     print(f"  Eşleştirme kodu: {cfg['pair']}   (AppShell → Jarvis'te bir kez gir)")
     print(f"  Yapay zekâ: {PNAME[prov()]} · anahtar {'var ✓' if key_of(prov()) else 'yok — Jarvis ekranındaki Ayarlar’dan ekle (Gemini ücretsiz)'}")

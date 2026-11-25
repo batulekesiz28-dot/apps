@@ -201,24 +201,35 @@ const S={items:new Map(),albums:[],fs:null,ready:false};
 const live=()=>[...S.items.values()].filter(x=>!x.del).sort((a,b)=>b.at-a.at);
 const b2url=b=>new Promise(ok=>{const r=new FileReader();r.onload=()=>ok(r.result);r.readAsDataURL(b)});
 const Store={
-  col:()=>S.fs.collection('hub').doc('gallery').collection('items'),fullc:()=>S.fs.collection('hub').doc('gallery').collection('full'), // DİKKAT: ad 'full' OLMAZ — aşağıdaki full(id) yükleyicisiyle çakışıp sonsuz döngüye giriyordu (yükleme takılıyordu)meta:()=>S.fs.collection('hub').doc('gallery'),
+  col:()=>S.fs.collection('hub').doc('gallery').collection('items'),fullc:()=>S.fs.collection('hub').doc('gallery').collection('full'), /* DİKKAT: ad 'full' OLMAZ — aşağıdaki full(id) yükleyicisiyle çakışıp sonsuz döngüye giriyordu */meta:()=>S.fs.collection('hub').doc('gallery'),
   async start(fs){S.fs=fs;
     if(!fs){for(const it of await IDB.all().catch(()=>[]))S.items.set(it.id,it);S.albums=lsg('galeri:albums',[]);S.ready=true;purge();render();return}
-    this.meta().onSnapshot(d=>{S.albums=d.data()?.albums||[];if(S.ready)render()},()=>{});
-    this.col().onSnapshot(q=>{const first=!S.ready;const added=[];q.docChanges().forEach(c=>{if(c.type==='removed')S.items.delete(c.doc.id);else{if(!first&&c.type==='added'&&!S.items.has(c.doc.id))added.push(c.doc.id);S.items.set(c.doc.id,c.doc.data())}});
-      S.ready=true;if(first)purge();render(added);if(added.length&&!UP.busy)toast(`${added.length} yeni fotoğraf geldi`,'başka bir cihazdan',['Göster',()=>{go('ph');openV(added[0])}])},
-      e=>{$('#main').innerHTML=emptyHTML('Galeri okunamadı',E(e.code||e.message),'')})},
+    // önce bu cihazdaki kopya (anında görünür, bulut yavaş/yoksa da), sonra bulut gelince eşitlenir
+    for(const it of await IDB.all().catch(()=>[]))S.items.set(it.id,it);S.albums=lsg('galeri:albums',[]);if(S.items.size){S.ready=true;render()}
+    this.meta().onSnapshot(d=>{S.albums=d.data()?.albums||[];lss('galeri:albums',S.albums);if(S.ready)render()},()=>{});
+    let cloud=false;
+    this.col().onSnapshot(q=>{const first=!cloud;cloud=true;S.cloudOk=true;$('#cfT')?.remove();const added=[];
+      if(first){const ids=new Set(q.docs.map(d=>d.id)),pend=new Set(CQ.map(j=>j.it.id));for(const id of [...S.items.keys()])if(!ids.has(id)&&!pend.has(id)){S.items.delete(id);IDB.del(id).catch(()=>{})}}
+      q.docChanges().forEach(c=>{if(c.type==='removed'){S.items.delete(c.doc.id);IDB.del(c.doc.id).catch(()=>{})}else{const had=S.items.has(c.doc.id);if(!first&&c.type==='added'&&!had)added.push(c.doc.id);const v=c.doc.data();S.items.set(c.doc.id,v);IDB.put(v).catch(()=>{})}});
+      const wasReady=S.ready;S.ready=true;if(first)purge();render(wasReady?added:[]);if(added.length&&!UP.busy)toast(`${added.length} yeni fotoğraf geldi`,'başka bir cihazdan',['Göster',()=>{go('ph');openV(added[0])}])},
+      e=>{if(S.items.size){toast('Bulut okunamadı',fsWhy(e)+' · bu cihazdaki kopyalar gösteriliyor',null,8000);return}$('#main').innerHTML=emptyHTML('Galeri okunamadı',E(fsWhy(e)),'')});
+    // 10 sn'de buluttan ses yoksa sonsuza dek gri kare kalmasın: ne olduğunu söyle, onarma yolu ver
+    setTimeout(()=>{if(cloud)return;if(!S.items.size){S.ready=true;$('#main').innerHTML=emptyHTML('Buluta bağlanılamıyor',navigator.onLine?'Bulut 10 saniyedir yanıt vermiyor. Biraz bekle ya da bağlantıyı onar.':'İnternet bağlantın yok gibi görünüyor.',`<button class="btn" data-cfix>Bağlantıyı onar</button>`)}
+      else{const t=toast('Bulut yanıt vermiyor','bu cihazdaki kopyalar gösteriliyor',['Onar',cloudFix],0);t.id='cfT'}},10000)},
   // fotoğraf hemen bu cihazda görünür; bulut gönderimi arka planda sıraya girer (önce küçük kayıt → diğer cihazlarda hemen görünür, sonra tam boy)
   async put(it,full){S.items.set(it.id,it);if(full)IDB.setBlob(it.id,full).catch(()=>{});
-    if(!S.fs){await IDB.put(it);return}CQ.push({it,full});CQ.n++;cloudPump()},
-  async patch(id,p){const it=S.items.get(id);if(!it)return;Object.assign(it,p);if(!S.fs)return IDB.put(it);return this.col().doc(id).set(p,{merge:true}).catch(e=>toast('Kaydedilemedi',e.code||e.message))},
-  async kill(id){S.items.delete(id);IDB.delBlob(id).catch(()=>{});if(!S.fs)return IDB.del(id);await Promise.all([this.col().doc(id).delete(),this.fullc().doc(id).delete()]).catch(()=>{})},
+    if(!S.fs){await IDB.put(it);return}IDB.put(it).catch(()=>{}); /* bulutta da bu cihazda kopya (açılışta anında görünür) */CQ.push({it,full});CQ.n++;cloudPump()},
+  async patch(id,p){const it=S.items.get(id);if(!it)return;Object.assign(it,p);if(!S.fs)return IDB.put(it);IDB.put(it).catch(()=>{});return this.col().doc(id).set(p,{merge:true}).catch(e=>toast('Kaydedilemedi',e.code||e.message))},
+  async kill(id){S.items.delete(id);IDB.delBlob(id).catch(()=>{});if(!S.fs)return IDB.del(id);IDB.del(id).catch(()=>{});await Promise.all([this.col().doc(id).delete(),this.fullc().doc(id).delete()]).catch(()=>{})},
   async full(id){let b=await IDB.blob(id).catch(()=>null);if(b)return b;
     if(S.fs){try{const d=(await this.fullc().doc(id).get()).data();if(d?.d){b=await(await fetch(d.d)).blob();IDB.setBlob(id,b).catch(()=>{});return b}}catch{}}return null},
   saveAlbums(){if(!S.fs)return lss('galeri:albums',S.albums);this.meta().set({albums:S.albums},{merge:true}).catch(()=>{})}};
 // 30 günden eski silinenler kalıcı gider (Apple “Son Silinenler” gibi)
 function purge(){const lim=Date.now()-30*864e5;for(const it of S.items.values())if(it.del&&it.del<lim)Store.kill(it.id)}
 
+async function cloudFix(){if(CQ.n&&!confirm(`${CQ.n} fotoğraf henüz buluta gitmedi. Bağlantıyı onarmak onları bu cihazdan da silebilir. Devam edilsin mi?`))return;
+  toast('Bağlantı onarılıyor…','bulut önbelleği temizleniyor, sayfa yenilenecek',null,0);
+  try{await firebase.firestore().terminate();await firebase.firestore().clearPersistence()}catch(e){console.warn('onar',e)}location.reload()}
 /* ── bulut gönderim sırası: 2 paralel, takılırsa sıradakine geçer (Firestore yarım kalanı arkada/sonraki açılışta tamamlar) ── */
 const CQ=[];CQ.n=0;CQ.run=0;CQ.err=new Set();
 function cloudPump(){while(CQ.run<2&&CQ.length){const j=CQ.shift();CQ.run++;
@@ -488,6 +499,7 @@ function wireV(v){const st=v.querySelector('.vw-st'),img=st.querySelector('img')
 
 /* ── olaylar ── */
 document.addEventListener('click',e=>{const t=e.target;if(t.closest('.cm')||t.closest('.vw'))return;$('.cm')?.remove();
+  if(t.closest('[data-cfix]'))return cloudFix();
   const tb=t.closest('[data-tab]');if(tb){if(V.q){V.q='';$('#q').value=''}go(tb.dataset.tab);return}
   const tl=t.closest('.tl');if(tl){if(V.sel){if(e.shiftKey&&V.last){const all=$$('#main .tl').map(x=>x.dataset.id),a=all.indexOf(V.last),b=all.indexOf(tl.dataset.id);all.slice(Math.min(a,b),Math.max(a,b)+1).forEach(id=>{V.sel.add(id);$$(`.tl[data-id="${id}"]`).forEach(x=>x.classList.add('on'))});paintSel()}else selToggle(tl.dataset.id);V.last=tl.dataset.id;return}
     const list=V.col==='del'?colByKey('del').L:null;openV(tl.dataset.id,list);return}

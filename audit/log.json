@@ -6003,5 +6003,31 @@
     "fix": "1800 px / ≤480 KB — yükleme yaklaşık yarıya indi"
    }
   ]
+ },
+ {
+  "at": "2026-11-25T23:10:00+03:00",
+  "change": "Galeri girişliyken açılmıyor, gri kareler (yükleniyor görüntüsü) sonsuza kadar kalıyordu — bir önceki düzeltmemde yazdığım bir açıklama satırı “albümleri buluttan oku” kısmını bozmuştu; düzeltildi. Ayrıca artık fotoğrafların bu cihazdaki kopyası açılışta hemen görünüyor (bulut yavaşsa da), bulut 10 saniyede yanıt vermezse gri kareler yerine ne olduğu yazıyor ve “Bağlantıyı onar” düğmesi çıkıyor.",
+  "scores": {
+   "galeri telefon": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "galeri",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Girişliyken galeri hiç açılmıyordu (sonsuz gri kareler): açıklama satırı Store.meta'yı yutmuştu",
+    "fix": "Satır düzeltildi; bulut yolu sahte bulutla da test edildi"
+   },
+   {
+    "app": "galeri",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Bulut yanıt vermezse galeri sonsuza dek yükleniyor görünüyordu",
+    "fix": "Yerel kopya anında, 10 sn'de açıklama + Bağlantıyı onar (Firestore önbelleğini temizler)"
+   }
+  ]
  }
 ]

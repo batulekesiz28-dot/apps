@@ -366,3 +366,6 @@ Kullanıcı şikâyeti: Mıknatıs'ta arkada açık uygulama varken “Açık”
 - **Durum gezgini `node audit/states.js [dünya] [durum]`:** 10 arayüz × {boş, arkada uygulama, canlı şarkı + sayaç, ada açık, uygulama içinde} × {bilgisayar, telefon} = 100 durum. Her değişiklikten sonra çalıştır; hata varsa çıkış kodu 1.
 - **Hareket avcısı `node audit/motion.js [slug] [m]`:** her uygulamada düğmelere basar, “tak diye” değişen büyük öğeyi bulur.
 - Yeni bir sabit çubuk/panel eklersen: states.js'te onu açan bir durum yoksa ekle.
+
+## Tek satırlık kodda `//` yorum YASAK
+Bu projede çok kod tek satırda yazılıyor. Satırın ortasına `//` yorum eklemek satırın geri kalanını yorum yapıp sessizce kodu siler (Galeri'de iki kez oldu: `Store.meta` ve `cloudPump` yutuldu, galeri açılmadı). Satır ortasına açıklama gerekiyorsa `/* … */` kullan. Değişiklikten sonra bulut (girişli) yolu en az sahte bir `fs` nesnesiyle denenmeli — `?local` testi bulut kodunu hiç çalıştırmaz.

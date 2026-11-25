@@ -21,7 +21,7 @@ Kurulum (Windows, Win+R'ye yapıştır):
   py -c "import urllib.request as u;exec(u.urlopen('https://batulekesiz28-dot.github.io/apps/jarvis/kur.py').read())"
 Çalıştır:  python jarvis.py          Test: python jarvis.py --sahte  (hiçbir şeyi gerçekten yapmaz)
 """
-import asyncio, base64, datetime, hashlib, json, os, pathlib, platform, re, secrets, shutil, struct, subprocess, sys, tempfile, threading, time, zlib
+import asyncio, base64, datetime, hashlib, html as htmlmod, json, os, pathlib, platform, re, secrets, shutil, struct, subprocess, sys, tempfile, threading, time, zlib
 import urllib.error, urllib.parse, urllib.request
 
 try:
@@ -29,7 +29,7 @@ try:
 except Exception:
     pass
 
-VERSION = "2026.11.25c"
+VERSION = "2026.11.25d"
 ROOT = pathlib.Path(__file__).resolve().parent
 CFG = ROOT / "ayarlar.json"
 MEM = ROOT / "hafiza.json"
@@ -60,6 +60,8 @@ def load_cfg():
     c.setdefault("tokens", [])
     c.setdefault("effort", "low")   # low = en hızlı; medium/high daha derin düşünür
     c.setdefault("fast", False)     # Claude hızlı mod (2 kat fiyat)
+    c.setdefault("provider", "")    # gemini | groq | openrouter (ücretsiz) | claude (ücretli); boşsa anahtarı olandan seçilir
+    c.setdefault("keys", {})        # ücretsiz sağlayıcı anahtarları
     return c
 
 
@@ -73,6 +75,28 @@ save_cfg()
 
 def api_key():
     return cfg["api_key"] or os.environ.get("ANTHROPIC_API_KEY", "")
+
+
+# Ücretsiz sağlayıcılar (hepsi OpenAI uyumlu sohbet + araç çağırma). Model adları sık değiştiği için sabit yazılmaz:
+# anahtarın erişebildiği modeller listelenir, en iyisi seçilir; kota yoksa sıradakine geçilir.
+FREE = {
+    "gemini": {"name": "Gemini", "url": "https://generativelanguage.googleapis.com/v1beta/openai/", "vision": True},
+    "groq": {"name": "Groq", "url": "https://api.groq.com/openai/v1/", "vision": False},
+    "openrouter": {"name": "OpenRouter", "url": "https://openrouter.ai/api/v1/", "vision": False},
+}
+PROVS = ["gemini", "groq", "openrouter", "claude"]
+PNAME = {**{k: v["name"] for k, v in FREE.items()}, "claude": "Claude"}
+
+
+def key_of(p):
+    return api_key() if p == "claude" else str(cfg["keys"].get(p) or "")
+
+
+def prov():
+    p = cfg.get("provider")
+    if p in PROVS:
+        return p
+    return next((k for k in PROVS if key_of(k)), "gemini")
 
 
 def memory():
@@ -819,10 +843,12 @@ class Session:
         self.ws = ws
         self.hist = []
         self.n0 = 0
+        self.hprov = ""
         self.task = None
         self.asks = {}
         self.allow_cmd = False
         self.scale = 1.0
+        self.model = ""
         self.last = time.time()
 
     async def send(self, **m):
@@ -988,23 +1014,30 @@ BETAS = "server-side-fallback-2026-07-01,thinking-display-updates-2026-08-18"
 class ApiErr(Exception):
     def __init__(self, status, kind, msg):
         super().__init__(msg)
-        self.status, self.kind = status, kind
+        self.status, self.kind, self.retry = status, kind, 0.0
 
 
-def _sse(body, put, stop):
+def _sse(url, headers, body, put, stop):
     """İş parçacığında çalışır: isteği gönderir, gelen her SSE olayını put() ile döngüye aktarır."""
-    req = urllib.request.Request(API, data=json.dumps(body).encode(), method="POST", headers={
-        "content-type": "application/json", "accept": "text/event-stream", "x-api-key": api_key(),
-        "anthropic-version": "2026-10-21", "anthropic-beta": BETAS})
-    op = LOCAL if urllib.parse.urlparse(API).hostname in ("127.0.0.1", "localhost") else urllib.request.build_opener()
+    req = urllib.request.Request(url, data=json.dumps(body).encode(), method="POST", headers={"content-type": "application/json", "accept": "text/event-stream", **headers})
+    op = LOCAL if urllib.parse.urlparse(url).hostname in ("127.0.0.1", "localhost") else urllib.request.build_opener()
     try:
         r = op.open(req, timeout=120)
     except urllib.error.HTTPError as e:
+        raw = e.read() or b"{}"
         try:
-            j = json.loads(e.read() or b"{}").get("error", {})
+            j = json.loads(raw)
+            j = j[0] if isinstance(j, list) and j else j
+            err = j.get("error", j) if isinstance(j, dict) else {}
+            err = err if isinstance(err, dict) else {"message": str(err)}
         except Exception:
-            j = {}
-        raise ApiErr(e.code, j.get("type", ""), j.get("message", str(e)))
+            err = {"message": raw.decode("utf-8", "replace")[:300]}
+        x = ApiErr(e.code, str(err.get("type") or err.get("status") or ""), str(err.get("message") or e))
+        try:
+            x.retry = float(e.headers.get("retry-after") or 0)
+        except Exception:
+            pass
+        raise x
     with r:
         data = []
         for raw in r:
@@ -1012,20 +1045,21 @@ def _sse(body, put, stop):
                 return
             line = raw.decode("utf-8", "replace").rstrip("\r\n")
             if not line:
-                if data:
-                    put(json.loads("\n".join(data))); data = []
+                if data and data != ["[DONE]"]:
+                    put(json.loads("\n".join(data)))
+                data = []
             elif line.startswith("data:"):
                 data.append(line[5:].lstrip(" "))
 
 
-async def claude_stream(body):
+async def sse_stream(url, headers, body):
     loop = asyncio.get_running_loop()
     q, stop, END = asyncio.Queue(), threading.Event(), object()
     put = lambda x: loop.call_soon_threadsafe(q.put_nowait, x)
 
     def run():
         try:
-            _sse(body, put, stop)
+            _sse(url, headers, body, put, stop)
             put(END)
         except BaseException as e:  # hatayı döngüye taşı
             put(e)
@@ -1040,6 +1074,10 @@ async def claude_stream(body):
             yield x
     finally:
         stop.set()
+
+
+def claude_stream(body):
+    return sse_stream(API, {"x-api-key": api_key(), "anthropic-version": "2026-10-21", "anthropic-beta": BETAS}, body)
 
 
 async def claude_turn(sess, rid, body):
@@ -1094,8 +1132,8 @@ async def claude_turn(sess, rid, body):
             await asyncio.sleep(1.2 * 2 ** attempt)  # yoğunluk / bağlantı: biraz bekle, yeniden dene
 
 
-async def agent(sess: Session, rid, text):
-    if MOCK and not os.environ.get("JARVIS_API_URL"):
+async def mock_agent(sess, rid, text):
+    if True:
         await sess.send(t="note", id=rid, text="Planlıyorum: önce sayfayı açıp sonra bakacağım.")
         await sess.send(t="step", id=rid, sid="s1", label="Sayfaya gidiliyor: example.com", state="run"); await asyncio.sleep(0.4)
         await sess.send(t="step", id=rid, sid="s1", label="Sayfaya gidiliyor: example.com", state="ok")
@@ -1105,6 +1143,13 @@ async def agent(sess: Session, rid, text):
         for w in "Tamam, sahte modda işi yaptım gibi davrandım. Gerçek modda bilgisayarında yapacağım.".split(" "):
             await sess.send(t="delta", id=rid, text=w + " "); await asyncio.sleep(0.03)
         return "ok"
+
+
+async def agent(sess: Session, rid, text):
+    if MOCK and not os.environ.get("JARVIS_API_URL"):
+        return await mock_agent(sess, rid, text)
+    if sess.hprov != "claude":
+        sess.hist, sess.hprov = [], "claude"
     if not api_key():
         await sess.send(t="error", id=rid, msg="Claude anahtarı yok. Jarvis ekranındaki Ayarlar'dan ekle.")
         return "err"
@@ -1165,6 +1210,234 @@ async def agent(sess: Session, rid, text):
     return "ok"
 
 
+# ───────────────────────── ÜCRETSİZ SAĞLAYICILAR (Gemini · Groq · OpenRouter) ─────────────────────────
+SYSTEM_FREE = SYSTEM + """
+
+Önemli: Bir işi yapmak için araçları GERÇEKTEN çağır; "açıyorum" deyip durma. İş bitince kısa söyle.
+web_search ücretsiz arama yapar (DuckDuckGo); sonuç yetmezse browser_go ile sayfayı aç."""
+OA_TOOLS = [{"type": "function", "function": {"name": t["name"], "description": t["description"],
+             **({"parameters": t["input_schema"]} if t["input_schema"]["properties"] else {})}} for t in TOOLS if "input_schema" in t]
+OA_TOOLS.append({"type": "function", "function": {"name": "web_search", "description": "İnternette ara (güncel bilgi, haber, fiyat, tarih…). Başlık, adres ve özet döndürür.",
+                                                  "parameters": {"type": "object", "properties": {"query": {"type": "string"}}, "required": ["query"]}}})
+SCHEMA["web_search"] = {"type": "object", "properties": {"query": {"type": "string"}}, "required": ["query"]}
+MODELS, BADM = {}, {}  # sağlayıcı → (zaman, sıralı modeller) · model → kotası bitti (zaman)
+
+
+def oa_base(p):
+    return os.environ.get("JARVIS_OA_URL") or FREE[p]["url"]
+
+
+def rank_models(p, ids):
+    ids = [i.split("/", 1)[1] if p == "gemini" and i.startswith("models/") else i for i in ids]
+    if p == "gemini":
+        sc = []
+        for i in ids:
+            m = re.match(r"^gemini-(\d+(?:\.\d+)?)-flash(-lite)?(-preview[\w.-]*|-latest|-\d{3})?$", i)
+            if m and not re.search(r"image|tts|live|audio|exp", i):
+                sc.append((float(m.group(1)), (0 if m.group(2) else 1), (0 if m.group(3) else 1), i))  # yeni sürüm > tam model > kararlı
+        return [x[-1] for x in sorted(sc, reverse=True)] or ["gemini-2.5-flash", "gemini-2.5-flash-lite"]
+    if p == "groq":
+        pref = ["openai/gpt-oss-120b", "moonshotai/kimi-k2-instruct-0905", "moonshotai/kimi-k2-instruct", "llama-3.3-70b-versatile", "openai/gpt-oss-20b"]
+        have = [m for m in pref if m in ids]
+        return have or pref
+    return ["openrouter/free"]
+
+
+def _models_http(p, key):
+    req = urllib.request.Request(oa_base(p) + "models", headers={"authorization": f"Bearer {key}"})
+    op = LOCAL if urllib.parse.urlparse(req.full_url).hostname in ("127.0.0.1", "localhost") else urllib.request.build_opener()
+    with op.open(req, timeout=8) as r:
+        return [m.get("id", "") for m in json.loads(r.read()).get("data", [])]
+
+
+async def model_list(p, key):
+    at, L = MODELS.get(p, (0, None))
+    if not L or time.time() - at > 6 * 3600:
+        try:
+            ids = await asyncio.get_running_loop().run_in_executor(None, _models_http, p, key)
+        except urllib.error.HTTPError as e:
+            if e.code in (400, 401, 403):
+                raise ApiErr(401, "auth", "anahtar geçersiz")
+            ids = []
+        except Exception:
+            ids = []
+        L = rank_models(p, ids); MODELS[p] = (time.time(), L)
+    return [m for m in L if time.time() - BADM.get(m, 0) > 3 * 3600]
+
+
+def ddg(q):
+    """Ücretsiz web araması (DuckDuckGo HTML sayfası; anahtar gerekmez)."""
+    req = urllib.request.Request("https://html.duckduckgo.com/html/", data=urllib.parse.urlencode({"q": q, "kl": "tr-tr"}).encode(), headers={
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36",
+        "content-type": "application/x-www-form-urlencoded"})
+    try:
+        h = urllib.request.urlopen(req, timeout=12).read().decode("utf-8", "replace")
+    except Exception as e:
+        return f"Arama yapılamadı ({e}). browser_go ile https://www.google.com/search?q={urllib.parse.quote(q)} adresini açıp bak."
+    clean = lambda x: htmlmod.unescape(re.sub(r"<[^>]+>", "", x)).strip()
+    out = []
+    for m in re.finditer(r'class="result__a"[^>]*href="([^"]+)"[^>]*>(.*?)</a>.*?class="result__snippet"[^>]*>(.*?)</a>', h, re.S):
+        u = htmlmod.unescape(m.group(1))
+        u = (urllib.parse.parse_qs(urllib.parse.urlparse(u).query).get("uddg") or [u])[0]
+        out.append(f"{clean(m.group(2))}\n{u}\n{clean(m.group(3))}")
+        if len(out) >= 6:
+            break
+    return "\n\n".join(out) or "Sonuç bulunamadı. browser_go ile https://www.google.com/search?q=… adresini açıp bakabilirsin."
+
+
+async def oa_once(sess, rid, p, model, msgs):
+    """Bir model turu (akış) → (yazı, araç çağrıları, bitiş sebebi)."""
+    body = {"model": model, "messages": msgs, "tools": OA_TOOLS, "stream": True, "max_tokens": 4096}
+    ef = {"xhigh": "high"}.get(cfg.get("effort", "low"), cfg.get("effort", "low"))
+    if p == "gemini" or "gpt-oss" in model:
+        body["reasoning_effort"] = ef
+    text, calls, fin, reas, got = "", {}, None, "", False
+    try:
+        async for ev in sse_stream(oa_base(p) + "chat/completions", {"authorization": f"Bearer {key_of(p)}"}, body):
+            if ev.get("error"):
+                e = ev["error"]; raise ApiErr(int(e.get("code") or 500) if str(e.get("code", "")).isdigit() else 500, "", e.get("message", "akış hatası"))
+            for ch in ev.get("choices") or []:
+                d = ch.get("delta") or {}
+                r = d.get("reasoning") or d.get("reasoning_content")
+                if r:
+                    reas += r; got = True
+                    await sess.send(t="note", id=rid, nid="r", text=reas[-700:])
+                if d.get("content"):
+                    text += d["content"]; got = True
+                    await sess.send(t="delta", id=rid, text=d["content"])
+                for tc in d.get("tool_calls") or []:
+                    got = True
+                    c = calls.setdefault(tc.get("index", len(calls)), {"id": "", "type": "function", "function": {"name": "", "arguments": ""}})
+                    if tc.get("id"):
+                        c["id"] = tc["id"]
+                    f = tc.get("function") or {}
+                    if f.get("name") and not c["function"]["name"]:
+                        c["function"]["name"] = f["name"]
+                    if f.get("arguments"):
+                        c["function"]["arguments"] += f["arguments"] if isinstance(f["arguments"], str) else json.dumps(f["arguments"])
+                    for k, v in tc.items():  # Gemini'nin düşünce imzası (extra_content) aynen geri gönderilmeli
+                        if k not in ("index", "id", "type", "function"):
+                            c[k] = v
+                if ch.get("finish_reason"):
+                    fin = ch["finish_reason"]
+    except ApiErr as e:
+        e.got = got
+        raise
+    L = [calls[k] for k in sorted(calls)]
+    for n, c in enumerate(L):
+        c["id"] = c["id"] or f"call_{secrets.token_hex(4)}_{n}"
+    return text, L, fin
+
+
+async def oa_turn(sess, rid, p, msgs):
+    key = key_of(p)
+    for attempt in range(8):
+        models = await model_list(p, key)
+        if not models:
+            raise ApiErr(429, "quota", "ücretsiz günlük kota bitti")
+        model = models[0]
+        sess.model = model
+        try:
+            return await oa_once(sess, rid, p, model, msgs)
+        except ApiErr as e:
+            msg = str(e)
+            if getattr(e, "got", False) or e.status == 401:
+                raise
+            if e.status == 404 or (e.status in (400, 403) and re.search(r"model|not found|not supported|does not exist|decommission", msg, re.I)):
+                BADM[model] = time.time(); continue  # bu model yok/ücretsiz değil → sıradaki
+            if e.status == 429:
+                w = e.retry or float((re.search(r"(?:retry in|try again in)\s*([\d.]+)\s*s", msg, re.I) or [0, 0])[1] or 0)
+                if re.search(r"limit:\s*0\b|per ?day|PerDay|daily|TPD|RPD", msg) or w > 40:
+                    BADM[model] = time.time(); continue  # bu modelin ücretsiz kotası bitti → başka model
+                w = min(max(w, 3.0), 40.0)
+                await sess.send(t="step", id=rid, sid=f"q{attempt}", label=f"Ücretsiz sınır doldu, {int(w)} sn bekleniyor", state="run")
+                await asyncio.sleep(w)
+                await sess.send(t="step", id=rid, sid=f"q{attempt}", label="Devam ediliyor", state="ok")
+                continue
+            if e.status >= 500:
+                await asyncio.sleep(1.5 * (attempt + 1)); continue
+            raise
+        except (urllib.error.URLError, TimeoutError, ConnectionError):
+            if attempt >= 2:
+                raise
+            await asyncio.sleep(1.5)
+    raise ApiErr(429, "quota", "ücretsiz kullanım sınırı doldu")
+
+
+def oa_trim_images(hist, keep=2):
+    """Eski ekran görüntülerini geçmişten çıkar (her istekte yeniden gönderilmesin)."""
+    idx = [i for i, m in enumerate(hist) if isinstance(m.get("content"), list) and any(c.get("type") == "image_url" for c in m["content"])]
+    for i in idx[:-keep]:
+        hist[i] = {"role": "user", "content": "(eski ekran görüntüsü)"}
+
+
+async def oa_agent(sess: Session, rid, text, p):
+    if MOCK and not os.environ.get("JARVIS_OA_URL"):
+        return await mock_agent(sess, rid, text)
+    if not key_of(p):
+        await sess.send(t="error", id=rid, msg=f"{PNAME[p]} anahtarı yok. Jarvis ekranındaki Ayarlar'dan ücretsiz anahtar ekle.")
+        return "err"
+    if sess.hprov != p or time.time() - sess.last > 30 * 60 or len(sess.hist) > 80:
+        sess.hist, sess.hprov = [], p
+        sess.n0 = 0
+    sess.last = time.time()
+    sess.hist.append({"role": "user", "content": context_note() + "\n" + text})
+    vision = FREE[p]["vision"]
+    for _turn in range(40):
+        oa_trim_images(sess.hist)
+        said, calls, fin = await oa_turn(sess, rid, p, [{"role": "system", "content": SYSTEM_FREE}] + sess.hist)
+        msg = {"role": "assistant"}
+        if said:
+            msg["content"] = said
+        if calls:
+            msg["tool_calls"] = calls
+        if not said and not calls:
+            msg["content"] = "…"
+        sess.hist.append(msg)
+        if not calls:
+            return "ok"
+        if fin == "length":
+            await sess.send(t="error", id=rid, msg="Yanıt yarıda kesildi.")
+            return "err"
+        imgs = []
+        for c in calls:
+            name = c["function"]["name"]
+            res = {"role": "tool", "tool_call_id": c["id"]}
+            if p == "gemini":
+                res["name"] = name
+            try:
+                a = json.loads(c["function"]["arguments"] or "{}")
+            except ValueError:
+                sess.hist.append({**res, "content": json.dumps({"INVALID_JSON": c["function"]["arguments"]}, ensure_ascii=False)})
+                continue
+            a = a if isinstance(a, dict) else {}
+            lbl = step_label(name, a) if name != "web_search" else f"İnternette aranıyor: {str(a.get('query', ''))[:60]}"
+            await sess.send(t="step", id=rid, sid=c["id"], label=lbl, state="run")
+            try:
+                check_input(name, a)
+                if name == "web_search":
+                    out = await asyncio.get_running_loop().run_in_executor(None, ddg, a["query"])
+                else:
+                    out = await run_tool(sess, rid, name, a)
+                if isinstance(out, list):  # ekran görüntüsü
+                    if vision:
+                        imgs.append(out[0]["source"]); out = "Ekran görüntüsü alındı, aşağıda."
+                    else:
+                        out = f"{PNAME[p]} ekranı göremiyor. Masaüstü yerine tarayıcı araçlarını (browser_*) ya da open_target/press_keys kullan."
+                sess.hist.append({**res, "content": str(out)[:12000]})
+                await sess.send(t="step", id=rid, sid=c["id"], label=lbl, state="ok")
+            except asyncio.CancelledError:
+                raise
+            except Exception as e:
+                sess.hist.append({**res, "content": f"Hata: {e}"[:1500]})
+                await sess.send(t="step", id=rid, sid=c["id"], label=lbl + f" — olmadı: {str(e)[:80]}", state="err")
+        for src in imgs:
+            sess.hist.append({"role": "user", "content": [{"type": "text", "text": "Ekran görüntüsü (click koordinatları bu görüntüye göre):"},
+                                                          {"type": "image_url", "image_url": {"url": f"data:{src['media_type']};base64,{src['data']}"}}]})
+    return "ok"
+
+
+
 async def handle_say(sess: Session, rid, text):
     t0 = time.perf_counter()
     sess.n0 = len(sess.hist)
@@ -1173,11 +1446,12 @@ async def handle_say(sess: Session, rid, text):
         if q:
             await sess.send(t="quick", id=rid, text=q, ms=int((time.perf_counter() - t0) * 1000))
             log(f"hızlı ({int((time.perf_counter() - t0) * 1000)} ms):", text, "→", q)
-            sess.hist.append({"role": "user", "content": [{"type": "text", "text": f"{context_note()}\n{text}\n[Bu komut hızlı yoldan yapıldı: {q}]"}]})
-            sess.hist.append({"role": "assistant", "content": [{"type": "text", "text": q}]})
+            sess.hist.append({"role": "user", "content": f"{context_note()}\n{text}\n[Bu komut hızlı yoldan yapıldı: {q}]"})
+            sess.hist.append({"role": "assistant", "content": q})
             return
-        log("ajan:", text)
-        r = await agent(sess, rid, text)
+        p = prov()
+        log(f"ajan ({PNAME[p]}):", text)
+        r = await (agent(sess, rid, text) if p == "claude" else oa_agent(sess, rid, text, p))
         if r != "ok":
             del sess.hist[sess.n0:]  # yarım kalan tur: geçmiş tutarlı kalsın
         await sess.send(t="done", id=rid, r=r)
@@ -1189,8 +1463,11 @@ async def handle_say(sess: Session, rid, text):
         del sess.hist[sess.n0:]
         msg = str(e)
         if isinstance(e, ApiErr):
-            msg = {401: "Claude anahtarı geçersiz. Ayarlar'dan yeniden gir.", 403: "Bu anahtarın bu modele izni yok.",
-                   429: "Çok sık istek; birkaç saniye sonra tekrar dene.", 529: "Claude şu an çok yoğun; biraz sonra tekrar dene."}.get(e.status, f"Claude hatası ({e.status}): {e}")
+            n = PNAME[prov()]
+            msg = {401: f"{n} anahtarı geçersiz. Ayarlar'dan yeniden gir.", 403: f"{n} anahtarının bu modele izni yok.",
+                   429: f"{n} ücretsiz kullanım sınırı doldu; biraz sonra tekrar dene ya da Ayarlar'dan başka ücretsiz sağlayıcı seç."
+                   if prov() != "claude" else "Çok sık istek; birkaç saniye sonra tekrar dene.",
+                   529: f"{n} şu an çok yoğun; biraz sonra tekrar dene."}.get(e.status, f"{n} hatası ({e.status}): {e}")
             if e.status == 400 and re.search(r"credit|balance", str(e), re.I):
                 msg = "Anthropic hesabında kredi kalmamış."
         elif isinstance(e, (urllib.error.URLError, ConnectionError, TimeoutError)):
@@ -1201,6 +1478,12 @@ async def handle_say(sess: Session, rid, text):
 
 
 # ───────────────────────── sunucu ─────────────────────────
+async def send_ready(sess):
+    p = prov()
+    await sess.send(t="ready", provider=p, has_key=bool(key_of(p)), keys={k: bool(key_of(k)) for k in PROVS}, model=sess.model,
+                    effort=cfg["effort"], fast=cfg["fast"], os=OS, mock=MOCK, v=VERSION)
+
+
 async def handler(ws):
     sess = Session(ws)
     authed = False
@@ -1220,7 +1503,7 @@ async def handler(ws):
                 log("Yeni cihaz eşleştirildi.")
             else:
                 await sess.send(t="need_pair", bad=k == "pair"); continue
-            await sess.send(t="ready", has_key=bool(api_key()), effort=cfg["effort"], fast=cfg["fast"], os=OS, mock=MOCK, v=VERSION)
+            await send_ready(sess)
             continue
         if k == "say":
             if sess.task and not sess.task.done():
@@ -1240,14 +1523,20 @@ async def handler(ws):
             if m.get("always"):
                 sess.allow_cmd = True
         elif k == "set":
-            if "key" in m and isinstance(m["key"], str) and m["key"].startswith("sk-"):
-                cfg["api_key"] = m["key"].strip()
+            if m.get("provider") in PROVS:
+                cfg["provider"] = m["provider"]
+            kp = m.get("kp") if m.get("kp") in PROVS else prov()
+            kv = m.get("key").strip() if isinstance(m.get("key"), str) else ""
+            if kv and kp == "claude" and kv.startswith("sk-"):
+                cfg["api_key"] = kv
+            elif kv and kp != "claude" and 10 < len(kv) < 300:
+                cfg["keys"][kp] = kv; MODELS.pop(kp, None)
             if m.get("effort") in ("low", "medium", "high", "xhigh"):
                 cfg["effort"] = m["effort"]
             if "fast" in m:
                 cfg["fast"] = bool(m["fast"])
             save_cfg()
-            await sess.send(t="ready", has_key=bool(api_key()), effort=cfg["effort"], fast=cfg["fast"], os=OS, mock=MOCK, v=VERSION)
+            await send_ready(sess)
         elif k == "new":
             sess.hist = []
     if sess.task and not sess.task.done():
@@ -1314,7 +1603,7 @@ async def main():
     srv = await asyncio.start_server(on_conn, "127.0.0.1", PORT)
     print("\n  ╭──────────────────────────────╮\n  │   J A R V I S   hazır        │\n  ╰──────────────────────────────╯")
     print(f"  Eşleştirme kodu: {cfg['pair']}   (AppShell → Jarvis'te bir kez gir)")
-    print(f"  Anahtar: {'var ✓' if api_key() else 'yok — Jarvis ekranındaki Ayarlar’dan ekle'}")
+    print(f"  Yapay zekâ: {PNAME[prov()]} · anahtar {'var ✓' if key_of(prov()) else 'yok — Jarvis ekranındaki Ayarlar’dan ekle (Gemini ücretsiz)'}")
     print(f"  Mod: {'SAHTE (hiçbir şey yapılmaz)' if MOCK else 'gerçek'} · {OS} · sürüm {VERSION}")
     print("  Bu pencereyi kapatma; Jarvis bu çalıştıkça çalışır. Durdurmak: pencereyi kapat ya da Ctrl+C\n", flush=True)
     async with srv:

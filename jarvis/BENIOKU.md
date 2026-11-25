@@ -12,14 +12,14 @@ Python'un kendi, imzalı parçalarını kullanır.)
    Jarvis kullanıcı klasöründeki `Jarvis` klasörüne iner, masaüstüne **Jarvis** kısayolu konur ve başlar.
    (Mac/Linux: Terminal'de `py` yerine `python3`.)
 3. Açılan pencerede **6 haneli eşleştirme kodu** yazar. AppShell → **Jarvis**'i aç, kodu gir.
-4. Jarvis ekranında **Ayarlar → Claude API anahtarı**'nı gir (ya da “Netleştir'deki anahtarı kullan”).
+4. Jarvis ekranında **Ayarlar**'dan yapay zekâyı seç ve anahtarını yapıştır. **Ücretsiz:** Gemini (önerilen — https://aistudio.google.com/apikey, Google hesabı yeter), Groq, OpenRouter. Ücretli: Claude.
 
 Sonraki seferlerde masaüstündeki **Jarvis**'e çift tıkla. Jarvis her açılışta yeni sürüm var mı bakar, varsa kendini günceller.
 
 ## Ne yapabilir
 - Anında (yapay zekâsız): “Google aç”, “YouTube'da lofi aç”, “YouTube Music'te Tarkan çal”, “hesap makinesi aç”, “sesi kıs”,
   “sonraki şarkı”, “durdur”, “ekran görüntüsü al”, “bilgisayarı kilitle”, “saat kaç”.
-- Düşünerek (Claude): her şey — “YouTube Music'te son dinlediğim şarkıya yorum bırak”, “yarın 9'da spor hatırlat”,
+- Düşünerek (Gemini / Groq / OpenRouter / Claude): her şey — “YouTube Music'te son dinlediğim şarkıya yorum bırak”, “yarın 9'da spor hatırlat”,
   “masaüstündeki PDF'leri bir klasöre topla”, “şu siteden randevu al”… Bir yol olmazsa başka yol dener.
 
 ## Tarayıcı

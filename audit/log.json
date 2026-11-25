@@ -6096,5 +6096,42 @@
     "fix": "Bilerek: bağlantı yokken yapılacak tek şey kurulum"
    }
   ]
+ },
+ {
+  "at": "2026-11-25T22:00:35",
+  "change": "Jarvis artık ücretsiz çalışabiliyor: Ayarlar'dan Gemini (önerilen, Google hesabıyla ücretsiz anahtar), Groq ya da OpenRouter seçebilirsin; Claude ücretli seçenek olarak duruyor. Ücretsiz kota dolunca Jarvis kendiliğinden başka modele geçiyor ya da biraz bekliyor. Ayarlar düğmesi de artık çalışıyor.",
+  "scores": {
+   "jarvis telefon": {
+    "before": 94,
+    "after": 94
+   },
+   "jarvis masaüstü": {
+    "before": 94,
+    "after": 94
+   }
+  },
+  "items": [
+   {
+    "app": "jarvis",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Sağ üstteki ayarlar düğmesine basınca hiçbir şey olmuyordu",
+    "fix": "Düğme bağlandı; bağlı değilken kurulum ekranını açar"
+   },
+   {
+    "app": "jarvis",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "“Ücretsiz anahtar al” bağlantısının dokunma alanı küçüktü",
+    "fix": "Dokunma alanı büyütüldü"
+   },
+   {
+    "app": "jarvis",
+    "sev": "uyari",
+    "status": "kabul",
+    "text": "Ayarlar ve kurulum pencereleri ekranı kaplıyor",
+    "fix": "Bilerek: açılır pencere"
+   }
+  ]
  }
 ]

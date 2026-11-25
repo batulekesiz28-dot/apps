@@ -57,6 +57,16 @@ Yazı ────────────────────────�
 - **Ses:** ilk sürümde tarayıcı (kurulum yok): Türkçe konuşma tanıma + Türkçe ses; yanıt cümle cümle okunur (ilk cümle gelir gelmez).
   Sonraki adım: çekirdekte yerel uyandırma kelimesi (openWakeWord) + faster-whisper + Türkçe Piper/Okur sesi.
 
+### Ücretsiz yapay zekâ (kullanıcı isteği: Claude anahtarı paralı)
+| Sağlayıcı | Neden | Sınır |
+|---|---|---|
+| **Gemini** (varsayılan) | Google hesabıyla ücretsiz anahtar, kart yok; araç çağırma + ekranı görme; Türkçe iyi | Dakikalık/günlük kota; ücretsiz kullanımda veriler ürün geliştirmede kullanılabilir |
+| **Groq** | Ücretsiz, çok hızlı (gpt-oss-120b, Llama) | Ekranı göremez; dakikalık token sınırı düşük |
+| **OpenRouter** | `openrouter/free` uygun ücretsiz modeli seçer | Hız/kalite değişken |
+| Claude | En iyi ajan | Ücretli |
+Hepsi OpenAI uyumlu uç (`/chat/completions` + `tools` + akış) → tek döngü `oa_agent`. Web araması ücretsiz DuckDuckGo (`ddg`).
+Kaynaklar: https://ai.google.dev/gemini-api/docs/rate-limits · https://ai.google.dev/gemini-api/docs/openai · https://console.groq.com/docs/rate-limits · https://openrouter.ai/blog/tutorials/free-llm-apis-compared/
+
 ## 3. Yol haritası
 1. **v1 (bu):** çekirdek + AppShell arayüzü, hızlı yol, ajan, tarayıcı, onay, sesli konuşma.
 2. Arka planda dinleme (AppShell kapalıyken de) — çekirdeğe yerel ses hattı.

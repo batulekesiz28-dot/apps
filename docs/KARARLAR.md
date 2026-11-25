@@ -86,6 +86,7 @@ Son güncelleme: 2026-11-15
 - Geri alınamaz işler (komut çalıştırma, gönder/yorum/satın al/sil/randevu onayla) kodda onaya bağlı — sadece isteme bırakılmaz.
 - Giriş gereken siteler için ayrı tarayıcı profili (Chrome ana profile dışarıdan bağlanmaya izin vermiyor).
 - Çekirdek ek paket kullanmaz (sadece Python standart kütüphanesi) ve .bat ile başlatılmaz: Windows Akıllı Uygulama Denetimi bunları engelliyor. Kurulum tek satır (Win+R), güncelleme kendiliğinden.
+- Varsayılan yapay zekâ ücretsiz Gemini (Google hesabıyla anahtar, kart yok); Groq ve OpenRouter da ücretsiz seçenek, Claude ücretli seçenek olarak kalır. Model adları koda sabit yazılmaz (sık değişiyor): anahtarın erişebildiği en yeni model seçilir, kotası bitince sıradakine geçilir.
 - Anahtar sadece bilgisayardaki `jarvis/ayarlar.json`'da; repoya girmez. Hız için varsayılan düşünme seviyesi düşük, Hızlı mod kapalı.
 
 ## Açık sorular (kullanıcı seçecek)

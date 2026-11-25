@@ -75,7 +75,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--j-acc);outline-
 .card a{color:var(--j-acc)}
 .code{display:flex;gap:8px;margin-top:16px}.code input{flex:1;min-width:0;height:48px;padding:0 14px;border-radius:12px;border:0;background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px var(--j-line);font:600 22px var(--mono);letter-spacing:.3em;text-align:center;color:var(--j-ink);outline:0}
 .code input:focus{box-shadow:inset 0 0 0 2px var(--j-acc)}.code .b{height:48px}
-.fld{margin-top:16px}.fld>span{display:block;font-size:12.5px;font-weight:600;color:var(--j-ink3);margin-bottom:6px}
+.fld{margin-top:16px}.fld>span{display:flex;align-items:baseline;gap:6px;font-size:12.5px;font-weight:600;color:var(--j-ink3);margin-bottom:6px}
 .fld input[type=password]{width:100%;height:42px;padding:0 12px;border-radius:10px;border:0;background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px var(--j-line);font:13px var(--mono);color:var(--j-ink);outline:0}
 .seg{display:inline-flex;gap:2px;padding:3px;border-radius:12px;background:rgba(255,255,255,.06)}.seg button{height:34px;padding:0 14px;border-radius:9px;font-size:13.5px;color:var(--j-ink2)}.seg button[aria-pressed=true]{background:var(--j-ink);color:var(--j-bg)}
 .tg{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;font-size:14px}.tg small{display:block;color:var(--j-ink3);font-size:12.5px;margin-top:2px}
@@ -85,8 +85,12 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--j-acc);outline-
 .kc{display:flex;gap:8px;align-items:center;margin-top:8px;padding:6px 6px 6px 12px;border-radius:12px;background:var(--j-bg2);box-shadow:inset 0 0 0 1px var(--j-line)}
 .kc code{flex:1;min-width:0;padding:0;background:none;font-size:12px;line-height:1.5;word-break:break-all;user-select:all}
 .kc .b{flex:none}
+.seg.pv{display:grid;grid-template-columns:repeat(4,1fr);width:100%}.seg.pv button{height:auto;min-height:46px;padding:6px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;line-height:1.2}
+.seg.pv small{font-size:12px;font-weight:500;opacity:.75}
+.pvi{display:block;margin:8px 0 6px;font-size:12.5px;line-height:1.5;color:var(--j-ink3)}
+.ka{margin:-6px -8px -6px auto;padding:0 8px;min-height:32px;display:inline-flex;align-items:center;border-radius:8px;font-weight:500;color:var(--j-acc);text-decoration:none}.ka:hover{text-decoration:underline}
 .note2{margin-top:12px;font-size:12.5px;color:var(--j-ink3);line-height:1.5}
-@media (max-width:600px){.ib{width:44px;height:44px}.log{bottom:214px;padding:10px 14px 40px}.top{padding:0 12px}.j .tx{font-size:16px}.b,.chips button{height:42px}.seg button{height:40px}.orb{width:84px;height:84px}}
+@media (max-width:600px){.ib{width:44px;height:44px}.ka{min-height:40px;margin:-8px -8px -8px auto}.log{bottom:214px;padding:10px 14px 40px}.top{padding:0 12px}.j .tx{font-size:16px}.b,.chips button{height:42px}.seg button{height:40px}.orb{width:84px;height:84px}}
 @media (prefers-reduced-motion:reduce){.orb .c,.orb .r,.sx[data-s=run] b{animation:none!important}.sw::after{transition:none}}
 html[data-motion=off] :is(.orb .c,.orb .r,.sx[data-s=run] b){animation:none!important}
 </style>
@@ -229,20 +233,27 @@ function showConn(mode){const c=$('#conn .card');if(mode==='pair'){c.innerHTML=`
 
 /* ── ayarlar ── */
 function showSets(firstKey){$('#sets').hidden=false;paintSets(firstKey)}
+$('#setB').addEventListener('click',()=>{if(!ok)return showConn();$('#sets').hidden?showSets():($('#sets').hidden=true)});
+const PV={gemini:{n:'Gemini',tag:'ücretsiz',key:'https://aistudio.google.com/apikey',ph:'AIza…',info:'Ücretsiz; Google hesabı yeter, kart istemez. Ekranı görebilir. Ücretsiz kullanımda Google konuşmaları ürünlerini geliştirmek için kullanabilir.'},
+  groq:{n:'Groq',tag:'ücretsiz',key:'https://console.groq.com/keys',ph:'gsk_…',info:'Ücretsiz ve çok hızlı. Ekranı göremez; dakikalık sınırı düşük, uzun işlerde bekleyebilir.'},
+  openrouter:{n:'OpenRouter',tag:'ücretsiz',key:'https://openrouter.ai/keys',ph:'sk-or-…',info:'Ücretsiz modeller arasından uygun olanı seçer; hız ve kalite değişken.'},
+  claude:{n:'Claude',tag:'ücretli',key:'https://console.anthropic.com/settings/keys',ph:'sk-ant-…',info:'En akıllısı; karmaşık işlerde en iyisi. Kullandıkça ücret alır.'}};
 function paintSets(firstKey){const c=$('#sets .card');if($('#sets').hidden)return;let nk='';try{nk=lsg('netlestir:key','')}catch{}
-  c.innerHTML=`<h2 id="sT">Ayarlar</h2>${firstKey?'<p>Jarvis düşünmek için Claude kullanır. Anahtarın sadece bilgisayarındaki Jarvis programında saklanır.</p>':''}
-    <label class="fld"><span>Claude API anahtarı ${cfg.has_key?'· kayıtlı ✓':''}</span><input type="password" id="kIn" placeholder="${cfg.has_key?'değiştirmek için yeni anahtarı yapıştır':'sk-ant-…'}" autocomplete="off"></label>
-    ${nk&&!cfg.has_key?'<button class="b" id="kN" style="margin-top:8px">Netleştir’deki anahtarı kullan</button>':''}
+  const p=cfg.provider||'gemini',P=PV[p],has=cfg.keys?cfg.keys[p]:cfg.has_key;
+  c.innerHTML=`<h2 id="sT">Ayarlar</h2>${firstKey?'<p>Jarvis\'in düşünmesi için bir yapay zekâ anahtarı gerekir. En kolayı <b>ücretsiz Gemini</b>: Google hesabınla anahtar al, buraya yapıştır.</p>':''}
+    <div class="fld"><span>Yapay zekâ</span><div class="seg pv" role="group" aria-label="Yapay zekâ">${Object.entries(PV).map(([k,v])=>`<button data-pv="${k}" aria-pressed="${p===k}">${v.n}<small>${v.tag}</small></button>`).join('')}</div><small class="pvi">${P.info}${cfg.model&&p!=='claude'?` Şu an: ${esc(cfg.model)}.`:''}</small></div>
+    <label class="fld"><span>${P.n} anahtarı ${has?'· kayıtlı ✓':''}<a href="${P.key}" target="_blank" rel="noopener" class="ka">${p==='claude'?'Anahtar al':'Ücretsiz anahtar al'} ↗</a></span><input type="password" id="kIn" placeholder="${has?'değiştirmek için yeni anahtarı yapıştır':P.ph}" autocomplete="off"></label>
+    ${p==='claude'&&nk&&!has?'<button class="b" id="kN" style="margin-top:8px">Netleştir’deki anahtarı kullan</button>':''}
     <div class="fld"><span>Düşünme</span><div class="seg" role="group" aria-label="Düşünme derinliği">${[['low','Hızlı'],['medium','Dengeli'],['high','Derin']].map(([k,l])=>`<button data-ef="${k}" aria-pressed="${cfg.effort===k}">${l}</button>`).join('')}</div></div>
-    <div class="tg"><span>Hızlı mod<small>Claude yaklaşık 2 kat hızlı yazar, ücreti 2 katı.</small></span><button class="sw" id="fS" role="switch" aria-checked="${!!cfg.fast}" aria-label="Hızlı mod"></button></div>
+    ${p==='claude'?`<div class="tg"><span>Hızlı mod<small>Claude yaklaşık 2 kat hızlı yazar, ücreti 2 katı.</small></span><button class="sw" id="fS" role="switch" aria-checked="${!!cfg.fast}" aria-label="Hızlı mod"></button></div>`:''}
     <div class="tg"><span>Yeni konuşma<small>Jarvis'in bu konuşmadaki hafızasını temizler.</small></span><button class="b" id="nw">Temizle</button></div>
     <div class="end"><button class="b pri" id="sOk">Tamam</button></div>`;
-  $('#kN')?.addEventListener('click',()=>{send({t:'set',key:nk})});
+  $('#kN')?.addEventListener('click',()=>{send({t:'set',kp:'claude',key:nk})});
+  c.querySelectorAll('[data-pv]').forEach(b=>b.onclick=()=>{const v=$('#kIn').value.trim();if(v)send({t:'set',kp:p,key:v});send({t:'set',provider:b.dataset.pv})});
   c.querySelectorAll('[data-ef]').forEach(b=>b.onclick=()=>send({t:'set',effort:b.dataset.ef}));
-  $('#fS').onclick=()=>send({t:'set',fast:!cfg.fast});
+  $('#fS')?.addEventListener('click',()=>send({t:'set',fast:!cfg.fast}));
   $('#nw').onclick=()=>{send({t:'new'});lss('jarvis:log',[]);empty();$('#sets').hidden=true};
-  $('#sOk').onclick=()=>{const k=$('#kIn').value.trim();if(k)send({t:'set',key:k});$('#sets').hidden=true}}
-$('#setB').addEventListener('click',()=>{if(!ok)return showConn();showSets()});
+  $('#sOk').onclick=()=>{const k=$('#kIn').value.trim();if(k)send({t:'set',kp:p,key:k});$('#sets').hidden=true}}
 for(const id of['#conn','#sets'])$(id).addEventListener('click',e=>{if(e.target.id===id.slice(1)&&ok)$(id).hidden=true});
 addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('#sets').hidden){$('#sets').hidden=true;e.stopImmediatePropagation()}else if(!$('#conn').hidden&&ok){$('#conn').hidden=true}}},true);
 

@@ -142,7 +142,7 @@ svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stro
   <button class="ib" id="sBtn" title="Ara (/)" aria-label="Ara" aria-expanded="false"><svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg></button>
   <button class="ib" id="selBtn" title="Seç (S)" aria-label="Seç"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 12.2l2.4 2.4 4.6-4.8"/></svg></button>
   <button class="btn" id="upBtn" title="Fotoğraf yükle (U)"><svg class="i" viewBox="0 0 24 24"><path d="M12 16V4.5M7.5 9L12 4.5 16.5 9M5 15.5v3a1.5 1.5 0 0 0 1.5 1.5h11a1.5 1.5 0 0 0 1.5-1.5v-3"/></svg>Yükle</button>
-  <input type="file" id="file" accept="image/*" multiple hidden>
+  <input type="file" id="file" accept="image/*,.heic,.heif" multiple hidden>
 </header>
 <main class="wrap" id="main"></main>
 <nav class="dock" id="dock" aria-label="Görünüm"></nav>
@@ -210,7 +210,10 @@ const Store={
       e=>{$('#main').innerHTML=emptyHTML('Galeri okunamadı',E(e.code||e.message),'')})},
   async put(it,full){S.items.set(it.id,it);if(full)IDB.setBlob(it.id,full).catch(()=>{});
     if(!S.fs){await IDB.put(it);return}
-    if(full)await this.full().doc(it.id).set({d:await b2url(full),at:Date.now()});await this.col().doc(it.id).set(it)},
+    // yazma sunucuya ulaşınca biter; internet zayıfsa 20 sn sonra sıradakine geçilir (Firestore arkada göndermeye devam eder, bu cihazda zaten görünür)
+    const wait=(pr,ms=20000)=>Promise.race([pr,new Promise(ok=>setTimeout(()=>ok('slow'),ms))]);let slow=false;
+    if(full){const r=await wait(this.full().doc(it.id).set({d:await b2url(full),at:Date.now()})).catch(e=>e);if(r==='slow')slow=true;else if(r instanceof Error){it.nofull=1;UP.why.add(fsWhy(r))}}
+    const r=await wait(this.col().doc(it.id).set(it));if(r==='slow')slow=true;if(slow)UP.slow++},
   async patch(id,p){const it=S.items.get(id);if(!it)return;Object.assign(it,p);if(!S.fs)return IDB.put(it);return this.col().doc(id).set(p,{merge:true}).catch(e=>toast('Kaydedilemedi',e.code||e.message))},
   async kill(id){S.items.delete(id);IDB.delBlob(id).catch(()=>{});if(!S.fs)return IDB.del(id);await Promise.all([this.col().doc(id).delete(),this.full().doc(id).delete()]).catch(()=>{})},
   async full(id){let b=await IDB.blob(id).catch(()=>null);if(b)return b;
@@ -240,7 +243,7 @@ function nameDate(n){const m=n.match(/((?:19|20)\d\d)[-_.]?(0[1-9]|1[0-2])[-_.]?
 const canvas=(w,h)=>{const c=document.createElement('canvas');c.width=w;c.height=h;return c};
 const toBlob=(c,q)=>new Promise(ok=>c.toBlob(ok,'image/jpeg',q));
 function draw(bmp,max){const k=Math.min(1,max/Math.max(bmp.width,bmp.height)),c=canvas(Math.max(1,Math.round(bmp.width*k)),Math.max(1,Math.round(bmp.height*k))),x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.imageSmoothingQuality='high';x.drawImage(bmp,0,0,c.width,c.height);return c}
-async function shrink(bmp,max,lim){let c=draw(bmp,max);for(const q of [.86,.78,.68,.58]){const b=await toBlob(c,q);if(b.size<=lim)return b}c=draw(bmp,max*.7);return toBlob(c,.7)}
+async function shrink(bmp,max,lim){for(const m of [max,max*.75,max*.55,max*.4]){const c=draw(bmp,m);for(const q of [.86,.78,.68,.58]){const b=await toBlob(c,q);if(b.size<=lim)return b}}return toBlob(draw(bmp,max*.3),.6)} // sınır her zaman tutulur (bulut belgesi en çok 1 MB)
 function analyze(bmp){const c=draw(bmp,32),x=c.getContext('2d',{willReadFrequently:true}),d=x.getImageData(0,0,c.width,c.height).data;let r=0,g=0,b=0,n=0,white=0,dark=0,ink=0,sat=0;
   for(let i=0;i<d.length;i+=4){const R=d[i],G=d[i+1],B=d[i+2],mx=Math.max(R,G,B),mn=Math.min(R,G,B);r+=R;g+=G;b+=B;n++;const s=mx?(mx-mn)/mx:0;sat+=s;if(mn>200&&s<.12)white++;if(mx<90)dark++;if(mx<190&&s<.2)ink++}
   const h=canvas(9,8),hx=h.getContext('2d',{willReadFrequently:true});hx.drawImage(bmp,0,0,9,8);const p=hx.getImageData(0,0,9,8).data,gr=i=>p[i*4]*.3+p[i*4+1]*.59+p[i*4+2]*.11;let bits='';
@@ -257,19 +260,33 @@ const ham=(a,b)=>{let d=0;for(let i=0;i<16;i++){let x=parseInt(a[i],16)^parseInt
 const rid=()=>'G_'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 
 /* ── yükleme kuyruğu ── */
-const UP={busy:false,q:[],done:0,total:0,added:[],dupes:0,errs:0,heic:0};
+const UP={busy:false,q:[],done:0,total:0,added:[],dupes:0,errs:0,heic:0,slow:0,why:new Set()};
+// bulut hatasını anlaşılır cümleye çevir
+const fsWhy=e=>{const c=e?.code||'';return c==='permission-denied'?'bulut izni yok (Firebase kuralları galeriye yazmaya izin vermiyor)':c==='resource-exhausted'?'bulut kotası doldu':c==='invalid-argument'?'fotoğraf bulut için fazla büyük':c==='unavailable'?'internet yok':(e?.message||'bilinmeyen hata').slice(0,80)};
 function upload(files){files=[...files].filter(f=>/^image\//.test(f.type)||/\.(heic|heif|jpe?g|png|webp|gif|avif)$/i.test(f.name));if(!files.length)return toast('Fotoğraf bulunamadı','sadece resim dosyaları eklenir');
   UP.q.push(...files);UP.total+=files.length;if(!UP.busy)pump()}
 async function pump(){UP.busy=true;progress();
-  while(UP.q.length){const f=UP.q.shift();try{const r=await addOne(f);if(r==='dupe')UP.dupes++;else UP.added.push(r)}catch(e){if(e.message==='heic')UP.heic++;else{UP.errs++;console.warn('galeri',f.name,e)}}UP.done++;progress()}
+  while(UP.q.length){const f=UP.q.shift();try{const r=await addOne(f);if(r==='dupe')UP.dupes++;else UP.added.push(r)}catch(e){if(e.message==='heic'||e.message==='heicnet'){UP.heic++;if(e.message==='heicnet')UP.why.add('HEIC çevirici yüklenemedi (internet?)')}else{UP.errs++;UP.why.add(e.code?fsWhy(e):e.message==='decode'?`${f.name.slice(0,30)} açılamadı (desteklenmeyen biçim)`:fsWhy(e));console.warn('galeri',f.name,e)}}UP.done++;progress()}
   const a=UP.added.slice(),sum={};a.forEach(id=>{const k=S.items.get(id)?.kind;if(k)sum[k]=(sum[k]||0)+1});
   const parts=Object.entries(sum).filter(([k])=>k!=='kamera').map(([k,n])=>`${n} ${KIND1[k]}`);
-  if(UP.dupes)parts.push(`${UP.dupes} zaten vardı`);if(UP.heic)parts.push(`${UP.heic} HEIC açılamadı`);if(UP.errs)parts.push(`${UP.errs} hata`);
-  UP.busy=false;$('#upT')?.remove();Object.assign(UP,{q:[],done:0,total:0,added:[],dupes:0,errs:0,heic:0});
+  if(UP.dupes)parts.push(`${UP.dupes} zaten vardı`);if(UP.heic)parts.push(`${UP.heic} HEIC açılamadı`);if(UP.errs)parts.push(`${UP.errs} eklenemedi`);if(UP.slow)parts.push(`${UP.slow} tanesi internet gelince buluta gidecek`);if(UP.why.size)parts.push([...UP.why].slice(0,2).join(' · '));
+  UP.busy=false;$('#upT')?.remove();Object.assign(UP,{q:[],done:0,total:0,added:[],dupes:0,errs:0,heic:0,slow:0,why:new Set()});
   toast(a.length?`${a.length} fotoğraf eklendi`:'Yeni fotoğraf eklenmedi',parts.join(' · ')||'tarihe göre yerleştirildi',a.length?['Göster',()=>{go('ph');openV(a[0])}]:null,a.length?6000:7000);
   render(a);geoAll();aiAll()}
+/* Fotoğrafı aç: (1) çok büyük dosyalar (50–200 MP telefon fotoğrafları) telefonda belleği taşırıp sekmeyi çökertiyordu → önce küçülterek çöz;
+   (2) HEIC/HEIF (iPhone, bazı Samsung) Chrome'da açılmıyordu → gerekince heic2any ile JPEG'e çevir (sadece bu cihazda, ilk HEIC'te bir kez yüklenir). */
+let HEIC=null;const heicLib=()=>HEIC||(HEIC=new Promise((ok,no)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js';sc.onload=()=>ok(window.heic2any);sc.onerror=()=>{HEIC=null;no(new Error('heiclib'))};document.head.appendChild(sc)}));
+async function decode(f){const isH=/hei[cf]/i.test(f.type+' '+f.name),big=f.size>9e6;
+  const tryBmp=async(src,o={})=>{try{return await createImageBitmap(src,{imageOrientation:'from-image',...o})}catch{return null}};
+  let bmp=null;
+  if(!isH){bmp=big?null:await tryBmp(f);if(!bmp)bmp=await tryBmp(f,{resizeWidth:2600,resizeQuality:'high'})} // büyük ya da sorunlu dosya: küçülterek çöz
+  else{bmp=await tryBmp(f); // Safari HEIC'i kendisi açar
+    if(!bmp){let lib;try{lib=await heicLib()}catch{throw new Error('heicnet')}
+      let out;try{out=await lib({blob:f,toType:'image/jpeg',quality:.92})}catch{throw new Error('heic')}
+      bmp=await tryBmp(Array.isArray(out)?out[0]:out)}}
+  if(!bmp)throw new Error(isH?'heic':'decode');return bmp}
 async function addOne(f){const ex=await f.slice(0,262144).arrayBuffer().then(b=>{try{return exif(b)}catch{return{}}});
-  let bmp;try{bmp=await createImageBitmap(f,{imageOrientation:'from-image'})}catch{throw new Error(/hei[cf]/i.test(f.type+f.name)?'heic':'decode')}
+  const bmp=await decode(f);
   const a=analyze(bmp),w=bmp.width,h=bmp.height,at=ex.at||nameDate(f.name)||f.lastModified||Date.now();
   if(live().some(x=>x.hash===a.hash&&x.w===w&&x.h===h&&Math.abs(x.at-at)<2000)){bmp.close?.();return'dupe'}
   const[full,thumb]=await Promise.all([shrink(bmp,2048,700e3),toBlob(draw(bmp,360),.72)]);bmp.close?.();

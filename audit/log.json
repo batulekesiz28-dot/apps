@@ -5862,5 +5862,45 @@
     "fix": "Menü yazısı her arayüzde koyu"
    }
   ]
+ },
+ {
+  "at": "2026-11-25T19:20:00+03:00",
+  "change": "Galeri: fotoğraf yüklenmeme hatası düzeltildi. iPhone/Samsung HEIC fotoğrafları artık açılıyor (gerekince JPEG'e çevrilir), çok büyük fotoğraflar telefonda belleği taşırmadan küçültülerek açılıyor, internet zayıfken yükleme takılı kalmıyor (bulut arkada gönderir), bir fotoğraf eklenemezse sebebi yazıyor.",
+  "scores": {
+   "galeri telefon": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "galeri",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "HEIC (iPhone/Samsung) fotoğraflar Chrome'da açılmadığı için eklenmiyordu",
+    "fix": "heic2any ile cihazda JPEG'e çevrilir"
+   },
+   {
+    "app": "galeri",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "50–200 MP fotoğraflar telefonda belleği taşırıp yüklemeyi bozabiliyordu",
+    "fix": "Büyük dosya küçültülerek çözülür"
+   },
+   {
+    "app": "galeri",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Zayıf internette yükleme “Yükleniyor 0/…”da kalıyordu",
+    "fix": "20 sn sonra sıradakine geçer, bulut arkada gönderir"
+   },
+   {
+    "app": "galeri",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Bazı çok ayrıntılı fotoğraflar bulut sınırını (1 MB) aşabiliyordu; hatalar sadece “1 hata” diye görünüyordu",
+    "fix": "Boyut sınırı her zaman tutulur; hata sebebi yazılır"
+   }
+  ]
  }
 ]

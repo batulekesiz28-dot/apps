@@ -5945,5 +5945,30 @@
     "text": "Takip kontrolü sadece AppShell (ya da Haberler) bir cihazda açıkken çalışır; tarayıcı tamamen kapalıyken bildirim gelmez (sunucu gerekir)"
    }
   ]
+ },
+ {
+  "at": "2026-11-25T21:10:00+03:00",
+  "change": "Tema stüdyosunda yeni karışım özellikleri: 8 hazır karışım (Gün doğumu, Gece mavisi, Neon kağıt…) tek dokunuşla, “Rastgele” zarıyla iki tema rastgele karışır, “Fotoğraftan…” ile seçtiğin fotoğrafın renklerinden tema çıkar, “Kendi renklerim”de tek bir ana renkten açık ya da koyu bütün palet üretilir. Yazı her zaman okunur kalır.",
+  "scores": {
+   "hub telefon": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "hub",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Tema stüdyosu önizlemesindeki “Günün odağı” yazısı 10.5px'ti (eski açık konu)",
+    "fix": "12px"
+   },
+   {
+    "app": "hub",
+    "sev": "uyari",
+    "status": "kabul",
+    "text": "Tema stüdyosunda çok yazı tipi görünüyor — yazı tipi seçicisi örnekleri bilerek"
+   }
+  ]
  }
 ]

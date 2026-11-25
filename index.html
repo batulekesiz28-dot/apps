@@ -882,7 +882,7 @@ body,.btn,.mi,.pal-in,input,textarea,button{font-family:var(--font)}
 .tp-ui{position:absolute;inset:14px;display:grid;grid-template-rows:auto 1fr auto;gap:10px}
 .tp-top{display:flex;align-items:center;gap:6px}.tp-top i{width:8px;height:8px;border-radius:50%;background:var(--accent)}.tp-top span{height:6px;width:46%;border-radius:4px;background:var(--line3)}
 .tp-w{align-self:start;justify-self:start;padding:9px 12px;border-radius:12px;background:var(--surface);box-shadow:var(--shadow);display:grid;gap:2px}
-.tp-w b{font:600 18px/1 var(--display);color:var(--ink)}.tp-w small{font-size:10.5px;color:var(--ink3)}
+.tp-w b{font:600 18px/1 var(--display);color:var(--ink)}.tp-w small{font-size:12px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .tp-tiles{display:flex;gap:6px}.tp-tiles i{width:22px;height:22px;border-radius:7px;background:var(--surface);box-shadow:0 0 0 .5px var(--line2)}.tp-tiles i:first-child{background:var(--accent)}
 .tp-n{padding:12px 14px 14px;background:var(--surface);display:grid;gap:2px}
 .tp-n b{font:600 15px/1.2 var(--display);color:var(--ink)}
@@ -897,9 +897,13 @@ body,.btn,.mi,.pal-in,input,textarea,button{font-family:var(--font)}
 .lk-own{display:flex;gap:10px;flex-wrap:wrap}.lk-own label{display:grid;justify-items:center;gap:4px;font-size:12px;color:var(--ink2)}.lk-own input{width:44px;height:44px;border:0;border-radius:12px;padding:0;background:none;cursor:pointer}
 .lk-mix{display:flex;align-items:center;gap:10px;flex-wrap:wrap;flex:1}.lk-mix select{height:36px;padding:0 8px;border-radius:9px;border:0;background:var(--hover);color:var(--ink);font:inherit;font-size:13px}
 .lk-mix input[type=range]{flex:1;min-width:140px;height:28px;appearance:none;background:linear-gradient(90deg,var(--a),var(--b)) center/100% 10px no-repeat;border-radius:5px}
+.lk-ideas{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.lk-ideas button{display:inline-flex;align-items:center;gap:7px;height:32px;padding:0 12px 0 8px;border-radius:999px;font-size:12.5px;font-weight:550;color:var(--ink);background:var(--hover);transition:background .15s,scale .2s}
+.lk-ideas button:hover{background:var(--hover2,var(--line2))}.lk-ideas button:active{scale:.96}.lk-ideas button.on{box-shadow:inset 0 0 0 1.5px var(--ink)}
+.lk-dots{display:inline-flex}.lk-dots i{width:14px;height:14px;border-radius:50%;box-shadow:0 0 0 1.5px var(--surface,#fff)}.lk-dots i+i{margin-left:-5px}.lk-dice{font-size:14px}
+.lk-gen{display:inline-flex;align-items:center;gap:6px;margin-left:auto}.lk-gen button{height:36px;padding:0 12px;border-radius:10px;font-size:12.5px;font-weight:600;background:var(--hover);color:var(--ink)}.lk-gen button:hover{background:var(--line2)}
 .lk-mix input[type=range]::-webkit-slider-thumb{appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.35)}
 .lk-add{height:32px;padding:0 12px;border-radius:9px;font-size:13px;color:var(--ink2);box-shadow:inset 0 0 0 1px var(--line2)}.lk-add:hover{color:var(--ink)}
-@media (max-width:600px){.lk-mix input[type=range]{height:40px}.lk-sw button,.lk-cu{width:40px;height:40px}.lk-pi button,.lk-add{height:40px}}
+@media (max-width:600px){.lk-ideas button,.lk-gen button{height:40px}.lk-gen{margin-left:0}.lk-mix input[type=range]{height:40px}.lk-sw button,.lk-cu{width:40px;height:40px}.lk-pi button,.lk-add{height:40px}}
 .ts-mo{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:22px;padding-top:18px;border-top:.5px solid var(--line2)}
 .ts-mo b{font-size:13.5px;font-weight:600;color:var(--ink)}.ts-mo small{font-size:12px;color:var(--ink3);flex-basis:100%}
 .ts-seg{display:flex;gap:4px;padding:3px;border-radius:12px;background:var(--hover)}
@@ -1103,16 +1107,32 @@ function palColors(pal){if(!pal||!pal.mode)return null;if(pal.mode==='own')retur
   // yazı zemine en az 7:1; değilse yazıyı açıklığın uç ucuna it
   if(contrast(o.ink,o.bg)<7){const[H,S]=hsl(o.ink),dark=relL(o.bg)<.3;for(let l=dark?.86:.16;dark?l<=.99:l>=.02;l+=dark?.03:-.03){const c=hex3(H,Math.min(S,.25),l);if(contrast(c,o.bg)>=7){o.ink=c;break}}}
   return o}
+// hazır karışımlar (iki tema + oran) ve tek renkten / fotoğraftan palet üretme (Material You, Coolors, Arc fikirleri)
+const MIX_IDEAS=[['Gün doğumu','light','gunbatimi',45],['Gece mavisi','dark','aurora',40],['Neon kağıt','kagit','neon',35],['Orman gecesi','dark','doga',50],['Pembe uzay','evren','gunbatimi',40],['Sakin aurora','light','aurora',55],['Retro','kagit','cyberpunk',30],['Derin doğa','doga','evren',50]];
+function palFix(o){if(contrast(o.ink,o.bg)<7){const[H,S]=hsl(o.ink),dark=relL(o.bg)<.3;for(let l=dark?.86:.16;dark?l<=.99:l>=.02;l+=dark?.03:-.03){const c=hex3(H,Math.min(S,.25),l);if(contrast(c,o.bg)>=7){o.ink=c;break}}}
+  if(contrast(o.accent,o.bg)<3){const[H,S]=hsl(o.accent),dark=relL(o.bg)<.3;for(let l=hsl(o.accent)[2];dark?l<=.9:l>=.15;l+=dark?.03:-.03){const c=hex3(H,S,l);if(contrast(c,o.bg)>=3){o.accent=c;break}}}return o}
+function palFromBase(hex,dark){const[H,S]=hsl(hex);const s=Math.min(S,.35);
+  return palFix(dark?{bg:hex3(H,s*.6,.08),surface:hex3(H,s*.55,.13),ink:hex3(H,.12,.93),accent:hex}:{bg:hex3(H,s*.5,.965),surface:hex3(H,s*.35,.995),ink:hex3(H,.18,.12),accent:hex})}
+async function palFromImage(file){const bmp=await createImageBitmap(file,{resizeWidth:64,resizeQuality:'medium'}).catch(()=>null);if(!bmp)throw new Error('img');
+  const c=document.createElement('canvas');c.width=bmp.width;c.height=bmp.height;const x=c.getContext('2d');x.drawImage(bmp,0,0);const d=x.getImageData(0,0,c.width,c.height).data;
+  const B=new Map();let Ls=0,n=0;for(let i=0;i<d.length;i+=4){if(d[i+3]<128)continue;const k=(d[i]>>4)<<8|(d[i+1]>>4)<<4|(d[i+2]>>4);const b=B.get(k)||{n:0,r:0,g:0,b:0};b.n++;b.r+=d[i];b.g+=d[i+1];b.b+=d[i+2];B.set(k,b);
+    Ls+=(.299*d[i]+.587*d[i+1]+.114*d[i+2])/255;n++}
+  const cols=[...B.values()].map(b=>{const h='#'+[b.r,b.g,b.b].map(v=>Math.round(v/b.n).toString(16).padStart(2,'0')).join(''),[H,S,L]=hsl(h);return{h,n:b.n,H,S,L}});
+  const dom=cols.sort((a,b)=>b.n-a.n)[0],acc=cols.filter(c=>c.S>.25&&c.L>.2&&c.L<.85).sort((a,b)=>b.n*b.S-a.n*a.S)[0]||dom,dark=Ls/n<.5;
+  const o=palFromBase(acc.h,dark);o.bg=dark?hex3(dom.H,Math.min(dom.S,.3),.09):hex3(dom.H,Math.min(dom.S,.3),.955);o.surface=dark?hex3(dom.H,Math.min(dom.S,.28),.14):hex3(dom.H,Math.min(dom.S,.2),.99);return palFix(o)}
+const palDots=o=>`<i style="background:${o.bg}"></i><i style="background:${o.surface}"></i><i style="background:${o.accent}"></i>`;
 function setPal(patch){const l=store.get('appshell:look',{}),pal={...(l.pal||{}),...patch};const c=palColors(pal);setLook({pal,colors:c||null})}
 const lookSnap=()=>({theme:store.get('appshell:theme','light'),motion:MOTION,look:store.get('appshell:look',{}),world:store.get('appshell:world',null)});
 function lookHTML(){const l=store.get('appshell:look',{}),P=store.get('appshell:profiles',[]);
   const pal=l.pal||{},mode=pal.mode||'',own=pal.own||themeColors(document.documentElement.dataset.theme||'light'),TH=Object.keys(THEMES),tn=k=>THEMES[k]?.n||k;
-  const colors=`<div class="ts-mo"><b>Renkler</b><div class="ts-seg" role="radiogroup" aria-label="Renk kaynağı">${[['','Tema'],['own','Kendi renklerim'],['mix','İki temayı karıştır']].map(([k,n])=>`<button data-pm="${k}" role="radio" aria-checked="${mode===k}" class="${mode===k?'on':''}">${n}</button>`).join('')}</div>
-    ${mode==='own'?`<div class="lk-own">${[['bg','Zemin'],['surface','Yüzey'],['ink','Yazı'],['accent','Vurgu']].map(([k,n])=>`<label><input type="color" data-pc="${k}" value="${toHex(own[k])}" aria-label="${n} rengi"><span>${n}</span></label>`).join('')}</div>`:''}
+  const colors=`<div class="ts-mo"><b>Renkler</b><div class="ts-seg" role="radiogroup" aria-label="Renk kaynağı">${[['','Tema'],['own','Kendi renklerim'],['mix','Karıştır']].map(([k,n])=>`<button data-pm="${k}" role="radio" aria-checked="${mode===k}" class="${mode===k?'on':''}">${n}</button>`).join('')}<button data-pimg title="Bir fotoğraf seç, renkler ondan çıkarılsın">Fotoğraftan…</button></div><input type="file" accept="image/*" data-pfile hidden>
+    ${mode==='own'?`<div class="lk-own">${[['bg','Zemin'],['surface','Yüzey'],['ink','Yazı'],['accent','Vurgu']].map(([k,n])=>`<label><input type="color" data-pc="${k}" value="${toHex(own[k])}" aria-label="${n} rengi"><span>${n}</span></label>`).join('')}
+      <span class="lk-gen"><label title="Tek renkten bütün paleti üret"><input type="color" data-pbase value="${toHex(own.accent)}" aria-label="Ana renk"><span>Ana renk</span></label><button data-pgen="0">Açık üret</button><button data-pgen="1">Koyu üret</button></span></div>`:''}
     ${mode==='mix'?`<div class="lk-mix"><select data-pa aria-label="Birinci tema">${TH.map(k=>`<option value="${k}"${(pal.a||'light')===k?' selected':''}>${esc(tn(k))}</option>`).join('')}</select>
       <input type="range" min="0" max="100" value="${pal.t??50}" data-pt aria-label="Karışım oranı" style="--a:${themeColors(pal.a||'light').bg};--b:${themeColors(pal.b||'dark').bg}">
-      <select data-pb aria-label="İkinci tema">${TH.map(k=>`<option value="${k}"${(pal.b||'dark')===k?' selected':''}>${esc(tn(k))}</option>`).join('')}</select></div>`:''}
-    <small>${mode==='own'?'Dört renkten bütün tonlar (ikincil yazı, çizgiler, cam) kendiliğinden türetilir.':mode==='mix'?'Kaydırıcıyla iki temanın zemin, yüzey, yazı ve vurgu renklerini istediğin oranda karıştır.':'Temanın kendi renkleri.'} Bütün uygulamalara geçer.</small></div>`;
+      <select data-pb aria-label="İkinci tema">${TH.map(k=>`<option value="${k}"${(pal.b||'dark')===k?' selected':''}>${esc(tn(k))}</option>`).join('')}</select></div>
+      <div class="lk-ideas" role="list" aria-label="Hazır karışımlar">${MIX_IDEAS.filter(m=>THEMES[m[1]]&&THEMES[m[2]]).map((m,i)=>{const o=palColors({mode:'mix',a:m[1],b:m[2],t:m[3]});const on=pal.a===m[1]&&pal.b===m[2]&&(pal.t??50)===m[3];return`<button role="listitem" data-mi="${i}" class="${on?'on':''}" aria-pressed="${on}"><span class="lk-dots">${palDots(o)}</span>${m[0]}</button>`}).join('')}<button data-mrnd title="Rastgele iki tema ve oran"><span class="lk-dice">🎲</span>Rastgele</button></div>`:''}
+    <small>${mode==='own'?'Dört renkten bütün tonlar türetilir. Ana renkten bütün paleti tek tıkla da üretebilirsin.':mode==='mix'?'İki tema seç, kaydırıcıyla oranı ayarla ya da hazır bir karışıma dokun. Yazı her zaman okunur kalır.':'Temanın kendi renkleri.'} Bütün uygulamalara geçer.</small></div>`;
   return colors+`<div class="ts-mo"><b>Vurgu rengi</b><div class="lk-sw" role="radiogroup" aria-label="Vurgu rengi">${LOOK_ACC.map(c=>`<button data-acc="${c}" role="radio" aria-checked="${(l.accent||'')===c}" class="${(l.accent||'')===c?'on':''}" style="--c:${c||'var(--ink4)'}" title="${c||'Temanın kendi rengi'}" aria-label="${c||'Temanın kendi rengi'}">${c?'':'A'}</button>`).join('')}<label class="lk-cu" title="Özel renk"><input type="color" data-accc value="${/^#/.test(l.accent||'')?l.accent:'#2563EB'}" aria-label="Özel vurgu rengi"></label></div></div>
     <div class="ts-mo"><b>Yazı tipi</b><div class="ts-seg lk-f" role="radiogroup" aria-label="Yazı tipi">${Object.entries(LOOK_FONTS).map(([k,[n]])=>`<button data-font="${k}" role="radio" aria-checked="${(l.font||'')===k}" class="${(l.font||'')===k?'on':''}">${n.split(' (')[0]}</button>`).join('')}</div><small>Seçimin hub'a ve bütün uygulamalara anında geçer.</small></div>
     <div class="ts-mo"><b>Görünüm profilleri</b><div class="lk-p">${P.map((p,i)=>`<span class="lk-pi"><button data-prof="${i}" title="Uygula">${esc(p.name)}</button><button data-pdel="${i}" aria-label="${esc(p.name)} profilini sil" title="Sil">${XI}</button></span>`).join('')}<button class="lk-add" data-psave>+ Şu anki görünümü kaydet</button><button class="lk-add" data-preset>Varsayılana dön</button></div><small>Profil; temayı, animasyonu, vurgu rengini, yazı tipini ve arayüz dünyasını birlikte saklar.</small></div>`}
@@ -1134,6 +1154,10 @@ function themeStudio(){if(tsEl)return;const saved=document.documentElement.datas
     const m=e.target.closest('[data-mo]');if(m){applyMotion(m.dataset.mo);tsEl.querySelectorAll('[data-mo]').forEach(x=>{x.classList.toggle('on',x===m);x.setAttribute('aria-checked',x===m)});return}
     const ac=e.target.closest('[data-acc]');if(ac){setLook({accent:ac.dataset.acc});$('#lookBox').innerHTML=lookHTML();return}
     const fo=e.target.closest('[data-font]');if(fo){setLook({font:fo.dataset.font});$('#lookBox').innerHTML=lookHTML();return}
+    const mi=e.target.closest('[data-mi]');if(mi){const m=MIX_IDEAS[+mi.dataset.mi];setPal({mode:'mix',a:m[1],b:m[2],t:m[3]});$('#lookBox').innerHTML=lookHTML();toast(`“${m[0]}” karışımı`);return}
+    if(e.target.closest('[data-mrnd]')){const K=Object.keys(THEMES),a=K[Math.floor(Math.random()*K.length)];let b=a;while(b===a)b=K[Math.floor(Math.random()*K.length)];const t=25+Math.round(Math.random()*50);setPal({mode:'mix',a,b,t});$('#lookBox').innerHTML=lookHTML();toast(`${THEMES[a].n} + ${THEMES[b].n} · %${t} — beğendiysen “Şu anki görünümü kaydet”`);return}
+    const pg=e.target.closest('[data-pgen]');if(pg){const base=tsEl.querySelector('[data-pbase]').value;setPal({mode:'own',own:palFromBase(base,pg.dataset.pgen==='1')});$('#lookBox').innerHTML=lookHTML();return}
+    if(e.target.closest('[data-pimg]')){tsEl.querySelector('[data-pfile]').click();return}
     const pm=e.target.closest('[data-pm]');if(pm){const m=pm.dataset.pm;if(m==='own'&&!(store.get('appshell:look',{}).pal?.own))setPal({mode:m,own:themeColors(document.documentElement.dataset.theme||'light')});else setPal({mode:m});$('#lookBox').innerHTML=lookHTML();return}
     if(e.target.closest('[data-psave]')){const n=prompt('Profil adı',`Profil ${store.get('appshell:profiles',[]).length+1}`);if(!n)return;const P=store.get('appshell:profiles',[]);P.push({name:n.slice(0,30),...lookSnap()});store.set('appshell:profiles',P.slice(-12));$('#lookBox').innerHTML=lookHTML();toast(`“${n}” kaydedildi`);return}
     if(e.target.closest('[data-preset]')){store.set('appshell:look',{});applyLook({});applyMotion('full');setTheme('light');cur='light';$('#lookBox').innerHTML=lookHTML();tsEl.querySelectorAll('[data-mo]').forEach(x=>{x.classList.toggle('on',x.dataset.mo==='full')});toast('Varsayılan görünüme dönüldü');return}
@@ -1142,7 +1166,8 @@ function themeStudio(){if(tsEl)return;const saved=document.documentElement.datas
     if(e.target===tsEl||e.target.closest('[data-tsx]'))closeStudio()});
   tsEl.addEventListener('input',e=>{const t=e.target;if(t.matches('[data-accc]'))setLook({accent:t.value});
     else if(t.matches('[data-pc]')){const own={...(store.get('appshell:look',{}).pal?.own||{}),[t.dataset.pc]:t.value};setPal({own})}
-    else if(t.matches('[data-pt]'))setPal({t:+t.value});else if(t.matches('[data-pa]')){setPal({a:t.value});$('#lookBox').innerHTML=lookHTML()}else if(t.matches('[data-pb]')){setPal({b:t.value});$('#lookBox').innerHTML=lookHTML()}});tsEl.addEventListener('change',e=>{if(e.target.matches('[data-accc]'))$('#lookBox').innerHTML=lookHTML()});
+    else if(t.matches('[data-pt]'))setPal({t:+t.value});else if(t.matches('[data-pa]')){setPal({a:t.value});$('#lookBox').innerHTML=lookHTML()}else if(t.matches('[data-pb]')){setPal({b:t.value});$('#lookBox').innerHTML=lookHTML()}});tsEl.addEventListener('change',async e=>{if(e.target.matches('[data-accc]'))$('#lookBox').innerHTML=lookHTML();
+    if(e.target.matches('[data-pfile]')&&e.target.files[0]){try{const o=await palFromImage(e.target.files[0]);setPal({mode:'own',own:o});$('#lookBox').innerHTML=lookHTML();toast('Renkler fotoğraftan alındı — istersen tek tek düzenle')}catch{toast('Bu fotoğraf açılamadı')}}});
   tsEl.addEventListener('keydown',e=>{if(e.key==='Escape'){e.stopPropagation();closeStudio()}});setTimeout(()=>tsEl.querySelector('.tp.on')?.focus(),60)}
 function closeStudio(){if(!tsEl)return;const el=tsEl;tsEl=null;const want=store.get('appshell:theme',null);if(want&&document.documentElement.dataset.theme!==want)applyTheme(want);anim(el,[{opacity:1},{opacity:0}],{duration:160,easing:EASE}).finished.then(()=>el.remove(),()=>el.remove())}
 

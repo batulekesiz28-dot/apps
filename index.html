@@ -3028,7 +3028,7 @@ function paintOsBar(){const b=$('#osBar');if(!b||b.hidden)return;obTint();const 
   $('#obInd').innerHTML=I.join('')}
 setInterval(paintOsBar,15000);addEventListener('online',paintOsBar);addEventListener('offline',paintOsBar);
 
-function mountFrame(t){const f=document.createElement('iframe'),a=t.app;f.className='frame';f.title=a.name;f.setAttribute('allow','fullscreen; clipboard-write; autoplay; encrypted-media; picture-in-picture');f.hidden=true;
+function mountFrame(t){const f=document.createElement('iframe'),a=t.app;f.className='frame';f.title=a.name;f.setAttribute('allow','fullscreen; clipboard-write; autoplay; encrypted-media; picture-in-picture; microphone; local-network-access; local-network; loopback-network');f.hidden=true;
   if(a.kind==='draft'){f.setAttribute('sandbox','allow-scripts allow-forms allow-modals allow-popups allow-downloads allow-pointer-lock');t.blob=URL.createObjectURL(new Blob([a.html],{type:'text/html'}));f.src=t.blob}
   else f.src=bust(a.url);
   t.loading=true;f.addEventListener('load',()=>frameLoaded(t,f));W.el.appendChild(f);t.fr=f}

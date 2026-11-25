@@ -6029,5 +6029,42 @@
     "fix": "Yerel kopya anında, 10 sn'de açıklama + Bağlantıyı onar (Firestore önbelleğini temizler)"
    }
   ]
+ },
+ {
+  "at": "2026-11-25T20:46:51",
+  "change": "Yeni: Jarvis — kendi sesli asistanın. Bilgisayarında küçük bir program (baslat.bat) çalışır; “Google aç” gibi işleri anında yapar, karmaşık işlerde (YouTube Music'te yorum, randevu) Claude ile düşünüp adım adım yapar, yaptığını sohbette gösterir, geri alınamaz işlerde onay ister.",
+  "scores": {
+   "jarvis telefon": {
+    "before": null,
+    "after": 94
+   },
+   "jarvis masaüstü": {
+    "before": null,
+    "after": 94
+   }
+  },
+  "items": [
+   {
+    "app": "jarvis",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Onay kartındaki yazı ve “Onaylandı” notu soluktu",
+    "fix": "Biten kartın opaklığı kaldırıldı, zemin rengiyle ayrılıyor"
+   },
+   {
+    "app": "jarvis",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Telefonda üstteki düğmeler küçüktü",
+    "fix": "44px dokunma alanı"
+   },
+   {
+    "app": "jarvis",
+    "sev": "uyari",
+    "status": "kabul",
+    "text": "Program çalışmıyorken kurulum ekranı bütün sayfayı kaplıyor",
+    "fix": "Bilerek: bağlantı yokken yapılacak tek şey kurulum"
+   }
+  ]
  }
 ]

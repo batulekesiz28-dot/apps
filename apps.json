@@ -120,6 +120,14 @@
    "icon": "image",
    "color": "blue",
    "desc": "Fotoğraf galerisi: telefondan ve bilgisayardan fotoğraf yükle, çekim tarihine, yere ve türe göre (kamera, ekran görüntüsü, belge, kopyalar) kendiliğinden düzenlenir · albümler, favoriler, geçmişte bugün"
+  },
+  {
+   "slug": "jarvis",
+   "name": "Jarvis",
+   "icon": "spark",
+   "color": "violet",
+   "desc": "Sesli kişisel asistan: konuş ya da yaz; bilgisayarında uygulama ve site açar, tarayıcıda iş yapar (YouTube, takvim, randevu), alternatif yollar dener, yaptığı her adımı gösterir; geri alınamaz işlerde onay ister",
+   "ai": true
   }
  ]
 }

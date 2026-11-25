@@ -3,3 +3,10 @@ apps/arena/server/.env
 # test ekran görüntüleri (yanlışlıkla eklenmesin)
 apps/notlar/*.png
 extensions/*/_metadata/
+
+# Jarvis: kişisel ayarlar, anahtar, hafıza, tarayıcı profili (sadece kullanıcının bilgisayarında)
+jarvis/ayarlar.json
+jarvis/hafiza.json
+jarvis/tarayici-profili/
+jarvis/ekran/
+jarvis/.venv/

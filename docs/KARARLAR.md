@@ -80,6 +80,13 @@ Son güncelleme: 2026-11-15
 - Arka plan işleri (poster eşleştirme) bütün sayfayı değil sadece değişen kartı günceller.
 - `background-attachment:fixed` yok; uzun ızgaralarda `content-visibility:auto`.
 
+## Jarvis (sesli asistan)
+- İki yol: basit komutlar (site/uygulama aç, ses, medya, ekran görüntüsü, kilit, saat) yapay zekâsız ve anında; geri kalan her şey Claude ajanına gider (alternatif yol bulur).
+- Çekirdek kullanıcının bilgisayarında (`jarvis/jarvis.py`), arayüz AppShell'de (`apps/jarvis`); bağlantı sadece 127.0.0.1 + AppShell adresi + eşleştirme kodu.
+- Geri alınamaz işler (komut çalıştırma, gönder/yorum/satın al/sil/randevu onayla) kodda onaya bağlı — sadece isteme bırakılmaz.
+- Giriş gereken siteler için ayrı tarayıcı profili (Chrome ana profile dışarıdan bağlanmaya izin vermiyor).
+- Anahtar sadece bilgisayardaki `jarvis/ayarlar.json`'da; repoya girmez. Hız için varsayılan düşünme seviyesi düşük, Hızlı mod kapalı.
+
 ## Açık sorular (kullanıcı seçecek)
 Şu an soldaki “geçerli karar” uygulanıyor; kullanıcı aksini söylerse buraya işlenir.
 1. **Medya alt sekmeleri:** solda başlığın yanında (şu an) mı, ortada mı?

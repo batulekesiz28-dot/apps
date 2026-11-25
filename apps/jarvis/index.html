@@ -87,6 +87,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--j-acc);outline-
 .kc .b{flex:none}
 .seg.pv{display:grid;grid-template-columns:repeat(4,1fr);width:100%}.seg.pv button{height:auto;min-height:46px;padding:6px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;line-height:1.2}
 .seg.pv small{font-size:12px;font-weight:500;opacity:.75}
+.kerr{margin-top:10px;font-size:13.5px;line-height:1.5}
 .pvi{display:block;margin:8px 0 6px;font-size:12.5px;line-height:1.5;color:var(--j-ink3)}
 .ka{margin:-6px -8px -6px auto;padding:0 8px;min-height:32px;display:inline-flex;align-items:center;border-radius:8px;font-weight:500;color:var(--j-acc);text-decoration:none}.ka:hover{text-decoration:underline}
 .note2{margin-top:12px;font-size:12.5px;color:var(--j-ink3);line-height:1.5}
@@ -131,14 +132,14 @@ function connect(){clearTimeout(retryT);try{ws=new WebSocket(URL_WS)}catch{retur
   ws.onerror=()=>{}}
 function later(){clearTimeout(retryT);retryT=setTimeout(connect,Math.min(8000,1500+retry++*1000))}
 const send=m=>{if(ws&&ws.readyState===1){ws.send(JSON.stringify(m));return true}return false};
-const NEED='2026.11.25f',OLDMSG='Bilgisayarındaki Jarvis programı eski sürüm, Gemini’yi tanımıyor. Jarvis’in siyah penceresini kapat, masaüstündeki Jarvis’e çift tıkla: kendini güncelleyip açılır.';let updAsked=0;
+const NEED='2026.11.25h',OLDMSG='Bilgisayarındaki Jarvis programı eski sürüm, Gemini’yi tanımıyor. Jarvis’in siyah penceresini kapat, masaüstündeki Jarvis’e çift tıkla: kendini güncelleyip açılır.';let updAsked=0,pendKey=0;
 function setSt(s,t){const e=$('#st');e.dataset.s=s;e.querySelector('span').textContent=t}
 
 function on(m){
   if(m.t==='hello'){const tk=lsg('jarvis:token','');if(tk)send({t:'auth',token:tk});else send({t:'auth',token:''})}
   else if(m.t==='need_pair'){pairBad=!!m.bad;lss('jarvis:token','');showConn('pair')}
   else if(m.t==='paired'){lss('jarvis:token',m.token)}
-  else if(m.t==='ready'){ok=true;cfg=m;cfg.old=!('provider' in m);setSt('on',m.mock?'Bağlı · sahte mod':cfg.old?'Bağlı · güncelleme gerekli':'Bağlı');if(!cfg.old&&m.v&&m.v<NEED&&!updAsked){updAsked=1;send({t:'update'})}if(cfg.old)showSets();$('#conn').hidden=true;orb(busy?'think':'idle');if(!m.has_key)showSets(true);paintSets()}
+  else if(m.t==='ready'){ok=true;cfg=m;cfg.old=!('provider' in m);setSt('on',m.mock?'Bağlı · sahte mod':cfg.old?'Bağlı · güncelleme gerekli':'Bağlı');if(!cfg.old&&m.v&&m.v<NEED&&!updAsked){updAsked=1;send({t:'update'})}if(cfg.old)showSets();if(pendKey){const kc=(m.kcheck||{})[m.provider];if(!kc||kc[0]!=='wait'){pendKey=0;if(!kc||kc[0]==='ok')$('#sets').hidden=true}}$('#conn').hidden=true;orb(busy?'think':'idle');if(!m.has_key)showSets(true);paintSets()}
   else if(m.t==='quick'){const r=run(m.id);addStep(r,'qk',m.text+(m.ms!=null?` · ${m.ms} ms`:''),'ok');say(m.text);endRun(m.id)}
   else if(m.t==='note'){const r=run(m.id);let n=r.notes[m.nid??'n'];if(!n){n=r.notes[m.nid??'n']=addStep(r,'note','','')}n.querySelector('span').textContent=m.text}
   else if(m.t==='step'){const r=run(m.id);let s=r.steps[m.sid];if(!s){s=r.steps[m.sid]=addStep(r,'',m.label,m.state)}else{s.dataset.s=m.state;s.querySelector('span').textContent=m.label}}
@@ -241,10 +242,12 @@ const PV={gemini:{n:'Gemini',tag:'ücretsiz',key:'https://aistudio.google.com/ap
   openrouter:{n:'OpenRouter',tag:'ücretsiz',key:'https://openrouter.ai/keys',ph:'sk-or-…',info:'Ücretsiz modeller arasından uygun olanı seçer; hız ve kalite değişken.'},
   claude:{n:'Claude',tag:'ücretli',key:'https://console.anthropic.com/settings/keys',ph:'sk-ant-…',info:'En akıllısı; karmaşık işlerde en iyisi. Kullandıkça ücret alır.'}};
 function paintSets(firstKey){const c=$('#sets .card');if($('#sets').hidden)return;let nk='';try{nk=lsg('netlestir:key','')}catch{}
-  const p=cfg.provider||'gemini',P=PV[p],has=cfg.keys?cfg.keys[p]:cfg.has_key;
+  const p=cfg.provider||'gemini',P=PV[p],has=cfg.keys?cfg.keys[p]:cfg.has_key,kc=(cfg.kcheck||{})[p];
+  const kst=!has?'':!kc?' · kayıtlı ✓':kc[0]==='wait'?' · deneniyor…':kc[0]==='ok'?' · doğrulandı ✓':kc[0]==='bad'?' · reddedildi':' · kayıtlı';
   c.innerHTML=`<h2 id="sT">Ayarlar</h2>${cfg.old?`<p class="err oldv">${OLDMSG}</p>`:''}${firstKey&&!cfg.old?'<p>Jarvis\'in düşünmesi için bir yapay zekâ anahtarı gerekir. En kolayı <b>ücretsiz Gemini</b>: Google hesabınla anahtar al, buraya yapıştır.</p>':''}
     <div class="fld"><span>Yapay zekâ</span><div class="seg pv" role="group" aria-label="Yapay zekâ">${Object.entries(PV).map(([k,v])=>`<button data-pv="${k}" aria-pressed="${p===k}">${v.n}<small>${v.tag}</small></button>`).join('')}</div><small class="pvi">${P.info}${cfg.model&&p!=='claude'?` Şu an: ${esc(cfg.model)}.`:''}</small></div>
-    <label class="fld"><span>${P.n} anahtarı ${has?'· kayıtlı ✓':''}<a href="${P.key}" target="_blank" rel="noopener" class="ka">${p==='claude'?'Anahtar al':'Ücretsiz anahtar al'} ↗</a></span><input type="password" id="kIn" placeholder="${has?'değiştirmek için yeni anahtarı yapıştır':P.ph}" autocomplete="off"></label>
+    <label class="fld"><span>${P.n} anahtarı${kst}<a href="${P.key}" target="_blank" rel="noopener" class="ka">${p==='claude'?'Anahtar al':'Ücretsiz anahtar al'} ↗</a></span><input type="password" id="kIn" placeholder="${has?'değiştirmek için yeni anahtarı yapıştır':P.ph}" autocomplete="off"></label>
+    ${kc&&kc[0]==='bad'?`<p class="err kerr">${P.n} bu anahtarı kabul etmedi: ${esc(kc[1]||'geçersiz anahtar')}. Anahtarı yeniden kopyalayıp yapıştır (başında/sonunda boşluk kalmasın) ya da yeni anahtar oluştur.</p>`:kc&&kc[0]==='?'?`<p class="pvi">Anahtar kaydedildi ama şu an denenemedi (${esc(kc[1])}). Bir şey sorunca tekrar denenir.</p>`:''}
     ${p==='claude'&&nk&&!has?'<button class="b" id="kN" style="margin-top:8px">Netleştir’deki anahtarı kullan</button>':''}
     <div class="fld"><span>Düşünme</span><div class="seg" role="group" aria-label="Düşünme derinliği">${[['low','Hızlı'],['medium','Dengeli'],['high','Derin']].map(([k,l])=>`<button data-ef="${k}" aria-pressed="${cfg.effort===k}">${l}</button>`).join('')}</div></div>
     ${p==='claude'?`<div class="tg"><span>Hızlı mod<small>Claude yaklaşık 2 kat hızlı yazar, ücreti 2 katı.</small></span><button class="sw" id="fS" role="switch" aria-checked="${!!cfg.fast}" aria-label="Hızlı mod"></button></div>`:''}
@@ -255,7 +258,7 @@ function paintSets(firstKey){const c=$('#sets .card');if($('#sets').hidden)retur
   c.querySelectorAll('[data-ef]').forEach(b=>b.onclick=()=>send({t:'set',effort:b.dataset.ef}));
   $('#fS')?.addEventListener('click',()=>send({t:'set',fast:!cfg.fast}));
   $('#nw').onclick=()=>{send({t:'new'});lss('jarvis:log',[]);empty();$('#sets').hidden=true};
-  $('#sOk').onclick=()=>{const k=$('#kIn').value.trim();if(k)send({t:'set',kp:p,key:k});$('#sets').hidden=true}}
+  $('#sOk').onclick=()=>{const k=$('#kIn').value.trim();if(k&&!cfg.old&&cfg.kcheck){pendKey=1;$('#sOk').textContent='Deneniyor…';send({t:'set',kp:p,key:k})}else{if(k)send({t:'set',kp:p,key:k});$('#sets').hidden=true}}}
 for(const id of['#conn','#sets'])$(id).addEventListener('click',e=>{if(e.target.id===id.slice(1)&&ok)$(id).hidden=true});
 addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('#sets').hidden){$('#sets').hidden=true;e.stopImmediatePropagation()}else if(!$('#conn').hidden&&ok){$('#conn').hidden=true}}},true);
 

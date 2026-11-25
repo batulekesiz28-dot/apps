@@ -29,7 +29,8 @@ try:
 except Exception:
     pass
 
-VERSION = "2026.11.25g"
+VERSION = "2026.11.25h"
+UA = "Jarvis/" + VERSION  # bazı servisler (Cloudflare arkasındakiler) Python'un varsayılan kimliğini engelliyor
 ROOT = pathlib.Path(__file__).resolve().parent
 CFG = ROOT / "ayarlar.json"
 MEM = ROOT / "hafiza.json"
@@ -1019,7 +1020,7 @@ class ApiErr(Exception):
 
 def _sse(url, headers, body, put, stop):
     """İş parçacığında çalışır: isteği gönderir, gelen her SSE olayını put() ile döngüye aktarır."""
-    req = urllib.request.Request(url, data=json.dumps(body).encode(), method="POST", headers={"content-type": "application/json", "accept": "text/event-stream", **headers})
+    req = urllib.request.Request(url, data=json.dumps(body).encode(), method="POST", headers={"content-type": "application/json", "accept": "text/event-stream", "user-agent": UA, **headers})
     op = LOCAL if urllib.parse.urlparse(url).hostname in ("127.0.0.1", "localhost") else urllib.request.build_opener()
     try:
         r = op.open(req, timeout=120)
@@ -1246,9 +1247,9 @@ def rank_models(p, ids):
 
 def _models_http(p, key):
     if p == "gemini":
-        req = urllib.request.Request(oa_base(p) + "models?pageSize=200", headers={"x-goog-api-key": key})
+        req = urllib.request.Request(oa_base(p) + "models?pageSize=200", headers={"x-goog-api-key": key, "user-agent": UA})
     else:
-        req = urllib.request.Request(oa_base(p) + "models", headers={"authorization": f"Bearer {key}"})
+        req = urllib.request.Request(oa_base(p) + "models", headers={"authorization": f"Bearer {key}", "user-agent": UA})
     op = LOCAL if urllib.parse.urlparse(req.full_url).hostname in ("127.0.0.1", "localhost") else urllib.request.build_opener()
     with op.open(req, timeout=8) as r:
         j = json.loads(r.read())
@@ -1257,19 +1258,63 @@ def _models_http(p, key):
     return [m.get("id", "") for m in j.get("data", [])]
 
 
+def key_err(e):
+    """Model listesi hatası → ("bad", sebep) anahtar reddedildi / ("?", sebep) anahtarla ilgisiz (ağ, güvenlik duvarı)."""
+    try:
+        raw = (e.read() or b"").decode("utf-8", "replace")
+    except Exception:
+        raw = ""
+    try:
+        j = json.loads(raw); j = j[0] if isinstance(j, list) and j else j
+        err = j.get("error", j) if isinstance(j, dict) else {}
+        msg = str(err.get("message") or "") if isinstance(err, dict) else str(err)
+    except Exception:
+        j, msg = None, ""
+    if e.code in (400, 401) or (e.code == 403 and j is not None and not re.search(r"1010|cloudflare", raw, re.I)):
+        return "bad", (msg or raw)[:300] + (" ACCESS_TOKEN_TYPE_UNSUPPORTED" if "ACCESS_TOKEN_TYPE" in raw else "")
+    return "?", f"sunucu {e.code} döndü" + (" (güvenlik duvarı engeli)" if re.search(r"1010|cloudflare|<html", raw, re.I) else "")
+
+
+KCHK = {}  # sağlayıcı → [durum ok|bad|?|wait, sebep]
+
+
+async def check_key(p):
+    """Kaydedilen anahtarı hemen dene (model listesi; ücretsiz, kota yemez)."""
+    if p == "claude" or not key_of(p):
+        KCHK.pop(p, None); return
+    KCHK[p] = ["wait", ""]
+    try:
+        ids = await asyncio.get_running_loop().run_in_executor(None, _models_http, p, key_of(p))
+        MODELS[p] = (time.time(), rank_models(p, ids)); KCHK[p] = ["ok", ""]
+    except urllib.error.HTTPError as e:
+        KCHK[p] = list(key_err(e))
+    except Exception as e:
+        KCHK[p] = ["?", f"bağlanılamadı ({str(e)[:80]})"]
+
+
+def key_kind(k):
+    """Anahtarın biçiminden hangi servise ait olduğunu anla (yanlış sekmeye yapıştırılsa da doğru yere gitsin)."""
+    if k.startswith("gsk_"):
+        return "groq"
+    if k.startswith("sk-or-"):
+        return "openrouter"
+    if k.startswith("sk-ant-"):
+        return "claude"
+    if k.startswith(("AIza", "AQ.")):
+        return "gemini"
+    return None
+
+
 async def model_list(p, key):
     at, L = MODELS.get(p, (0, None))
     if not L or time.time() - at > 6 * 3600:
         try:
             ids = await asyncio.get_running_loop().run_in_executor(None, _models_http, p, key)
         except urllib.error.HTTPError as e:
-            if e.code in (400, 401, 403):
-                try:
-                    why = (e.read() or b"").decode("utf-8", "replace")[:800]  # ayrıntılar (ör. ACCESS_TOKEN_TYPE_UNSUPPORTED) da içinde
-                except Exception:
-                    why = ""
+            st, why = key_err(e)
+            if st == "bad":
                 raise ApiErr(401, "auth", "anahtar geçersiz " + why)
-            ids = []
+            ids = []  # anahtarla ilgisiz (ağ/güvenlik duvarı): varsayılan modellerle dene
         except Exception:
             ids = []
         L = rank_models(p, ids); MODELS[p] = (time.time(), L)
@@ -1583,9 +1628,14 @@ async def handle_say(sess: Session, rid, text):
 
 
 # ───────────────────────── sunucu ─────────────────────────
+async def check_then_ready(sess, p):
+    await check_key(p)
+    await send_ready(sess)
+
+
 async def send_ready(sess):
     p = prov()
-    await sess.send(t="ready", provider=p, has_key=bool(key_of(p)), keys={k: bool(key_of(k)) for k in PROVS}, model=sess.model,
+    await sess.send(t="ready", provider=p, has_key=bool(key_of(p)), keys={k: bool(key_of(k)) for k in PROVS}, model=sess.model, kcheck=KCHK,
                     effort=cfg["effort"], fast=cfg["fast"], os=OS, mock=MOCK, v=VERSION)
 
 
@@ -1632,11 +1682,18 @@ async def handler(ws):
             if m.get("provider") in PROVS:
                 cfg["provider"] = m["provider"]
             kp = m.get("kp") if m.get("kp") in PROVS else prov()
-            kv = m.get("key").strip() if isinstance(m.get("key"), str) else ""
+            kv = re.sub(r"\s+", "", m.get("key")) if isinstance(m.get("key"), str) else ""
+            kv = kv.strip("\"'")
+            if kv and key_kind(kv):
+                kp = key_kind(kv); cfg["provider"] = kp  # biçimden servis belli: oraya kaydet ve onu seç
+            saved = None
             if kv and kp == "claude" and kv.startswith("sk-"):
-                cfg["api_key"] = kv
+                cfg["api_key"] = kv; saved = kp
             elif kv and kp != "claude" and 10 < len(kv) < 300:
-                cfg["keys"][kp] = kv; MODELS.pop(kp, None)
+                cfg["keys"][kp] = kv; MODELS.pop(kp, None); saved = kp
+            if saved and saved != "claude":
+                KCHK[saved] = ["wait", ""]
+                asyncio.create_task(check_then_ready(sess, saved))
             if m.get("effort") in ("low", "medium", "high", "xhigh"):
                 cfg["effort"] = m["effort"]
             if "fast" in m:

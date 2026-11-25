@@ -6179,5 +6179,42 @@
     "fix": "Gemini kendi yolundan (x-goog-api-key) bağlanıyor"
    }
   ]
+ },
+ {
+  "at": "2026-11-25T22:28:24",
+  "change": "Jarvis: Groq anahtarı reddediliyordu. Groq'un güvenlik duvarı Python'un varsayılan kimliğini engelliyordu, Jarvis bunu yanlışlıkla “anahtar geçersiz” sanıyordu; düzeldi. Anahtar hangi sekmeye yapıştırılırsa yapıştırılsın biçiminden tanınıp doğru yere kaydediliyor ve kaydedince hemen deneniyor (doğrulandı ✓ / reddedildi + sebep).",
+  "scores": {
+   "jarvis telefon": {
+    "before": 94,
+    "after": 94
+   },
+   "jarvis masaüstü": {
+    "before": 94,
+    "after": 94
+   }
+  },
+  "items": [
+   {
+    "app": "jarvis",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Groq anahtarı “geçersiz” deniyordu",
+    "fix": "İsteklere Jarvis kimliği eklendi; güvenlik duvarı engeli anahtar hatası sayılmıyor"
+   },
+   {
+    "app": "jarvis",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Başka sekme açıkken yapıştırılan anahtar yanlış servise kaydoluyordu",
+    "fix": "Anahtar biçiminden servis tanınıyor (gsk_ → Groq, AIza/AQ. → Gemini, sk-or- → OpenRouter, sk-ant- → Claude)"
+   },
+   {
+    "app": "jarvis",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Anahtarın çalışıp çalışmadığı belli değildi",
+    "fix": "Kaydedince hemen deneniyor, sonuç etikette"
+   }
+  ]
  }
 ]

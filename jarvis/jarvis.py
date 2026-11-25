@@ -29,7 +29,7 @@ try:
 except Exception:
     pass
 
-VERSION = "2026.11.25f"
+VERSION = "2026.11.25g"
 ROOT = pathlib.Path(__file__).resolve().parent
 CFG = ROOT / "ayarlar.json"
 MEM = ROOT / "hafiza.json"
@@ -1570,7 +1570,10 @@ async def handle_say(sess: Session, rid, text):
                    429: f"{n} ücretsiz kullanım sınırı doldu; biraz sonra tekrar dene ya da Ayarlar'dan başka ücretsiz sağlayıcı seç."
                    if prov() != "claude" else "Çok sık istek; birkaç saniye sonra tekrar dene.",
                    529: f"{n} şu an çok yoğun; biraz sonra tekrar dene."}.get(e.status, f"{n} hatası ({e.status}): {e}")
-            if e.status == 400 and re.search(r"credit|balance", str(e), re.I):
+            if prov() == "openrouter" and e.status in (402, 403) and re.search(r"limit|credit|balance|key", str(e), re.I):
+                msg = ("OpenRouter anahtarın harcama sınırı yüzünden reddetti. Jarvis orada sadece ücretsiz modelleri kullanır; "
+                       "anahtarın sınırını boş bırak ya da 0,01 $ yap (hesabına para yüklemediysen zaten çekilemez).")
+            elif e.status == 400 and re.search(r"credit|balance", str(e), re.I):
                 msg = "Anthropic hesabında kredi kalmamış."
         elif isinstance(e, (urllib.error.URLError, ConnectionError, TimeoutError)):
             msg = "İnternete ya da Claude'a bağlanılamadı."

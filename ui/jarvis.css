@@ -1,0 +1,24 @@
+/* Jarvis paneli (ui/jarvis.js) — hub'ın her yerinden açılır; kenar ışığı Jarvis'in durumunu gösterir */
+@property --jva { syntax: '<angle>'; inherits: false; initial-value: 0deg }
+.jv { position: fixed; right: 16px; bottom: 16px; z-index: 115; width: min(400px, calc(100vw - 32px)); height: min(620px, calc(100dvh - 96px));
+  border-radius: 26px; transform-origin: 85% 100% }
+.jv[hidden] { display: none }
+.jv-in { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; background: #07080C;
+  box-shadow: 0 30px 90px -24px rgba(0, 0, 0, .7), inset 0 0 0 1px rgba(255, 255, 255, .08) }
+.jv-in iframe { width: 100%; height: 100%; border: 0; display: block; background: #07080C; color-scheme: dark }
+/* kenar ışığı: boştayken sönük, dinlerken/düşünürken/konuşurken dönen renkli hale */
+.jv-glow { position: absolute; inset: -2px; border-radius: 28px; padding: 2px; pointer-events: none;
+  background: conic-gradient(from var(--jva), #6EC1FF, #9B8CFF, #FF7AC6, #FFB86B, #6EC1FF);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+  opacity: .28; transition: opacity .4s; filter: saturate(1.1) }
+.jv-glow::after { content: ''; position: absolute; inset: -14px; border-radius: 40px; background: inherit; filter: blur(22px); opacity: 0; transition: opacity .4s; z-index: -1 }
+.jv:is([data-s=listen], [data-s=think], [data-s=speak]) .jv-glow { opacity: 1; animation: jvSpin 3.2s linear infinite }
+.jv:is([data-s=listen], [data-s=think], [data-s=speak]) .jv-glow::after { opacity: .55 }
+.jv[data-s=listen] .jv-glow { animation-duration: 1.6s }
+.jv[data-s=off] .jv-glow { opacity: .12 }
+@keyframes jvSpin { to { --jva: 360deg } }
+@media (prefers-reduced-motion: reduce) { .jv .jv-glow { animation: none !important } }
+html[data-motion=off] .jv .jv-glow { animation: none !important }
+@media (max-width: 600px) {
+  .jv { left: 8px; right: 8px; bottom: 8px; width: auto; height: min(72dvh, calc(100dvh - 72px)); border-radius: 24px; transform-origin: 50% 100% }
+}

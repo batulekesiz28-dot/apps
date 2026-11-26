@@ -29,12 +29,13 @@ try:
 except Exception:
     pass
 
-VERSION = "2026.11.25h"
+VERSION = "2026.11.26a"
 UA = "Jarvis/" + VERSION  # bazı servisler (Cloudflare arkasındakiler) Python'un varsayılan kimliğini engelliyor
 ROOT = pathlib.Path(__file__).resolve().parent
 CFG = ROOT / "ayarlar.json"
 MEM = ROOT / "hafiza.json"
 SHOTS = ROOT / "ekran"
+ARAC = ROOT / "araclar"  # Jarvis'in kendi yazdığı araçlar (onayınla kaydedilir)
 PORT = 8765
 CDP_PORT = 9223
 OS = platform.system()  # Windows | Darwin | Linux
@@ -799,6 +800,8 @@ Nasıl çalışırsın:
 - Bir yol olmazsa pes etme, alternatif düşün: başka bir sayfa, başka bir uygulama, kısayol tuşu, arama. Örnek: YouTube Music'te yorum özelliği yoksa aynı şarkının YouTube videosunu bul ve yorumu oraya yaz.
 - Bilgi soruları için web_search kullan; kısa ve kesin cevap ver.
 - Yapmadığın bir şeyi yaptım deme; işlemden sonra sayfaya/ekrana bakıp doğrula.
+- Bir sayfanın içeriğini okumak için (tıklamadan) fetch_page en hızlısıdır; etkileşim gerekiyorsa browser_*.
+- Bir iş için uygun aracın yoksa “yapamam” deme: bir kerelik işler için run_python ile Python yaz; tekrar işe yarayacaksa create_tool ile kendine kalıcı bir araç yaz (sadece Python standart kütüphanesi; def run(...) -> str). Araç hata verirse düzeltip create_tool ile yeniden kaydet.
 
 Geri alınamaz işler: gönderme, yayınlama, yorum/mesaj gönderme, satın alma, ödeme, silme, randevu/rezervasyon onaylama, komut çalıştırma. Bunlarda araç kullanıcıdan otomatik onay ister; sen sadece ne yapacağını net söyle (ör. yorumun tam metni). Kullanıcı reddederse başka yol dene ya da sor.
 
@@ -835,8 +838,115 @@ TOOLS = [
       {"text": S, "when": {"type": "string", "description": "yerel saatle ISO tarih-saat, ör. 2026-11-26T09:00"}}, ["text", "when"]),
     T("remember", "Kullanıcı hakkında kalıcı bir bilgiyi hatırla (tercih, kişi, alışkanlık).", {"fact": S}, ["fact"]),
     T("wait", "Birkaç saniye bekle (sayfa/uygulama yüklenirken).", {"seconds": {"type": "number"}}, ["seconds"]),
+    T("fetch_page", "Bir web sayfasını tarayıcı açmadan hızlıca oku: başlık + düz yazı (en çok ~8000 karakter). Bilgi toplamak için browser_go'dan çok daha hızlı.", {"url": S}, ["url"]),
+    T("run_python", "Bilgisayarda Python kodu çalıştır (bir kerelik hesap, dosya işi, sistem bilgisi, veri dönüştürme…). Sadece standart kütüphane. Kullanıcı onayı istenir. print edilen çıktıyı döndürür.",
+      {"code": S, "why": {"type": "string", "description": "kullanıcıya gösterilecek kısa sebep"}}, ["code", "why"]),
+    T("create_tool", "Kendine KALICI yeni bir araç yaz (kullanıcı onaylayınca kaydedilir, sonraki konuşmalarda da hazır olur). Kod sadece Python standart kütüphanesini kullanır ve "
+      "params'taki alanları anahtar kelime olarak alan bir def run(...) fonksiyonu tanımlar; sonucu metin olarak döndürür. Aynı adla yeniden çağırmak aracı günceller.",
+      {"name": {"type": "string", "description": "küçük harf, rakam, alt çizgi; ör. hava_durumu"}, "description": {"type": "string", "description": "aracın ne yaptığı (model bunu okuyup ne zaman kullanacağına karar verir)"},
+       "params": {"type": "string", "description": "parametreler JSON metni olarak: {\"ad\": {\"type\": \"string|integer|number|boolean\", \"description\": \"…\"}}; parametre yoksa {}"}, "required": {"type": "array", "items": {"type": "string"}},
+       "code": {"type": "string", "description": "Python kaynak kodu; def run(**params) içermeli"}}, ["name", "description", "code"]),
+    T("delete_tool", "Daha önce yazdığın bir aracı sil.", {"name": S}, ["name"]),
 ]
 SCHEMA = {t["name"]: t["input_schema"] for t in TOOLS if "input_schema" in t}
+BUILTIN = set(SCHEMA) | {"web_search"}
+CUSTOM = {}  # ad → {description, schema, path}
+
+
+def clean_schema(x):
+    """Modelin yazdığı şemayı bütün sağlayıcıların kabul ettiği sade biçime indir (Gemini bilinmeyen alanlarda hata verir)."""
+    if not isinstance(x, dict):
+        return {"type": "string"}
+    t = x.get("type") if x.get("type") in ("string", "integer", "number", "boolean", "array", "object") else "string"
+    o = {"type": t}
+    if isinstance(x.get("description"), str):
+        o["description"] = x["description"][:300]
+    if isinstance(x.get("enum"), list) and t == "string":
+        o["enum"] = [str(v) for v in x["enum"]][:30]
+    if t == "array":
+        o["items"] = clean_schema(x.get("items") or {"type": "string"})
+    if t == "object":
+        props = {str(k)[:40]: clean_schema(v) for k, v in (x.get("properties") or {}).items()}
+        if not props:  # alt alanı olmayan nesne bazı sağlayıcılarda reddediliyor → JSON metni
+            return {"type": "string", "description": (o.get("description", "") + " (JSON metni)").strip()}
+        o["properties"] = props
+    return o
+
+
+def load_custom():
+    CUSTOM.clear()
+    if not ARAC.exists():
+        return
+    for f in sorted(ARAC.glob("*.py")):
+        try:
+            head = f.read_text("utf-8").split("\n", 1)[0]
+            meta = json.loads(head.split("JARVIS_ARAC", 1)[1]) if "JARVIS_ARAC" in head else None
+            if meta and re.match(r"^[a-z][a-z0-9_]{2,40}$", meta.get("name", "")) and meta["name"] not in BUILTIN:
+                sc = {"type": "object", "properties": {k: clean_schema(v) for k, v in (meta.get("params") or {}).items()},
+                      "required": [r for r in meta.get("required") or [] if r in (meta.get("params") or {})]}
+                CUSTOM[meta["name"]] = {"description": str(meta.get("description", ""))[:900], "schema": sc, "path": f}
+                SCHEMA[meta["name"]] = sc
+        except Exception as e:
+            log("araç yüklenemedi:", f.name, e)
+
+
+def custom_tools():
+    """Claude biçiminde özel araçlar (yerleşiklerin arkasına eklenir)."""
+    return [{"name": n, "description": "[Senin yazdığın araç] " + c["description"], "eager_input_streaming": True, "input_schema": c["schema"]} for n, c in CUSTOM.items()]
+
+
+RUNNER = r"""
+import json, sys, io, contextlib, importlib.util
+p = sys.argv[1]; a = json.loads(sys.stdin.read() or "{}")
+buf = io.StringIO()
+try:
+    with contextlib.redirect_stdout(buf):
+        spec = importlib.util.spec_from_file_location("arac", p); m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+        r = m.run(**a)
+    out = {"ok": True, "result": r if isinstance(r, (str, int, float, bool, list, dict, type(None))) else str(r), "print": buf.getvalue()[-3000:]}
+except Exception as e:
+    import traceback
+    out = {"ok": False, "error": traceback.format_exc()[-2500:], "print": buf.getvalue()[-1500:]}
+sys.stdout.write("\x00JARVIS" + json.dumps(out, ensure_ascii=False, default=str))
+"""
+
+
+def run_custom(name, args):
+    c = CUSTOM[name]
+    r = subprocess.run([sys.executable, "-X", "utf8", "-c", RUNNER, str(c["path"])], input=json.dumps(args, ensure_ascii=False),
+                       capture_output=True, text=True, timeout=90, encoding="utf-8", errors="replace", cwd=str(ROOT))
+    raw = (r.stdout or "").split("\x00JARVIS")
+    try:
+        o = json.loads(raw[-1])
+    except Exception:
+        raise RuntimeError(("araç çıktı vermedi\n" + (r.stderr or r.stdout or ""))[-2000:])
+    if not o.get("ok"):
+        raise RuntimeError("araç hata verdi (düzeltip create_tool ile yeniden kaydedebilirsin):\n" + o.get("error", ""))
+    res = o.get("result")
+    res = res if isinstance(res, str) else json.dumps(res, ensure_ascii=False, default=str)
+    return ((o.get("print") or "") + "\n" + res).strip()[-8000:] or "(boş sonuç)"
+
+
+def fetch_page(url):
+    if not re.match(r"^https?://", url):
+        url = "https://" + url
+    req = urllib.request.Request(url, headers={"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36",
+                                               "accept-language": "tr-TR,tr;q=0.9,en;q=0.7"})
+    with urllib.request.urlopen(req, timeout=15) as r:
+        ct = r.headers.get("content-type", ""); raw = r.read(3_000_000)
+        cs = (re.search(r"charset=([\w-]+)", ct) or [None, "utf-8"])[1]
+    txt = raw.decode(cs, "replace")
+    if "html" not in ct and not re.search(r"<html|<body", txt[:2000], re.I):
+        return txt[:8000]
+    title = htmlmod.unescape((re.search(r"<title[^>]*>(.*?)</title>", txt, re.S | re.I) or [None, ""])[1]).strip()
+    body = re.sub(r"(?is)<(script|style|noscript|svg|head)[^>]*>.*?</\1>", " ", txt)
+    body = re.sub(r"(?i)<(br|p|div|li|h[1-6]|tr)[^>]*>", "\n", body)
+    body = htmlmod.unescape(re.sub(r"<[^>]+>", " ", body))
+    body = re.sub(r"[ \t\r\f\v]+", " ", body); body = re.sub(r"\n\s*\n+", "\n", body).strip()
+    return f"Başlık: {title}\nAdres: {url}\n\n{body[:8000]}"
+
+
+load_custom()
 
 
 class Session:
@@ -981,6 +1091,50 @@ async def run_tool(sess: Session, rid, name, a):
     if name == "wait":
         await asyncio.sleep(min(10.0, max(0.2, float(a.get("seconds", 1)))))
         return "Beklendi."
+    if name == "fetch_page":
+        return await loop.run_in_executor(None, fetch_page, a["url"])
+    if name == "run_python":
+        if not sess.allow_cmd:
+            if not await sess.ask(rid, "Bu Python kodu çalıştırılsın mı?", f"{a.get('why', '')}\n\n{a['code'][:2500]}"):
+                return "Kullanıcı onaylamadı; çalıştırılmadı."
+        if MOCK:
+            return "(sahte) çıktı"
+
+        def runpy():
+            r = subprocess.run([sys.executable, "-X", "utf8", "-c", a["code"]], capture_output=True, text=True, timeout=120, encoding="utf-8", errors="replace", cwd=str(pathlib.Path.home()))
+            return (f"çıkış kodu {r.returncode}\n" + (r.stdout or "") + (("\nHATA:\n" + r.stderr) if r.stderr else ""))[-6000:]
+        return await loop.run_in_executor(None, runpy)
+    if name == "create_tool":
+        n = str(a["name"]).strip().lower()
+        if not re.match(r"^[a-z][a-z0-9_]{2,40}$", n) or n in BUILTIN:
+            raise ValueError("ad: küçük harf/rakam/alt çizgi, 3–40 karakter ve yerleşik araçlardan farklı olmalı")
+        if not re.search(r"def\s+run\s*\(", a["code"]):
+            raise ValueError("kod def run(...) fonksiyonu tanımlamalı")
+        compile(a["code"], n + ".py", "exec")
+        upd = n in CUSTOM
+        if not await sess.ask(rid, f"Jarvis kendine {'aracı güncellesin' if upd else 'yeni araç eklesin'} mi: {n}?", f"{a['description']}\n\n{a['code'][:2500]}"):
+            return "Kullanıcı onaylamadı; araç kaydedilmedi."
+        pr = a.get("params") or {}
+        if isinstance(pr, str):
+            try:
+                pr = json.loads(pr or "{}")
+            except ValueError:
+                raise ValueError("params geçerli JSON değil")
+        if not isinstance(pr, dict):
+            raise ValueError("params bir JSON nesnesi olmalı")
+        meta = {"name": n, "description": str(a["description"])[:900], "params": pr, "required": a.get("required") or []}
+        ARAC.mkdir(exist_ok=True)
+        (ARAC / f"{n}.py").write_text("# JARVIS_ARAC " + json.dumps(meta, ensure_ascii=False) + "\n" + a["code"], "utf-8")
+        load_custom()
+        return f"“{n}” aracı {'güncellendi' if upd else 'kaydedildi'}; artık kullanabilirsin (hemen dene)."
+    if name == "delete_tool":
+        n = str(a["name"]).strip().lower()
+        if n not in CUSTOM:
+            raise ValueError(f"böyle bir araç yok. Var olanlar: {', '.join(CUSTOM) or 'yok'}")
+        CUSTOM[n]["path"].unlink(missing_ok=True); load_custom()
+        return f"“{n}” silindi."
+    if name in CUSTOM:
+        return await loop.run_in_executor(None, run_custom, name, a)
     raise RuntimeError(f"Bilinmeyen araç: {name}")
 
 
@@ -988,11 +1142,16 @@ LABEL = {"open_target": "Açılıyor", "web_search": "İnternette aranıyor", "b
          "browser_click": "Tıklanıyor", "browser_type": "Yazılıyor", "browser_keys": "Tuşa basılıyor", "screenshot": "Ekrana bakılıyor",
          "click": "Tıklanıyor", "type_text": "Yazılıyor", "press_keys": "Tuşa basılıyor", "run_command": "Komut çalıştırılıyor",
          "list_files": "Dosyalara bakılıyor", "read_file": "Dosya okunuyor", "appshell_reminder": "Hatırlatıcı kuruluyor",
-         "remember": "Not alınıyor", "wait": "Bekleniyor"}
+         "remember": "Not alınıyor", "wait": "Bekleniyor", "fetch_page": "Sayfa okunuyor", "run_python": "Python çalıştırılıyor",
+         "create_tool": "Kendine araç yazıyor", "delete_tool": "Araç siliniyor"}
 
 
 def step_label(name, a):
-    d = a.get("target") or a.get("url") or a.get("text") or a.get("keys") or a.get("command") or a.get("path") or a.get("fact") or ""
+    d = a.get("target") or a.get("url") or a.get("text") or a.get("keys") or a.get("command") or a.get("path") or a.get("fact") or a.get("why") or ""
+    if name in ("create_tool", "delete_tool"):
+        d = a.get("name", "")
+    elif name in CUSTOM:
+        return f"Araç: {name}"
     if name == "browser_click":
         d = f"#{a.get('id')}"
     d = str(d).replace("\n", " ")
@@ -1068,7 +1227,10 @@ async def sse_stream(url, headers, body):
     threading.Thread(target=run, daemon=True).start()
     try:
         while True:
-            x = await q.get()
+            try:
+                x = await asyncio.wait_for(q.get(), 45)
+            except asyncio.TimeoutError:
+                raise TimeoutError("yanıt 45 sn gecikti")
             if x is END:
                 return
             if isinstance(x, BaseException):
@@ -1161,7 +1323,7 @@ async def agent(sess: Session, rid, text):
     sess.n0 = len(sess.hist)
     sess.hist.append({"role": "user", "content": [{"type": "text", "text": context_note() + "\n" + text}]})
     for _turn in range(40):
-        body = {"model": MODEL, "max_tokens": 16000, "system": SYSTEM, "tools": TOOLS, "messages": sess.hist, "stream": True,
+        body = {"model": MODEL, "max_tokens": 16000, "system": SYSTEM, "tools": TOOLS + custom_tools(), "messages": sess.hist, "stream": True,
                 "thinking": {"type": "adaptive", "display": "updates"}, "output_config": {"effort": cfg.get("effort", "low")},
                 "fallbacks": "default", "cache_control": {"type": "ephemeral"}}
         if cfg.get("fast"):
@@ -1222,6 +1384,11 @@ OA_TOOLS = [{"type": "function", "function": {"name": t["name"], "description": 
 OA_TOOLS.append({"type": "function", "function": {"name": "web_search", "description": "İnternette ara (güncel bilgi, haber, fiyat, tarih…). Başlık, adres ve özet döndürür.",
                                                   "parameters": {"type": "object", "properties": {"query": {"type": "string"}}, "required": ["query"]}}})
 SCHEMA["web_search"] = {"type": "object", "properties": {"query": {"type": "string"}}, "required": ["query"]}
+
+
+def oa_tools():
+    return OA_TOOLS + [{"type": "function", "function": {"name": n, "description": "[Senin yazdığın araç] " + c["description"],
+                                                         **({"parameters": c["schema"]} if c["schema"]["properties"] else {})}} for n, c in CUSTOM.items()]
 MODELS, BADM = {}, {}  # sağlayıcı → (zaman, sıralı modeller) · model → kotası bitti (zaman)
 
 
@@ -1343,7 +1510,7 @@ def ddg(q):
 
 async def oa_once(sess, rid, p, model, msgs):
     """Bir model turu (akış) → (yazı, araç çağrıları, bitiş sebebi)."""
-    body = {"model": model, "messages": msgs, "tools": OA_TOOLS, "stream": True, "max_tokens": 4096}
+    body = {"model": model, "messages": msgs, "tools": oa_tools(), "stream": True, "max_tokens": 4096}
     ef = {"xhigh": "high"}.get(cfg.get("effort", "low"), cfg.get("effort", "low"))
     if p == "gemini" or "gpt-oss" in model:
         body["reasoning_effort"] = ef
@@ -1383,6 +1550,9 @@ async def oa_once(sess, rid, p, model, msgs):
     for n, c in enumerate(L):
         c["id"] = c["id"] or f"call_{secrets.token_hex(4)}_{n}"
     return text, L, fin
+
+
+GEMTHINK = {}  # model → 2 minimal dene, 1 low, 0 düşünme ayarı gönderme (model reddederse)
 
 
 def gem_contents(msgs):
@@ -1427,7 +1597,8 @@ def gem_contents(msgs):
     return sysi, out
 
 
-GEM_TOOLS = [{"functionDeclarations": [t["function"] for t in OA_TOOLS]}]
+def gem_tools():
+    return [{"functionDeclarations": [t["function"] for t in oa_tools()]}]
 
 
 async def gem_once(sess, rid, model, msgs):
@@ -1435,9 +1606,9 @@ async def gem_once(sess, rid, model, msgs):
     sysi, contents = gem_contents(msgs)
     ef = cfg.get("effort", "low")
     think = {"includeThoughts": True}
-    if model.startswith("gemini-3"):
-        think["thinkingLevel"] = "low" if ef == "low" else "high"
-    body = {"contents": contents, "tools": GEM_TOOLS, "generationConfig": {"maxOutputTokens": 4096, "thinkingConfig": think}}
+    if model.startswith("gemini-3") and GEMTHINK.get(model, 2):
+        think["thinkingLevel"] = ("minimal" if GEMTHINK.get(model, 2) == 2 else "low") if ef == "low" else "high"
+    body = {"contents": contents, "tools": gem_tools(), "generationConfig": {"maxOutputTokens": 4096, "thinkingConfig": think}}
     if sysi:
         body["systemInstruction"] = sysi
     text, calls, fin, reas, got = "", [], None, "", False
@@ -1489,6 +1660,8 @@ async def oa_turn(sess, rid, p, msgs):
             msg = str(e)
             if getattr(e, "got", False) or e.status == 401:
                 raise
+            if p == "gemini" and e.status == 400 and re.search(r"thinking", msg, re.I):
+                GEMTHINK[model] = GEMTHINK.get(model, 2) - 1; continue  # “minimal” desteklenmiyorsa low, o da değilse ayarsız
             if e.status == 404 or (e.status in (400, 403) and re.search(r"model|not found|not supported|does not exist|decommission", msg, re.I)):
                 BADM[model] = time.time(); continue  # bu model yok/ücretsiz değil → sıradaki
             if e.status == 429:
@@ -1508,6 +1681,13 @@ async def oa_turn(sess, rid, p, msgs):
                 raise
             await asyncio.sleep(1.5)
     raise ApiErr(429, "quota", "ücretsiz kullanım sınırı doldu")
+
+
+def oa_trim_tools(hist, keep=8, size=700):
+    """Son birkaç mesaj dışındaki uzun araç çıktılarını kısalt (sayfa dökümleri her istekte yeniden gönderilip yavaşlatmasın)."""
+    for m in hist[:-keep]:
+        if m.get("role") == "tool" and isinstance(m.get("content"), str) and len(m["content"]) > size:
+            m["content"] = m["content"][:size] + " …(kısaltıldı)"
 
 
 def oa_trim_images(hist, keep=2):
@@ -1530,7 +1710,7 @@ async def oa_agent(sess: Session, rid, text, p):
     sess.hist.append({"role": "user", "content": context_note() + "\n" + text})
     vision = FREE[p]["vision"]
     for _turn in range(40):
-        oa_trim_images(sess.hist)
+        oa_trim_images(sess.hist); oa_trim_tools(sess.hist)
         said, calls, fin = await oa_turn(sess, rid, p, [{"role": "system", "content": SYSTEM_FREE}] + sess.hist)
         msg = {"role": "assistant"}
         if said:

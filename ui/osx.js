@@ -233,6 +233,6 @@ function cloud(){const fs=H()?.cloud?.();if(!fs||clipDoc)return;try{
   hoDoc=fs.collection('hub').doc('handoff');hoDoc.onSnapshot(d=>hoSeeOthers(d.data()),()=>{})}catch{}}
 function start(){if(window.OSX.started)return;window.OSX.started=true;paintNight();paintA11();corners();edgeHandle();if(get('appshell:perfov',false))perfOn(true);hookDoc(document,'Ana ekran');
   setInterval(()=>{useTick();hookFrames();if(A11().zoom!==1||A11().solid||A11().contrast)paintA11();hoTick();sumTick();if(!H()?.cloud?.()||!clipDoc)cloud()},10000);setInterval(()=>{rtTick();paintNight()},20000);setTimeout(()=>{rtTick();sumTick();cloud();hookFrames()},1500)}
-window.OSX={open,close,gate,tiles,ccRow,cmds,focus:()=>{const f=FO();return f?{m:f.m,...MODES[f.m]}:null},night:v=>v==null?nightOn():setNight({on:v}),perf:perfOn,edge:edgeOpen,clip:clipAll,usage:usageDay,start};
+window.OSX={a11y:paintA11,open,close,gate,tiles,ccRow,cmds,focus:()=>{const f=FO();return f?{m:f.m,...MODES[f.m]}:null},night:v=>v==null?nightOn():setNight({on:v}),perf:perfOn,edge:edgeOpen,clip:clipAll,usage:usageDay,start};
 if(document.readyState==='loading')addEventListener('DOMContentLoaded',start);else start();
 })();

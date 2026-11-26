@@ -6288,5 +6288,51 @@
     "fix": "Türkçe ekler tolere ediliyor"
    }
   ]
+ },
+ {
+  "at": "2026-11-26T17:11:17",
+  "change": "Jarvis büyük güncelleme: kendine araç yazabiliyor (bir işi yapamazsa küçük bir program yazıp onayınla kaydediyor ve hep kullanıyor), Python çalıştırabiliyor, sayfaları tarayıcı açmadan hızlıca okuyabiliyor. Takılırsa 45 sn'de kesip yeniden deniyor, eski uzun çıktıları kırpıyor, Gemini daha az düşünüp daha hızlı cevap veriyor. Onayları sesle de verebilirsin (“evet/hayır”). Hub'ın her yerinden Alt+J ile Siri gibi açılan Jarvis paneli eklendi (“Jarvis” uyandırma kelimesi açıksa her yerde dinler).",
+  "scores": {
+   "jarvis telefon": {
+    "before": 94,
+    "after": 94
+   }
+  },
+  "items": [
+   {
+    "app": "jarvis",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Eşleştirme kodu kutusu 2,5 sn sonra kurulum ekranıyla değişiyordu",
+    "fix": "Bağlantı varken kurulum ekranı gösterilmiyor"
+   },
+   {
+    "app": "jarvis",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Onay beklerken ekrana bakmazsan Jarvis donmuş gibi kalıyordu",
+    "fix": "Onay sesle soruluyor ve “evet/hayır” dinleniyor; 40 sn sessizlikte “hâlâ çalışıyor” notu"
+   },
+   {
+    "app": "jarvis",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Uyandırma kelimesinden sonra mikrofon bazen başlamıyordu (takılma)",
+    "fix": "Mikrofon tam kapanınca yeniden deneniyor"
+   },
+   {
+    "app": "jarvis",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Jarvis kendine yeni yetenek ekleyemiyordu",
+    "fix": "create_tool / run_python / fetch_page araçları"
+   }
+  ]
+ },
+ {
+  "at": "2026-11-26T17:11:17",
+  "change": "Tema stüdyosuna “Ayrıntılar”: köşeler (keskin / normal / yuvarlak), çizgiler (yok / ince / belirgin), yüzey (cam / düz) ve yazı boyutu. Hepsi bütün uygulamalara geçer ve görünüm profiline kaydedilir.",
+  "scores": {},
+  "items": []
  }
 ]

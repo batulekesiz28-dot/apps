@@ -894,6 +894,8 @@ body,.btn,.mi,.pal-in,input,textarea,button{font-family:var(--font)}
 .lk-sw{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.lk-sw button{width:28px;height:28px;border-radius:50%;background:var(--c);font-size:12px;font-weight:700;color:var(--ink2);box-shadow:inset 0 0 0 1px var(--line3)}.lk-sw button.on{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--ink)}
 .lk-cu{position:relative;width:28px;height:28px;border-radius:50%;overflow:hidden;background:conic-gradient(#E5484D,#CA8A04,#16A34A,#0D9488,#2563EB,#7C3AED,#DB2777,#E5484D);cursor:pointer}.lk-cu input{position:absolute;inset:0;opacity:0;cursor:pointer}
 .lk-f{flex-wrap:wrap}.lk-p{display:flex;flex-wrap:wrap;gap:6px}.lk-pi{display:inline-flex;align-items:center;border-radius:9px;background:var(--hover)}.lk-pi button{height:32px;padding:0 10px;font-size:13px;color:var(--ink)}.lk-pi button+button{padding:0 8px;color:var(--ink3)}.lk-pi svg{width:10px;height:10px;stroke:currentColor;stroke-width:1.6}
+.lk-row{display:flex;align-items:center;gap:12px;margin-top:8px}.lk-row>span{width:92px;flex:none;font-size:13px;color:var(--ink2)}.lk-row .ts-seg{flex:1;min-width:0}
+@media (max-width:600px){.lk-row{flex-wrap:wrap;gap:6px}.lk-row>span{width:100%}}
 .lk-own{display:flex;gap:10px;flex-wrap:wrap}.lk-own label{display:grid;justify-items:center;gap:4px;font-size:12px;color:var(--ink2)}.lk-own input{width:44px;height:44px;border:0;border-radius:12px;padding:0;background:none;cursor:pointer}
 .lk-mix{display:flex;align-items:center;gap:10px;flex-wrap:wrap;flex:1}.lk-mix select{height:36px;padding:0 8px;border-radius:9px;border:0;background:var(--hover);color:var(--ink);font:inherit;font-size:13px}
 .lk-mix input[type=range]{flex:1;min-width:140px;height:28px;appearance:none;background:linear-gradient(90deg,var(--a),var(--b)) center/100% 10px no-repeat;border-radius:5px}
@@ -1070,9 +1072,15 @@ let tsEl=null;
 /* ── Kişisel görünüm: vurgu rengi + yazı tipi (tüm uygulamalara skin.js ile geçer) + görünüm profilleri ── */
 const LOOK_FONTS={'':['Tema yazı tipi',''],geist:['Geist','Geist:wght@300..800'],inter:['Inter','Inter:wght@300..800'],serif:['Fraunces (editoryal)','Fraunces:opsz,wght@9..144,300..800'],round:['Nunito (yumuşak)','Nunito:wght@300..800'],mono:['JetBrains Mono','JetBrains+Mono:wght@300..700']};
 const LOOK_ACC=['','#2563EB','#7C3AED','#DB2777','#E5484D','#EA580C','#CA8A04','#16A34A','#0D9488'];
+/* ayrıntılar (tema stüdyosu): köşeler sharp|round, çizgiler strong|none — shared/skin.js'teki lookExtra ile AYNI */
+const lookExtra=l=>{let c='';const X=':not([role=switch]):not(.sw):not([type=range]):not([type=checkbox]):not([type=radio]):not([type=color]):not([class*=orb]):not(.tile):not(.ob):not(.tk-chk):not([class*="-bg"]):not([class*=scrim])';
+  if(l.corner==='sharp')c+=`:where(button,input,select,textarea,[class*="card"],[class*="btn"],[class*="chip"],[class*="sheet"],[class*="panel"],[class*="menu"],[class*="pill"],[class*="toast"],dialog)${X}{border-radius:5px!important}`;
+  if(l.corner==='round')c+=`:where(button,input,select,[class*="btn"],[class*="chip"],[class*="pill"])${X}{border-radius:999px!important}:where([class*="card"],[class*="sheet"],[class*="panel"],[class*="menu"],dialog)${X}{border-radius:26px!important}`;
+  if(l.lines==='strong')c+='html{--line:color-mix(in srgb,currentColor 22%,transparent)!important;--line2:color-mix(in srgb,currentColor 34%,transparent)!important}';
+  if(l.lines==='none')c+='html{--line:transparent!important}';return c};
 function applyLook(l=store.get('appshell:look',{})){let st=$('#lookCss');if(!st){st=document.createElement('style');st.id='lookCss';document.head.appendChild(st)}
   const f=LOOK_FONTS[l.font]?.[1];if(f&&!document.querySelector(`link[data-look="${l.font}"]`)){const k=document.createElement('link');k.rel='stylesheet';k.dataset.look=l.font;k.href='https://fonts.googleapis.com/css2?family='+f+'&display=swap';document.head.appendChild(k)}
-  st.textContent=(window.SkinPal?SkinPal(l.colors):'')+(/^#[0-9a-f]{6}$/i.test(l.accent||'')?`html{--accent:${l.accent}!important;--acc:${l.accent}!important}`:'')+(f?`html{--font:'${LOOK_FONTS[l.font][0].split(' (')[0]}',system-ui,sans-serif!important;--display:var(--font)!important}`:'')}
+  st.textContent=lookExtra(l)+(window.SkinPal?SkinPal(l.colors):'')+(/^#[0-9a-f]{6}$/i.test(l.accent||'')?`html{--accent:${l.accent}!important;--acc:${l.accent}!important}`:'')+(f?`html{--font:'${LOOK_FONTS[l.font][0].split(' (')[0]}',system-ui,sans-serif!important;--display:var(--font)!important}`:'')}
 function setLook(patch){const l={...store.get('appshell:look',{}),...patch};store.set('appshell:look',l);applyLook(l)}
 /* ── Renk sistemi: kendi renklerin ya da iki temayı karıştır (Material You / One UI renk paleti gibi). Sonuç look.colors'a yazılır,
    hub ve skin.js (bütün uygulamalar) aynı palette() ile 4 renkten bütün tonları türetir. ── */
@@ -1136,6 +1144,9 @@ function lookHTML(){const l=store.get('appshell:look',{}),P=store.get('appshell:
     <small>${mode==='own'?'Dört renkten bütün tonlar türetilir. Ana renkten bütün paleti tek tıkla da üretebilirsin.':mode==='mix'?'İki tema seç, kaydırıcıyla oranı ayarla ya da hazır bir karışıma dokun. Yazı her zaman okunur kalır.':'Temanın kendi renkleri.'} Bütün uygulamalara geçer.</small></div>`;
   return colors+`<div class="ts-mo"><b>Vurgu rengi</b><div class="lk-sw" role="radiogroup" aria-label="Vurgu rengi">${LOOK_ACC.map(c=>`<button data-acc="${c}" role="radio" aria-checked="${(l.accent||'')===c}" class="${(l.accent||'')===c?'on':''}" style="--c:${c||'var(--ink4)'}" title="${c||'Temanın kendi rengi'}" aria-label="${c||'Temanın kendi rengi'}">${c?'':'A'}</button>`).join('')}<label class="lk-cu" title="Özel renk"><input type="color" data-accc value="${/^#/.test(l.accent||'')?l.accent:'#2563EB'}" aria-label="Özel vurgu rengi"></label></div></div>
     <div class="ts-mo"><b>Yazı tipi</b><div class="ts-seg lk-f" role="radiogroup" aria-label="Yazı tipi">${Object.entries(LOOK_FONTS).map(([k,[n]])=>`<button data-font="${k}" role="radio" aria-checked="${(l.font||'')===k}" class="${(l.font||'')===k?'on':''}">${n.split(' (')[0]}</button>`).join('')}</div><small>Seçimin hub'a ve bütün uygulamalara anında geçer.</small></div>
+    <div class="ts-mo"><b>Ayrıntılar</b>${(()=>{const A=store.get('appshell:a11y',{}),z=A.zoom||1,row=(n,k,cur,opts)=>`<div class="lk-row"><span>${n}</span><div class="ts-seg" role="radiogroup" aria-label="${n}">${opts.map(([v,t])=>`<button data-lkx="${k}" data-v="${v}" role="radio" aria-checked="${cur===v}" class="${cur===v?'on':''}">${t}</button>`).join('')}</div></div>`;
+      return row('Köşeler','corner',l.corner||'',[['sharp','Keskin'],['','Normal'],['round','Yuvarlak']])+row('Çizgiler','lines',l.lines||'',[['none','Yok'],['','İnce'],['strong','Belirgin']])+row('Yüzey','solid',A.solid?'1':'',[['','Cam'],['1','Düz']])+row('Yazı boyutu','zoom',String(z),[['0.9','Küçük'],['1','Normal'],['1.1','Büyük'],['1.2','Çok büyük']])})()}
+      <small>Köşe, çizgi ve yazı boyutu bütün uygulamalara geçer; “Şu anki görünümü kaydet” ile profil olarak saklanır.</small></div>
     <div class="ts-mo"><b>Görünüm profilleri</b><div class="lk-p">${P.map((p,i)=>`<span class="lk-pi"><button data-prof="${i}" title="Uygula">${esc(p.name)}</button><button data-pdel="${i}" aria-label="${esc(p.name)} profilini sil" title="Sil">${XI}</button></span>`).join('')}<button class="lk-add" data-psave>+ Şu anki görünümü kaydet</button><button class="lk-add" data-preset>Varsayılana dön</button></div><small>Profil; temayı, animasyonu, vurgu rengini, yazı tipini ve arayüz dünyasını birlikte saklar.</small></div>`}
 function themeStudio(){if(tsEl)return;const saved=document.documentElement.dataset.theme;Object.keys(FONTS).forEach(loadFont);
   const card=([k,n,d])=>{const T=THEMES[k];return`<button class="tp${k===saved?' on':''}" data-theme="${k}" data-family="${T.dark?'dark':'light'}" data-tk="${k}" aria-pressed="${k===saved}" aria-label="${n} teması"><div class="tp-v"><div class="tp-sky" style="background:${T.pv}"></div>
@@ -1155,6 +1166,7 @@ function themeStudio(){if(tsEl)return;const saved=document.documentElement.datas
     const m=e.target.closest('[data-mo]');if(m){applyMotion(m.dataset.mo);tsEl.querySelectorAll('[data-mo]').forEach(x=>{x.classList.toggle('on',x===m);x.setAttribute('aria-checked',x===m)});return}
     const ac=e.target.closest('[data-acc]');if(ac){setLook({accent:ac.dataset.acc});$('#lookBox').innerHTML=lookHTML();return}
     const fo=e.target.closest('[data-font]');if(fo){setLook({font:fo.dataset.font});$('#lookBox').innerHTML=lookHTML();return}
+    const lx=e.target.closest('[data-lkx]');if(lx){const k=lx.dataset.lkx,v=lx.dataset.v;if(k==='solid'||k==='zoom'){const A={...store.get('appshell:a11y',{})};if(k==='solid')A.solid=!!v;else A.zoom=parseFloat(v)||1;store.set('appshell:a11y',A);window.OSX?.a11y?.()}else setLook({[k]:v});$('#lookBox').innerHTML=lookHTML();return}
     const mi=e.target.closest('[data-mi]');if(mi){const m=MIX_IDEAS[+mi.dataset.mi];setPal({mode:'mix',a:m[1],b:m[2],t:m[3]});$('#lookBox').innerHTML=lookHTML();toast(`“${m[0]}” karışımı`);return}
     if(e.target.closest('[data-mrnd]')){const K=Object.keys(THEMES),a=K[Math.floor(Math.random()*K.length)];let b=a;while(b===a)b=K[Math.floor(Math.random()*K.length)];const t=25+Math.round(Math.random()*50);setPal({mode:'mix',a,b,t});$('#lookBox').innerHTML=lookHTML();toast(`${THEMES[a].n} + ${THEMES[b].n} · %${t} — beğendiysen “Şu anki görünümü kaydet”`);return}
     const pg=e.target.closest('[data-pgen]');if(pg){const base=tsEl.querySelector('[data-pbase]').value;setPal({mode:'own',own:palFromBase(base,pg.dataset.pgen==='1')});$('#lookBox').innerHTML=lookHTML();return}
@@ -3265,6 +3277,7 @@ function osKeys(e){
     if(/^Digit[1-9]$/.test(c)){const t=TABS[+c.slice(5)-1];if(t){e.preventDefault();closeSwitcher();switchTo(t.key);return true}return false}
     if(c==='KeyS'&&W.app&&!W.min){e.preventDefault();splitToggle();return true}
     if(c==='KeyA'){e.preventDefault();window.OS?.toggle();return true}
+    if(c==='KeyJ'){e.preventDefault();window.JV?.toggle();return true}
     if((c==='KeyP'||c==='KeyN')&&npTab()){e.preventDefault();npCmd(c==='KeyP'?'toggle':'next');toast(c==='KeyP'?(NP.on?'▶ '+NP.t:'⏸ Duraklatıldı'):'⏭ Sonraki');return true}
     if(c==='KeyM'){e.preventDefault();if(W.app&&!W.min)floFromFull();else if(FL)floExpand();return true}
     if(c==='KeyH'||c==='Digit0'){if(W.app&&!W.min){e.preventDefault();goHome()}return true}
@@ -3471,6 +3484,7 @@ const SVI={open:'<path d="M3 8h10M9 4l4 4-4 4"/>',split:'<rect x="2.5" y="3.5" w
   world:'<circle cx="8" cy="8" r="5.5"/><path d="M2.5 8h11M8 2.5c2 2 2 9 0 11M8 2.5c-2 2-2 9 0 11"/>',moon:'<path d="M13.5 9.5A5.5 5.5 0 0 1 6.5 2.5a5.5 5.5 0 1 0 7 7z"/>',brush:'<path d="M9.5 2.5l4 4-6 6H3.5v-4z"/><path d="M8 4l4 4"/>',
   cc:'<rect x="2.5" y="2.5" width="11" height="11" rx="3"/><circle cx="6" cy="6.5" r="1.3"/><path d="M8.5 6.5h2.5M5 10h2.5"/><circle cx="10" cy="10" r="1.3"/>',sys:'<rect x="2.5" y="3" width="11" height="8" rx="1.5"/><path d="M6 13.5h4M8 11v2.5"/>',
   calm:'<path d="M2.5 9.5c2-2 3.5-2 5.5 0s3.5 2 5.5 0M2.5 6c2-2 3.5-2 5.5 0s3.5 2 5.5 0"/>',fit:'<path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/>',apps:'<rect x="2.5" y="3.5" width="5" height="9" rx="1.5"/><rect x="9.5" y="3.5" width="4" height="9" rx="1.5"/>',dice:'<rect x="2.5" y="2.5" width="11" height="11" rx="2.5"/><circle cx="5.7" cy="5.7" r=".9"/><circle cx="10.3" cy="10.3" r=".9"/><circle cx="8" cy="8" r=".9"/>'};
+SVI.jarvis='<circle cx="8" cy="8" r="5.5"/><path d="M5.3 8.6a2.8 2.8 0 0 0 5.4 0M6 6.2h.01M10 6.2h.01"/>';
 const mItem=(k,l,kb,ic,cls='')=>`<button class="mi${cls}" data-mk="${k}" role="menuitem"><svg viewBox="0 0 16 16" class="si">${SVI[ic||k]||''}</svg>${l}${kb?`<span class="k">${kb}</span>`:''}</button>`;
 // uygulama işlemleri: menüde gösterilecek liste (galaksi showMenu ve arayüzler WG.menu kullanır)
 function appActs(a){const t=tabOf(a.key),f=curTab()&&!W.min?curTab():mru().find(x=>x.key!==a.key),url=a.url&&a.kind!=='draft';
@@ -3488,10 +3502,10 @@ function appAct(a,k){const n=nodes.get(a.key),t=tabOf(a.key);
 function appMenuAt(key,x,y){const a=find(key);if(!a)return;
   popMenu(x,y,`<p class="m-h">${esc(a.name)}</p>`+appActs(a).map(([k,l,kb])=>mItem(k,esc(l),kb,k,k==='close'?' danger':'')).join(''),e=>{const b=e.target.closest('[data-mk]');if(!b)return;hideMenu();appAct(a,b.dataset.mk)})}
 function deskMenu(x,y){const inW=document.body.classList.contains('inworld'),open=TABS.length;
-  const I=[['search','Ara ya da komut çalıştır','Ctrl+K'],'-',['note','Yeni not',''],['task','Bugünün görevleri',''],['bell','Hatırlatıcı kur',''],'-',['widget','Widget ekle',''],['world','Arayüz değiştir','⇧⌘U'],['dice','Rastgele arayüz','R'],['moon','Tema',''],['brush','Kişiselleştir…',''],'-',
+  const I=[['search','Ara ya da komut çalıştır','Ctrl+K'],['jarvis','Jarvis\'e sor','Alt+J'],'-',['note','Yeni not',''],['task','Bugünün görevleri',''],['bell','Hatırlatıcı kur',''],'-',['widget','Widget ekle',''],['world','Arayüz değiştir','⇧⌘U'],['dice','Rastgele arayüz','R'],['moon','Tema',''],['brush','Kişiselleştir…',''],'-',
     ...(open?[['apps',`Açık uygulamalar (${open})`,'⇧Tab']]:[]),['cc','Kontrol merkezi','Alt+A'],['sys','Sistem ve ekran süresi',''],['calm','Sakin mod',''],...(inW?[]:[['fit','Hepsini ekrana sığdır','']])];
   popMenu(x,y,I.map(i=>i==='-'?'<div class="msep"></div>':mItem(i[0],i[1],i[2])).join(''),e=>{const b=e.target.closest('[data-mk]');if(!b)return;hideMenu();const k=b.dataset.mk;
-    ({search:()=>palette(),note:()=>openNotes('#new'),task:()=>window.DayCard?window.DayCard.open('plan'):openNotes('#tasks'),bell:()=>window.Notify?.open(),widget:()=>widgetGallery(),world:()=>window.Worlds?.picker(),
+    ({search:()=>palette(),jarvis:()=>window.JV?.open(),note:()=>openNotes('#new'),task:()=>window.DayCard?window.DayCard.open('plan'):openNotes('#tasks'),bell:()=>window.Notify?.open(),widget:()=>widgetGallery(),world:()=>window.Worlds?.picker(),
       dice:()=>window.Worlds?.random?window.Worlds.random():window.Worlds?.picker(),moon:()=>themeMenu(),brush:()=>themeStudio(),apps:()=>switcher(false,0),cc:()=>window.OS?.open(),sys:()=>window.OSX?.open('ekran'),calm:()=>calm(true),fit:()=>fitAll()})[k]?.()})}
 function hideMenu(){if(!menuEl)return;const m=menuEl;menuEl=null;anim(m,[{opacity:1},{opacity:0,transform:'scale(.97)'}],{duration:120,easing:EASE}).finished.then(()=>m.remove(),()=>m.remove())}
 addEventListener('pointerdown',e=>{if(menuEl&&!e.target.closest('.menu'))hideMenu()},true);
@@ -3509,6 +3523,7 @@ function palette(){
   anim(bg.firstChild,[{opacity:0,transform:'translateY(-10px) scale(.97)'},{opacity:1,transform:'none'}],{duration:420,easing:OUT});
   const inp=bg.querySelector('input'),list=bg.querySelector('.pal-l');let items=[],sel=0;
   const cmds=()=>[
+    {ic:UI.chk,l:'Jarvis\'e sor',sub:'Sesli asistan · her yerden Alt+J',run:()=>window.JV?.open()},
     {ic:UI.plus,l:'Yeni not',sub:'Notlar',run:()=>openNotes('#new')},
     {ic:UI.plus,l:'Yeni görev',sub:'Bugünün sayfasına yapılacak ekle',run:()=>openNotes('#today')},
     {ic:UI.plus,l:'Yeni proje',sub:'Proje planı şablonuyla',run:()=>openNotes('#new/project')},
@@ -3859,6 +3874,7 @@ addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.shiftKey&&(e.key==='
 <script src="shared/newswatch.js?v=20261126a"></script>
 <link rel="stylesheet" href="ui/os.css?v=20261121a">
 <script src="ui/os.js?v=20261123b"></script>
-<link rel="stylesheet" href="ui/osx.css?v=20261124d"><script src="ui/osx.js?v=20261124a"></script><script src="ui/tour.js?v=20261124b"></script>
+<link rel="stylesheet" href="ui/jarvis.css?v=20261126a"><script src="ui/jarvis.js?v=20261126a"></script>
+<link rel="stylesheet" href="ui/osx.css?v=20261124d"><script src="ui/osx.js?v=20261126a"></script><script src="ui/tour.js?v=20261124b"></script>
 </body>
 </html>

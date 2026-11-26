@@ -26,8 +26,14 @@
     '--line:'+m(8,c.ink)+'!important;--line2:'+m(12,c.ink)+'!important;--line3:'+m(17,c.ink)+'!important;--hover:'+m(7,c.ink)+'!important;--hover2:'+m(11,c.ink)+'!important;'+
     '--menu:'+m(90,c.surface)+'!important;--glass:'+m(78,c.surface)+'!important;--scrim:'+m(50,c.bg)+'!important;--labelbg:'+m(90,c.bg)+'!important;'+
     (/^#[0-9a-f]{6}$/i.test(c.accent||'')?'--accent:'+c.accent+'!important;--acc:'+c.accent+'!important;':'')+'color-scheme:'+(dk?'dark':'light')+'}body{background-color:'+c.bg+'}'}
+  // tema stüdyosu “Ayrıntılar” (hub'daki lookExtra ile AYNI)
+  var lookExtra=function(l){var c='';const X=':not([role=switch]):not(.sw):not([type=range]):not([type=checkbox]):not([type=radio]):not([type=color]):not([class*=orb]):not(.tile):not(.ob):not(.tk-chk):not([class*="-bg"]):not([class*=scrim])';
+  if(l.corner==='sharp')c+=`:where(button,input,select,textarea,[class*="card"],[class*="btn"],[class*="chip"],[class*="sheet"],[class*="panel"],[class*="menu"],[class*="pill"],[class*="toast"],dialog)${X}{border-radius:5px!important}`;
+  if(l.corner==='round')c+=`:where(button,input,select,[class*="btn"],[class*="chip"],[class*="pill"])${X}{border-radius:999px!important}:where([class*="card"],[class*="sheet"],[class*="panel"],[class*="menu"],dialog)${X}{border-radius:26px!important}`;
+  if(l.lines==='strong')c+='html{--line:color-mix(in srgb,currentColor 22%,transparent)!important;--line2:color-mix(in srgb,currentColor 34%,transparent)!important}';
+  if(l.lines==='none')c+='html{--line:transparent!important}';return c};
   function look(){var l=rd('appshell:look')||{},st=document.getElementById('lookCss');if(!st){st=document.createElement('style');st.id='lookCss';document.head.appendChild(st)}
-    var f=LF[l.font],css=pal(l.colors);if(/^#[0-9a-f]{6}$/i.test(l.accent||''))css+='html{--accent:'+l.accent+'!important;--acc:'+l.accent+'!important}';
+    var f=LF[l.font],css=lookExtra(l)+pal(l.colors);if(/^#[0-9a-f]{6}$/i.test(l.accent||''))css+='html{--accent:'+l.accent+'!important;--acc:'+l.accent+'!important}';
     if(f){if(!document.querySelector('link[data-look="'+l.font+'"]')){var k=document.createElement('link');k.rel='stylesheet';k.setAttribute('data-look',l.font);k.href='https://fonts.googleapis.com/css2?family='+f[1]+'&display=swap';document.head.appendChild(k)}
       css+="html{--font:'"+f[0]+"',system-ui,sans-serif!important;--serif:'"+f[0]+"',Georgia,serif!important}body{font-family:var(--font)}"}st.textContent=css}
   apply();

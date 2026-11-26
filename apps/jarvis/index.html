@@ -94,14 +94,19 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--j-acc);outline-
 @media (max-width:600px){.ib{width:44px;height:44px}.ka{min-height:40px;margin:-8px -8px -8px auto}.log{bottom:214px;padding:10px 14px 40px}.top{padding:0 12px}.j .tx{font-size:16px}.b,.chips button{height:42px}.seg button{height:40px}.orb{width:84px;height:84px}}
 @media (prefers-reduced-motion:reduce){.orb .c,.orb .r,.sx[data-s=run] b{animation:none!important}.sw::after{transition:none}}
 html[data-motion=off] :is(.orb .c,.orb .r,.sx[data-s=run] b){animation:none!important}
+/* küçük mod: hub'ın her yerinden açılan Jarvis paneli (?mini=1) */
+html.mini .top{height:48px;padding:0 10px 0 16px}html.mini .wm{font-size:13px}html.mini .log{top:48px;bottom:168px;padding:8px 14px 30px}
+html.mini .orb{width:64px;height:64px}html.mini .hint{display:none}html.mini .dock{gap:10px;padding-bottom:14px}html.mini .bar{height:46px}
+html.mini .empty h1{font-size:22px}html.mini .empty p{font-size:14px}html.mini .chips button{font-size:13px}html.mini .bgfx{opacity:.6}
 </style>
-<script src="../../shared/skin.js?v=20261124a"></script>
+<script src="../../shared/skin.js?v=20261126a"></script>
 </head>
 <body>
 <div class="bgfx" aria-hidden="true"></div>
 <header class="top"><span class="wm">JARVIS</span><span class="st" id="st" data-s="off" role="status"><i></i><span>Bağlı değil</span></span><span class="sp"></span>
   <button class="ib" id="wakeB" aria-pressed="false" title="“Jarvis” deyince dinle" aria-label="Uyandırma kelimesi"><svg viewBox="0 0 20 20"><path d="M10 2.5a2.5 2.5 0 0 1 2.5 2.5v5a2.5 2.5 0 0 1-5 0V5A2.5 2.5 0 0 1 10 2.5z"/><path d="M5 9.5a5 5 0 0 0 10 0M10 14.5v3"/></svg></button>
   <button class="ib" id="voiceB" aria-pressed="true" title="Jarvis sesli konuşsun" aria-label="Sesli yanıt"><svg viewBox="0 0 20 20"><path d="M3.5 8v4h3l4 3.5v-11L6.5 8z"/><path d="M13.5 7.5a3.5 3.5 0 0 1 0 5M15.5 5.5a6.5 6.5 0 0 1 0 9"/></svg></button>
+  <button class="ib" id="closeB" title="Kapat (Esc)" aria-label="Paneli kapat" hidden><svg viewBox="0 0 20 20"><path d="M5.5 5.5l9 9M14.5 5.5l-9 9"/></svg></button>
   <button class="ib" id="setB" title="Ayarlar" aria-label="Ayarlar"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="2.5"/><path d="M10 2.5v2M10 15.5v2M2.5 10h2M15.5 10h2M4.7 4.7l1.4 1.4M13.9 13.9l1.4 1.4M4.7 15.3l1.4-1.4M13.9 6.1l1.4-1.4"/></svg></button></header>
 <main class="log" id="log" aria-live="polite" data-nomotion><div class="lw" id="lw"></div></main>
 <div class="dock"><p class="live" id="live" aria-live="polite"></p>
@@ -120,6 +125,8 @@ const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>
 const lsg=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k));return v??d}catch{return d}},lss=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
 const RM=()=>matchMedia('(prefers-reduced-motion: reduce)').matches||document.documentElement.dataset.motion==='off';
 const URL_WS='ws://127.0.0.1:8765';
+const MINI=new URLSearchParams(location.search).has('mini');if(MINI){document.documentElement.classList.add('mini')}
+const toHub=m=>{if(MINI&&parent!==window)try{parent.postMessage({jarvis:1,...m},'*')}catch{}};
 let ws=null,ok=false,cfg={},busy=null,retry=0,retryT=0,pairBad=false;
 const RUN={};  // id → {el, tx, steps, text}
 
@@ -132,10 +139,11 @@ function connect(){clearTimeout(retryT);try{ws=new WebSocket(URL_WS)}catch{retur
   ws.onerror=()=>{}}
 function later(){clearTimeout(retryT);retryT=setTimeout(connect,Math.min(8000,1500+retry++*1000))}
 const send=m=>{if(ws&&ws.readyState===1){ws.send(JSON.stringify(m));return true}return false};
-const NEED='2026.11.25h',OLDMSG='Bilgisayarındaki Jarvis programı eski sürüm, Gemini’yi tanımıyor. Jarvis’in siyah penceresini kapat, masaüstündeki Jarvis’e çift tıkla: kendini güncelleyip açılır.';let updAsked=0,pendKey=0;
+const NEED='2026.11.26a',OLDMSG='Bilgisayarındaki Jarvis programı eski sürüm, Gemini’yi tanımıyor. Jarvis’in siyah penceresini kapat, masaüstündeki Jarvis’e çift tıkla: kendini güncelleyip açılır.';let updAsked=0,pendKey=0;
 function setSt(s,t){const e=$('#st');e.dataset.s=s;e.querySelector('span').textContent=t}
 
-function on(m){
+let lastMsg=Date.now();
+function on(m){lastMsg=Date.now();
   if(m.t==='hello'){const tk=lsg('jarvis:token','');if(tk)send({t:'auth',token:tk});else send({t:'auth',token:''})}
   else if(m.t==='need_pair'){pairBad=!!m.bad;lss('jarvis:token','');showConn('pair')}
   else if(m.t==='paired'){lss('jarvis:token',m.token)}
@@ -163,8 +171,14 @@ function endRun(id,why){const r=RUN[id];if(r){if(why){const e=document.createEle
     r.el.querySelectorAll('.sx[data-s=run]').forEach(s=>s.dataset.s=why?'err':'ok');if(r.text)keepLog('j',r.text)}
   if(busy===id){busy=null;setBusy(false)}orb(ok?(speaking()?'speak':'idle'):'off')}
 function askCard(r,m){const c=document.createElement('div');c.className='ask';c.dataset.aid=m.aid;c.innerHTML=`<h3>${esc(m.title)}</h3>${m.detail?`<pre>${esc(m.detail)}</pre>`:''}<div class="row"><button class="b pri" data-ok="1">Onayla</button><button class="b" data-ok="0">Vazgeç</button>${/komut/i.test(m.title)?'<button class="b" data-ok="always">Bu oturum hep izin ver</button>':''}</div><p class="res" aria-live="polite"></p>`;
-  r.el.appendChild(c);scroll();say(m.title.replace(/[“”]/g,''));c.querySelector('[data-ok="1"]').focus({preventScroll:true});
+  r.el.appendChild(c);scroll();say(m.title.replace(/[“”]/g,'')+(voiceOn&&SR?' Evet mi, hayır mı?':''));c.querySelector('[data-ok="1"]').focus({preventScroll:true});if(voiceOn&&SR)yesNo(c);
   c.addEventListener('click',e=>{const b=e.target.closest('[data-ok]');if(!b)return;const v=b.dataset.ok;send({t:'approve',aid:m.aid,ok:v!=='0',always:v==='always'});c.classList.add('dn');c.querySelector('.res').textContent=v==='0'?'Vazgeçildi.':'Onaylandı.'})}
+/* onayı sesle de ver: soru okunduktan sonra bir kez “evet/hayır” dinler (eskiden ekrana bakmazsan Jarvis donmuş gibi bekliyordu) */
+function yesNo(c){let n=0;const go=()=>{if(c.classList.contains('dn')||listening)return;if(speaking()){if(++n<60)setTimeout(go,300);return}
+    try{wakeRec?.abort()}catch{}const r=new SR();r.lang='tr-TR';r.interimResults=false;listening=true;orb('listen');$('#live').textContent='“Evet” ya da “hayır” de…';
+    r.onresult=e=>{const t=e.results[0][0].transcript.toLocaleLowerCase('tr');if(/\b(evet|onay|onayla|tamam|yap|gönder|olur|tabii)\b/.test(t))c.querySelector('[data-ok="1"]').click();else if(/\b(hayır|hayir|vazgeç|iptal|dur|yapma|olmaz)\b/.test(t))c.querySelector('[data-ok="0"]').click()};
+    r.onend=()=>{listening=false;$('#live').textContent='';orb(busy?'think':ok?'idle':'off');if(wake)wakeStart()};r.onerror=()=>{};
+    setTimeout(()=>{try{r.start()}catch{listening=false}},250)};setTimeout(go,500)}
 function remind(r,m){const at=Date.parse(m.when);let done=false;try{const N=parent!==window&&parent.Notify;if(N?.add){N.add(m.text,isNaN(at)?Date.now()+6e4:at);done=true}}catch{}
   addStep(r,'',done?`Hatırlatıcı kuruldu: ${m.text} · ${isNaN(at)?'':new Date(at).toLocaleString('tr-TR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}`:'Hatırlatıcı için Jarvis\'i AppShell içinden aç',done?'ok':'err')}
 function keepLog(k,t){const L=lsg('jarvis:log',[]);L.push([k,t.slice(0,600),Date.now()]);lss('jarvis:log',L.slice(-40))}
@@ -178,6 +192,7 @@ lw.addEventListener('click',e=>{const c=e.target.closest('[data-c]');if(c)ask(c.
 function ask(text){text=text.trim();if(!text)return;if(!ok){showConn();return}
   hush();userMsg(text);const id=Math.random().toString(36).slice(2,9);busy=id;run(id);setBusy(true);orb('think');send({t:'say',id,text})}
 function stop(){if(busy){send({t:'stop'})}hush()}
+setInterval(()=>{if(!busy||!RUN[busy]||RUN[busy].slow||Date.now()-lastMsg<40000)return;RUN[busy].slow=1;addStep(RUN[busy],'note','Hâlâ çalışıyor… Çok uzarsa Durdur’a bas ya da “dur” de.','')},5000);
 function setBusy(b){const s=$('#sendB');s.classList.toggle('stop',b);s.setAttribute('aria-label',b?'Durdur':'Gönder');s.type=b?'button':'submit';
   s.innerHTML=b?'<svg viewBox="0 0 20 20"><rect x="6" y="6" width="8" height="8" rx="1.5" fill="currentColor" stroke="none"/></svg>':'<svg viewBox="0 0 20 20"><path d="M10 15.5V4.5M5 9l5-4.5L15 9"/></svg>'}
 $('#f').addEventListener('submit',e=>{e.preventDefault();const v=$('#q').value;$('#q').value='';ask(v)});
@@ -202,11 +217,12 @@ function listen(){if(!SR){$('#live').textContent='Bu tarayıcı konuşma tanıma
   let fin='';rec.onresult=e=>{let t='';for(const r of e.results){t+=r[0].transcript;if(r.isFinal)fin=t}$('#live').textContent=t};
   rec.onerror=e=>{$('#live').textContent=e.error==='not-allowed'?'Mikrofona izin verilmedi (adres çubuğundaki kilitten aç).':e.error==='no-speech'?'Ses gelmedi.':''};
   rec.onend=()=>{listening=false;orb(busy?'think':ok?'idle':'off');if(fin.trim()){$('#live').textContent='';ask(fin)}else setTimeout(()=>{if(!listening)$('#live').textContent=''},1800);if(wake)wakeStart()};
-  if(wakeRec){try{wakeRec.abort()}catch{}}try{rec.start()}catch{listening=false}
+  const st=k=>{try{rec.start()}catch{if(k<3)setTimeout(()=>st(k+1),250);else{listening=false;orb(busy?'think':ok?'idle':'off');$('#live').textContent='Mikrofon başlatılamadı, tekrar dokun.'}}};
+  if(wakeRec){try{wakeRec.abort()}catch{}setTimeout(()=>st(0),200)}else st(0)
   levels()}
 function wakeStart(){if(!SR||!wake||listening)return;try{wakeRec?.abort()}catch{}wakeRec=new SR();wakeRec.lang='tr-TR';wakeRec.continuous=true;wakeRec.interimResults=true;
   wakeRec.onresult=e=>{const r=e.results[e.results.length-1],t=r[0].transcript.toLowerCase();const i=t.search(/\b(jarvis|carvis|cervis|jarvıs)\b/);if(i<0)return;
-    const after=t.slice(i).replace(/^\S+\s*/,'');if(r.isFinal&&after.trim().length>2){try{wakeRec.abort()}catch{}ask(after)}else if(r.isFinal){try{wakeRec.abort()}catch{}listen()}};
+    const after=t.slice(i).replace(/^\S+\s*/,'');toHub({open:1});if(r.isFinal&&after.trim().length>2){try{wakeRec.abort()}catch{}ask(after)}else if(r.isFinal){try{wakeRec.abort()}catch{}setTimeout(listen,300)}};
   wakeRec.onend=()=>{if(wake&&!listening)setTimeout(wakeStart,400)};wakeRec.onerror=e=>{if(e.error==='not-allowed'){wake=false;lss('jarvis:wake',false);$('#wakeB').setAttribute('aria-pressed',false);$('#live').textContent='Mikrofona izin verilmedi.'}};
   try{wakeRec.start()}catch{}}
 $('#wakeB').setAttribute('aria-pressed',wake);$('#wakeB').addEventListener('click',()=>{wake=!wake;lss('jarvis:wake',wake);$('#wakeB').setAttribute('aria-pressed',wake);if(wake){wakeStart();$('#live').textContent='“Jarvis” dediğinde dinliyorum.'}else{try{wakeRec?.abort()}catch{}$('#live').textContent=''}});
@@ -214,7 +230,7 @@ $('#orbB').addEventListener('click',()=>{if(busy&&!listening){stop();return}list
 // mikrofon seviyesi → küre büyür (sadece dinlerken)
 let an=null;async function levels(){if(RM())return;try{if(!an){const s=await navigator.mediaDevices.getUserMedia({audio:true});const ctx=new AudioContext();const src=ctx.createMediaStreamSource(s);an=ctx.createAnalyser();an.fftSize=256;src.connect(an)}}catch{return}
   const d=new Uint8Array(an.frequencyBinCount),o=$('#orb');const f=()=>{if(!listening){o.style.setProperty('--lv',0);return}an.getByteFrequencyData(d);let v=0;for(const x of d)v+=x;o.style.setProperty('--lv',Math.min(1,v/d.length/90).toFixed(3));requestAnimationFrame(f)};f()}
-function orb(s){$('#orb').dataset.s=s}
+function orb(s){$('#orb').dataset.s=s;toHub({s})}
 
 /* ── klavye ── */
 addEventListener('keydown',e=>{if(e.target.closest('input,textarea'))return;if(e.code==='Space'&&$('#conn').hidden&&$('#sets').hidden&&!e.target.closest('button')){e.preventDefault();listen()}
@@ -226,7 +242,7 @@ const KUR=`py -c "import urllib.request as u;exec(u.urlopen('https://batulekesiz
 function showConn(mode){const c=$('#conn .card');if(mode==='pair'){c.innerHTML=`<h2 id="cT">Bilgisayarınla eşleştir</h2><p>Jarvis penceresinde yazan <b>6 haneli kodu</b> gir. Bir kez yeterli; bu cihaz hatırlanır.</p>
     <form class="code" id="pf"><input id="pc" inputmode="numeric" maxlength="6" autocomplete="one-time-code" aria-label="Eşleştirme kodu" placeholder="••••••"><button class="b pri">Eşleştir</button></form>${pairBad?'<p class="err" style="margin-top:10px">Kod tutmadı, tekrar dene.</p>':''}`;
     $('#conn').hidden=false;setTimeout(()=>$('#pc')?.focus(),40);$('#pf').onsubmit=e=>{e.preventDefault();send({t:'pair',code:$('#pc').value.trim()})};return}
-  if(ok)return;c.innerHTML=`<h2 id="cT">Jarvis'i bilgisayarında başlat</h2><p>Jarvis'in bilgisayarını kullanabilmesi için küçük bir program çalışmalı. Ek paket kurmaz; Windows'un Akıllı Uygulama Denetimi açıkken de çalışır.</p>
+  if(ok||(ws&&ws.readyState===1&&!$('#conn').hidden))return;c.innerHTML=`<h2 id="cT">Jarvis'i bilgisayarında başlat</h2><p>Jarvis'in bilgisayarını kullanabilmesi için küçük bir program çalışmalı. Ek paket kurmaz; Windows'un Akıllı Uygulama Denetimi açıkken de çalışır.</p>
     <ol><li><b>Python</b> kur: <a href="https://www.python.org/downloads/" target="_blank" rel="noopener">python.org</a> (kurarken “Add python.exe to PATH” kutusunu işaretle). Zaten varsa geç.</li>
     <li><b>Win+R</b>'ye bas, bunu yapıştır, Enter:<div class="kc"><code id="kcT">${KUR}</code><button class="b" id="kcB">Kopyala</button></div></li>
     <li>Açılan pencerede yazan <b>6 haneli kodu</b> burada gir. Sonraki seferlerde masaüstündeki <b>Jarvis</b>'e çift tıkla.</li></ol>
@@ -262,7 +278,11 @@ function paintSets(firstKey){const c=$('#sets .card');if($('#sets').hidden)retur
 for(const id of['#conn','#sets'])$(id).addEventListener('click',e=>{if(e.target.id===id.slice(1)&&ok)$(id).hidden=true});
 addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('#sets').hidden){$('#sets').hidden=true;e.stopImmediatePropagation()}else if(!$('#conn').hidden&&ok){$('#conn').hidden=true}}},true);
 
-restoreLog();connect();setTimeout(()=>{if(!ok)showConn()},2500);if(wake)wakeStart();
+restoreLog();connect();setTimeout(()=>{if(!ok&&!(ws&&ws.readyState===1))showConn()},2500); /* bağlıysa (eşleştirme bekliyorsa) kod kutusunun yerine kurulum ekranı gelmesin */if(wake)wakeStart();
+/* hub paneli (küçük mod): kapat düğmesi, Esc, hub'dan gelen “odaklan / dinle” */
+if(MINI){$('#closeB').hidden=false;$('#closeB').onclick=()=>toHub({close:1});
+  addEventListener('keydown',e=>{if(e.altKey&&e.code==='KeyJ'){e.preventDefault();toHub({close:1});return}if(e.key==='Escape'&&!busy&&!listening&&$('#sets').hidden&&$('#conn').hidden&&!e.defaultPrevented)toHub({close:1})});
+  addEventListener('message',e=>{const m=e.data;if(!m||m.jarvisHub!==1||e.source!==parent)return;if(m.cmd==='focus')$('#q').focus();else if(m.cmd==='listen')listen()})}
 </script>
 </body>
 </html>

@@ -6379,5 +6379,24 @@
     "fix": "Jarvis renk paletinden muaf (data-keep-dark), zemin hep koyu"
    }
   ]
+ },
+ {
+  "at": "2026-11-26T17:54:12",
+  "change": "Galeri artık fotoğraftaki yazıları da okuyor: kullanıcı adları (@cyberleek), hashtag'ler, markalar, alıntılar, ekran görüntüsündeki metinler. Tanınan adlar (hesaplar, kişiler, markalar, uygulamalar) ayrıca kaydediliyor, etiket sayısı 25'e çıktı. Yazıların okunabilmesi için küçük önizleme yerine büyük görüntüye bakılıyor. Arama esnek: “cyberleek”, “CYBER LEEK”, “@cyber.leek”, hatta yazım hatalı “cyberlek” aynı fotoğrafı buluyor. Daha önce etiketlenen fotoğraflar kendiliğinden yeniden, ayrıntılı etiketleniyor.",
+  "scores": {
+   "galeri telefon": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "galeri",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Etiketler fazla genel kalıyordu; fotoğraftaki yazılar/hesap adları aranamıyordu",
+    "fix": "OCR (yazi) + özel adlar (adlar) + büyük görüntü + esnek arama"
+   }
+  ]
  }
 ]

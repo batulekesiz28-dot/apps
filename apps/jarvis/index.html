@@ -258,7 +258,7 @@ function paintSets(firstKey){const c=$('#sets .card');if($('#sets').hidden)retur
   c.querySelectorAll('[data-ef]').forEach(b=>b.onclick=()=>send({t:'set',effort:b.dataset.ef}));
   $('#fS')?.addEventListener('click',()=>send({t:'set',fast:!cfg.fast}));
   $('#nw').onclick=()=>{send({t:'new'});lss('jarvis:log',[]);empty();$('#sets').hidden=true};
-  $('#sOk').onclick=()=>{const k=$('#kIn').value.trim();if(k&&!cfg.old&&cfg.kcheck){pendKey=1;$('#sOk').textContent='Deneniyor…';send({t:'set',kp:p,key:k})}else{if(k)send({t:'set',kp:p,key:k});$('#sets').hidden=true}}}
+  $('#sOk').onclick=()=>{const k=$('#kIn').value.trim();if(/^(AIza|AQ\.)/.test(k))lss('ai:gemini',k);/* Galeri'nin otomatik etiketi de aynı ücretsiz anahtarı kullansın (sadece bu tarayıcıda) */if(k&&!cfg.old&&cfg.kcheck){pendKey=1;$('#sOk').textContent='Deneniyor…';send({t:'set',kp:p,key:k})}else{if(k)send({t:'set',kp:p,key:k});$('#sets').hidden=true}}}
 for(const id of['#conn','#sets'])$(id).addEventListener('click',e=>{if(e.target.id===id.slice(1)&&ok)$(id).hidden=true});
 addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('#sets').hidden){$('#sets').hidden=true;e.stopImmediatePropagation()}else if(!$('#conn').hidden&&ok){$('#conn').hidden=true}}},true);
 

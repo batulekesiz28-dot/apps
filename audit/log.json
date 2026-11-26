@@ -6262,5 +6262,31 @@
     "fix": "Seri anahtarı (fkey) ile eleme + öneriler içinde tekilleştirme"
    }
   ]
+ },
+ {
+  "at": "2026-11-26T17:00:35",
+  "change": "Galeri: fotoğraflara otomatik isim ve etiket — ücretsiz Gemini anahtarıyla her fotoğrafın içine bakılıp “Bahçede sarı çiçek” gibi bir isim ve etiketler veriliyor; aramada “çiçek”, “ÇİÇEKLER”, “deniz” yazınca bulunuyor. Jarvis'e girdiğin Gemini anahtarı Galeri'de de kullanılıyor.",
+  "scores": {
+   "galeri telefon": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "galeri",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Otomatik etiketleme sadece ücretli Claude anahtarıyla çalışıyordu",
+    "fix": "Ücretsiz Gemini (8'erli gruplar, kota bitince başka model)"
+   },
+   {
+    "app": "galeri",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Aramada çoğul/ekli kelimeler (çiçekler, denizde) bulunmuyordu",
+    "fix": "Türkçe ekler tolere ediliyor"
+   }
+  ]
  }
 ]

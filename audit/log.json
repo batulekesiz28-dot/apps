@@ -6222,5 +6222,31 @@
   "change": "Yeni uygulamalar: WhatsApp (WhatsApp Web) ve Bambu Lab (MakerWorld). Eklenti 1.3'e güncellendi: kurarsan bunlar da hub'ın içinde açılır, kurmazsan ayrı pencerede.",
   "scores": {},
   "items": []
+ },
+ {
+  "at": "2026-11-26T16:55:21",
+  "change": "Haberler yeniden bağlanıyor: haber siteleri artık tek bir aracı servise bağlı değil; altı yol aynı anda deneniyor, çalışan hatırlanıyor. Ayrıca kaynaklar yanıt vermeyince Akış ekranının kilitlenmesine yol açan hata giderildi. Hub'daki haber kutusu ve haber takibi de aynı yolu kullanıyor.",
+  "scores": {
+   "haberler telefon": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "haberler",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Haberler internete bağlanamıyordu (kullanılan aracı servis çökmüş)",
+    "fix": "6 yol yarışıyor, çalışan hatırlanıyor (shared/cors.js)"
+   },
+   {
+    "app": "haberler",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Kaynaklar yanıt vermeyince Akış sonsuz döngüye girip sayfayı kilitliyordu",
+    "fix": "Boş dönüşte 30 sn bekleyip yeniden dener"
+   }
+  ]
  }
 ]

@@ -40,6 +40,7 @@ const Feed=(()=>{
     const m=new Map();S.forEach(x=>{if(!m.has(x.id))m.set(x.id,x)});return[...m.values()]}
   function addItems(L,cat,whyTxt){const s=seen();let n=0;for(const i of L){const k=NW().key(i);if(s[k]||pool.has(k)||shown.some(x=>x.k===k))continue;if(i.t&&Date.now()-i.t>4*864e5)continue;
       pool.set(k,{...i,k,cat:i.cat||cat,why:whyTxt||''});n++}return n}
+  let stalled=0;
   async function more(){if(loading)return;loading=true;paintLoad(true);
     try{// önce önbellekteki kategori haberleri (Liste ile aynı), sonra sıradaki kaynak
       if(!shown.length&&typeof C!=='undefined')Object.entries(C).forEach(([id,v])=>addItems(v.items||[],id));
@@ -48,7 +49,7 @@ const Feed=(()=>{
         try{addItems(await NW().feed(x.url),x.cat,x.why)}catch{}}
       if(!pool.size&&!shown.length)throw new Error('net')}
     catch{if(!shown.length)paintEmpty()}
-    finally{loading=false;paintLoad(false);fill()}}
+    finally{loading=false;paintLoad(false);if(pool.size)fill();else stalled=Date.now()}} // boş döndüyse hemen yeniden deneme (eskiden more↔fill sonsuz döngüye giriyordu)
   // sıradaki kartları seç: ilgi + çeşitlilik + keşif
   function next(n){const out=[];for(let j=0;j<n&&pool.size;j++){const L=[...pool.values()],prev=[...shown,...out].slice(-2),explore=(shown.length+out.length)%5===4;
       let best=null,bs=-1e9;for(const i of L){let s=explore?-fam(i)*1.5+Math.random()*2+3*Math.exp(-((Date.now()-(i.t||Date.now()))/36e5)/18):score(i);
@@ -64,10 +65,10 @@ const Feed=(()=>{
       <div class="rc-rail"><button data-fa="like" aria-pressed="false" aria-label="Beğen" title="Beğen · L">${sv('like')}<small>Beğen</small></button><button data-fa="open" aria-label="Habere git" title="Habere git · Enter">${sv('open')}<small>Oku</small></button>
         <button data-fa="less" aria-label="Bunun gibi daha az" title="Daha az · N">${sv('less')}<small>Daha az</small></button><button data-fa="share" aria-label="Paylaş" title="Paylaş">${sv('share')}<small>Paylaş</small></button></div></article>`}
   function fill(){if(!el)return;const box=el.querySelector('.rl-s');const left=shown.length-Math.max(0,cur);if(left>5)return;
-    const add=next(8);if(!add.length){if(!loading&&mode==='feed')more();return}
+    const add=next(8);if(!add.length){if(!loading&&mode==='feed'&&Date.now()-stalled>30000)setTimeout(more,0);return}
     const start=shown.length;shown.push(...add);box.insertAdjacentHTML('beforeend',add.map((i,j)=>card(i,start+j)).join(''));
     box.querySelectorAll('.rc:not([data-o])').forEach(c=>{c.dataset.o=1;io.observe(c)});
-    if(pool.size<10&&mode==='feed')more()}
+    if(pool.size<10&&mode==='feed'&&!loading&&Date.now()-stalled>30000)setTimeout(more,0)}
   function paintLoad(on){el?.querySelector('.rl-ld')?.toggleAttribute('hidden',!on||shown.length>cur+2)}
   function paintEmpty(){const box=el?.querySelector('.rl-s');if(box&&!shown.length)box.innerHTML=`<div class="rl-e"><b>Haber alınamadı</b><span>İnternet bağlantını kontrol et.</span><button class="ib" data-fa="retry">Tekrar dene</button></div>`}
   /* ── kart değişimi: kalma süresinden öğren ── */

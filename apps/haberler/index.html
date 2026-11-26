@@ -53,7 +53,8 @@
 <script>try{var f=JSON.parse(localStorage.getItem('notlar:theme'));if(f)document.documentElement.dataset.theme=f}catch(e){}</script>
 <script src="../../shared/skin.js?v=20261124a"></script>
 <link rel="stylesheet" href="feed.css?v=20261125d">
-<script src="../../shared/newswatch.js?v=20261125c"></script>
+<script src="../../shared/cors.js?v=20261126a"></script>
+<script src="../../shared/newswatch.js?v=20261126a"></script>
 </head>
 <body>
 <header class="hb" id="hb"><div class="hb-seg" role="group" aria-label="Görünüm"><button data-mode="feed" aria-pressed="true">Akış</button><button data-mode="list" aria-pressed="false">Liste</button></div>
@@ -70,10 +71,10 @@
   <main id="main" aria-live="polite"></main>
   <p class="src">Başlıklar haber sitelerinin herkese açık RSS akışlarından ve Google Haberler'den gelir; habere tıklayınca kaynağında açılır. Okudukların soluk görünür.</p>
 </div>
-<script src="feed.js?v=20261125c"></script>
+<script src="feed.js?v=20261126a"></script>
 <script>
 /* Bugünkü Haberler — konu başlıklarına göre güncel haberler (RSS).
-   Çekme sırası: kaynağın kendisi → rss2json → allorigins (CORS izin vermeyen siteler için). Önbellek haberler:cache (15 dk), okunanlar haberler:read,
+   Çekme: shared/cors.js (doğrudan + 5 aracı servis yarışır, çalışan hatırlanır). Önbellek haberler:cache (15 dk), okunanlar haberler:read,
    kendi konuların haberler:topics (Google Haberler araması). Hub'daki “Bugünkü Haberler” widget'ı aynı önbelleği okur. */
 const GN=(q,lang='tr')=>lang==='tr'?`https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=tr&gl=TR&ceid=TR:tr`:`https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=en-US&gl=US&ceid=US:en`;
 const CATS=[
@@ -99,11 +100,9 @@ function parse(txt,url){const x=new DOMParser().parseFromString(txt,'text/xml'),
     const mc=n.getElementsByTagName('media:content')[0]||n.getElementsByTagName('media:thumbnail')[0],enc=n.querySelector('enclosure[type^=image]'),im=(d.match(/<img[^>]+src="([^"]+)"/)||[])[1];
     return{title,link,t:Date.parse(g('pubDate')||g('updated')||g('published'))||0,src:src.slice(0,40),desc:/news\.google\./.test(url)?'':clean(d).slice(0,300),img:mc?.getAttribute('url')||enc?.getAttribute('url')||im||''}})
     .filter(i=>i.title&&/^https?:/.test(i.link))}
-async function one(url){const tm=ms=>({signal:AbortSignal.timeout?AbortSignal.timeout(ms):undefined});
-  try{const r=await fetch(url,{cache:'no-store',...tm(6000)});if(r.ok)return parse(await r.text(),url)}catch{}
-  try{const r=await fetch('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(url),tm(8000));const j=await r.json();
-    if(j.status==='ok')return j.items.slice(0,25).map(i=>{let title=clean(i.title);const src=(j.feed?.title||host(url)).slice(0,40);return{title,link:i.link,t:Date.parse((i.pubDate||'').replace(' ','T')+'Z')||0,src,desc:clean(i.description).slice(0,300),img:i.thumbnail||i.enclosure?.link||''}}).filter(i=>i.title)}catch{}
-  const r=await fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(url),tm(9000));if(!r.ok)throw new Error('rss');return parse(await r.text(),url)}
+async function one(url){const r=await Cors.get(url); /* shared/cors.js: çalışan aracı servisi bulur ve hatırlar */
+  if(r.xml)return parse(r.xml,url);const j=r.r2j;
+  return j.items.slice(0,25).map(i=>{let title=clean(i.title);const src=(j.feed?.title||host(url)).slice(0,40);if(title.endsWith(' - '+src))title=title.slice(0,-(src.length+3));return{title,link:i.link,t:Date.parse((i.pubDate||'').replace(' ','T')+'Z')||0,src,desc:/news\.google\./.test(url)?'':clean(i.description).slice(0,300),img:i.thumbnail||i.enclosure?.link||''}}).filter(i=>i.title)}
 const norm=s=>s.toLocaleLowerCase('tr').replace(/[^\p{L}\p{N} ]/gu,'').slice(0,70);
 async function load(cat,force){const c=allCats().find(x=>x.id===cat);if(!c)return;const ids=cat==='hepsi'?CATS.map(x=>x.id):[cat];
   const need=ids.filter(id=>force||!C[id]||Date.now()-C[id].at>15*6e4);if(!need.length)return;busy=true;paint();

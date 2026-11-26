@@ -19,13 +19,10 @@ function parse(txt,url){const x=new DOMParser().parseFromString(txt,'text/xml'),
     let title=clean(g('title'));const src=clean(n.querySelector('source')?.textContent)||src0;if(src&&title.endsWith(' - '+src))title=title.slice(0,-(src.length+3));
     const d=g('description')||g('summary')||g('content'),mc=n.getElementsByTagName('media:content')[0]||n.getElementsByTagName('media:thumbnail')[0],enc=n.querySelector('enclosure[type^=image]'),im=(d.match(/<img[^>]+src="([^"]+)"/)||[])[1];
     return{title,link,t:Date.parse(g('pubDate')||g('updated')||g('published'))||0,src:String(src).slice(0,40),desc:/news\.google\./.test(url)?'':clean(d).slice(0,300),img:mc?.getAttribute('url')||enc?.getAttribute('url')||im||''}}).filter(i=>i.title&&/^https?:/.test(i.link))}
-// RSS: kaynağın kendisi → rss2json → allorigins (CORS izin vermeyenler için)
-async function feed(url){const tm=ms=>({signal:AbortSignal.timeout?AbortSignal.timeout(ms):undefined});
-  try{const r=await fetch(url,{cache:'no-store',...tm(6000)});if(r.ok)return parse(await r.text(),url)}catch{}
-  try{const r=await fetch('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(url),tm(8000));const j=await r.json();
-    if(j.status==='ok')return j.items.slice(0,40).map(i=>{const src=(j.feed?.title||host(url)).slice(0,40);let title=clean(i.title);if(title.endsWith(' - '+src))title=title.slice(0,-(src.length+3));
-      return{title,link:i.link,t:Date.parse((i.pubDate||'').replace(' ','T')+'Z')||0,src,desc:/news\.google\./.test(url)?'':clean(i.description).slice(0,300),img:i.thumbnail||i.enclosure?.link||''}}).filter(i=>i.title)}catch{}
-  const r=await fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(url),tm(9000));if(!r.ok)throw new Error('rss');return parse(await r.text(),url)}
+// RSS: shared/cors.js (doğrudan + aracı servisler yarışır; çalışan hatırlanır)
+async function feed(url){const r=await Cors.get(url);if(r.xml)return parse(r.xml,url);const j=r.r2j;
+  return j.items.slice(0,40).map(i=>{const src=(j.feed?.title||host(url)).slice(0,40);let title=clean(i.title);if(title.endsWith(' - '+src))title=title.slice(0,-(src.length+3));
+    return{title,link:i.link,t:Date.parse((i.pubDate||'').replace(' ','T')+'Z')||0,src,desc:/news\.google\./.test(url)?'':clean(i.description).slice(0,300),img:i.thumbnail||i.enclosure?.link||''}}).filter(i=>i.title)}
 
 /* ── kelimeler: küçük harf, Türkçe ekleri kabaca at (ilk 5 harf), dolgu kelimeleri çıkar ── */
 const STOP=new Set('ve ile bir bu şu o da de mi mı mu mü için gibi daha çok en ama fakat ki ne neden nasıl olan oldu olarak yeni son sonra önce kadar göre her tüm bazı hem ise ya yada veya üzerine karşı arasında haber haberi haberleri açıkladı dedi the a an of to in on for and or is are was with by at from as that this it be has have will after new says said over into about'.split(' '));

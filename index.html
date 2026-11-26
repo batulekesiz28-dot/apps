@@ -999,6 +999,7 @@ body,.btn,.mi,.pal-in,input,textarea,button{font-family:var(--font)}
 <div class="pdrop" id="pdrop"><div><svg viewBox="0 0 28 28"><path d="M14 4v15M8.5 9.5L14 4l5.5 5.5M5 23.5h18"/></svg>HTML dosyalarını bırak<span>bıraktığın yere yerleşir</span></div></div>
 <div class="toasts" id="toasts"></div>
 
+<script src="shared/cors.js?v=20261126a"></script>
 <script>
 'use strict';
 /* ════════════════════════════════════════════════════════════
@@ -2859,9 +2860,8 @@ const RSS={cache:{},at:{},busy:false,err:false,
     const parse=txt=>{const x=new DOMParser().parseFromString(txt,'text/xml'),nodes=[...x.querySelectorAll('item,entry')];const src=x.querySelector('channel>title,feed>title')?.textContent.trim()||host;
       return nodes.slice(0,12).map(n=>{const g=s=>n.querySelector(s)?.textContent?.trim()||'';const l=n.querySelector('link');const link=l?.getAttribute('href')||l?.textContent?.trim()||'';
         return{title:g('title'),link,t:Date.parse(g('pubDate')||g('updated')||g('published'))||0,src:src.slice(0,28)}}).filter(i=>i.title&&/^https?:/.test(i.link))};
-    try{const r=await fetch(url,{cache:'no-store'});if(r.ok)return parse(await r.text())}catch{}
-    try{const r=await fetch('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(url));const j=await r.json();if(j.status==='ok')return j.items.slice(0,12).map(i=>({title:i.title,link:i.link,t:Date.parse(i.pubDate.replace(' ','T')+'Z')||0,src:(j.feed?.title||host).slice(0,28)}))}catch{}
-    const r=await fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(url));if(!r.ok)throw new Error('rss');return parse(await r.text())},
+    const r=await Cors.get(url);if(r.xml)return parse(r.xml);const j=r.r2j; /* shared/cors.js */
+    return j.items.slice(0,12).map(i=>({title:i.title,link:i.link,t:Date.parse((i.pubDate||'').replace(' ','T')+'Z')||0,src:(j.feed?.title||host).slice(0,28)}))},
   async load(feeds,force){const k=feeds.join();if(this.busy&&!force)return;this.busy=true;
     const res=await Promise.allSettled(feeds.map(u=>this.one(u)));this.busy=false;this.at[k]=Date.now();
     const all=res.flatMap(x=>x.status==='fulfilled'?x.value:[]);this.err=!all.length&&res.some(x=>x.status==='rejected');
@@ -3856,7 +3856,7 @@ addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.shiftKey&&(e.key==='
 <link rel="stylesheet" href="ui/notify.css?v=20261120d">
 <script src="ui/notify.js?v=20261125a"></script>
 <link rel="stylesheet" href="ui/soon.css?v=20261124a"><script src="ui/soon.js?v=20261124a"></script>
-<script src="shared/newswatch.js?v=20261125c"></script>
+<script src="shared/newswatch.js?v=20261126a"></script>
 <link rel="stylesheet" href="ui/os.css?v=20261121a">
 <script src="ui/os.js?v=20261123b"></script>
 <link rel="stylesheet" href="ui/osx.css?v=20261124d"><script src="ui/osx.js?v=20261124a"></script><script src="ui/tour.js?v=20261124b"></script>

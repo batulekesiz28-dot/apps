@@ -146,6 +146,13 @@
    "color": "violet",
    "desc": "Sesli kişisel asistan: konuş ya da yaz; bilgisayarında uygulama ve site açar, tarayıcıda iş yapar (YouTube, takvim, randevu), alternatif yollar dener, yaptığı her adımı gösterir; geri alınamaz işlerde onay ister",
    "ai": true
+  },
+  {
+   "slug": "yansit",
+   "name": "Yansıt",
+   "icon": "cast",
+   "color": "blue",
+   "desc": "Ekran yansıtma: bilgisayar ekranını televizyona ya da başka cihaza, telefon kamerasını bilgisayara kodla yansıt · telefon ekranı için Smart View / AirPlay rehberi"
   }
  ]
 }

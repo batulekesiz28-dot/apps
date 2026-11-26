@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Yansıt</title>
+<style>
+  :root{--bg:#FAFAFA;--card:#FFFFFF;--ink:#18181B;--ink2:#52525B;--ink3:#6E6E77;--line:rgba(0,0,0,.08);--line2:rgba(0,0,0,.14);--hover:rgba(0,0,0,.04);--acc:#2563EB;--ok:#15803D;--err:#C62828;
+    --font:"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;--spring:cubic-bezier(.2,1.2,.3,1);color-scheme:light}
+  [data-theme=dark]{--bg:#0E0E10;--card:#18181B;--ink:#EDEDEF;--ink2:#B4B4BC;--ink3:#8E8E98;--line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.16);--hover:rgba(255,255,255,.05);--acc:#6EA8FF;--ok:#4ADE80;--err:#F87171;color-scheme:dark}
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{min-height:100%}body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--font);-webkit-font-smoothing:antialiased}
+  button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+  :focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:12px}
+  .wrap{max-width:760px;margin:0 auto;padding:56px 20px 48px}
+  h1{font-size:40px;font-weight:650;letter-spacing:-.03em;line-height:1.1}
+  .sub{margin-top:10px;font-size:16px;color:var(--ink2);max-width:540px}
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:32px}
+  .opt{display:grid;gap:10px;align-content:start;text-align:left;padding:22px;border-radius:22px;background:var(--card);box-shadow:inset 0 0 0 1px var(--line);transition:transform .25s var(--spring),box-shadow .2s}
+  .opt:hover{box-shadow:inset 0 0 0 1px var(--line2),0 14px 34px -22px rgba(0,0,0,.35);transform:translateY(-2px)}.opt:active{transform:scale(.98)}
+  .opt svg{width:30px;height:30px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;color:var(--acc)}
+  .opt b{font-size:18px}.opt small{font-size:14px;color:var(--ink2)}
+  .gd{margin-top:34px;border-top:1px solid var(--line);padding-top:22px}
+  .gd h2{font-size:17px;font-weight:600}.gd>p{font-size:14px;color:var(--ink2);margin-top:4px}
+  .gd details{margin-top:12px;border-radius:16px;background:var(--card);box-shadow:inset 0 0 0 1px var(--line)}
+  .gd summary{list-style:none;cursor:pointer;padding:14px 18px;font-weight:600;font-size:15px;display:flex;align-items:center;gap:10px;min-height:48px}
+  .gd summary::-webkit-details-marker{display:none}.gd summary::after{content:'';margin-left:auto;width:8px;height:8px;border-right:1.6px solid var(--ink3);border-bottom:1.6px solid var(--ink3);transform:rotate(45deg);transition:transform .2s}
+  .gd details[open] summary::after{transform:rotate(-135deg)}
+  .gd ol{padding:0 22px 16px 40px;font-size:14.5px;color:var(--ink2);display:grid;gap:6px}.gd ol b{color:var(--ink)}
+  .gd a{color:var(--acc);display:inline-block;padding:10px 0;margin:-10px 0}
+  .note{margin-top:26px;font-size:13px;color:var(--ink3);max-width:560px}
+  /* gönderen */
+  .pane{margin-top:28px;padding:24px;border-radius:24px;background:var(--card);box-shadow:inset 0 0 0 1px var(--line)}
+  .back{display:inline-flex;align-items:center;gap:6px;font-size:14px;color:var(--ink2);height:40px;padding:0 6px;margin-left:-6px}
+  .lb{display:block;font-size:13px;font-weight:600;color:var(--ink3);margin:18px 0 8px}.lb:first-child{margin-top:0}
+  .code-in{width:100%;height:64px;border:0;border-radius:16px;background:var(--hover);box-shadow:inset 0 0 0 1px var(--line2);color:var(--ink);font:600 30px/1 var(--mono);letter-spacing:.32em;text-align:center;text-transform:uppercase;outline:0}
+  .code-in:focus{box-shadow:inset 0 0 0 2px var(--acc)}
+  .seg{display:flex;gap:4px;padding:4px;border-radius:14px;background:var(--hover);flex-wrap:wrap}
+  .seg button{flex:1;min-width:96px;height:42px;border-radius:10px;font-size:14px;font-weight:500;color:var(--ink2)}
+  .seg button[aria-pressed=true]{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12),inset 0 0 0 1px var(--line)}
+  .seg button:disabled{opacity:.45;cursor:not-allowed}
+  .hint{font-size:13px;color:var(--ink3);margin-top:8px}
+  .go{width:100%;height:52px;margin-top:22px;border-radius:16px;background:var(--ink);color:var(--bg);font-weight:600;font-size:16px;transition:transform .2s var(--spring),opacity .2s}
+  .go:active{transform:scale(.98)}.go:disabled{opacity:.5}
+  .msg{margin-top:12px;font-size:14px;min-height:21px}.msg.err{color:var(--err)}.msg.ok{color:var(--ok)}
+  .live{display:grid;gap:14px}.live video{width:100%;max-height:46vh;border-radius:16px;background:#000;object-fit:contain}
+  .row{display:flex;gap:10px;flex-wrap:wrap}.row .go{flex:1;margin:0}.ghost{background:none!important;color:var(--ink)!important;box-shadow:inset 0 0 0 1px var(--line2)}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--ok);margin-right:8px;vertical-align:1px;box-shadow:0 0 0 4px color-mix(in srgb,var(--ok) 20%,transparent)}
+  /* alıcı (TV) */
+  .rx{position:fixed;inset:0;z-index:10;background:#000;color:#fff;display:grid;place-items:center;text-align:center;cursor:default}
+  .rx[hidden]{display:none}
+  .rx-w{display:grid;gap:18px;justify-items:center;padding:24px}
+  .rx-k{font-size:clamp(15px,2.2vw,22px);color:rgba(255,255,255,.72)}
+  .rx-c{font:600 clamp(64px,15vw,168px)/1 var(--mono);letter-spacing:.14em;padding-left:.14em}
+  .rx-u{font-size:clamp(14px,1.6vw,18px);color:rgba(255,255,255,.62);max-width:760px}
+  .rx-u b{color:#fff;font-weight:600}
+  .rx-s{font-size:15px;color:rgba(255,255,255,.7);min-height:22px}
+  .rx video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}
+  .rx-ui{position:absolute;left:50%;bottom:28px;translate:-50% 0;display:flex;align-items:center;gap:8px;padding:8px;border-radius:999px;background:rgba(20,20,22,.72);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);transition:opacity .4s,translate .4s var(--spring)}
+  .rx-ui span{font-size:14px;padding:0 10px 0 8px;color:rgba(255,255,255,.85);white-space:nowrap}
+  .rx-ui button{height:40px;padding:0 16px;border-radius:999px;color:#fff;font-size:14px;font-weight:500}.rx-ui button:hover{background:rgba(255,255,255,.12)}
+  .rx.idle .rx-ui{opacity:0;translate:-50% 12px;pointer-events:none}.rx.idle{cursor:none}
+  .rx-x{position:absolute;top:16px;right:16px;height:40px;padding:0 16px;border-radius:999px;color:rgba(255,255,255,.75);font-size:14px;background:rgba(255,255,255,.08)}
+  @media (max-width:600px){.wrap{padding:36px 16px 40px}h1{font-size:32px}.opts{grid-template-columns:1fr}.pane{padding:18px}.code-in{font-size:26px}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+  html[data-motion=off] *{transition:none!important;animation:none!important}
+</style>
+<script>try{var f=JSON.parse(localStorage.getItem('notlar:theme'));if(f)document.documentElement.dataset.theme=f}catch(e){}</script>
+<script src="../../shared/skin.js?v=20261126a"></script>
+</head>
+<body>
+<main class="wrap" id="app"></main>
+<section class="rx" id="rx" hidden aria-label="Yansıtma alıcısı"></section>
+<script>
+/* Yansıt — bir ekranı (ya da kamerayı) başka bir cihazda gösterir.
+   Görüntü WebRTC ile cihazdan cihaza DOĞRUDAN gider; eşleşme mesajları (bağlantı bilgisi) kısa kodla ntfy.sh üzerinden.
+   Alıcı (TV/bilgisayar): #izle → büyük kod; gönderen kodu girer. Telefon tarayıcıları ekran paylaşamaz (sadece kamera) → telefon ekranı için rehber. */
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const lsg=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k));return v??d}catch{return d}},lss=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
+const RM=()=>matchMedia('(prefers-reduced-motion: reduce)').matches||document.documentElement.dataset.motion==='off';
+const ALPH='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',NT='https://ntfy.sh/',TOP=c=>'appshell-yansit-v1-'+c.toLowerCase();
+const me=Math.random().toString(36).slice(2,10);
+const ICE=[{urls:['stun:stun.l.google.com:19302','stun:stun.cloudflare.com:3478']}];
+const canScreen=!!(navigator.mediaDevices&&navigator.mediaDevices.getDisplayMedia),canCam=!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia);
+const Q={smooth:{n:'Akıcı',fps:60,h:720,br:4e6,hint:'motion',d:'60 kare/sn · film, oyun'},sharp:{n:'Net',fps:30,h:1080,br:6e6,hint:'detail',d:'1080p · yazı, sunum'}};
+const IC={scr:'<rect x="3" y="4.5" width="18" height="12" rx="2"/><path d="M8.5 20h7M12 16.5V20"/>',tv:'<rect x="2.5" y="4.5" width="19" height="13" rx="2.5"/><path d="M7.5 20.5h9"/><path d="M9.5 9l5 2-5 2z"/>'};
+const ic=k=>`<svg viewBox="0 0 24 24" aria-hidden="true">${IC[k]}</svg>`;
+
+/* ── sinyal: sıkıştır + parçala (ntfy mesajı ≤4 KB) ── */
+const b64u=b=>btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+const ub64=s=>{const b=atob(s.replace(/-/g,'+').replace(/_/g,'/'));return Uint8Array.from(b,c=>c.charCodeAt(0))};
+async function pack(o){const s=new Blob([JSON.stringify(o)]).stream().pipeThrough(new CompressionStream('deflate-raw'));return b64u(await new Response(s).arrayBuffer())}
+async function unpack(t){const s=new Blob([ub64(t)]).stream().pipeThrough(new DecompressionStream('deflate-raw'));return JSON.parse(await new Response(s).text())}
+async function sig(code,o){const z=await pack({...o,from:me}),parts=z.match(/.{1,3200}/g)||[''],id=Math.random().toString(36).slice(2,8);
+  for(let i=0;i<parts.length;i++){const r=await fetch(NT+TOP(code),{method:'POST',body:`${id}|${i}|${parts.length}|${parts[i]}`});if(!r.ok)throw new Error('eşleşme sunucusu '+r.status)}}
+function subscribe(code,on){const buf={};const es=new EventSource(`${NT}${TOP(code)}/sse?since=${Math.floor(Date.now()/1000)-2}`);
+  es.onmessage=async e=>{let d;try{d=JSON.parse(e.data)}catch{return}if(d.event&&d.event!=='message')return;const[id,i,n,part]=String(d.message||'').split('|');if(!part)return;
+    const b=buf[id]||(buf[id]={n:+n,p:[]});b.p[+i]=part;if(b.p.filter(Boolean).length<b.n)return;delete buf[id];
+    try{const m=await unpack(b.p.join(''));if(m.from!==me)on(m)}catch(er){console.warn('yansıt sinyal',er)}};
+  return new Promise((res,rej)=>{const t=setTimeout(()=>rej(new Error('Eşleşme sunucusuna bağlanılamadı (internet?)')),9000);es.onopen=()=>{clearTimeout(t);res(es)};es.onerror=()=>{}})}
+const iceDone=pc=>new Promise(r=>{if(pc.iceGatheringState==='complete')return r();const t=setTimeout(r,3000);pc.addEventListener('icegatheringstatechange',()=>{if(pc.iceGatheringState==='complete'){clearTimeout(t);r()}})});
+const newCode=()=>Array.from(crypto.getRandomValues(new Uint8Array(6)),x=>ALPH[x%ALPH.length]).join('');
+
+/* ── ana ekran ── */
+function home(){stopTx();$('#rx').hidden=true;
+  $('#app').innerHTML=`<h1>Yansıt</h1><p class="sub">Bir ekranı başka bir cihazda göster: bilgisayarını televizyona, telefon kameranı bilgisayara. Görüntü cihazlar arasında doğrudan gider.</p>
+  <div class="opts"><button class="opt" data-go="tx">${ic('scr')}<b>Bu ekranı göster</b><small>${canScreen?'Ekranını, bir pencereyi ya da sekmeyi':'Bu cihazın kamerasını'} başka bir cihaza yansıt.</small></button>
+    <button class="opt" data-go="rx">${ic('tv')}<b>Burada izle</b><small>Bu cihaz alıcı olsun: TV'de ya da bilgisayarda aç, çıkan kodu öbür cihaza gir.</small></button></div>
+  <section class="gd"><h2>Telefonun ekranını yansıtmak</h2><p>Telefon tarayıcıları ekranı paylaşamıyor; telefonun kendi yansıtma özelliği en akıcısı:</p>
+    <details><summary>Android → televizyon</summary><ol><li>Ekranın üstünden iki kez aşağı kaydırıp hızlı ayarları aç.</li><li><b>Smart View</b>, <b>Ekran yansıtma</b> ya da <b>Yayınla</b>'ya dokun.</li><li>Listeden televizyonu seç (TV'nin Chromecast ya da Miracast desteklemesi gerekir; ikisi aynı Wi-Fi'de olmalı).</li></ol></details>
+    <details><summary>Android → Windows bilgisayar</summary><ol><li>Bilgisayarda <b>Ayarlar → Sistem → Bu bilgisayara yansıtma</b>'yı aç (ilk seferde “Kablosuz Ekran” isteğe bağlı özelliğini ekle).</li><li>Telefonda <b>Smart View / Ekran yansıtma</b>'dan bilgisayarı seç.</li><li>Kabloyla ve en akıcısı: ücretsiz <a href="https://github.com/Genymobile/scrcpy" target="_blank" rel="noopener">scrcpy</a> (telefonu USB ile bağla, telefondan da kontrol edersin).</li></ol></details>
+    <details><summary>iPhone → televizyon / Mac</summary><ol><li>Denetim Merkezi'ni aç (sağ üstten aşağı kaydır).</li><li><b>Ekran Yansıtma</b>'ya dokun.</li><li>Apple TV'yi, AirPlay destekli TV'yi ya da Mac'i seç.</li></ol></details>
+    <details><summary>Bilgisayar → televizyon (bu uygulamasız)</summary><ol><li>Chrome'da sağ üst menü → <b>Yayınla…</b> → Chromecast'li TV'yi seç.</li><li>Windows'ta <b>Windows + K</b> → Miracast destekli TV'yi seç.</li></ol></details></section>
+  <p class="note">Eşleşme için kısa bağlantı bilgisi ntfy.sh üzerinden geçer; görüntü hiçbir sunucuya gitmez. İki cihaz aynı Wi-Fi'deyse en iyi sonuç.</p>`}
+document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(!g)return;if(g.dataset.go==='tx')txUI();else if(g.dataset.go==='rx')rxStart();else if(g.dataset.go==='home'){location.hash='';home()}});
+
+/* ── gönderen ── */
+let TX={src:canScreen?'screen':'front',q:lsg('yansit:q','smooth'),pc:null,es:null,stream:null,code:''};
+function txUI(pref){if(location.hash!=='#gonder'&&!pref)history.replaceState(null,'','#gonder');
+  const S=[['screen','Ekran',canScreen],['front','Ön kamera',canCam],['back','Arka kamera',canCam]];
+  $('#app').innerHTML=`<button class="back" data-go="home">‹ Yansıt</button><h1>Bu ekranı göster</h1>
+  <div class="pane"><label class="lb" for="code">Alıcıdaki kod</label><input class="code-in" id="code" maxlength="6" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="••••••" value="${esc(pref||'')}" aria-describedby="codeH">
+    <p class="hint" id="codeH">Alıcı cihazda (TV ya da bilgisayar) Yansıt → <b>Burada izle</b>'yi aç; çıkan 6 harfli kodu buraya yaz.</p>
+    <span class="lb">Ne gösterilsin?</span><div class="seg" role="group" aria-label="Kaynak">${S.map(([k,n,ok])=>`<button data-src="${k}" aria-pressed="${TX.src===k}" ${ok?'':'disabled title="Bu cihazda yok"'}>${n}</button>`).join('')}</div>
+    ${canScreen?'':'<p class="hint">Bu cihazın tarayıcısı ekran paylaşamıyor; telefon ekranı için ana sayfadaki rehbere bak.</p>'}
+    <span class="lb">Görüntü</span><div class="seg" role="group" aria-label="Görüntü kalitesi">${Object.entries(Q).map(([k,v])=>`<button data-q="${k}" aria-pressed="${TX.q===k}" title="${v.d}">${v.n}</button>`).join('')}</div><p class="hint">${Q[TX.q].d}</p>
+    <button class="go" id="txGo">Yansıtmayı başlat</button><p class="msg" id="txMsg" role="status" aria-live="polite"></p></div>`;
+  const ci=$('#code');ci.addEventListener('input',()=>{ci.value=ci.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6)});if(!pref)setTimeout(()=>ci.focus(),60);
+  ci.addEventListener('keydown',e=>{if(e.key==='Enter')$('#txGo').click()});
+  $('#app').querySelectorAll('[data-src]').forEach(b=>b.onclick=()=>{TX.src=b.dataset.src;txUI(ci.value||' ')});
+  $('#app').querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{TX.q=b.dataset.q;lss('yansit:q',TX.q);txUI(ci.value||' ')});
+  $('#txGo').onclick=()=>txStart(ci.value.trim())}
+const txMsg=(t,c='')=>{const m=$('#txMsg');if(m){m.textContent=t;m.className='msg '+c}};
+async function txStart(code){if(!/^[A-Z0-9]{6}$/.test(code)){txMsg('Kod 6 harf/rakam olmalı.','err');$('#code')?.focus();return}
+  const q=Q[TX.q],b=$('#txGo');b.disabled=true;txMsg('Hazırlanıyor…');
+  try{TX.stream=TX.src==='screen'?await navigator.mediaDevices.getDisplayMedia({video:{frameRate:{ideal:q.fps,max:q.fps},height:{ideal:q.h}},audio:true})
+      :await navigator.mediaDevices.getUserMedia({video:{facingMode:TX.src==='back'?'environment':'user',height:{ideal:q.h},frameRate:{ideal:Math.min(30,q.fps)}},audio:false})}
+  catch(e){b.disabled=false;txMsg(e.name==='NotAllowedError'?'İzin verilmedi. Paylaşmak için tarayıcının sorusuna “İzin ver” de.':'Görüntü alınamadı: '+e.message,'err');return}
+  const v=TX.stream.getVideoTracks()[0];if(v&&'contentHint' in v)v.contentHint=q.hint;
+  v?.addEventListener('ended',()=>{stopTx(true);txUI(code);txMsg('Paylaşım durduruldu.')});
+  TX.code=code;txMsg('Alıcı aranıyor…');
+  try{const pc=TX.pc=new RTCPeerConnection({iceServers:ICE});TX.stream.getTracks().forEach(t=>pc.addTrack(t,TX.stream));
+    pc.getSenders().forEach(s=>{if(s.track?.kind!=='video')return;const p=s.getParameters();p.encodings=p.encodings?.length?p.encodings:[{}];p.encodings[0].maxBitrate=q.br;p.encodings[0].maxFramerate=q.fps;p.degradationPreference=q.hint==='motion'?'maintain-framerate':'maintain-resolution';s.setParameters(p).catch(()=>{})});
+    let answered=false;
+    TX.es=await subscribe(code,async m=>{if(m.type==='answer'&&m.to===me&&!answered){answered=true;await pc.setRemoteDescription(m.data)}else if(m.type==='bye')txMsg('Alıcı kapandı.','err')});
+    pc.onconnectionstatechange=()=>{const s=pc.connectionState;if(s==='connected')txLive();else if(s==='failed'){txMsg('Bağlantı kurulamadı. İki cihaz aynı Wi-Fi\'de mi?','err');stopTx()}else if(s==='disconnected')txMsg('Bağlantı zayıfladı…')};
+    await pc.setLocalDescription(await pc.createOffer());await iceDone(pc);await sig(code,{type:'offer',data:pc.localDescription,src:TX.src});
+    setTimeout(()=>{if(!answered&&TX.pc===pc){txMsg('Alıcı bulunamadı: kodu kontrol et, alıcıda Yansıt açık mı?','err');stopTx();b.disabled=false}},15000)}
+  catch(e){txMsg(e.message,'err');stopTx();b.disabled=false}}
+function txLive(){const S={screen:'Ekranın',front:'Ön kameran',back:'Arka kameran'}[TX.src];
+  $('#app').innerHTML=`<button class="back" data-go="home">‹ Yansıt</button><h1>Yansıtılıyor</h1><div class="pane live"><p><span class="dot"></span>${S} <b>${esc(TX.code)}</b> kodlu cihazda görünüyor.</p>
+    <video id="pv" muted playsinline autoplay aria-label="Önizleme"></video><div class="row"><button class="go" id="txStop">Durdur</button></div></div>`;
+  const pv=$('#pv');pv.srcObject=TX.stream;$('#txStop').onclick=()=>{stopTx(true);home()}}
+function stopTx(bye){if(bye&&TX.code&&TX.pc)sig(TX.code,{type:'bye'}).catch(()=>{});try{TX.es?.close()}catch{}try{TX.pc?.close()}catch{}TX.stream?.getTracks().forEach(t=>t.stop());TX.pc=TX.es=TX.stream=null}
+
+/* ── alıcı (TV / bilgisayar) ── */
+let RX={code:'',pc:null,es:null,lock:null,idleT:0};
+async function rxStart(){history.replaceState(null,'','#izle');stopTx();const R=$('#rx');R.hidden=false;R.classList.remove('idle');
+  RX.code=RX.code||newCode();rxWait('Bağlanıyor…');
+  try{RX.es?.close();RX.es=await subscribe(RX.code,rxSig);rxWait('')}catch(e){rxWait(e.message+' — yeniden deneniyor');setTimeout(rxStart,5000)}
+  try{RX.lock=await navigator.wakeLock?.request('screen')}catch{}}
+function rxWait(st){const R=$('#rx');const u=location.origin+location.pathname.replace(/index\.html$/,'');
+  R.innerHTML=`<div class="rx-w"><p class="rx-k">Bu ekranda göstermek için öbür cihaza bu kodu gir</p><p class="rx-c" aria-label="Kod ${[...RX.code].join(' ')}">${RX.code}</p>
+    <p class="rx-u">Öbür cihazda AppShell → <b>Yansıt</b> → <b>Bu ekranı göster</b><br>ya da: <b>${esc(u.replace(/^https?:\/\//,''))}#k=${RX.code}</b></p><p class="rx-s" role="status">${esc(st)}</p></div><button class="rx-x" data-go="home">Kapat</button>`}
+async function rxSig(m){if(m.type==='bye'){rxEnd('Yansıtma bitti. Yeniden göstermek için aynı kodu gir.');return}if(m.type!=='offer')return;
+  try{RX.pc?.close()}catch{}const pc=RX.pc=new RTCPeerConnection({iceServers:ICE});
+  pc.ontrack=e=>rxShow(e.streams[0]||new MediaStream([e.track]),m.src);
+  pc.onconnectionstatechange=()=>{if(pc.connectionState==='failed')rxEnd('Bağlantı kurulamadı. İki cihaz aynı Wi-Fi\'de mi?');else if(pc.connectionState==='closed')rxEnd('')};
+  await pc.setRemoteDescription(m.data);await pc.setLocalDescription(await pc.createAnswer());await iceDone(pc);
+  await sig(RX.code,{type:'answer',to:m.from,data:pc.localDescription})}
+function rxShow(stream,src){const R=$('#rx');if(R.querySelector('video')?.srcObject===stream)return;
+  const hasA=stream.getAudioTracks().length>0;
+  R.innerHTML=`<video autoplay playsinline muted></video><div class="rx-ui" role="toolbar" aria-label="Yansıtma"><span>${{screen:'Ekran',front:'Kamera',back:'Kamera'}[src]||'Görüntü'} · ${RX.code}</span>${hasA?'<button data-rx="snd">Sesi aç</button>':''}<button data-rx="fs">Tam ekran</button><button data-rx="end">Bitir</button></div>`;
+  const v=R.querySelector('video');v.srcObject=stream;v.play().catch(()=>{});
+  if(!RM())v.animate([{opacity:0,scale:'.97'},{opacity:1,scale:'1'}],{duration:420,easing:'cubic-bezier(.2,.8,.2,1)'});
+  R.onclick=e=>{const b=e.target.closest('[data-rx]');if(!b)return;const k=b.dataset.rx;
+    if(k==='fs')(document.fullscreenElement?document.exitFullscreen():R.requestFullscreen?.()).catch?.(()=>{});
+    else if(k==='snd'){v.muted=!v.muted;b.textContent=v.muted?'Sesi aç':'Sesi kapat'}else if(k==='end'){rxEnd('')}};
+  R.ondblclick=()=>{(document.fullscreenElement?document.exitFullscreen():R.requestFullscreen?.())?.catch?.(()=>{})};
+  rxIdle()}
+function rxIdle(){const R=$('#rx');R.classList.remove('idle');clearTimeout(RX.idleT);if(R.querySelector('video'))RX.idleT=setTimeout(()=>R.classList.add('idle'),3000)}
+['pointermove','keydown','touchstart'].forEach(ev=>addEventListener(ev,()=>{if(!$('#rx').hidden)rxIdle()},{passive:true}));
+function rxEnd(msg){try{RX.pc?.close()}catch{}RX.pc=null;if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});rxWait(msg)}
+addEventListener('keydown',e=>{if($('#rx').hidden)return;if(e.key==='f'||e.key==='F'){$('#rx [data-rx=fs]')?.click()}else if(e.key==='Escape'&&!document.fullscreenElement&&!$('#rx video')){home();location.hash=''}});
+
+/* ── başlangıç: #izle → alıcı (TV'de yer imi), #k=KOD → gönderen (kod hazır), #gonder ── */
+function route(){const h=location.hash;if(h==='#izle')rxStart();else if(/^#k=[A-Z0-9]{6}$/i.test(h))txUI(h.slice(3).toUpperCase());else if(h==='#gonder')txUI();else home()}
+addEventListener('hashchange',()=>{if(location.hash==='')home()});
+route();
+</script>
+</body>
+</html>

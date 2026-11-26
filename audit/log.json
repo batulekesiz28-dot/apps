@@ -6334,5 +6334,31 @@
   "change": "Tema stüdyosuna “Ayrıntılar”: köşeler (keskin / normal / yuvarlak), çizgiler (yok / ince / belirgin), yüzey (cam / düz) ve yazı boyutu. Hepsi bütün uygulamalara geçer ve görünüm profiline kaydedilir.",
   "scores": {},
   "items": []
+ },
+ {
+  "at": "2026-11-26T17:15:39",
+  "change": "Yeni uygulama: Yansıt — bilgisayar ekranını televizyona ya da başka bir cihaza, telefon kamerasını bilgisayara 6 harfli kodla yansıtır (görüntü cihazlar arasında doğrudan gider). TV'de “Burada izle”yi aç, kodu öbür cihaza gir. Telefon ekranı için Smart View / AirPlay / scrcpy rehberi içinde. Pencere arayüzünde sağ tık menüsündeki soluk kısayol yazısı da düzeltildi.",
+  "scores": {
+   "yansit telefon": {
+    "before": null,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "yansit",
+    "sev": "uyari",
+    "status": "kabul",
+    "text": "Telefon tarayıcıları ekran paylaşamıyor",
+    "fix": "Telefon kamerası yansıtılabiliyor; telefon ekranı için yerleşik yansıtma rehberi"
+   },
+   {
+    "app": "hub",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Pencere arayüzünde sağ tık menüsündeki kısayol yazısı okunaksızdı",
+    "fix": "Kontrast artırıldı"
+   }
+  ]
  }
 ]

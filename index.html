@@ -1214,6 +1214,7 @@ const ICONS={
   pen:'<path d="M15 4.5l4.5 4.5L9 19.5H4.5V15zM13 6.5l4.5 4.5"/>',
   cart:'<path d="M3.5 4.5h2.2l2 10.5h10.5l2-7.5H6.8"/><circle cx="9" cy="19" r="1.2"/><circle cx="17" cy="19" r="1.2"/>',
   map:'<path d="M9 4.5l-5.5 2v13l5.5-2 6 2 5.5-2v-13l-5.5 2zM9 4.5v13M15 6.5v13"/>',
+  cast:'<path d="M3.5 15.5V7a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-5"/><path d="M3.5 18.5a1.5 1.5 0 0 1 1.5 1.5M3.5 15.5a4.5 4.5 0 0 1 4.5 4.5"/>',
   spark:'<path d="M12 3.5v4M12 16.5v4M3.5 12h4M16.5 12h4M6 6l2.6 2.6M15.4 15.4L18 18M18 6l-2.6 2.6M8.6 15.4L6 18"/>',
 };
 const COLORS={ink:['#18181B','#FAFAFA'],gray:['#F4F4F5','#3F3F46'],blue:['#EAF1FF','#2453C4'],green:['#E8F6EE','#1D7447'],
@@ -3040,7 +3041,7 @@ function paintOsBar(){const b=$('#osBar');if(!b||b.hidden)return;obTint();const 
   $('#obInd').innerHTML=I.join('')}
 setInterval(paintOsBar,15000);addEventListener('online',paintOsBar);addEventListener('offline',paintOsBar);
 
-function mountFrame(t){const f=document.createElement('iframe'),a=t.app;f.className='frame';f.title=a.name;f.setAttribute('allow','fullscreen; clipboard-write; autoplay; encrypted-media; picture-in-picture; microphone; local-network-access; local-network; loopback-network');f.hidden=true;
+function mountFrame(t){const f=document.createElement('iframe'),a=t.app;f.className='frame';f.title=a.name;f.setAttribute('allow','fullscreen; clipboard-write; autoplay; encrypted-media; picture-in-picture; microphone; camera; display-capture; screen-wake-lock; local-network-access; local-network; loopback-network');f.hidden=true;
   if(a.kind==='draft'){f.setAttribute('sandbox','allow-scripts allow-forms allow-modals allow-popups allow-downloads allow-pointer-lock');t.blob=URL.createObjectURL(new Blob([a.html],{type:'text/html'}));f.src=t.blob}
   else f.src=bust(a.url);
   t.loading=true;f.addEventListener('load',()=>frameLoaded(t,f));W.el.appendChild(f);t.fr=f}
@@ -3863,7 +3864,7 @@ window.HUB={flash:o=>islFlash(o),
   toast:(t,undo,label)=>toast(t,undo,label),bh:BH_KEY};
 addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.shiftKey&&(e.key==='u'||e.key==='U')){e.preventDefault();window.Worlds?.picker()}});
 </script>
-<link rel="stylesheet" href="ui/worlds.css?v=20261124c">
+<link rel="stylesheet" href="ui/worlds.css?v=20261126a">
 <script src="ui/worlds.js?v=20261124b"></script>
 <link rel="stylesheet" href="ui/day.css?v=20261121a">
 <script src="apps/notlar/tasks.js?v=20261120a"></script>

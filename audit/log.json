@@ -6424,5 +6424,31 @@
     "fix": "Arama modunda akış ekrana dokunmuyor"
    }
   ]
+ },
+ {
+  "at": "2026-11-26T17:59:45",
+  "change": "Galeri: etiketler daha doğru (güçlü model önce kullanılıyor, “uydurma” yasak) ve meme'ler tanınıyor: şablon adı (Drake, Wojak, Gigachad…) ve esprinin konusu kaydediliyor. Bütün fotoğraflar bir kez yeniden etiketleniyor. Gelişmiş arama: sonuçlar en iyi eşleşmeye göre sıralanıyor (isim, yazı, adlar ve meme önde; hepsi tutanlar en üstte) ve Gemini ile anlamca arama yapılıyor — “komik kedi” yazınca etikette o kelimeler olmasa da kedi meme'ini buluyor.",
+  "scores": {
+   "galeri telefon": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "galeri",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Etiketler yanlış/genel kalıyordu, meme'ler tanınmıyordu",
+    "fix": "Güçlü model önce + meme alanı + yeniden etiketleme (sürüm 3)"
+   },
+   {
+    "app": "galeri",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Arama sonuçları tarihe göre sıralıydı, en iyi eşleşme üstte değildi",
+    "fix": "Puanlı sıralama + anlam (embedding) araması"
+   }
+  ]
  }
 ]

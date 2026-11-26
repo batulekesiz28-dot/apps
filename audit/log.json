@@ -6450,5 +6450,16 @@
     "fix": "Puanlı sıralama + anlam (embedding) araması"
    }
   ]
+ },
+ {
+  "at": "2026-11-26T18:01:20",
+  "change": "Yansıt: kare hızı (15 / 30 / 60 / 90 / 120 FPS) ve çözünürlük (480p / 720p / 1080p / 1440p / 4K) ayrı ayrı seçiliyor; yansıtma sürerken de anında değişiyor. Altında o an gerçekte giden çözünürlük ve FPS görünüyor (bağlantı ya da işlemci yetmezse sebebiyle).",
+  "scores": {
+   "yansit telefon": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": []
  }
 ]

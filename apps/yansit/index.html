@@ -38,6 +38,7 @@
   .seg{display:flex;gap:4px;padding:4px;border-radius:14px;background:var(--hover);flex-wrap:wrap}
   .seg button{flex:1;min-width:96px;height:42px;border-radius:10px;font-size:14px;font-weight:500;color:var(--ink2)}
   .seg button[aria-pressed=true]{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12),inset 0 0 0 1px var(--line)}
+  .seg.sm{flex-wrap:nowrap}.seg.sm button{min-width:0}
   .seg button:disabled{opacity:.45;cursor:not-allowed}
   .hint{font-size:13px;color:var(--ink3);margin-top:8px}
   .go{width:100%;height:52px;margin-top:22px;border-radius:16px;background:var(--ink);color:var(--bg);font-weight:600;font-size:16px;transition:transform .2s var(--spring),opacity .2s}
@@ -82,7 +83,12 @@ const ALPH='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',NT='https://ntfy.sh/',TOP=c=>'apps
 const me=Math.random().toString(36).slice(2,10);
 const ICE=[{urls:['stun:stun.l.google.com:19302','stun:stun.cloudflare.com:3478']}];
 const canScreen=!!(navigator.mediaDevices&&navigator.mediaDevices.getDisplayMedia),canCam=!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia);
-const Q={smooth:{n:'Akıcı',fps:60,h:720,br:4e6,hint:'motion',d:'60 kare/sn · film, oyun'},sharp:{n:'Net',fps:30,h:1080,br:6e6,hint:'detail',d:'1080p · yazı, sunum'}};
+/* görüntü: kare hızı (FPS) ve çözünürlük ayrı seçilir; bit hızı ikisine göre (piksel × FPS), yansıtma sürerken de değişir */
+const FPS=[15,30,60,90,120],RES=[[480,'480p'],[720,'720p'],[1080,'1080p'],[1440,'1440p'],[2160,'4K']];
+const qOf=()=>{const fps=TX.fps,h=TX.res,px=Math.round(h*16/9)*h;return{fps,h,br:Math.round(Math.min(25e6,Math.max(1.2e6,px*fps*.07))),hint:fps>=50?'motion':'detail'}};
+const qHint=()=>{const q=qOf();return`${q.h>=2160?'4K':q.h+'p'} · ${q.fps} kare/sn · yaklaşık ${(q.br/1e6).toFixed(q.br<1e7?1:0)} Mbit/sn${q.fps>60?' · 60 üstünü ekran ve tarayıcı destekliyorsa alır':''}${q.fps>=50?' · oyun/film için akıcı':' · yazı/sunum için net'}`};
+const qRows=()=>`<span class="lb">Kare hızı (FPS)</span><div class="seg sm" role="group" aria-label="Kare hızı">${FPS.map(f=>`<button data-fps="${f}" aria-pressed="${TX.fps===f}">${f}</button>`).join('')}</div>
+    <span class="lb">Çözünürlük</span><div class="seg sm" role="group" aria-label="Çözünürlük">${RES.map(([h,n])=>`<button data-res="${h}" aria-pressed="${TX.res===h}">${n}</button>`).join('')}</div><p class="hint" id="qH">${qHint()}</p>`;
 const IC={scr:'<rect x="3" y="4.5" width="18" height="12" rx="2"/><path d="M8.5 20h7M12 16.5V20"/>',tv:'<rect x="2.5" y="4.5" width="19" height="13" rx="2.5"/><path d="M7.5 20.5h9"/><path d="M9.5 9l5 2-5 2z"/>'};
 const ic=k=>`<svg viewBox="0 0 24 24" aria-hidden="true">${IC[k]}</svg>`;
 
@@ -115,7 +121,7 @@ function home(){stopTx();$('#rx').hidden=true;
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(!g)return;if(g.dataset.go==='tx')txUI();else if(g.dataset.go==='rx')rxStart();else if(g.dataset.go==='home'){location.hash='';home()}});
 
 /* ── gönderen ── */
-let TX={src:canScreen?'screen':'front',q:lsg('yansit:q','smooth'),pc:null,es:null,stream:null,code:''};
+const q0=lsg('yansit:q','');let TX={src:canScreen?'screen':'front',fps:lsg('yansit:fps',q0==='sharp'?30:60),res:lsg('yansit:res',q0==='sharp'?1080:720),pc:null,es:null,stream:null,code:''};
 function txUI(pref){if(location.hash!=='#gonder'&&!pref)history.replaceState(null,'','#gonder');
   const S=[['screen','Ekran',canScreen],['front','Ön kamera',canCam],['back','Arka kamera',canCam]];
   $('#app').innerHTML=`<button class="back" data-go="home">‹ Yansıt</button><h1>Bu ekranı göster</h1>
@@ -123,34 +129,42 @@ function txUI(pref){if(location.hash!=='#gonder'&&!pref)history.replaceState(nul
     <p class="hint" id="codeH">Alıcı cihazda (TV ya da bilgisayar) Yansıt → <b>Burada izle</b>'yi aç; çıkan 6 harfli kodu buraya yaz.</p>
     <span class="lb">Ne gösterilsin?</span><div class="seg" role="group" aria-label="Kaynak">${S.map(([k,n,ok])=>`<button data-src="${k}" aria-pressed="${TX.src===k}" ${ok?'':'disabled title="Bu cihazda yok"'}>${n}</button>`).join('')}</div>
     ${canScreen?'':'<p class="hint">Bu cihazın tarayıcısı ekran paylaşamıyor; telefon ekranı için ana sayfadaki rehbere bak.</p>'}
-    <span class="lb">Görüntü</span><div class="seg" role="group" aria-label="Görüntü kalitesi">${Object.entries(Q).map(([k,v])=>`<button data-q="${k}" aria-pressed="${TX.q===k}" title="${v.d}">${v.n}</button>`).join('')}</div><p class="hint">${Q[TX.q].d}</p>
+    ${qRows()}
     <button class="go" id="txGo">Yansıtmayı başlat</button><p class="msg" id="txMsg" role="status" aria-live="polite"></p></div>`;
   const ci=$('#code');ci.addEventListener('input',()=>{ci.value=ci.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6)});if(!pref)setTimeout(()=>ci.focus(),60);
   ci.addEventListener('keydown',e=>{if(e.key==='Enter')$('#txGo').click()});
   $('#app').querySelectorAll('[data-src]').forEach(b=>b.onclick=()=>{TX.src=b.dataset.src;txUI(ci.value||' ')});
-  $('#app').querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{TX.q=b.dataset.q;lss('yansit:q',TX.q);txUI(ci.value||' ')});
+  qWire();
   $('#txGo').onclick=()=>txStart(ci.value.trim())}
 const txMsg=(t,c='')=>{const m=$('#txMsg');if(m){m.textContent=t;m.className='msg '+c}};
 async function txStart(code){if(!/^[A-Z0-9]{6}$/.test(code)){txMsg('Kod 6 harf/rakam olmalı.','err');$('#code')?.focus();return}
-  const q=Q[TX.q],b=$('#txGo');b.disabled=true;txMsg('Hazırlanıyor…');
+  const q=qOf(),b=$('#txGo');b.disabled=true;txMsg('Hazırlanıyor…');
   try{TX.stream=TX.src==='screen'?await navigator.mediaDevices.getDisplayMedia({video:{frameRate:{ideal:q.fps,max:q.fps},height:{ideal:q.h}},audio:true})
-      :await navigator.mediaDevices.getUserMedia({video:{facingMode:TX.src==='back'?'environment':'user',height:{ideal:q.h},frameRate:{ideal:Math.min(30,q.fps)}},audio:false})}
+      :await navigator.mediaDevices.getUserMedia({video:{facingMode:TX.src==='back'?'environment':'user',height:{ideal:q.h},frameRate:{ideal:q.fps}},audio:false})}
   catch(e){b.disabled=false;txMsg(e.name==='NotAllowedError'?'İzin verilmedi. Paylaşmak için tarayıcının sorusuna “İzin ver” de.':'Görüntü alınamadı: '+e.message,'err');return}
   const v=TX.stream.getVideoTracks()[0];if(v&&'contentHint' in v)v.contentHint=q.hint;
   v?.addEventListener('ended',()=>{stopTx(true);txUI(code);txMsg('Paylaşım durduruldu.')});
   TX.code=code;txMsg('Alıcı aranıyor…');
   try{const pc=TX.pc=new RTCPeerConnection({iceServers:ICE});TX.stream.getTracks().forEach(t=>pc.addTrack(t,TX.stream));
-    pc.getSenders().forEach(s=>{if(s.track?.kind!=='video')return;const p=s.getParameters();p.encodings=p.encodings?.length?p.encodings:[{}];p.encodings[0].maxBitrate=q.br;p.encodings[0].maxFramerate=q.fps;p.degradationPreference=q.hint==='motion'?'maintain-framerate':'maintain-resolution';s.setParameters(p).catch(()=>{})});
+    qSend(pc,q);
     let answered=false;
     TX.es=await subscribe(code,async m=>{if(m.type==='answer'&&m.to===me&&!answered){answered=true;await pc.setRemoteDescription(m.data)}else if(m.type==='bye')txMsg('Alıcı kapandı.','err')});
     pc.onconnectionstatechange=()=>{const s=pc.connectionState;if(s==='connected')txLive();else if(s==='failed'){txMsg('Bağlantı kurulamadı. İki cihaz aynı Wi-Fi\'de mi?','err');stopTx()}else if(s==='disconnected')txMsg('Bağlantı zayıfladı…')};
     await pc.setLocalDescription(await pc.createOffer());await iceDone(pc);await sig(code,{type:'offer',data:pc.localDescription,src:TX.src});
     setTimeout(()=>{if(!answered&&TX.pc===pc){txMsg('Alıcı bulunamadı: kodu kontrol et, alıcıda Yansıt açık mı?','err');stopTx();b.disabled=false}},15000)}
   catch(e){txMsg(e.message,'err');stopTx();b.disabled=false}}
+function qSend(pc,q){pc.getSenders().forEach(s=>{if(s.track?.kind!=='video')return;const p=s.getParameters();p.encodings=p.encodings?.length?p.encodings:[{}];p.encodings[0].maxBitrate=q.br;p.encodings[0].maxFramerate=q.fps;p.degradationPreference=q.hint==='motion'?'maintain-framerate':'maintain-resolution';s.setParameters(p).catch(()=>{})})}
+/* FPS/çözünürlük düğmeleri: başlamadan önce sadece kaydeder; yansıtma sürerken anında uygular */
+function qWire(){$('#app').querySelectorAll('[data-fps],[data-res]').forEach(b=>b.onclick=async()=>{if(b.dataset.fps){TX.fps=+b.dataset.fps;lss('yansit:fps',TX.fps)}else{TX.res=+b.dataset.res;lss('yansit:res',TX.res)}
+    $('#app').querySelectorAll('[data-fps]').forEach(x=>x.setAttribute('aria-pressed',+x.dataset.fps===TX.fps));$('#app').querySelectorAll('[data-res]').forEach(x=>x.setAttribute('aria-pressed',+x.dataset.res===TX.res));
+    const h=$('#qH');if(h)h.textContent=qHint();const v=TX.stream?.getVideoTracks()[0];if(!v||!TX.pc)return;const q=qOf();
+    try{await v.applyConstraints({frameRate:{ideal:q.fps},height:{ideal:q.h}});if('contentHint' in v)v.contentHint=q.hint}catch{}qSend(TX.pc,q)})}
 function txLive(){const S={screen:'Ekranın',front:'Ön kameran',back:'Arka kameran'}[TX.src];
   $('#app').innerHTML=`<button class="back" data-go="home">‹ Yansıt</button><h1>Yansıtılıyor</h1><div class="pane live"><p><span class="dot"></span>${S} <b>${esc(TX.code)}</b> kodlu cihazda görünüyor.</p>
-    <video id="pv" muted playsinline autoplay aria-label="Önizleme"></video><div class="row"><button class="go" id="txStop">Durdur</button></div></div>`;
-  const pv=$('#pv');pv.srcObject=TX.stream;$('#txStop').onclick=()=>{stopTx(true);home()}}
+    <video id="pv" muted playsinline autoplay aria-label="Önizleme"></video><p class="hint" id="qNow" aria-live="polite">Ölçülüyor…</p>${qRows()}<div class="row"><button class="go" id="txStop">Durdur</button></div></div>`;
+  const pv=$('#pv');pv.srcObject=TX.stream;$('#txStop').onclick=()=>{stopTx(true);home()};qWire();
+  /* gerçekte giden görüntü: çözünürlük + kare hızı (WebRTC istatistiği; bağlantı ya da ekran isteneni karşılamıyorsa burada görünür) */
+  const pc=TX.pc;const tick=async()=>{if(TX.pc!==pc||!$('#qNow'))return;try{const st=await pc.getStats();st.forEach(r=>{if(r.type==='outbound-rtp'&&r.kind==='video'&&r.frameWidth){const e=$('#qNow');if(e)e.textContent=`Şu an giden: ${r.frameWidth}×${r.frameHeight} · ${Math.round(r.framesPerSecond||0)} kare/sn${r.qualityLimitationReason&&r.qualityLimitationReason!=='none'?` · ${({bandwidth:'bağlantı yetmiyor',cpu:'işlemci yetmiyor'})[r.qualityLimitationReason]||r.qualityLimitationReason}`:''}`}})}catch{}setTimeout(tick,1000)};tick()}
 function stopTx(bye){if(bye&&TX.code&&TX.pc)sig(TX.code,{type:'bye'}).catch(()=>{});try{TX.es?.close()}catch{}try{TX.pc?.close()}catch{}TX.stream?.getTracks().forEach(t=>t.stop());TX.pc=TX.es=TX.stream=null}
 
 /* ── alıcı (TV / bilgisayar) ── */

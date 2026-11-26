@@ -52,7 +52,7 @@
 </style>
 <script>try{var f=JSON.parse(localStorage.getItem('notlar:theme'));if(f)document.documentElement.dataset.theme=f}catch(e){}</script>
 <script src="../../shared/skin.js?v=20261126b"></script>
-<link rel="stylesheet" href="feed.css?v=20261125d">
+<link rel="stylesheet" href="feed.css?v=20261126b">
 <script src="../../shared/cors.js?v=20261126a"></script>
 <script src="../../shared/newswatch.js?v=20261126a"></script>
 </head>
@@ -71,23 +71,24 @@
   <main id="main" aria-live="polite"></main>
   <p class="src">Başlıklar haber sitelerinin herkese açık RSS akışlarından ve Google Haberler'den gelir; habere tıklayınca kaynağında açılır. Okudukların soluk görünür.</p>
 </div>
-<script src="feed.js?v=20261126a"></script>
+<script src="feed.js?v=20261126b"></script>
 <script>
 /* Bugünkü Haberler — konu başlıklarına göre güncel haberler (RSS).
    Çekme: shared/cors.js (doğrudan + 5 aracı servis yarışır, çalışan hatırlanır). Önbellek haberler:cache (15 dk), okunanlar haberler:read,
    kendi konuların haberler:topics (Google Haberler araması). Hub'daki “Bugünkü Haberler” widget'ı aynı önbelleği okur. */
 const GN=(q,lang='tr')=>lang==='tr'?`https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=tr&gl=TR&ceid=TR:tr`:`https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=en-US&gl=US&ceid=US:en`;
+const BING=(q,l='tr')=>`https://www.bing.com/news/search?q=${encodeURIComponent(q)}&format=rss&setlang=${l}&cc=${l==='tr'?'TR':'US'}`; // Google aracı servisleri engelleyince yedek
 const CATS=[
-  {id:'gundem',n:'Gündem',f:['https://feeds.bbci.co.uk/turkce/rss.xml','https://news.google.com/rss?hl=tr&gl=TR&ceid=TR:tr']},
-  {id:'oyun',n:'Oyun',f:[GN('oyun OR PlayStation OR Xbox OR Nintendo OR Steam when:2d'),'https://feeds.feedburner.com/ign/games-all','https://www.pcgamer.com/rss/']},
+  {id:'gundem',n:'Gündem',f:['https://feeds.bbci.co.uk/turkce/rss.xml','https://news.google.com/rss?hl=tr&gl=TR&ceid=TR:tr',BING('Türkiye gündem')]},
+  {id:'oyun',n:'Oyun',f:[GN('oyun OR PlayStation OR Xbox OR Nintendo OR Steam when:2d'),'https://feeds.feedburner.com/ign/games-all','https://www.pcgamer.com/rss/',BING('oyun')]},
   {id:'abd',n:'ABD Siyaseti',f:['https://news.google.com/rss/headlines/section/topic/POLITICS?hl=en-US&gl=US&ceid=US:en','https://feeds.npr.org/1014/rss.xml',GN('ABD Beyaz Saray OR Kongre OR Trump when:2d')]},
-  {id:'tekno',n:'Teknoloji',f:[GN('teknoloji OR yapay zeka OR Apple OR Google when:2d'),'https://www.theverge.com/rss/index.xml']},
-  {id:'anime',n:'Anime',f:['https://www.animenewsnetwork.com/all/rss.xml?ann-edition=w',GN('anime when:3d')]}];
+  {id:'tekno',n:'Teknoloji',f:[GN('teknoloji OR yapay zeka OR Apple OR Google when:2d'),'https://www.theverge.com/rss/index.xml',BING('teknoloji')]},
+  {id:'anime',n:'Anime',f:['https://www.animenewsnetwork.com/all/rss.xml?ann-edition=w',GN('anime when:3d'),BING('anime','en')]}];
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const lsg=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k));return v??d}catch{return d}},lss=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
 const TOP=()=>lsg('haberler:topics',[]),READ=new Set(lsg('haberler:read',[]).slice(-600));
 let cur=lsg('haberler:cat','hepsi'),C=lsg('haberler:cache',{}),busy=false;
-const allCats=()=>[{id:'hepsi',n:'Hepsi'},...CATS,...TOP().map(t=>({id:'t:'+t,n:t,f:[GN(t+' when:3d')],user:true}))];
+const allCats=()=>[{id:'hepsi',n:'Hepsi'},...CATS,...TOP().map(t=>({id:'t:'+t,n:t,f:[GN(t+' when:3d'),BING(t)],user:true}))];
 const ago=t=>{if(!t)return'';const m=Math.round((Date.now()-t)/6e4);return m<1?'az önce':m<60?m+' dk önce':m<1440?Math.round(m/60)+' sa önce':Math.round(m/1440)+' gün önce'};
 const host=u=>{try{return new URL(u).hostname.replace(/^www\./,'')}catch{return''}};
 const clean=s=>String(s||'').replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/\s+/g,' ').trim();

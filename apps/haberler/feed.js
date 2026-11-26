@@ -49,7 +49,7 @@ const Feed=(()=>{
         try{addItems(await NW().feed(x.url),x.cat,x.why)}catch{}}
       if(!pool.size&&!shown.length)throw new Error('net')}
     catch{if(!shown.length)paintEmpty()}
-    finally{loading=false;paintLoad(false);if(pool.size)fill();else stalled=Date.now()}} // boş döndüyse hemen yeniden deneme (eskiden more↔fill sonsuz döngüye giriyordu)
+    finally{loading=false;paintLoad(false);if(mode!=='feed')return;if(pool.size)fill();else stalled=Date.now()}} // boş döndüyse hemen yeniden deneme (eskiden more↔fill sonsuz döngüye giriyordu)
   // sıradaki kartları seç: ilgi + çeşitlilik + keşif
   function next(n){const out=[];for(let j=0;j<n&&pool.size;j++){const L=[...pool.values()],prev=[...shown,...out].slice(-2),explore=(shown.length+out.length)%5===4;
       let best=null,bs=-1e9;for(const i of L){let s=explore?-fam(i)*1.5+Math.random()*2+3*Math.exp(-((Date.now()-(i.t||Date.now()))/36e5)/18):score(i);
@@ -70,7 +70,7 @@ const Feed=(()=>{
     box.querySelectorAll('.rc:not([data-o])').forEach(c=>{c.dataset.o=1;io.observe(c)});
     if(pool.size<10&&mode==='feed'&&!loading&&Date.now()-stalled>30000)setTimeout(more,0)}
   function paintLoad(on){el?.querySelector('.rl-ld')?.toggleAttribute('hidden',!on||shown.length>cur+2)}
-  function paintEmpty(){const box=el?.querySelector('.rl-s');if(box&&!shown.length)box.innerHTML=`<div class="rl-e"><b>Haber alınamadı</b><span>İnternet bağlantını kontrol et.</span><button class="ib" data-fa="retry">Tekrar dene</button></div>`}
+  function paintEmpty(){if(mode==='search')return;const box=el?.querySelector('.rl-s');if(box&&!shown.length)box.innerHTML=`<div class="rl-e"><b>Haber alınamadı</b><span>İnternet bağlantını kontrol et.</span><button class="ib" data-fa="retry">Tekrar dene</button></div>`}
   /* ── kart değişimi: kalma süresinden öğren ── */
   function active(ix){if(ix===cur)return;const now=performance.now();
     if(cur>=0&&shown[cur]){const d=(now-t0)/1000,i=shown[cur];if(!i._l){const a=d<1.5?-.35:d<5?.2:d<15?.8:1.2;learn(i,a);i._l=1}markSeen(i)}
@@ -89,13 +89,29 @@ const Feed=(()=>{
       try{await navigator.clipboard.writeText(i.link);tip('Bağlantı kopyalandı')}catch{tip(i.link)}}}
   let tipT=0;function tip(m){const t=el.querySelector('.rl-tip');t.textContent=m;t.hidden=false;clearTimeout(tipT);tipT=setTimeout(()=>t.hidden=true,2600)}
   /* ── arama ── */
+  /* Arama: tek kaynağa bağlı değil — Google Haberler (TR + EN), Bing Haberler ve GDELT (aracı servissiz, doğrudan) aynı anda;
+     her kaynak geldikçe sonuçlar eklenir (en yeni üstte). Hepsi başarısızsa “bulunamadı” değil, bağlantı hatası söylenir. */
+  const BING=(s,l='tr')=>`https://www.bing.com/news/search?q=${encodeURIComponent(s)}&format=rss&setlang=${l}&cc=${l==='tr'?'TR':'US'}`;
+  async function gdelt(s){const u=`https://api.gdeltproject.org/api/v2/doc/doc?query=${encodeURIComponent(/\s/.test(s)?'"'+s+'"':s)}&mode=artlist&format=json&maxrecords=60&timespan=30d&sort=datedesc`;
+    let j;try{const r=await fetch(u,{signal:AbortSignal.timeout?AbortSignal.timeout(10000):undefined});j=await r.json()}catch{const r=await Cors.get(u,{rss:false});j=JSON.parse(r.xml)}
+    const T=d=>{const m=String(d||'').match(/^(\d{4})(\d\d)(\d\d)T(\d\d)(\d\d)(\d\d)/);return m?Date.UTC(+m[1],m[2]-1,+m[3],+m[4],+m[5],+m[6]):0};
+    return(j.articles||[]).filter(a=>a.title&&a.url).map(a=>({title:a.title,link:a.url,t:T(a.seendate),src:String(a.domain||'').replace(/^www\./,'').slice(0,40),desc:'',img:a.socialimage||''}))}
+  const RO={1:'i',2:'ii',3:'iii',4:'iv',5:'v',6:'vi',7:'vii',8:'viii',9:'ix',10:'x',11:'xi',12:'xii'}; // “gta 6” ↔ “GTA VI”
   async function search(s){s=s.trim();if(!s)return;q=s;mode='search';const box=el.querySelector('.rl-s');box.innerHTML='';shown=[];pool.clear();cur=-1;
     el.querySelector('.rl-q').hidden=false;el.querySelector('.rl-q span').textContent=`“${s}”`;
     for(const t of NW().toks(s))P.w['k:'+t]=Math.min(12,(P.w['k:'+t]||0)+1.5);saveP();loading=true;paintLoad(true);
-    try{const L=await NW().feed(NW().GN(s+' when:14d'));const k=new Set();L.forEach(i=>{const kk=NW().key(i);if(!k.has(kk)){k.add(kk);pool.set(kk,{...i,k:kk,cat:'ara',why:''})}})}catch{}
-    loading=false;paintLoad(false);if(!pool.size){box.innerHTML=`<div class="rl-e"><b>“${esc2(s)}” için haber bulunamadı</b><span>Başka kelimelerle dene.</span></div>`;return}
-    // aramada sıra: tazelik (ilgi değil)
-    const L=[...pool.values()].sort((a,b)=>b.t-a.t);pool.clear();shown=L;box.innerHTML=L.map(card).join('');box.querySelectorAll('.rc').forEach(c=>{c.dataset.o=1;io.observe(c)});box.scrollTop=0}
+    const my=q,seen=new Map(),toks=NW().toks(s).map(t=>t.slice(0,5)),num=(s.match(/\d+/g)||[]),
+      rel=i=>{const t=String(i.title).toLocaleLowerCase('tr')+' | '+String(i.title).toLowerCase(); /* “GTA VI” Türkçe kuralla “gta vı” olur; ikisine birden bak */
+      return(!toks.length||toks.some(w=>t.includes(w)))&&(!num.length||num.some(n=>new RegExp(`(^|\\D)${n}(\\D|$)|\\b${RO[n]||'_'}\\b`).test(t))||toks.length>1)};
+    const paint=()=>{if(mode!=='search'||q!==my)return;const L=[...seen.values()].sort((a,b)=>(b.t||0)-(a.t||0)).slice(0,80);if(!L.length)return;
+      const top=box.scrollTop;shown=L;box.innerHTML=L.map(card).join('');box.querySelectorAll('.rc').forEach(c=>{c.dataset.o=1;io.observe(c)});box.scrollTop=top};
+    const add=L=>{for(const i of L){if(!rel(i))continue;const kk=NW().key(i);if(!seen.has(kk))seen.set(kk,{...i,k:kk,cat:'ara',why:''})}paint()};
+    const src=[NW().feed(NW().GN(s+' when:30d')),NW().feed(NW().GN(s+' when:30d','en')),NW().feed(BING(s)),gdelt(s)];
+    const res=await Promise.allSettled(src.map(p=>p.then(add)));if(mode!=='search'||q!==my)return;
+    loading=false;paintLoad(false);if(seen.size)return;
+    const allFail=res.every(r=>r.status==='rejected');
+    box.innerHTML=`<div class="rl-e"><b>${allFail?'Haber kaynaklarına ulaşılamadı':`“${esc2(s)}” için haber bulunamadı`}</b><span>${allFail?'İnternet bağlantını kontrol et; birazdan tekrar dene.':'Başka kelimelerle dene (ör. İngilizce adıyla).'}</span><button class="rl-rt" data-rt>Tekrar dene</button></div>`;
+    box.querySelector('[data-rt]').onclick=()=>search(s)}
   function endSearch(){mode='feed';q='';el.querySelector('.rl-q').hidden=true;const si=document.querySelector('#hbIn');if(si)si.value='';const box=el.querySelector('.rl-s');box.innerHTML='';shown=[];pool.clear();cur=-1;more()}
   /* ── kur ── */
   function mount(host){el=host;el.innerHTML=`<div class="rl-s" tabindex="-1" aria-label="Haber akışı"></div>

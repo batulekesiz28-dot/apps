@@ -6398,5 +6398,31 @@
     "fix": "OCR (yazi) + özel adlar (adlar) + büyük görüntü + esnek arama"
    }
   ]
+ },
+ {
+  "at": "2026-11-26T17:57:34",
+  "change": "Haberler araması artık tek kaynağa bağlı değil: Google Haberler (Türkçe + İngilizce), Bing Haberler ve GDELT (dünya haber veritabanı, aracı servissiz) aynı anda aranıyor, sonuçlar geldikçe ekleniyor. “gta 6” araması “GTA VI” başlıklarını da buluyor, alakasızları (GTA 5) eliyor. Bağlantı yoksa “bulunamadı” değil gerçek sebebi ve Tekrar dene düğmesi çıkıyor. Kategorilere ve kendi konularına Bing yedek kaynak olarak eklendi.",
+  "scores": {
+   "haberler telefon": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "haberler",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Arama (ör. gta 6) sonuç getirmiyordu: tek kaynak Google'dı ve aracı servislerden gelen isteği engelliyordu",
+    "fix": "4 kaynak paralel + Roma rakamı eşleşmesi + doğru hata mesajı"
+   },
+   {
+    "app": "haberler",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Arka plandaki akış yüklemesi arama sonucunu “Haber alınamadı” ile eziyordu",
+    "fix": "Arama modunda akış ekrana dokunmuyor"
+   }
+  ]
  }
 ]

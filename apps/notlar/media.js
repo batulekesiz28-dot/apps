@@ -489,9 +489,10 @@ const Media=(()=>{
         out=(d?.Page?.media||[]).map(alPack).filter(x=>x.t&&x.img)}catch(e){console.warn('AniList',e)}
       if(!out.length){try{const seen=new Set();for(const pg of[1,2]){const j=await jget(`https://api.jikan.moe/v4/seasons/now?sfw=true&limit=25&page=${pg}`);for(const d of j?.data||[]){if(seen.has(d.mal_id))continue;seen.add(d.mal_id);out.push(arecPack(d))}if(!j?.pagination?.has_next_page)break}}catch(e){console.warn('Jikan',e)}}
       arecP=null;if(out.length){arecErr=false;lss('mc:arec2',{at:Date.now(),d:out});return out}arecErr=true;return c?.d||[]})();return arecP}
-  function arecPick(list){const mine=[...KB.items.values()].filter(i=>i.type==='anime'),mal=new Set(mine.map(i=>String(i.mal)).filter(Boolean)),tt=new Set(mine.map(i=>norm(i.title)));
+  function arecPick(list){const mine=[...KB.items.values()].filter(i=>i.type==='anime'),mal=new Set(mine.map(i=>String(i.mal)).filter(Boolean)),tt=new Set(mine.map(i=>norm(i.title))),own=new Set(mine.flatMap(i=>[fkey(i.title),fkey(i.orig||'')]).filter(k=>k&&k.length>=3));
     const fav=new Map();mine.filter(i=>['done','doing'].includes(stOf(i))&&(i.rating>=7||i.like>0||i.fav||!i.rating)).forEach(i=>i.genres.forEach(g=>fav.set(g,(fav.get(g)||0)+1)));
-    return list.filter(d=>!mal.has(String(d.mal))&&!tt.has(norm(d.t))&&!tt.has(norm(d.o))).map(d=>{const why=d.g.filter(g=>fav.has(g));return{...d,why,rk:Math.log10(1+d.mem)+why.reduce((a,g)=>a+Math.min(1,fav.get(g)/3),0)*.6+(d.sc||0)/20}}).sort((a,b)=>b.rk-a.rk).slice(0,20)}
+    const seenK=new Set();
+    return list.filter(d=>!mal.has(String(d.mal))&&!tt.has(norm(d.t))&&!tt.has(norm(d.o))&&!sameShow(own,d)&&(k=>!seenK.has(k)&&(seenK.add(k),true))(fkey(d.o||d.t))).map(d=>{const why=d.g.filter(g=>fav.has(g));return{...d,why,rk:Math.log10(1+d.mem)+why.reduce((a,g)=>a+Math.min(1,fav.get(g)/3),0)*.6+(d.sc||0)/20}}).sort((a,b)=>b.rk-a.rk).slice(0,20)}
   const arecCard=d=>`<article class="mc-card v-p t-anime mrc" data-arid="${E(d.key||String(d.mal))}" tabindex="0" aria-label="${E(d.t)} — önizle"><div class="mc-art"><div class="mp">${d.img?`<img src="${E(d.img)}" alt="" loading="lazy" referrerpolicy="no-referrer" onload="Media.imgOk(this)">`:''}</div>${d.sc?`<span class="mc-sc"><i>MAL</i>${d.sc.toFixed(1)}</span>`:''}${d.air?'<span class="mrc-new">Yeni</span>':''}</div>
     <div class="mc-cap"><b>${E(d.t)}</b><small>${E([d.g.slice(0,2).join(', '),d.eps?d.eps+' bölüm':''].filter(Boolean).join(' · ')||'Anime')}</small></div></article>`;
   function recShelf(){return`<section class="mc-shelf an mrec" data-arec><header><h2>Yeni çıkan popüler animeler</h2><p>Bu sezon yayında · listende olmayanlar · sevdiğin türler önde</p></header>
@@ -609,14 +610,24 @@ const Media=(()=>{
       fyMoreBusy[kind]=null;return list.length})()}
   /* listende olan hiçbir şey önerilmez: ad (Türkçe/özgün, yıl ve “2. sezon” atılarak) + Wikidata kimliği + IMDb + TMDB eşleşmesi + MAL */
   const fyNorm=x=>norm(String(x||'').replace(/\(\d{4}\)/g,'').replace(/[:\-–]\s*(season|sezon)\s*\d+.*$/i,'').replace(/\b(\d+\.?\s*sezon|season\s*\d+)\b.*$/i,'').trim());
+  /* Seri anahtarı: sezon/devam/film ekleri atılmış ad — “Attack on Titan Final Season”, “Shingeki no Kyojin Season 2”, “Jujutsu Kaisen 2nd Season”,
+     “Mob Psycho 100 II”, “Naruto Shippuden”, “Demon Slayer: Mugen Train” hepsi kendi serisinin anahtarına iner */
+  const SEQ=/\b(the )?(final|second|third|fourth|fifth|\d+(st|nd|rd|th)?)\s*(season|sezon|series|part|cour|kisim)\b.*$|\b(season|sezon|series|part|cour|kisim|s)\s*\d+.*$|\b\d+\s*(sezon|season)\b.*$|\b(movie|film|the movie|gekijouban|ova|oad|specials?|recap|shippuden|kanketsu hen|zoku|shin)\b.*$|\b(ii|iii|iv|v|vi)$|\s(\d)$/;
+  const fkey=x=>{let k=norm(String(x||'').replace(/\(\d{4}\)/g,'').split(/\s[:\-–]\s|:\s/)[0]);for(let i=0;i<3;i++){const n=k.replace(SEQ,'').trim();if(n===k||n.length<3)break;k=n}return k};
+  const sameShow=(own,d)=>{const keys=[fkey(d.t),fkey(d.o)].filter(k=>k&&k.length>=3);
+    return keys.some(k=>own.has(k)||[...own].some(o=>o.includes(' ')&&(k.startsWith(o+' ')||o.startsWith(k+' '))))};
   function fyPick(D){const mine=[...KB.items.values()],tt=new Set(mine.flatMap(i=>[fyNorm(i.title),fyNorm(i.orig||''),norm(i.title),norm(i.orig||'')]).filter(Boolean)),mal=new Set(mine.map(i=>String(i.mal||'')).filter(x=>x&&x!=='0')),no=new Set(lsg('mc:fyno',[]));
     const mids=new Set(mine.map(i=>i.mid).filter(Boolean)),imdbs=new Set(mine.map(i=>i.imdb).filter(Boolean)),tmv=new Set(Object.values(lsg('mc:tmid',{})).filter(v=>v&&v!=='-'));
-    const ok=d=>!no.has(d.key)&&!tt.has(norm(d.t))&&!tt.has(norm(d.o))&&!tt.has(fyNorm(d.t))&&!tt.has(fyNorm(d.o))&&!(d.mal&&mal.has(String(d.mal)))&&!(d.mid&&mids.has(d.mid))&&!(d.imdb&&imdbs.has(d.imdb))&&!(d.key.startsWith('tm:')&&tmv.has(d.key.slice(3)));
+    const own=new Set(mine.flatMap(i=>[fkey(i.title),fkey(i.orig||'')]).filter(k=>k&&k.length>=3));
+    const ok=d=>!no.has(d.key)&&!sameShow(own,d)&&!tt.has(norm(d.t))&&!tt.has(norm(d.o))&&!tt.has(fyNorm(d.t))&&!tt.has(fyNorm(d.o))&&!(d.mal&&mal.has(String(d.mal)))&&!(d.mid&&mids.has(d.mid))&&!(d.imdb&&imdbs.has(d.imdb))&&!(d.key.startsWith('tm:')&&tmv.has(d.key.slice(3)));
     /* “Yeni öneriler”: gösterilip geçilenler (mc:fyseen {key:zaman}) 14 gün arkaya atılır; yeni kalmadıysa döngü baştan başlar */
     const SEEN=lsg('mc:fyseen',{}),now=Date.now(),fresh=d=>!(SEEN[d.key]&&now-SEEN[d.key]<14*864e5),have=new Set((D?.all||[]).map(d=>d.key));
     let pool=[...(D?.all||[]),...fyMoreAll().filter(d=>!have.has(d.key)&&(have.add(d.key),true))].filter(ok);
     if(Object.keys(SEEN).length&&pool.filter(fresh).length<8){const need=['movie','series','anime'].filter(k=>!fyMoreTried[k]);
       if(need.length){need.forEach(k=>fyMore(k).then(n=>{if(n)fyFill(false)}));pool=pool.filter(fresh)}else{lss('mc:fyseen',{});fyCycled=true}}else pool=pool.filter(fresh);
+    /* önerilerin kendi içinde aynı serinin tek kaydı kalsın (en kısa ad ≈ ilk sezon, puanı serinin en yükseği) */
+    {const g=new Map();for(const d of pool.sort((a,b)=>b.s-a.s)){const k=fkey(d.o||d.t)||fkey(d.t);const h=g.get(k);if(!h){g.set(k,d);continue}
+      if(String(d.t).length<String(h.t).length){g.set(k,{...d,s:Math.max(d.s,h.s)})}}pool=[...g.values()]}
     const all=mixKinds(pool.sort((a,b)=>b.s-a.s)),mx=Math.max(1e-9,...all.map(d=>d.s));all.forEach(d=>d.fit=Math.round(72+26*Math.min(1,d.s/mx)));
     const by=new Map(all.map(d=>[d.key,d]));return{all,top:all.slice(0,20),per:(D?.per||[]).map(p=>({seed:p.seed,list:p.list.map(k=>by.get(k)).filter(Boolean)})).filter(p=>p.list.length>=4)}}
   const KN={movie:'Film',series:'Dizi',anime:'Anime'};

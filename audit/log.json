@@ -6248,5 +6248,19 @@
     "fix": "Boş dönüşte 30 sn bekleyip yeniden dener"
    }
   ]
+ },
+ {
+  "at": "2026-11-26T16:57:35",
+  "change": "Medya önerileri: izlediğin ya da listende olan bir dizinin/animenin başka sezonları, devam serileri ve filmleri artık önerilmiyor (“2nd Season”, “Final Season”, “Part 2”, “II”, “Shippuden”, “Movie” gibi bütün biçimler tanınıyor). Önerilerin kendi içinde de aynı seriden tek kayıt kalıyor.",
+  "scores": {},
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "uyari",
+    "status": "fixed",
+    "text": "Önerilerde listendeki dizilerin başka sezonları çıkıyordu",
+    "fix": "Seri anahtarı (fkey) ile eleme + öneriler içinde tekilleştirme"
+   }
+  ]
  }
 ]

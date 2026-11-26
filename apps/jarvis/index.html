@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" data-keep-dark>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -10,7 +10,7 @@
 :root{--j-bg:#07080C;--j-bg2:#0E1017;--j-card:rgba(255,255,255,.05);--j-line:rgba(255,255,255,.09);--j-ink:#EEF0F6;--j-ink2:rgba(238,240,246,.72);--j-ink3:rgba(238,240,246,.58);
   --j-acc:#6EC1FF;--j-acc2:#9B8CFF;--j-ok:#4ADE80;--j-err:#F87171;--j-warn:#FBBF24;--font:"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;color-scheme:dark}
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;background:var(--j-bg);color:var(--j-ink);font-family:var(--font);-webkit-font-smoothing:antialiased;overflow:hidden}
+html,body{height:100%;background:var(--j-bg)!important;color:var(--j-ink)!important;color-scheme:dark!important;font-family:var(--font);-webkit-font-smoothing:antialiased;overflow:hidden}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 button:focus-visible,input:focus-visible{outline:2px solid var(--j-acc);outline-offset:2px}
 .bgfx{position:fixed;inset:0;pointer-events:none;background:radial-gradient(60% 50% at 50% 100%,color-mix(in srgb,var(--j-acc) 14%,transparent),transparent 70%),radial-gradient(40% 40% at 85% 0%,color-mix(in srgb,var(--j-acc2) 10%,transparent),transparent 70%)}
@@ -99,7 +99,7 @@ html.mini .top{height:48px;padding:0 10px 0 16px}html.mini .wm{font-size:13px}ht
 html.mini .orb{width:64px;height:64px}html.mini .hint{display:none}html.mini .dock{gap:10px;padding-bottom:14px}html.mini .bar{height:46px}
 html.mini .empty h1{font-size:22px}html.mini .empty p{font-size:14px}html.mini .chips button{font-size:13px}html.mini .bgfx{opacity:.6}
 </style>
-<script src="../../shared/skin.js?v=20261126a"></script>
+<script src="../../shared/skin.js?v=20261126b"></script>
 </head>
 <body>
 <div class="bgfx" aria-hidden="true"></div>
@@ -246,6 +246,7 @@ function showConn(mode){const c=$('#conn .card');if(mode==='pair'){c.innerHTML=`
     <ol><li><b>Python</b> kur: <a href="https://www.python.org/downloads/" target="_blank" rel="noopener">python.org</a> (kurarken “Add python.exe to PATH” kutusunu işaretle). Zaten varsa geç.</li>
     <li><b>Win+R</b>'ye bas, bunu yapıştır, Enter:<div class="kc"><code id="kcT">${KUR}</code><button class="b" id="kcB">Kopyala</button></div></li>
     <li>Açılan pencerede yazan <b>6 haneli kodu</b> burada gir. Sonraki seferlerde masaüstündeki <b>Jarvis</b>'e çift tıkla.</li></ol>
+    <p class="note2"><b>Anahtar nereye girilir?</b> Program açılıp bağlanınca sağ üstteki dişliden (Ayarlar) Gemini/Groq/Claude anahtarını girersin; anahtar o programda saklanır.</p>
     <p class="note2">Mac/Linux: Terminal'de aynı komutu <code>py</code> yerine <code>python3</code> ile çalıştır. Program sadece bu bilgisayardan ve sadece AppShell'den bağlantı kabul eder. Tarayıcı “yerel ağa erişim” izni sorarsa İzin ver de.</p>
     <div class="end"><button class="b" id="cX">Sonra</button><button class="b pri" id="cR">Tekrar dene</button></div>`;
   $('#conn').hidden=false;$('#kcB').onclick=async()=>{try{await navigator.clipboard.writeText(KUR)}catch{getSelection().selectAllChildren($('#kcT'));document.execCommand('copy')}$('#kcB').textContent='Kopyalandı'};$('#cR').onclick=()=>{retry=0;connect()};$('#cX').onclick=()=>{$('#conn').hidden=true}}

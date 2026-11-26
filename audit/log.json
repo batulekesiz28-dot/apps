@@ -6360,5 +6360,24 @@
     "fix": "Kontrast artırıldı"
    }
   ]
+ },
+ {
+  "at": "2026-11-26T17:50:19",
+  "change": "Jarvis bembeyaz görünüyordu: tema stüdyosunda kendi (açık) renklerini seçince zemin beyaza boyanıyor, Jarvis'in açık renkli yazıları ve kurulum/anahtar ekranı görünmez oluyordu. Jarvis artık her zaman koyu kalıyor (vurgu rengi, yazı tipi ve köşe tercihlerin yine geçiyor). Bağlantı ekranına anahtarın nereye girileceği de yazıldı.",
+  "scores": {
+   "jarvis telefon": {
+    "before": 94,
+    "after": 94
+   }
+  },
+  "items": [
+   {
+    "app": "jarvis",
+    "sev": "hata",
+    "status": "fixed",
+    "text": "Kendi renklerinle Jarvis bembeyaz ve okunmaz oluyordu",
+    "fix": "Jarvis renk paletinden muaf (data-keep-dark), zemin hep koyu"
+   }
+  ]
  }
 ]

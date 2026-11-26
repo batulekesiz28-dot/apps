@@ -33,7 +33,7 @@
   if(l.lines==='strong')c+='html{--line:color-mix(in srgb,currentColor 22%,transparent)!important;--line2:color-mix(in srgb,currentColor 34%,transparent)!important}';
   if(l.lines==='none')c+='html{--line:transparent!important}';return c};
   function look(){var l=rd('appshell:look')||{},st=document.getElementById('lookCss');if(!st){st=document.createElement('style');st.id='lookCss';document.head.appendChild(st)}
-    var f=LF[l.font],css=lookExtra(l)+pal(l.colors);if(/^#[0-9a-f]{6}$/i.test(l.accent||''))css+='html{--accent:'+l.accent+'!important;--acc:'+l.accent+'!important}';
+    var f=LF[l.font],css=lookExtra(l)+(root.hasAttribute('data-keep-dark')?'':pal(l.colors)); // her zaman koyu tasarlanmış uygulamalar (Jarvis) kendi renklerinle boyanmaz — yoksa açık zemin + açık yazı = görünmezif(/^#[0-9a-f]{6}$/i.test(l.accent||''))css+='html{--accent:'+l.accent+'!important;--acc:'+l.accent+'!important}';
     if(f){if(!document.querySelector('link[data-look="'+l.font+'"]')){var k=document.createElement('link');k.rel='stylesheet';k.setAttribute('data-look',l.font);k.href='https://fonts.googleapis.com/css2?family='+f[1]+'&display=swap';document.head.appendChild(k)}
       css+="html{--font:'"+f[0]+"',system-ui,sans-serif!important;--serif:'"+f[0]+"',Georgia,serif!important}body{font-family:var(--font)}"}st.textContent=css}
   apply();

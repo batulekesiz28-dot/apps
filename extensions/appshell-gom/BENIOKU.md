@@ -1,9 +1,10 @@
-# AppShell · YouTube ve YouTube Music hub içinde
+# AppShell · siteler hub içinde (YouTube, YouTube Music, WhatsApp, Bambu Lab)
 
 YouTube ve YouTube Music, başka sitelerin içinde açılmayı yasaklayan bir güvenlik başlığı gönderir. Bu eklenti o başlığı
 **yalnızca** AppShell hub'ının (batulekesiz28-dot.github.io) içinde açılan YouTube / YouTube Music çerçevesi için kaldırır.
 Başka hiçbir siteye, sekmeye ya da YouTube Music'in kendi sekmesine dokunmaz.
 
+1.3: WhatsApp Web ve Bambu Lab MakerWorld da hub içinde açılır (aynı kural: sadece hub'ın içindeki çerçeve).
 1.2: hub içindeki YouTube Music / YouTube çerçevesi çalan şarkının adını, sanatçısını ve kapağını SADECE hub'a bildirir
 (üstteki adada görünür) ve oradaki ⏮ ⏯ ⏭ düğmelerini oynatıcıya iletir. Başka hiçbir yere bir şey göndermez.
 

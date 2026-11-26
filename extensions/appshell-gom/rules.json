@@ -23,14 +23,20 @@
       "requestDomains": [
         "music.youtube.com",
         "www.youtube.com",
-        "youtube.com"
+        "youtube.com",
+        "web.whatsapp.com",
+        "makerworld.com",
+        "bambulab.com"
       ],
       "initiatorDomains": [
         "batulekesiz28-dot.github.io",
         "localhost",
         "127.0.0.1",
         "music.youtube.com",
-        "www.youtube.com"
+        "www.youtube.com",
+        "web.whatsapp.com",
+        "makerworld.com",
+        "bambulab.com"
       ],
       "resourceTypes": [
         "sub_frame"

@@ -3073,13 +3073,13 @@ function openWin(a){hidePeek(true);const name='appshell-'+a.slug,sk='appshell:wi
 const gomHosts=()=>{const d=document.documentElement.dataset;return d.appshellGom?(d.appshellGomHosts||'music.youtube.com').split(/\s+/):[]};
 const gomOK=a=>{try{return gomHosts().includes(new URL(a.url).hostname)}catch{return false}};
 function gomSheet(a){if(matchMedia('(pointer:coarse)').matches){openWin(a);return}const n=esc(a.name),old=!!document.documentElement.dataset.appshellGom,upd=old&&gomOK(a);
-  sheet(upd?'Eklentinin yeni sürümü':`${n} · hub içinde`,`<div class="gom">${upd?`<p><b>Yeni:</b> çalan şarkının adı ve kapağı üstteki adada görünür; dokununca ⏮ ⏯ ⏭ ile kontrol edersin. Bunun için eklentiyi bir kez yenile:</p>`:old?`<p><b>Eklentinin yeni sürümü gerekiyor</b> — kurulu sürüm ${n}'u tanımıyor.</p>`:''}${upd?'':`<p>${n} başka sitelerin içinde açılmayı engelliyor. Tarayıcına <b>bir kerelik küçük bir eklenti</b> kurarsan hub'ın içinde, kendi sekmesinde açılır. Eklenti sadece bu hub'ın içinde ve sadece YouTube / YouTube Music için çalışır; başka hiçbir siteye dokunmaz.</p>`}
+  sheet(upd?'Eklentinin yeni sürümü':`${n} · hub içinde`,`<div class="gom">${upd?`<p><b>Yeni:</b> çalan şarkının adı ve kapağı üstteki adada görünür; dokununca ⏮ ⏯ ⏭ ile kontrol edersin. Bunun için eklentiyi bir kez yenile:</p>`:old?`<p><b>Eklentinin yeni sürümü gerekiyor</b> — kurulu sürüm ${n}'u tanımıyor.</p>`:''}${upd?'':`<p>${n} başka sitelerin içinde açılmayı engelliyor. Tarayıcına <b>bir kerelik küçük bir eklenti</b> kurarsan hub'ın içinde, kendi sekmesinde açılır. Eklenti sadece bu hub'ın içinde ve sadece YouTube, YouTube Music, WhatsApp ve Bambu Lab (MakerWorld) için çalışır; başka hiçbir siteye dokunmaz.</p>`}
     <ol><li><a href="extensions/appshell-gom.zip" download>Eklentiyi ${old?'yeniden ':''}indir</a>, zip'e sağ tık → <b>Tümünü ayıkla</b>.</li>
       <li>Adres çubuğuna <code>chrome://extensions</code> yaz <button class="btn ghost" data-gc>Kopyala</button></li>
       ${old?`<li>AppShell eklentisini kaldır (<b>Kaldır</b>), sonra <b>Paketlenmemiş öğe yükle</b> → yeni çıkardığın klasörü seç.</li>`:`<li>Sağ üstte <b>Geliştirici modu</b>nu aç.</li>
       <li><b>Paketlenmemiş öğe yükle</b> → çıkardığın klasörü seç (içinde <code>manifest.json</code> görünen klasör).</li>`}
       <li>Bu sayfayı yenile — ${n} artık burada açılır.</li></ol>
-    <p class="gom-n">Hesabın görünmezse bir kez normal sekmede youtube.com'da oturum aç.</p></div>`,
+    <p class="gom-n">Hesabın görünmezse bir kez normal sekmede o sitede oturum aç.</p></div>`,
     `${upd?'':'<button class="btn ghost" data-gw>Ayrı pencerede aç</button>'}<span class="grow"></span><button class="btn solid" data-gr>${upd?'Güncelledim, yenile':'Kurdum, yenile'}</button>`,
     s=>s.addEventListener('click',e=>{if(e.target.closest('[data-gc]')){navigator.clipboard?.writeText('chrome://extensions').then(()=>toast('Kopyalandı — adres çubuğuna yapıştır'),()=>{});return}
       if(e.target.closest('[data-gw]')){closeSheet();openWin(a);return}if(e.target.closest('[data-gr]'))location.reload()}))}

@@ -101,6 +101,24 @@
    "win": true
   },
   {
+   "slug": "whatsapp",
+   "name": "WhatsApp",
+   "icon": "chat",
+   "color": "green",
+   "desc": "WhatsApp Web · mesajlar, sohbetler · telefonundaki WhatsApp ile bir kez QR kodla bağlanır",
+   "url": "https://web.whatsapp.com/",
+   "win": true
+  },
+  {
+   "slug": "bambulab",
+   "name": "Bambu Lab",
+   "icon": "cube",
+   "color": "teal",
+   "desc": "Bambu Lab 3D yazıcı · MakerWorld modelleri, baskıya gönder, baskı geçmişi · kendi hesabınla",
+   "url": "https://makerworld.com/",
+   "win": true
+  },
+  {
    "slug": "haberler",
    "name": "Haberler",
    "icon": "globe",

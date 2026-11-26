@@ -1,15 +1,18 @@
 {
   "manifest_version": 3,
-  "name": "AppShell · YouTube hub içinde",
-  "version": "1.2",
-  "description": "YouTube ve YouTube Music'in SADECE AppShell hub'ı içinde açılmasına izin verir ve çalan şarkıyı hub'ın üst adasında gösterir. Başka hiçbir siteye dokunmaz.",
+  "name": "AppShell · siteler hub içinde",
+  "version": "1.3",
+  "description": "YouTube, YouTube Music, WhatsApp Web ve Bambu Lab MakerWorld'ün SADECE AppShell hub'ı içinde açılmasına izin verir ve çalan şarkıyı hub'ın üst adasında gösterir. Başka hiçbir siteye dokunmaz.",
   "permissions": [
     "declarativeNetRequest"
   ],
   "host_permissions": [
     "https://music.youtube.com/*",
     "https://www.youtube.com/*",
-    "https://youtube.com/*"
+    "https://youtube.com/*",
+    "https://web.whatsapp.com/*",
+    "https://makerworld.com/*",
+    "https://bambulab.com/*"
   ],
   "declarative_net_request": {
     "rule_resources": [

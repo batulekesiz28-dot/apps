@@ -77,7 +77,8 @@ const Media=(()=>{
   const IMG=(src,alt,cls='',eager)=>src?`<img class="${cls}" src="${E(src)}"${alt&&alt!==src?` data-alt="${E(alt)}"`:''} alt="" ${eager?'fetchpriority="high"':'loading="lazy"'} decoding="async" referrerpolicy="no-referrer" onload="Media.imgOk(this)" onerror="Media.imgErr(this)">`:'';
   // dikey poster kutusuna kare/yatay görsel (logo, tanıtım resmi) gelirse kırpma: ortala, sığdır
   // öneri kapağı yüklenmezse (poster deposunda yoksa) kart kendi sade kapağına döner
-  function fyNoImg(im){const mp=im.parentElement;if(!mp)return;mp.classList.add('mfy-ph');mp.innerHTML=`<small>${E(im.dataset.k||'')}</small><b>${E(im.dataset.t||'')}</b>`}
+  function fyNoImg(im){const alt=(im.dataset.alt||'').split(' ').filter(Boolean);if(alt.length){im.dataset.alt=alt.slice(1).join(' ');im.src=alt[0];return} /* sıradaki kapak adayı */
+    const mp=im.parentElement;if(!mp)return;mp.classList.add('mfy-ph');mp.innerHTML=`<small>${E(im.dataset.k||'')}</small><b>${E(im.dataset.t||'')}</b>`}
   function imgOk(im){im.classList.add('ok');const r=im.naturalWidth/Math.max(1,im.naturalHeight);if(r>.9&&im.parentElement?.classList.contains('mp'))im.classList.add('fitc')}
   // görsel yoksa: içeriğin adıyla tasarlanmış, türüne göre değişen tipografik kapak (rastgele görsel değil)
   function fallback(it){const g=(it.genres||[])[0]||'';
@@ -550,14 +551,32 @@ const Media=(()=>{
   // IMDb kimliği olan her film/dizinin posteri (anahtarsız, Stremio'nun açık poster deposu); yüklenmezse kart sade kapağa döner
   const MH=id=>`https://images.metahub.space/poster/medium/${id}/img`;
   // 6'şar paralel, en çok 8 sn: yavaş servis öneri rafını bekletmesin (bulunamayan sade kapakla görünür, sonra tekrar denenir)
+  /* Wikipedia afişi: Wikidata kimliği → en/tr Vikipedi sayfası → sayfanın ana görseli (afişler “serbest olmayan” lisanslı: pilicense=any şart).
+     50'şerli toplu istek; film/dizi kapağı için en sağlam yedek (metahub'da olmayan, iTunes'ta bulunmayan yapımlar). */
+  async function wikiPosters(list){const ids=[...new Set(list.map(d=>d.mid).filter(m=>/^Q\d+$/.test(m||'')))],out={};
+    for(let i=0;i<ids.length;i+=50){const part=ids.slice(i,i+50);
+      const j=await getJSON(`https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${part.join('|')}&props=sitelinks&sitefilter=enwiki|trwiki&format=json&origin=*`);
+      const T={en:{},tr:{}};for(const q of part){const sl=j?.entities?.[q]?.sitelinks||{};if(sl.enwiki)T.en[sl.enwiki.title]=q;if(sl.trwiki)T.tr[sl.trwiki.title]=q}
+      for(const lg of['en','tr']){const tl=Object.keys(T[lg]).filter(t=>!out[T[lg][t]]);if(!tl.length)continue;
+        const w=await getJSON(`https://${lg}.wikipedia.org/w/api.php?action=query&prop=pageimages&piprop=original|thumbnail&pithumbsize=500&pilicense=any&redirects=1&format=json&origin=*&titles=${tl.map(encodeURIComponent).join('|')}`);
+        const rd={};(w?.query?.redirects||[]).concat(w?.query?.normalized||[]).forEach(r=>rd[r.to]=r.from);
+        for(const pg of Object.values(w?.query?.pages||{})){const u=pg.thumbnail?.source||pg.original?.source;let t=pg.title;while(!T[lg][t]&&rd[t])t=rd[t];if(u&&T[lg][t]&&!/\.svg/i.test(u))out[T[lg][t]]=u}}}
+    return out}
+  /* Kapak: her öneri için aday listesi (IMDb → metahub, Vikipedi afişi, dizi → TVmaze / film → iTunes); kart ilkini gösterir, yüklenmezse
+     sıradakine geçer (data-alt, fyNoImg) — en son sade kapak. 6'şar paralel; 8 sn'de raf çizilir, geç gelen kapaklar karta sonradan oturur. */
+  function fyPatch(d){if(!d.img)return;document.querySelectorAll(`.mrc[data-fyid="${CSS.escape(d.key)}"] .mfy-ph`).forEach(ph=>{const im=document.createElement('img');Object.assign(im,{alt:'',loading:'lazy',referrerPolicy:'no-referrer'});
+    im.dataset.t=ph.querySelector('b')?.textContent||'';im.dataset.k=ph.querySelector('small')?.textContent||'';im.dataset.alt=(d.alt||[]).join(' ');im.onload=()=>imgOk(im);im.onerror=()=>fyNoImg(im);im.src=d.img;ph.classList.remove('mfy-ph');ph.replaceChildren(im)})}
   async function fyPosters(list){const C=lsg('mc:fyimg',{}),Q=[];let ch=0;
-    for(const d of list){if(d.img)continue;if(d.imdb){d.img=MH(d.imdb);continue}if(C[d.key]!==undefined&&C[d.key]){d.img=C[d.key];continue}Q.push(d)}
+    let W={};try{W=await Promise.race([wikiPosters(list.filter(d=>d.kind!=='anime'&&!(d.alt&&d.alt.length))),new Promise(r=>setTimeout(()=>r({}),5000))])}catch{}
+    const set=(d,...u)=>{const c=[...new Set([d.img,...(d.alt||[]),...u].filter(Boolean))];d.img=c[0]||'';d.alt=c.slice(1,4)};
+    for(const d of list){set(d,d.imdb?MH(d.imdb):'',W[d.mid]||'',C[d.key]||'');if(d.kind!=='anime'&&!W[d.mid]&&!C[d.key]&&(!d.img||/metahub/.test(d.img)))Q.push(d)} /* sadece tek dayanağı metahub olan ya da hiç kapağı olmayan için TVmaze/iTunes */
     const one=async d=>{let u='',done=false;try{if(d.kind==='series'){const s=d.imdb?await tvget(`https://api.tvmaze.com/lookup/shows?imdb=${d.imdb}`):await tvget(`https://api.tvmaze.com/singlesearch/shows?q=${encodeURIComponent(d.o||d.t)}`);u=s?.image?.original||s?.image?.medium||''}
-        else u=await itunes(d.o||d.t,+d.y||0);done=true}catch{}if(done){C[d.key]=u;ch++}d.img=u};
+        else u=await itunes(d.o||d.t,+d.y||0);done=true}catch{}if(done){C[d.key]=u;ch++}const had=d.img;set(d,u);if(!had&&d.img)fyPatch(d)};
     const run=async()=>{for(let d;(d=Q.shift());)await one(d)};
-    await Promise.race([Promise.all(Array.from({length:6},run)),new Promise(r=>setTimeout(r,8000))]);Q.length=0;
+    const all=Promise.all(Array.from({length:6},run)).then(()=>{if(ch)lss('mc:fyimg',C)});
+    await Promise.race([all,new Promise(r=>setTimeout(r,8000))]);
     if(ch)lss('mc:fyimg',C);return list}
-  function fyLoad(force){const k=tmdbKey(),S=fySeeds(),sig=S.map(s=>s.i.id+':'+(s.i.rating||0)+':'+(s.i.like||0)).join(',')+'|'+(k?1:0)+'|v3',c=lsg('mc:fy',null); // v3: eski (sadece anime kalmış) önbellek atılır
+  function fyLoad(force){const k=tmdbKey(),S=fySeeds(),sig=S.map(s=>s.i.id+':'+(s.i.rating||0)+':'+(s.i.like||0)).join(',')+'|'+(k?1:0)+'|v4',c=lsg('mc:fy',null); // v3: eski (sadece anime kalmış) önbellek atılır
     if(!S.length){fyErr='seed';return Promise.resolve(null)}
     if(!force&&c&&c.sig===sig&&Date.now()-c.at<FY_TTL){fyErr='';return Promise.resolve(c.d)}if(fyP)return fyP;
     fyP=(async()=>{const agg=new Map(),per=[];let G={},ok=0,fail=0,WD=new Map();if(k)try{G=await tmGenres(k)}catch{}
@@ -572,7 +591,7 @@ const Media=(()=>{
         list.forEach((d,r)=>{const e=agg.get(d.key)||{d,s:0,from:[]};e.s+=w*(1-r/24);if(!e.from.includes(i.title))e.from.push(i.title);agg.set(d.key,e)})}
       const out={per,all:[...agg.values()].map(e=>({...e.d,from:e.from,s:e.s+(e.d.sc||0)/25+Math.min(.3,(e.from.length-1)*.12)}))};
       // posteri olmayanlara (Wikidata) en iyi 36 için poster bul
-      try{await fyPosters(out.all.filter(d=>!d.img).sort((a,b)=>b.s-a.s).slice(0,80))}catch{} // posteri bulunamayan öneri silinmez: kart kendi kapağını çizer
+      try{await fyPosters(out.all.filter(d=>d.kind!=='anime'&&!d.alt?.length).sort((a,b)=>b.s-a.s).slice(0,80))}catch{} // posteri bulunamayan öneri silinmez: kart kendi kapağını çizer
       // film/dizi tohumu varken hiç film/dizi önerisi çıkmadıysa (servis yavaş/kapalı) sonuç önbelleğe ALINMAZ — yoksa 24 saat sadece anime görünüyordu
       const wantFS=S.some(s=>s.i.type!=='anime'),gotFS=out.all.some(d=>d.kind!=='anime');fyPart=wantFS&&!gotFS;
       fyP=null;fyErr=!ok&&fail?'net':'';if(ok&&!fyPart)lss('mc:fy',{at:Date.now(),sig,d:out});return out})();return fyP}
@@ -605,6 +624,7 @@ const Media=(()=>{
           for(let i=rows.length-1;i>0;i--){const k=Math.floor(Math.random()*(i+1));[rows[i],rows[k]]=[rows[k],rows[i]]}
           list=rows.slice(0,60).map(r=>({key:'wd:'+r.f,kind:'movie',t:r.tr||r.en,o:r.en,img:r.imdb?MH(r.imdb):'',y:r.y,sc:0,src:'Wikidata',g:[],syn:'',imdb:r.imdb,mid:r.f}))}}
       catch(e){console.warn('Yeni öneri ('+kind+')',e)}
+      if(kind!=='anime')try{await fyPosters(list.slice(0,60))}catch{}
       list=list.map((d,i)=>({...d,from:[],more:1,s:.35-i*.004+(d.gf?.05:0)}));
       if(list.length){const c=lsg('mc:fymore',{});c[kind]={at:Date.now(),list};lss('mc:fymore',c)}
       fyMoreBusy[kind]=null;return list.length})()}
@@ -632,7 +652,7 @@ const Media=(()=>{
     const by=new Map(all.map(d=>[d.key,d]));return{all,top:all.slice(0,20),per:(D?.per||[]).map(p=>({seed:p.seed,list:p.list.map(k=>by.get(k)).filter(Boolean)})).filter(p=>p.list.length>=4)}}
   const KN={movie:'Film',series:'Dizi',anime:'Anime'};
   const whyTxt=d=>d.more?'Sevdiğin türlerden':d.from?.length?`${d.from.slice(0,2).join(' ve ')}${d.from.length>2?` (+${d.from.length-2})`:''} sevdiğin için`:'';
-  const fyCard=(d,why)=>`<article class="mc-card v-p t-${d.kind} mrc" data-fyid="${E(d.key)}" tabindex="0" aria-label="${E(d.t)} — önizle, %${d.fit} uyum"><div class="mc-art">${d.img?`<div class="mp"><img src="${E(d.img)}" alt="" loading="lazy" referrerpolicy="no-referrer" onload="Media.imgOk(this)" onerror="Media.fyNoImg(this)" data-t="${E(d.t)}" data-k="${E(KN[d.kind]||'')}${d.y?' · '+E(d.y):''}"></div>`:`<div class="mp mfy-ph"><small>${E(KN[d.kind]||'')}${d.y?' · '+E(d.y):''}</small><b>${E(d.t)}</b></div>`}<span class="mfy-m">%${d.fit} uyum</span></div>
+  const fyCard=(d,why)=>`<article class="mc-card v-p t-${d.kind} mrc" data-fyid="${E(d.key)}" tabindex="0" aria-label="${E(d.t)} — önizle, %${d.fit} uyum"><div class="mc-art">${d.img?`<div class="mp"><img src="${E(d.img)}" alt="" loading="lazy" referrerpolicy="no-referrer" onload="Media.imgOk(this)" onerror="Media.fyNoImg(this)" data-alt="${E((d.alt||[]).join(' '))}" data-t="${E(d.t)}" data-k="${E(KN[d.kind]||'')}${d.y?' · '+E(d.y):''}"></div>`:`<div class="mp mfy-ph"><small>${E(KN[d.kind]||'')}${d.y?' · '+E(d.y):''}</small><b>${E(d.t)}</b></div>`}<span class="mfy-m">%${d.fit} uyum</span></div>
     <div class="mc-cap"><b>${E(d.t)}</b><small>${E(why?whyTxt(d):[KN[d.kind],d.y].filter(Boolean).join(' · '))}</small></div></article>`;
   const fyRow=(h,p,l,why,all,nw)=>`<section class="mc-shelf mrec mfy"><header><h2>${E(h)}</h2>${p?`<p>${E(p)}</p>`:''}${nw?`<button class="mc-all mfy-new" data-fynew title="Bunları geç, sıradaki önerileri göster">${IC.sync}Yeni öneriler</button>`:''}${all?`<a class="mc-all" href="#lib/m/foryou">Tümünü gör${IC.r}</a>`:''}</header><div class="mc-rw"><button class="mc-arr l" data-row="-1" aria-label="Sola kaydır" tabindex="-1">${IC.l}</button><div class="mc-row v-p">${l.map(d=>fyCard(d,why)).join('')}</div><button class="mc-arr r" data-row="1" aria-label="Sağa kaydır" tabindex="-1">${IC.r}</button></div></section>`;
   async function fyFill(force){const box=qa('#view>.mc [data-fy]');if(!box.length)return;const D=await fyLoad(force),P=fyPick(D);fyData=P.top.concat(P.per.flatMap(p=>p.list));
@@ -677,7 +697,7 @@ const Media=(()=>{
   function fyRepaint(){if(!fyP2)return;fyPageHTML=fyPage(fyP2);const b=q('#view>.mc [data-fyp]');if(b)b.innerHTML=fyPageHTML}
   function fyOpen(k0){const d=fyData.find(x=>x.key===k0);if(!d)return;q('.mrcp-bg')?.remove();const bg=document.createElement('div');bg.className='mrcp-bg';
     bg.innerHTML=`<div class="mrcp" role="dialog" aria-modal="true" aria-label="${E(d.t)}"><button class="mns-x mrcp-x" data-rx aria-label="Kapat">${IC.x}</button>
-      <div class="mrcp-p">${d.img?`<img src="${E(d.img)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">`:`<div class="mfy-ph" style="height:100%"><small>${E(KN[d.kind]||'')}</small><b>${E(d.t)}</b></div>`}</div>
+      <div class="mrcp-p">${d.img?`<img src="${E(d.img)}" alt="" referrerpolicy="no-referrer" data-alt="${E((d.alt||[]).join(' '))}" onerror="this.dataset.alt?Media.fyNoImg(this):this.remove()">`:`<div class="mfy-ph" style="height:100%"><small>${E(KN[d.kind]||'')}</small><b>${E(d.t)}</b></div>`}</div>
       <div class="mrcp-b"><span class="mrcp-k">%${d.fit} uyum · ${E([KN[d.kind],d.y].filter(Boolean).join(' · '))}</span><h3>${E(d.t)}</h3>${d.o&&d.o!==d.t?`<p class="mrcp-o">${E(d.o)}</p>`:''}
         ${d.sc?`<p class="mrcp-m"><span class="mc-sc"><i>${E(d.src||'')}</i>${(+d.sc).toFixed(1)}</span></p>`:''}
         ${d.g?.length?`<p class="mrcp-g">${d.g.map(g=>`<span>${E(g)}</span>`).join('')}</p>`:''}

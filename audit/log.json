@@ -6537,5 +6537,24 @@
     "text": "AppShell içindeki alıcıda tablet görüntüsü ayrı pencerede açılır (https sayfa http adresi çerçevede gösteremez)"
    }
   ]
+ },
+ {
+  "at": "2026-11-26T22:50:00Z",
+  "change": "Medya önerileri: film ve dizilerde kapak artık eksik kalmıyor. Her öneri için birkaç kapak kaynağı aranıyor (poster deposu, Vikipedi afişi, TVmaze/iTunes); biri açılmazsa sıradakine geçiyor, geç bulunan kapak karta sonradan oturuyor.",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Sana özel önerilerde bazı film/dizilerin kapağı yoktu",
+    "fix": "Aday kapak listesi (data-alt) + Vikipedi afişi (wikiPosters) + geç gelen kapak fyPatch"
+   }
+  ]
  }
 ]

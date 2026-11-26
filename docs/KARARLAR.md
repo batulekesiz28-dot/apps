@@ -139,4 +139,4 @@ Son güncelleme: 2026-11-15
 - **Pencere arayüzü (11.):** Windows alışkanlıkları — tek tık seçer, çift tık açar (dokunmatikte tek dokunuş), seçim kutusu, yazınca Başlat araması, Win tuşu. Görev çubuğunda çalan uygulama yok (adada).
 - **Haberler akışı:** varsayılan görünüm reels gibi tam ekran Akış (Liste duruyor). Öğrenme sadece cihazda/kendi bulutunda; her kartta neden gösterildiği yazar; “Daha az” ile azaltılır. Takip bildirimleri hub'ın Notify'ı üzerinden (ada + tarayıcı + telefon), dokununca haber açılır.
 - **Haberler: fotoğraf şart, uygulama içinde okunur** (2026-11-26): fotoğrafı bulunamayan haber gösterilmez; habere dokunmak yeni sekme açmaz, AppShell içinde okuyucu açılır (“Kaynakta aç” ve Ctrl/orta tık istisna).
-- **Yansıt: tablet ekranı** (2026-11-26): Android/iPad tarayıcıları ekran paylaşamıyor; “Ekran” seçeneği gizlenmez, seçilince cihazın kendi yansıtma yolu anlatılır.
+- **Yansıt: tablet ekranı** (2026-11-26): Android/iPad tarayıcıları ekran paylaşamıyor; “Ekran” seçeneği gizlenmez. Android'de doğrudan yayın ScreenStream (ücretsiz, açık kaynak) üzerinden: Yansıt adresi alıcıya iletir, alıcı açar; iPad'de AirPlay rehberi.

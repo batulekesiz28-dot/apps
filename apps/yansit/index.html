@@ -22,7 +22,10 @@
   .opt b{font-size:18px}.opt small{font-size:14px;color:var(--ink2)}
   .gd{margin-top:34px;border-top:1px solid var(--line);padding-top:22px}
   .gd h2{font-size:17px;font-weight:600}.gd>p{font-size:14px;color:var(--ink2);margin-top:4px}
-  .gd>p{max-width:66ch}.dg{margin:14px 0 4px;padding:16px;border-radius:16px;background:var(--card);box-shadow:inset 0 0 0 1px var(--line);font-size:15px;line-height:1.5}.dg>b{font-size:16px}.dg p{margin:6px 0;color:var(--ink2)}.dg ol{margin:8px 0;padding-left:20px}.dg li{margin:6px 0}.dg a{color:inherit}
+  .gd>p{max-width:66ch}.ss-in{display:block;width:100%;margin-top:8px;height:48px;padding:0 14px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:500 17px/1 inherit;font-family:inherit}
+  .ssb{display:inline-flex;align-items:center;height:40px;padding:0 14px;border-radius:12px;background:var(--ink);color:var(--bg)!important;font-weight:600;text-decoration:none}.dg small{color:var(--ink3)}
+  .dg.ss .go{margin-top:6px}.dg details{margin-top:12px}.dg summary{cursor:pointer;font-weight:600;min-height:40px;display:flex;align-items:center}
+  .rx-open{margin:18px auto 0;display:block;height:56px;padding:0 28px;border-radius:16px;background:#fff;color:#000;font-weight:700;font-size:20px}.dg{margin:14px 0 4px;padding:16px;border-radius:16px;background:var(--card);box-shadow:inset 0 0 0 1px var(--line);font-size:15px;line-height:1.5}.dg>b{font-size:16px}.dg p{margin:6px 0;color:var(--ink2)}.dg ol{margin:8px 0;padding-left:20px}.dg li{margin:6px 0}.dg a{color:inherit}
   .gd details{margin-top:12px;border-radius:16px;background:var(--card);box-shadow:inset 0 0 0 1px var(--line)}
   .gd summary{list-style:none;cursor:pointer;padding:14px 18px;font-weight:600;font-size:15px;display:flex;align-items:center;gap:10px;min-height:48px}
   .gd summary::-webkit-details-marker{display:none}.gd summary::after{content:'';margin-left:auto;width:8px;height:8px;border-right:1.6px solid var(--ink3);border-bottom:1.6px solid var(--ink3);transform:rotate(45deg);transition:transform .2s}
@@ -112,7 +115,7 @@ const newCode=()=>Array.from(crypto.getRandomValues(new Uint8Array(6)),x=>ALPH[x
 /* ── ana ekran ── */
 function home(){stopTx();$('#rx').hidden=true;
   $('#app').innerHTML=`<h1>Yansıt</h1><p class="sub">Bir ekranı başka bir cihazda göster: bilgisayarını televizyona, telefon kameranı bilgisayara. Görüntü cihazlar arasında doğrudan gider.</p>
-  <div class="opts"><button class="opt" data-go="tx">${ic('scr')}<b>Bu ekranı göster</b><small>${canScreen?'Ekranını, bir pencereyi ya da sekmeyi':'Bu cihazın kamerasını'} başka bir cihaza yansıt.</small></button>
+  <div class="opts"><button class="opt" data-go="tx">${ic('scr')}<b>Bu ekranı göster</b><small>${canScreen?'Ekranını, bir pencereyi ya da sekmeyi':AND?'Bu cihazın ekranını ya da kamerasını':'Bu cihazın kamerasını'} başka bir cihaza yansıt.</small></button>
     <button class="opt" data-go="rx">${ic('tv')}<b>Burada izle</b><small>Bu cihaz alıcı olsun: TV'de ya da bilgisayarda aç, çıkan kodu öbür cihaza gir.</small></button></div>
   <section class="gd" id="gd"><h2>Telefon ya da tabletin ekranını yansıtmak</h2><p>Telefon ve tablet tarayıcıları (Android, iPad) ekranı paylaşamıyor — bu, tarayıcının sınırı. Cihazın kendi yansıtma özelliği hem çalışır hem en akıcısı:</p>
     <details><summary>Android telefon / tablet → televizyon</summary><ol><li>Ekranın üstünden iki kez aşağı kaydırıp hızlı ayarları aç.</li><li><b>Smart View</b>, <b>Ekran yansıtma</b> ya da <b>Yayınla</b>'ya dokun.</li><li>Listeden televizyonu seç (TV'nin Chromecast ya da Miracast desteklemesi gerekir; ikisi aynı Wi-Fi'de olmalı).</li></ol></details>
@@ -123,24 +126,44 @@ function home(){stopTx();$('#rx').hidden=true;
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(!g)return;if(g.dataset.go==='tx')txUI();else if(g.dataset.go==='rx')rxStart();else if(g.dataset.go==='home'){location.hash='';home()}});
 
 /* ── gönderen ── */
-const q0=lsg('yansit:q','');let TX={src:canScreen?'screen':'front',fps:lsg('yansit:fps',q0==='sharp'?30:60),res:lsg('yansit:res',q0==='sharp'?1080:720),pc:null,es:null,stream:null,code:''};
+const q0=lsg('yansit:q','');let TX={src:canScreen||AND?'screen':'front',fps:lsg('yansit:fps',q0==='sharp'?30:60),res:lsg('yansit:res',q0==='sharp'?1080:720),pc:null,es:null,stream:null,code:''};
 function txUI(pref){if(location.hash!=='#gonder'&&!pref)history.replaceState(null,'','#gonder');
   const S=[['screen','Ekran',1],['front','Ön kamera',canCam],['back','Arka kamera',canCam]],noScr=TX.src==='screen'&&!canScreen;
   $('#app').innerHTML=`<button class="back" data-go="home">‹ Yansıt</button><h1>Bu ekranı göster</h1>
   <div class="pane"><label class="lb" for="code">Alıcıdaki kod</label><input class="code-in" id="code" maxlength="6" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="••••••" value="${esc(pref||'')}" aria-describedby="codeH">
     <p class="hint" id="codeH">Alıcı cihazda (TV ya da bilgisayar) Yansıt → <b>Burada izle</b>'yi aç; çıkan 6 harfli kodu buraya yaz.</p>
     <span class="lb">Ne gösterilsin?</span><div class="seg" role="group" aria-label="Kaynak">${S.map(([k,n,ok])=>`<button data-src="${k}" aria-pressed="${TX.src===k}" ${ok?'':'disabled title="Bu cihazda yok"'}>${n}</button>`).join('')}</div>
-    ${noScr?devGuide():`${qRows()}
+    ${noScr?(AND?ssPanel():devGuide()):`${qRows()}
     <button class="go" id="txGo">Yansıtmayı başlat</button>`}<p class="msg" id="txMsg" role="status" aria-live="polite"></p></div>`;
   const ci=$('#code');ci.addEventListener('input',()=>{ci.value=ci.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6)});if(!pref)setTimeout(()=>ci.focus(),60);
   ci.addEventListener('keydown',e=>{if(e.key==='Enter')$('#txGo').click()});
   $('#app').querySelectorAll('[data-src]').forEach(b=>b.onclick=()=>{TX.src=b.dataset.src;txUI(ci.value||' ')});
   qWire();
-  const go=$('#txGo');if(go)go.onclick=()=>txStart(ci.value.trim())}
+  const go=$('#txGo');if(go)go.onclick=()=>txStart(ci.value.trim());
+  const sg=$('#ssGo');if(sg){const ui=$('#ssUrl');ui.addEventListener('keydown',e=>{if(e.key==='Enter')sg.click()});sg.onclick=()=>ssSend(ci.value.trim(),ui.value)}}
+/* ── Android tablet/telefondan doğrudan yayın ──
+   Android tarayıcıları ekranı veremediği için ekranı ücretsiz, açık kaynak ScreenStream uygulaması yayınlar (aynı Wi-Fi'de http://IP:8080).
+   Tablet adresi alıcının koduyla ntfy üzerinden yollar ({type:'url'}); alıcı kendiliğinden açar. Sadece yerel ağ adresi kabul edilir (başkası TV'ye site açtıramasın). */
+const SS_PLAY='https://play.google.com/store/apps/details?id=info.dvkr.screenstream',SS_FD='https://f-droid.org/packages/info.dvkr.screenstream/';
+function lanUrl(v){v=String(v||'').trim();if(!v)return'';if(!/^https?:\/\//i.test(v))v='http://'+v;try{const u=new URL(v),h=u.hostname;
+  return/^(10\.\d+|192\.168|172\.(1[6-9]|2\d|3[01])|169\.254)\.\d+\.\d+$/.test(h)||/\.local$/i.test(h)?u.origin+u.pathname:''}catch{return''}}
+function ssPanel(){return`<div class="dg ss"><b>Tabletten doğrudan yayınla</b><p>Android tarayıcıları ekranı paylaşamıyor; ekranı ücretsiz <b>ScreenStream</b> uygulaması yayınlar, Yansıt alıcıda açar.</p>
+    <ol><li><a class="ssb" href="${SS_PLAY}" target="_blank" rel="noopener">ScreenStream'i kur</a> <small>(ücretsiz, açık kaynak · <a href="${SS_FD}" target="_blank" rel="noopener">F-Droid</a>)</small></li>
+      <li>Uygulamada <b>Yerel (Local)</b> modunda <b>Başlat</b>'a bas, izin ver.</li>
+      <li>Uygulamada yazan adresi buraya yaz:<input class="ss-in" id="ssUrl" inputmode="url" autocomplete="off" spellcheck="false" placeholder="192.168.1.20:8080" value="${esc(lsg('yansit:ss',''))}" aria-label="ScreenStream adresi"></li></ol>
+    <button class="go" id="ssGo">Yayınla</button><p class="msg" id="txMsg" role="status" aria-live="polite"></p>
+    <details><summary>Ya da uygulamasız (yerleşik yansıtma)</summary>${devList()}</details>
+    <p class="hint">İki cihaz aynı Wi-Fi'de olmalı. Ses gitmez (ScreenStream sadece görüntü yollar).</p></div>`}
+async function ssSend(code,v){if(!/^[A-Z0-9]{6}$/.test(code)){txMsg('Önce alıcıdaki 6 harfli kodu yaz.','err');$('#code')?.focus();return}
+  const url=lanUrl(v);if(!url){txMsg('Adres ScreenStream\'de yazan yerel adres olmalı (ör. 192.168.1.20:8080).','err');$('#ssUrl')?.focus();return}
+  lss('yansit:ss',v.trim());const b=$('#ssGo');b.disabled=true;txMsg('Alıcıya gönderiliyor…');
+  try{await sig(code,{type:'url',url});txMsg('Gönderildi ✓ Alıcıda tabletin ekranı açılıyor.','ok')}catch(e){txMsg('Gönderilemedi: '+e.message,'err')}b.disabled=false}
 /* tablet/telefon: tarayıcı ekranı veremez → bu cihazın kendi yansıtma yolu (kamera seçenekleri bu uygulamayla çalışır) */
+const devList=()=>`<ol>${devSteps().map(x=>`<li>${x}</li>`).join('')}</ol>`;
+function devSteps(){return IOS?['<b>Televizyona / Mac\'e:</b> Denetim Merkezi\'ni aç (sağ üst köşeden aşağı kaydır) → <b>Ekran Yansıtma</b> → Apple TV, AirPlay destekli TV ya da Mac.','<b>Windows bilgisayara:</b> bilgisayara bir AirPlay alıcı programı gerekir (Windows bunu kendisi yapmıyor); sonra yine <b>Ekran Yansıtma</b>.']
+    :['<b>Televizyona:</b> üstten iki kez aşağı kaydır → <b>Smart View</b> / <b>Ekran yansıtma</b> / <b>Yayınla</b> → televizyonu seç.','<b>Windows bilgisayara:</b> bilgisayarda <b>Ayarlar → Sistem → Bu bilgisayara yansıtma</b>\'yı aç; sonra tablette <b>Smart View</b>\'dan bilgisayarı seç. Kabloyla en akıcısı: <a href="https://github.com/Genymobile/scrcpy" target="_blank" rel="noopener">scrcpy</a>.']}
 function devGuide(){const os=IOS?'ios':AND?'and':'';
-  const L=os==='ios'?['<b>Televizyona / Mac\'e:</b> Denetim Merkezi\'ni aç (sağ üst köşeden aşağı kaydır) → <b>Ekran Yansıtma</b> → Apple TV, AirPlay destekli TV ya da Mac.','<b>Windows bilgisayara:</b> bilgisayara bir AirPlay alıcı programı gerekir (Windows bunu kendisi yapmıyor); sonra yine <b>Ekran Yansıtma</b>.']
-    :['<b>Televizyona:</b> üstten iki kez aşağı kaydır → <b>Smart View</b> / <b>Ekran yansıtma</b> / <b>Yayınla</b> → televizyonu seç.','<b>Windows bilgisayara:</b> bilgisayarda <b>Ayarlar → Sistem → Bu bilgisayara yansıtma</b>\'yı aç; sonra tablette <b>Smart View</b>\'dan bilgisayarı seç. Kabloyla en akıcısı: <a href="https://github.com/Genymobile/scrcpy" target="_blank" rel="noopener">scrcpy</a>.'];
+  const L=devSteps();
   return`<div class="dg" role="note"><b>Bu ${IOS?'iPad':AND?'tablet':'cihaz'} ekranını tarayıcıdan paylaşamıyor</b><p>${IOS?'Safari ve iPad\'deki bütün tarayıcılar':'Android\'deki tarayıcılar (Chrome, Samsung Internet)'} ekran paylaşmaya izin vermiyor. Cihazın kendi yansıtması daha akıcı:</p>
     <ol>${L.map(x=>`<li>${x}</li>`).join('')}</ol><p class="hint">Kamerayı bu uygulamayla yansıtabilirsin (Ön / Arka kamera). Bu cihaz <b>alıcı</b> da olabilir: ana sayfada <b>Burada izle</b>.</p></div>`}
 const txMsg=(t,c='')=>{const m=$('#txMsg');if(m){m.textContent=t;m.className='msg '+c}};
@@ -193,7 +216,12 @@ async function rxStart(){history.replaceState(null,'','#izle');stopTx();const R=
 function rxWait(st){const R=$('#rx');const u=location.origin+location.pathname.replace(/index\.html$/,'');
   R.innerHTML=`<div class="rx-w"><p class="rx-k">Bu ekranda göstermek için öbür cihaza bu kodu gir</p><p class="rx-c" aria-label="Kod ${[...RX.code].join(' ')}">${RX.code}</p>
     <p class="rx-u">Öbür cihazda AppShell → <b>Yansıt</b> → <b>Bu ekranı göster</b><br>ya da: <b>${esc(u.replace(/^https?:\/\//,''))}#k=${RX.code}</b></p><p class="rx-s" role="status">${esc(st)}</p></div><button class="rx-x" data-go="home">Kapat</button>`}
-async function rxSig(m){if(m.type==='bye'){rxEnd('Yansıtma bitti. Yeniden göstermek için aynı kodu gir.');return}if(m.type!=='offer')return;
+async function rxSig(m){if(m.type==='bye'){rxEnd('Yansıtma bitti. Yeniden göstermek için aynı kodu gir.');return}
+  if(m.type==='url'){const url=lanUrl(m.url);if(!url)return;let top=true;try{top=window.top===window}catch{top=false}
+    /* TV'de (Yansıt tek başına açık) doğrudan geçer; AppShell içindeyse http adresi çerçevede açılamaz → tek dokunuşla yeni pencere */
+    if(top){rxWait('Tabletin ekranı açılıyor…');setTimeout(()=>location.href=url,600);return}
+    const R=$('#rx');R.innerHTML=`<div class="rx-w"><p class="rx-k">Tablet yayına hazır</p><button class="rx-open" id="rxOpen">Tabletin ekranını aç</button><p class="rx-u">${esc(url.replace(/^https?:\/\//,''))} · aynı Wi-Fi'de olmalı</p></div><button class="rx-x" data-go="home">Kapat</button>`;
+    $('#rxOpen').onclick=()=>window.open(url,'_blank');$('#rxOpen').focus();return}if(m.type!=='offer')return;
   try{RX.pc?.close()}catch{}const pc=RX.pc=new RTCPeerConnection({iceServers:ICE});
   pc.ontrack=e=>rxShow(e.streams[0]||new MediaStream([e.track]),m.src);
   pc.onconnectionstatechange=()=>{if(pc.connectionState==='failed')rxEnd('Bağlantı kurulamadı. İki cihaz aynı Wi-Fi\'de mi?');else if(pc.connectionState==='closed')rxEnd('')};

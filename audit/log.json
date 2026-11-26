@@ -6505,5 +6505,37 @@
     "fix": "Tablette cihazın kendi yansıtma rehberi gösterilir"
    }
   ]
+ },
+ {
+  "at": "2026-11-26T22:10:00Z",
+  "change": "Yansıt: Android tabletten doğrudan yayın. Tablette “Ekran” → ücretsiz ScreenStream uygulamasını kur, Başlat'a bas, adresini yaz, Yayınla. Alıcı (TV ya da bilgisayar) kodla haberi alır ve tabletin ekranını kendiliğinden açar (AppShell içindeyse tek dokunuş).",
+  "scores": {
+   "yansit telefon": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "yansit",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Tabletten ekran yayınlanamıyordu",
+    "fix": "ScreenStream + kodla eşleşme ({type:'url'}), sadece yerel ağ adresi kabul"
+   },
+   {
+    "app": "yansit",
+    "sev": "info",
+    "status": "kabul",
+    "text": "iPad için doğrudan yayın yok (Apple izin vermiyor)",
+    "fix": "AirPlay rehberi"
+   },
+   {
+    "app": "yansit",
+    "sev": "info",
+    "status": "kabul",
+    "text": "AppShell içindeki alıcıda tablet görüntüsü ayrı pencerede açılır (https sayfa http adresi çerçevede gösteremez)"
+   }
+  ]
  }
 ]

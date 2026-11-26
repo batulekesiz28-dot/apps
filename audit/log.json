@@ -6461,5 +6461,49 @@
    }
   },
   "items": []
+ },
+ {
+  "at": "2026-11-26T21:30:00Z",
+  "change": "Haberler: her haberin fotoğrafı var (fotoğrafı olmayanın fotoğrafı kendi sayfasından bulunur, bulunamazsa gösterilmez); habere dokununca yeni sekme yerine AppShell içinde sade okuma ekranı açılır. Yansıt: 60–120 FPS'te donanım kodlayıcı (H.264) ve hızlı başlangıç bit hızı — takılma azalır; ölçümde ekranın/kameranın kaç kare verdiği yazar. Tablette “Ekran” seçince o tablete özel yansıtma yolu gösterilir.",
+  "scores": {
+   "haberler telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "yansit masaüstü": {
+    "before": 99,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "haberler",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Fotoğrafsız haberler görünüyordu",
+    "fix": "Bing fotoğrafları + sayfadan og:image; bulunamayan gizlenir"
+   },
+   {
+    "app": "haberler",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Haber yeni sekmede açılıyordu",
+    "fix": "Uygulama içi okuyucu (reader.js): metin + fotoğraflar, Geri/Esc, Kaynakta aç"
+   },
+   {
+    "app": "yansit",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Yüksek FPS'te takılma",
+    "fix": "H.264 donanım kodlayıcı önce, başlangıç bit hızı yüksek, canlı ölçümde darboğaz yazıyor"
+   },
+   {
+    "app": "yansit",
+    "sev": "info",
+    "status": "kabul",
+    "text": "Android/iPad tarayıcıları ekran paylaşamıyor (tarayıcı sınırı)",
+    "fix": "Tablette cihazın kendi yansıtma rehberi gösterilir"
+   }
+  ]
  }
 ]

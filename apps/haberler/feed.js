@@ -32,13 +32,17 @@ const Feed=(()=>{
   /* ── kaynaklar (sonsuz) ── */
   function sources(){const kw=Object.entries(P.w).filter(([f,v])=>f.startsWith('k:')&&v>1.2).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([f])=>f.slice(2));
     const cs=Object.entries(P.w).filter(([f,v])=>f.startsWith('c:d:')&&v>.8).map(([f])=>f.slice(4));
-    const S=[...kw.map(k=>({id:'i:'+k,url:NW().GN(k+' when:2d'),cat:'ilgi',why:`“${k}” ilgini çekiyor`})),
-      ...cs.map(d=>({id:'d:'+d,url:NW().GN(d+' when:2d'),cat:'d:'+d})),
-      ...(typeof TOP==='function'?TOP().map(t=>({id:'t:'+t,url:NW().GN(t+' when:3d'),cat:'t:'+t})):[]),
+    /* her arama iki kaynaktan: Google Haberler + Bing Haberler (Bing her habere fotoğraf verir; Google'ınki çoğu zaman yok) */
+    const two=(id,q,d,cat,why)=>[{id,url:NW().GN(q+' when:'+d),cat,why},{id:'b'+id,url:BING(q),cat,why}];
+    const S=[...kw.flatMap(k=>two('i:'+k,k,'2d','ilgi',`“${k}” ilgini çekiyor`)),
+      ...cs.flatMap(d=>two('d:'+d,d,'2d','d:'+d)),
+      ...(typeof TOP==='function'?TOP().flatMap(t=>two('t:'+t,t,'3d','t:'+t)):[]),
       ...(typeof CATS!=='undefined'?CATS.flatMap(c=>c.f.map((u,j)=>({id:c.id+j,url:u,cat:c.id}))):[]),
-      ...DISC.map(([d])=>({id:'d:'+d,url:NW().GN(d+' when:2d'),cat:'d:'+d}))]; // önce ilgilerin ve konuların, sonra keşif
+      ...DISC.flatMap(([d])=>two('d:'+d,d,'2d','d:'+d))]; // önce ilgilerin ve konuların, sonra keşif
     const m=new Map();S.forEach(x=>{if(!m.has(x.id))m.set(x.id,x)});return[...m.values()]}
+  /* fotoğraf şart: fotoğrafsız haber havuza girmez; sayfasından fotoğrafı bulunursa (reader.js Pic.need) sonradan girer */
   function addItems(L,cat,whyTxt){const s=seen();let n=0;for(const i of L){const k=NW().key(i);if(s[k]||pool.has(k)||shown.some(x=>x.k===k))continue;if(i.t&&Date.now()-i.t>4*864e5)continue;
+      if(!i.img){if(!i._np&&window.Pic)Pic.need(i,im=>{if(im){i.img=im;if(mode==='feed'&&addItems([i],cat,whyTxt))fill()}else i._np=1});continue}
       pool.set(k,{...i,k,cat:i.cat||cat,why:whyTxt||''});n++}return n}
   let stalled=0;
   async function more(){if(loading)return;loading=true;paintLoad(true);
@@ -46,7 +50,8 @@ const Feed=(()=>{
       if(!shown.length&&typeof C!=='undefined')Object.entries(C).forEach(([id,v])=>addItems(v.items||[],id));
       const S=sources();let tries=0;
       while(pool.size<14&&tries<S.length){const x=S[qi++%S.length];tries++;if(fetched[x.id]&&Date.now()-fetched[x.id]<15*6e4)continue;fetched[x.id]=Date.now();
-        try{addItems(await NW().feed(x.url),x.cat,x.why)}catch{}}
+        try{addItems(await NW().feed(x.url),x.cat,x.why)}catch{}
+        if(!shown.length&&pool.size>=3&&mode==='feed')fill()} /* ilk kartları beklemeden göster */
       if(!pool.size&&!shown.length)throw new Error('net')}
     catch{if(!shown.length)paintEmpty()}
     finally{loading=false;paintLoad(false);if(mode!=='feed')return;if(pool.size)fill();else stalled=Date.now()}} // boş döndüyse hemen yeniden deneme (eskiden more↔fill sonsuz döngüye giriyordu)
@@ -66,7 +71,7 @@ const Feed=(()=>{
         <button data-fa="less" aria-label="Bunun gibi daha az" title="Daha az · N">${sv('less')}<small>Daha az</small></button><button data-fa="share" aria-label="Paylaş" title="Paylaş">${sv('share')}<small>Paylaş</small></button></div></article>`}
   function fill(){if(!el)return;const box=el.querySelector('.rl-s');const left=shown.length-Math.max(0,cur);if(left>5)return;
     const add=next(8);if(!add.length){if(!loading&&mode==='feed'&&Date.now()-stalled>30000)setTimeout(more,0);return}
-    const start=shown.length;shown.push(...add);box.insertAdjacentHTML('beforeend',add.map((i,j)=>card(i,start+j)).join(''));
+    if(!shown.length)box.querySelector('.rl-e')?.remove();const start=shown.length;shown.push(...add);box.insertAdjacentHTML('beforeend',add.map((i,j)=>card(i,start+j)).join(''));
     box.querySelectorAll('.rc:not([data-o])').forEach(c=>{c.dataset.o=1;io.observe(c)});
     if(pool.size<10&&mode==='feed'&&!loading&&Date.now()-stalled>30000)setTimeout(more,0)}
   function paintLoad(on){el?.querySelector('.rl-ld')?.toggleAttribute('hidden',!on||shown.length>cur+2)}
@@ -78,7 +83,7 @@ const Feed=(()=>{
   async function act(k,c){const ix=+c?.dataset.ix,i=shown[ix];
     if(k==='retry'){shown=[];el.querySelector('.rl-s').innerHTML='';cur=-1;return more()}
     if(!i)return;
-    if(k==='open'){learn(i,2.5);i._l=1;READ.add(i.link);lss('haberler:read',[...READ].slice(-600));window.open(i.link,'_blank','noopener');return}
+    if(k==='open'){learn(i,2.5);i._l=1;READ.add(i.link);lss('haberler:read',[...READ].slice(-600));Reader.open(i);return} /* AppShell içinde okur (reader.js) */
     if(k==='like'){const b=c.querySelector('[data-fa=like]'),on=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',on);learn(i,on?3:-3);i._l=1;
       if(on&&!matchMedia('(prefers-reduced-motion: reduce)').matches)b.animate([{scale:1},{scale:1.35},{scale:1}],{duration:420,easing:'cubic-bezier(.3,1.6,.5,1)'});return}
     if(k==='less'){learn(i,-4);i._l=1;tip(`Bunun gibi daha az: ${catName(i.cat)}${i.src?' · '+i.src:''}`);// sıradakini getir
@@ -105,7 +110,9 @@ const Feed=(()=>{
       return(!toks.length||toks.some(w=>t.includes(w)))&&(!num.length||num.some(n=>new RegExp(`(^|\\D)${n}(\\D|$)|\\b${RO[n]||'_'}\\b`).test(t))||toks.length>1)};
     const paint=()=>{if(mode!=='search'||q!==my)return;const L=[...seen.values()].sort((a,b)=>(b.t||0)-(a.t||0)).slice(0,80);if(!L.length)return;
       const top=box.scrollTop;shown=L;box.innerHTML=L.map(card).join('');box.querySelectorAll('.rc').forEach(c=>{c.dataset.o=1;io.observe(c)});box.scrollTop=top};
-    const add=L=>{for(const i of L){if(!rel(i))continue;const kk=NW().key(i);if(!seen.has(kk))seen.set(kk,{...i,k:kk,cat:'ara',why:''})}paint()};
+    const add=L=>{for(const i of L){if(!rel(i))continue;const kk=NW().key(i);if(seen.has(kk))continue;
+        if(!i.img){if(!i._np)Pic.need(i,im=>{if(im&&!seen.has(kk)){seen.set(kk,{...i,img:im,k:kk,cat:'ara',why:''});paint()}});continue}
+        seen.set(kk,{...i,k:kk,cat:'ara',why:''})}paint()};
     const src=[NW().feed(NW().GN(s+' when:30d')),NW().feed(NW().GN(s+' when:30d','en')),NW().feed(BING(s)),gdelt(s)];
     const res=await Promise.allSettled(src.map(p=>p.then(add)));if(mode!=='search'||q!==my)return;
     loading=false;paintLoad(false);if(seen.size)return;

@@ -22,6 +22,7 @@
   .opt b{font-size:18px}.opt small{font-size:14px;color:var(--ink2)}
   .gd{margin-top:34px;border-top:1px solid var(--line);padding-top:22px}
   .gd h2{font-size:17px;font-weight:600}.gd>p{font-size:14px;color:var(--ink2);margin-top:4px}
+  .gd>p{max-width:66ch}.dg{margin:14px 0 4px;padding:16px;border-radius:16px;background:var(--card);box-shadow:inset 0 0 0 1px var(--line);font-size:15px;line-height:1.5}.dg>b{font-size:16px}.dg p{margin:6px 0;color:var(--ink2)}.dg ol{margin:8px 0;padding-left:20px}.dg li{margin:6px 0}.dg a{color:inherit}
   .gd details{margin-top:12px;border-radius:16px;background:var(--card);box-shadow:inset 0 0 0 1px var(--line)}
   .gd summary{list-style:none;cursor:pointer;padding:14px 18px;font-weight:600;font-size:15px;display:flex;align-items:center;gap:10px;min-height:48px}
   .gd summary::-webkit-details-marker{display:none}.gd summary::after{content:'';margin-left:auto;width:8px;height:8px;border-right:1.6px solid var(--ink3);border-bottom:1.6px solid var(--ink3);transform:rotate(45deg);transition:transform .2s}
@@ -82,7 +83,8 @@ const RM=()=>matchMedia('(prefers-reduced-motion: reduce)').matches||document.do
 const ALPH='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',NT='https://ntfy.sh/',TOP=c=>'appshell-yansit-v1-'+c.toLowerCase();
 const me=Math.random().toString(36).slice(2,10);
 const ICE=[{urls:['stun:stun.l.google.com:19302','stun:stun.cloudflare.com:3478']}];
-const canScreen=!!(navigator.mediaDevices&&navigator.mediaDevices.getDisplayMedia),canCam=!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia);
+const canScreen=!!(navigator.mediaDevices&&navigator.mediaDevices.getDisplayMedia),
+  IOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&navigator.maxTouchPoints>1),AND=/Android/i.test(navigator.userAgent),canCam=!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia);
 /* görüntü: kare hızı (FPS) ve çözünürlük ayrı seçilir; bit hızı ikisine göre (piksel × FPS), yansıtma sürerken de değişir */
 const FPS=[15,30,60,90,120],RES=[[480,'480p'],[720,'720p'],[1080,'1080p'],[1440,'1440p'],[2160,'4K']];
 const qOf=()=>{const fps=TX.fps,h=TX.res,px=Math.round(h*16/9)*h;return{fps,h,br:Math.round(Math.min(25e6,Math.max(1.2e6,px*fps*.07))),hint:fps>=50?'motion':'detail'}};
@@ -112,10 +114,10 @@ function home(){stopTx();$('#rx').hidden=true;
   $('#app').innerHTML=`<h1>Yansıt</h1><p class="sub">Bir ekranı başka bir cihazda göster: bilgisayarını televizyona, telefon kameranı bilgisayara. Görüntü cihazlar arasında doğrudan gider.</p>
   <div class="opts"><button class="opt" data-go="tx">${ic('scr')}<b>Bu ekranı göster</b><small>${canScreen?'Ekranını, bir pencereyi ya da sekmeyi':'Bu cihazın kamerasını'} başka bir cihaza yansıt.</small></button>
     <button class="opt" data-go="rx">${ic('tv')}<b>Burada izle</b><small>Bu cihaz alıcı olsun: TV'de ya da bilgisayarda aç, çıkan kodu öbür cihaza gir.</small></button></div>
-  <section class="gd"><h2>Telefonun ekranını yansıtmak</h2><p>Telefon tarayıcıları ekranı paylaşamıyor; telefonun kendi yansıtma özelliği en akıcısı:</p>
-    <details><summary>Android → televizyon</summary><ol><li>Ekranın üstünden iki kez aşağı kaydırıp hızlı ayarları aç.</li><li><b>Smart View</b>, <b>Ekran yansıtma</b> ya da <b>Yayınla</b>'ya dokun.</li><li>Listeden televizyonu seç (TV'nin Chromecast ya da Miracast desteklemesi gerekir; ikisi aynı Wi-Fi'de olmalı).</li></ol></details>
-    <details><summary>Android → Windows bilgisayar</summary><ol><li>Bilgisayarda <b>Ayarlar → Sistem → Bu bilgisayara yansıtma</b>'yı aç (ilk seferde “Kablosuz Ekran” isteğe bağlı özelliğini ekle).</li><li>Telefonda <b>Smart View / Ekran yansıtma</b>'dan bilgisayarı seç.</li><li>Kabloyla ve en akıcısı: ücretsiz <a href="https://github.com/Genymobile/scrcpy" target="_blank" rel="noopener">scrcpy</a> (telefonu USB ile bağla, telefondan da kontrol edersin).</li></ol></details>
-    <details><summary>iPhone → televizyon / Mac</summary><ol><li>Denetim Merkezi'ni aç (sağ üstten aşağı kaydır).</li><li><b>Ekran Yansıtma</b>'ya dokun.</li><li>Apple TV'yi, AirPlay destekli TV'yi ya da Mac'i seç.</li></ol></details>
+  <section class="gd" id="gd"><h2>Telefon ya da tabletin ekranını yansıtmak</h2><p>Telefon ve tablet tarayıcıları (Android, iPad) ekranı paylaşamıyor — bu, tarayıcının sınırı. Cihazın kendi yansıtma özelliği hem çalışır hem en akıcısı:</p>
+    <details><summary>Android telefon / tablet → televizyon</summary><ol><li>Ekranın üstünden iki kez aşağı kaydırıp hızlı ayarları aç.</li><li><b>Smart View</b>, <b>Ekran yansıtma</b> ya da <b>Yayınla</b>'ya dokun.</li><li>Listeden televizyonu seç (TV'nin Chromecast ya da Miracast desteklemesi gerekir; ikisi aynı Wi-Fi'de olmalı).</li></ol></details>
+    <details><summary>Android telefon / tablet → Windows bilgisayar</summary><ol><li>Bilgisayarda <b>Ayarlar → Sistem → Bu bilgisayara yansıtma</b>'yı aç (ilk seferde “Kablosuz Ekran” isteğe bağlı özelliğini ekle).</li><li>Telefonda <b>Smart View / Ekran yansıtma</b>'dan bilgisayarı seç.</li><li>Kabloyla ve en akıcısı: ücretsiz <a href="https://github.com/Genymobile/scrcpy" target="_blank" rel="noopener">scrcpy</a> (telefonu USB ile bağla, telefondan da kontrol edersin).</li></ol></details>
+    <details><summary>iPhone / iPad → televizyon / Mac</summary><ol><li>Denetim Merkezi'ni aç (sağ üst köşeden aşağı kaydır).</li><li><b>Ekran Yansıtma</b>'ya dokun.</li><li>Apple TV'yi, AirPlay destekli TV'yi ya da Mac'i seç.</li></ol></details>
     <details><summary>Bilgisayar → televizyon (bu uygulamasız)</summary><ol><li>Chrome'da sağ üst menü → <b>Yayınla…</b> → Chromecast'li TV'yi seç.</li><li>Windows'ta <b>Windows + K</b> → Miracast destekli TV'yi seç.</li></ol></details></section>
   <p class="note">Eşleşme için kısa bağlantı bilgisi ntfy.sh üzerinden geçer; görüntü hiçbir sunucuya gitmez. İki cihaz aynı Wi-Fi'deyse en iyi sonuç.</p>`}
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(!g)return;if(g.dataset.go==='tx')txUI();else if(g.dataset.go==='rx')rxStart();else if(g.dataset.go==='home'){location.hash='';home()}});
@@ -123,36 +125,49 @@ document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(!
 /* ── gönderen ── */
 const q0=lsg('yansit:q','');let TX={src:canScreen?'screen':'front',fps:lsg('yansit:fps',q0==='sharp'?30:60),res:lsg('yansit:res',q0==='sharp'?1080:720),pc:null,es:null,stream:null,code:''};
 function txUI(pref){if(location.hash!=='#gonder'&&!pref)history.replaceState(null,'','#gonder');
-  const S=[['screen','Ekran',canScreen],['front','Ön kamera',canCam],['back','Arka kamera',canCam]];
+  const S=[['screen','Ekran',1],['front','Ön kamera',canCam],['back','Arka kamera',canCam]],noScr=TX.src==='screen'&&!canScreen;
   $('#app').innerHTML=`<button class="back" data-go="home">‹ Yansıt</button><h1>Bu ekranı göster</h1>
   <div class="pane"><label class="lb" for="code">Alıcıdaki kod</label><input class="code-in" id="code" maxlength="6" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="••••••" value="${esc(pref||'')}" aria-describedby="codeH">
     <p class="hint" id="codeH">Alıcı cihazda (TV ya da bilgisayar) Yansıt → <b>Burada izle</b>'yi aç; çıkan 6 harfli kodu buraya yaz.</p>
     <span class="lb">Ne gösterilsin?</span><div class="seg" role="group" aria-label="Kaynak">${S.map(([k,n,ok])=>`<button data-src="${k}" aria-pressed="${TX.src===k}" ${ok?'':'disabled title="Bu cihazda yok"'}>${n}</button>`).join('')}</div>
-    ${canScreen?'':'<p class="hint">Bu cihazın tarayıcısı ekran paylaşamıyor; telefon ekranı için ana sayfadaki rehbere bak.</p>'}
-    ${qRows()}
-    <button class="go" id="txGo">Yansıtmayı başlat</button><p class="msg" id="txMsg" role="status" aria-live="polite"></p></div>`;
+    ${noScr?devGuide():`${qRows()}
+    <button class="go" id="txGo">Yansıtmayı başlat</button>`}<p class="msg" id="txMsg" role="status" aria-live="polite"></p></div>`;
   const ci=$('#code');ci.addEventListener('input',()=>{ci.value=ci.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6)});if(!pref)setTimeout(()=>ci.focus(),60);
   ci.addEventListener('keydown',e=>{if(e.key==='Enter')$('#txGo').click()});
   $('#app').querySelectorAll('[data-src]').forEach(b=>b.onclick=()=>{TX.src=b.dataset.src;txUI(ci.value||' ')});
   qWire();
-  $('#txGo').onclick=()=>txStart(ci.value.trim())}
+  const go=$('#txGo');if(go)go.onclick=()=>txStart(ci.value.trim())}
+/* tablet/telefon: tarayıcı ekranı veremez → bu cihazın kendi yansıtma yolu (kamera seçenekleri bu uygulamayla çalışır) */
+function devGuide(){const os=IOS?'ios':AND?'and':'';
+  const L=os==='ios'?['<b>Televizyona / Mac\'e:</b> Denetim Merkezi\'ni aç (sağ üst köşeden aşağı kaydır) → <b>Ekran Yansıtma</b> → Apple TV, AirPlay destekli TV ya da Mac.','<b>Windows bilgisayara:</b> bilgisayara bir AirPlay alıcı programı gerekir (Windows bunu kendisi yapmıyor); sonra yine <b>Ekran Yansıtma</b>.']
+    :['<b>Televizyona:</b> üstten iki kez aşağı kaydır → <b>Smart View</b> / <b>Ekran yansıtma</b> / <b>Yayınla</b> → televizyonu seç.','<b>Windows bilgisayara:</b> bilgisayarda <b>Ayarlar → Sistem → Bu bilgisayara yansıtma</b>\'yı aç; sonra tablette <b>Smart View</b>\'dan bilgisayarı seç. Kabloyla en akıcısı: <a href="https://github.com/Genymobile/scrcpy" target="_blank" rel="noopener">scrcpy</a>.'];
+  return`<div class="dg" role="note"><b>Bu ${IOS?'iPad':AND?'tablet':'cihaz'} ekranını tarayıcıdan paylaşamıyor</b><p>${IOS?'Safari ve iPad\'deki bütün tarayıcılar':'Android\'deki tarayıcılar (Chrome, Samsung Internet)'} ekran paylaşmaya izin vermiyor. Cihazın kendi yansıtması daha akıcı:</p>
+    <ol>${L.map(x=>`<li>${x}</li>`).join('')}</ol><p class="hint">Kamerayı bu uygulamayla yansıtabilirsin (Ön / Arka kamera). Bu cihaz <b>alıcı</b> da olabilir: ana sayfada <b>Burada izle</b>.</p></div>`}
 const txMsg=(t,c='')=>{const m=$('#txMsg');if(m){m.textContent=t;m.className='msg '+c}};
 async function txStart(code){if(!/^[A-Z0-9]{6}$/.test(code)){txMsg('Kod 6 harf/rakam olmalı.','err');$('#code')?.focus();return}
   const q=qOf(),b=$('#txGo');b.disabled=true;txMsg('Hazırlanıyor…');
-  try{TX.stream=TX.src==='screen'?await navigator.mediaDevices.getDisplayMedia({video:{frameRate:{ideal:q.fps,max:q.fps},height:{ideal:q.h}},audio:true})
+  try{TX.stream=TX.src==='screen'?await navigator.mediaDevices.getDisplayMedia({video:{frameRate:{ideal:q.fps,max:q.fps},height:{ideal:q.h},width:{ideal:Math.round(q.h*16/9)}},audio:true,surfaceSwitching:'include',selfBrowserSurface:'exclude'})
       :await navigator.mediaDevices.getUserMedia({video:{facingMode:TX.src==='back'?'environment':'user',height:{ideal:q.h},frameRate:{ideal:q.fps}},audio:false})}
   catch(e){b.disabled=false;txMsg(e.name==='NotAllowedError'?'İzin verilmedi. Paylaşmak için tarayıcının sorusuna “İzin ver” de.':'Görüntü alınamadı: '+e.message,'err');return}
   const v=TX.stream.getVideoTracks()[0];if(v&&'contentHint' in v)v.contentHint=q.hint;
   v?.addEventListener('ended',()=>{stopTx(true);txUI(code);txMsg('Paylaşım durduruldu.')});
   TX.code=code;txMsg('Alıcı aranıyor…');
   try{const pc=TX.pc=new RTCPeerConnection({iceServers:ICE});TX.stream.getTracks().forEach(t=>pc.addTrack(t,TX.stream));
-    qSend(pc,q);
+    qSend(pc,q);codecPref(pc,q);
     let answered=false;
-    TX.es=await subscribe(code,async m=>{if(m.type==='answer'&&m.to===me&&!answered){answered=true;await pc.setRemoteDescription(m.data)}else if(m.type==='bye')txMsg('Alıcı kapandı.','err')});
+    TX.es=await subscribe(code,async m=>{if(m.type==='answer'&&m.to===me&&!answered){answered=true;await pc.setRemoteDescription({type:m.data.type,sdp:fastStart(m.data.sdp,qOf())})}else if(m.type==='bye')txMsg('Alıcı kapandı.','err')});
     pc.onconnectionstatechange=()=>{const s=pc.connectionState;if(s==='connected')txLive();else if(s==='failed'){txMsg('Bağlantı kurulamadı. İki cihaz aynı Wi-Fi\'de mi?','err');stopTx()}else if(s==='disconnected')txMsg('Bağlantı zayıfladı…')};
     await pc.setLocalDescription(await pc.createOffer());await iceDone(pc);await sig(code,{type:'offer',data:pc.localDescription,src:TX.src});
     setTimeout(()=>{if(!answered&&TX.pc===pc){txMsg('Alıcı bulunamadı: kodu kontrol et, alıcıda Yansıt açık mı?','err');stopTx();b.disabled=false}},15000)}
   catch(e){txMsg(e.message,'err');stopTx();b.disabled=false}}
+/* akıcılık: 50+ FPS'te donanım kodlayıcısı olan H.264 önce (yazılım VP8 yüksek FPS'te işlemciyi boğar, “kasma” buradan);
+   karşı taraf desteklemezse tarayıcı kendisi sıradakine geçer. Yazı/sunumda VP9 (daha net). */
+function codecPref(pc,q){try{const caps=RTCRtpSender.getCapabilities?.('video')?.codecs;if(!caps)return;const first=q.fps>=50?/h264/i:/vp9/i;
+  const sorted=[...caps.filter(c=>first.test(c.mimeType)),...caps.filter(c=>!first.test(c.mimeType))];
+  pc.getTransceivers().forEach(t=>{if(t.sender.track?.kind==='video'&&t.setCodecPreferences)t.setCodecPreferences(sorted)})}catch{}}
+/* WebRTC bağlantıyı ~300 kbit/sn'den başlatıp yavaşça artırır → ilk saniyeler bulanık ve takılır. Chrome'a başlangıç/en düşük bit hızını söyle. */
+function fastStart(sdp,q){const k=Math.round(q.br/1000),st=Math.min(k,8000),mn=Math.min(1500,Math.round(k/3));
+  return sdp.replace(/a=fmtp:(\d+) (.*)\r\n/g,(l,pt,p)=>/x-google-/.test(p)||!new RegExp(`a=rtpmap:${pt} (H264|VP8|VP9|AV1)/`,'i').test(sdp)?l:`a=fmtp:${pt} ${p};x-google-start-bitrate=${st};x-google-min-bitrate=${mn};x-google-max-bitrate=${k}\r\n`)}
 function qSend(pc,q){pc.getSenders().forEach(s=>{if(s.track?.kind!=='video')return;const p=s.getParameters();p.encodings=p.encodings?.length?p.encodings:[{}];p.encodings[0].maxBitrate=q.br;p.encodings[0].maxFramerate=q.fps;p.degradationPreference=q.hint==='motion'?'maintain-framerate':'maintain-resolution';s.setParameters(p).catch(()=>{})})}
 /* FPS/çözünürlük düğmeleri: başlamadan önce sadece kaydeder; yansıtma sürerken anında uygular */
 function qWire(){$('#app').querySelectorAll('[data-fps],[data-res]').forEach(b=>b.onclick=async()=>{if(b.dataset.fps){TX.fps=+b.dataset.fps;lss('yansit:fps',TX.fps)}else{TX.res=+b.dataset.res;lss('yansit:res',TX.res)}
@@ -164,7 +179,9 @@ function txLive(){const S={screen:'Ekranın',front:'Ön kameran',back:'Arka kame
     <video id="pv" muted playsinline autoplay aria-label="Önizleme"></video><p class="hint" id="qNow" aria-live="polite">Ölçülüyor…</p>${qRows()}<div class="row"><button class="go" id="txStop">Durdur</button></div></div>`;
   const pv=$('#pv');pv.srcObject=TX.stream;$('#txStop').onclick=()=>{stopTx(true);home()};qWire();
   /* gerçekte giden görüntü: çözünürlük + kare hızı (WebRTC istatistiği; bağlantı ya da ekran isteneni karşılamıyorsa burada görünür) */
-  const pc=TX.pc;const tick=async()=>{if(TX.pc!==pc||!$('#qNow'))return;try{const st=await pc.getStats();st.forEach(r=>{if(r.type==='outbound-rtp'&&r.kind==='video'&&r.frameWidth){const e=$('#qNow');if(e)e.textContent=`Şu an giden: ${r.frameWidth}×${r.frameHeight} · ${Math.round(r.framesPerSecond||0)} kare/sn${r.qualityLimitationReason&&r.qualityLimitationReason!=='none'?` · ${({bandwidth:'bağlantı yetmiyor',cpu:'işlemci yetmiyor'})[r.qualityLimitationReason]||r.qualityLimitationReason}`:''}`}})}catch{}setTimeout(tick,1000)};tick()}
+  const pc=TX.pc;const tick=async()=>{if(TX.pc!==pc||!$('#qNow'))return;try{const st=await pc.getStats();st.forEach(r=>{if(r.type==='outbound-rtp'&&r.kind==='video'&&r.frameWidth){const e=$('#qNow'),cf=Math.round(TX.stream?.getVideoTracks()[0]?.getSettings().frameRate||0),want=qOf().fps,lim=r.qualityLimitationReason&&r.qualityLimitationReason!=='none'?r.qualityLimitationReason:'';
+          const cd=(st.get(r.codecId)?.mimeType||'').split('/')[1]||'',hw=r.encoderImplementation&&!/libvpx|openh264|libaom|fallback/i.test(r.encoderImplementation);
+          if(e)e.textContent=`Şu an giden: ${r.frameWidth}×${r.frameHeight} · ${Math.round(r.framesPerSecond||0)} kare/sn${cd?` · ${cd}${hw?' (donanım)':''}`:''}${lim?` · ${({bandwidth:'bağlantı yetmiyor — çözünürlüğü düşür ya da kablo/5 GHz Wi-Fi',cpu:'işlemci yetmiyor — çözünürlüğü düşür'})[lim]||lim}`:''}${cf&&cf<want-5&&!lim?TX.src==='screen'?` · ekran ${cf} kare/sn veriyor (${want} için “Tüm ekran”ı seç ve ekranın ${want} Hz olsun)`:` · kamera en çok ${cf} kare/sn veriyor`:''}`}})}catch{}setTimeout(tick,1000)};tick()}
 function stopTx(bye){if(bye&&TX.code&&TX.pc)sig(TX.code,{type:'bye'}).catch(()=>{});try{TX.es?.close()}catch{}try{TX.pc?.close()}catch{}TX.stream?.getTracks().forEach(t=>t.stop());TX.pc=TX.es=TX.stream=null}
 
 /* ── alıcı (TV / bilgisayar) ── */

@@ -14,15 +14,21 @@ const get=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k));return v??d}ca
 const GN=(q,lang='tr')=>lang==='tr'?`https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=tr&gl=TR&ceid=TR:tr`:`https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=en-US&gl=US&ceid=US:en`;
 const clean=s=>String(s||'').replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/\s+/g,' ').trim();
 const host=u=>{try{return new URL(u).hostname.replace(/^www\./,'')}catch{return''}};
+/* bağlantıyı asıl habere çevir: Bing yönlendirmesi (url=) açılır, Google Haberler'in eski biçim kimliğinde gömülü adres çıkarılır (yenisi çözülemez → olduğu gibi) */
+function unwrap(u){try{const x=new URL(u);if(/bing\.com$/.test(x.hostname)&&x.searchParams.get('url'))return x.searchParams.get('url');
+  const m=x.hostname==='news.google.com'&&x.pathname.match(/\/(?:rss\/)?articles\/([A-Za-z0-9_-]+)/);if(m){const b=atob(m[1].replace(/-/g,'+').replace(/_/g,'/')+'==='.slice((m[1].length+3)%4)),i=b.indexOf('http');if(i>=0){const h=b.slice(i).match(/^https?:\/\/[\x21-\x7e]+/);if(h&&!/^https?:\/\/news\.google/.test(h[0]))return h[0]}}}catch{}return u}
+/* fotoğraf: media:content / thumbnail / enclosure / açıklamadaki img / Bing News:Image (küçük → büyük boy ister) */
+function pic(n,d){const mc=n.getElementsByTagName('media:content')[0]||n.getElementsByTagName('media:thumbnail')[0],enc=n.querySelector('enclosure[type^=image]'),im=(String(d||'').match(/<img[^>]+src="([^"]+)"/)||[])[1],bi=n.getElementsByTagName('News:Image')[0]?.textContent?.trim();
+  return mc?.getAttribute('url')||enc?.getAttribute('url')||im||(bi?bi+(bi.includes('?')?'&':'?')+'w=800&h=450&c=7':'')}
 function parse(txt,url){const x=new DOMParser().parseFromString(txt,'text/xml'),src0=x.querySelector('channel>title,feed>title')?.textContent.trim()||host(url);
   return[...x.querySelectorAll('item,entry')].slice(0,40).map(n=>{const g=s=>n.querySelector(s)?.textContent?.trim()||'',l=n.querySelector('link'),link=l?.getAttribute('href')||l?.textContent?.trim()||'';
     let title=clean(g('title'));const src=clean(n.querySelector('source')?.textContent)||src0;if(src&&title.endsWith(' - '+src))title=title.slice(0,-(src.length+3));
-    const d=g('description')||g('summary')||g('content'),mc=n.getElementsByTagName('media:content')[0]||n.getElementsByTagName('media:thumbnail')[0],enc=n.querySelector('enclosure[type^=image]'),im=(d.match(/<img[^>]+src="([^"]+)"/)||[])[1];
-    return{title,link,t:Date.parse(g('pubDate')||g('updated')||g('published'))||0,src:String(src).slice(0,40),desc:/news\.google\./.test(url)?'':clean(d).slice(0,300),img:mc?.getAttribute('url')||enc?.getAttribute('url')||im||''}}).filter(i=>i.title&&/^https?:/.test(i.link))}
+    const d=g('description')||g('summary')||g('content');
+    return{title,link:unwrap(link),t:Date.parse(g('pubDate')||g('updated')||g('published'))||0,src:String(src).slice(0,40),desc:/news\.google\./.test(url)?'':clean(d).slice(0,300),img:pic(n,d)}}).filter(i=>i.title&&/^https?:/.test(i.link))}
 // RSS: shared/cors.js (doğrudan + aracı servisler yarışır; çalışan hatırlanır)
 async function feed(url){const r=await Cors.get(url);if(r.xml)return parse(r.xml,url);const j=r.r2j;
   return j.items.slice(0,40).map(i=>{const src=(j.feed?.title||host(url)).slice(0,40);let title=clean(i.title);if(title.endsWith(' - '+src))title=title.slice(0,-(src.length+3));
-    return{title,link:i.link,t:Date.parse((i.pubDate||'').replace(' ','T')+'Z')||0,src,desc:/news\.google\./.test(url)?'':clean(i.description).slice(0,300),img:i.thumbnail||i.enclosure?.link||''}}).filter(i=>i.title)}
+    return{title,link:unwrap(i.link),t:Date.parse((i.pubDate||'').replace(' ','T')+'Z')||0,src,desc:/news\.google\./.test(url)?'':clean(i.description).slice(0,300),img:i.thumbnail||i.enclosure?.link||''}}).filter(i=>i.title)}
 
 /* ── kelimeler: küçük harf, Türkçe ekleri kabaca at (ilk 5 harf), dolgu kelimeleri çıkar ── */
 const STOP=new Set('ve ile bir bu şu o da de mi mı mu mü için gibi daha çok en ama fakat ki ne neden nasıl olan oldu olarak yeni son sonra önce kadar göre her tüm bazı hem ise ya yada veya üzerine karşı arasında haber haberi haberleri açıkladı dedi the a an of to in on for and or is are was with by at from as that this it be has have will after new says said over into about'.split(' '));
@@ -88,5 +94,5 @@ function start(fs){if(start.done)return;start.done=true;
       if(!ch&&(all().some(r=>!(v.watch||[]).some(c=>c.id===r.id&&(c.upd||0)>=(r.upd||0)))))push()},()=>{});
     addEventListener('storage',e=>{if(e.key===WK||e.key===PK)push()});addEventListener('newswatch',push)}
   setTimeout(()=>check(),20000);setInterval(()=>check(),10*6e4);addEventListener('online',()=>setTimeout(()=>check(),5000))}
-window.NewsWatch={start,check,list,add,patch,remove,split,feed,GN,toks,key,hit,parse};
+window.NewsWatch={start,check,list,add,patch,remove,split,feed,GN,toks,key,hit,parse,unwrap,pic};
 })();

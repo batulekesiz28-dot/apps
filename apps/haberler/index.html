@@ -52,9 +52,11 @@
 </style>
 <script>try{var f=JSON.parse(localStorage.getItem('notlar:theme'));if(f)document.documentElement.dataset.theme=f}catch(e){}</script>
 <script src="../../shared/skin.js?v=20261126b"></script>
-<link rel="stylesheet" href="feed.css?v=20261126b">
+<link rel="stylesheet" href="feed.css?v=20261126c">
+<link rel="stylesheet" href="reader.css?v=20261126c">
 <script src="../../shared/cors.js?v=20261126a"></script>
-<script src="../../shared/newswatch.js?v=20261126a"></script>
+<script src="../../shared/newswatch.js?v=20261126c"></script>
+<script src="reader.js?v=20261126c"></script>
 </head>
 <body>
 <header class="hb" id="hb"><div class="hb-seg" role="group" aria-label="Görünüm"><button data-mode="feed" aria-pressed="true">Akış</button><button data-mode="list" aria-pressed="false">Liste</button></div>
@@ -71,7 +73,7 @@
   <main id="main" aria-live="polite"></main>
   <p class="src">Başlıklar haber sitelerinin herkese açık RSS akışlarından ve Google Haberler'den gelir; habere tıklayınca kaynağında açılır. Okudukların soluk görünür.</p>
 </div>
-<script src="feed.js?v=20261126b"></script>
+<script src="feed.js?v=20261126c"></script>
 <script>
 /* Bugünkü Haberler — konu başlıklarına göre güncel haberler (RSS).
    Çekme: shared/cors.js (doğrudan + 5 aracı servis yarışır, çalışan hatırlanır). Önbellek haberler:cache (15 dk), okunanlar haberler:read,
@@ -98,12 +100,11 @@ function parse(txt,url){const x=new DOMParser().parseFromString(txt,'text/xml'),
   return [...x.querySelectorAll('item,entry')].slice(0,25).map(n=>{const g=s=>n.querySelector(s)?.textContent?.trim()||'',l=n.querySelector('link'),link=l?.getAttribute('href')||l?.textContent?.trim()||'';
     let title=clean(g('title')),src=clean(n.querySelector('source')?.textContent)||src0;const d=g('description')||g('summary')||g('content');
     if(src&&title.endsWith(' - '+src))title=title.slice(0,-(src.length+3)); // Google Haberler (ve bazıları) başlığın sonuna kaynağı ekler
-    const mc=n.getElementsByTagName('media:content')[0]||n.getElementsByTagName('media:thumbnail')[0],enc=n.querySelector('enclosure[type^=image]'),im=(d.match(/<img[^>]+src="([^"]+)"/)||[])[1];
-    return{title,link,t:Date.parse(g('pubDate')||g('updated')||g('published'))||0,src:src.slice(0,40),desc:/news\.google\./.test(url)?'':clean(d).slice(0,300),img:mc?.getAttribute('url')||enc?.getAttribute('url')||im||''}})
+    return{title,link:NewsWatch.unwrap(link),t:Date.parse(g('pubDate')||g('updated')||g('published'))||0,src:src.slice(0,40),desc:/news\.google\./.test(url)?'':clean(d).slice(0,300),img:NewsWatch.pic(n,d)}})
     .filter(i=>i.title&&/^https?:/.test(i.link))}
 async function one(url){const r=await Cors.get(url); /* shared/cors.js: çalışan aracı servisi bulur ve hatırlar */
   if(r.xml)return parse(r.xml,url);const j=r.r2j;
-  return j.items.slice(0,25).map(i=>{let title=clean(i.title);const src=(j.feed?.title||host(url)).slice(0,40);if(title.endsWith(' - '+src))title=title.slice(0,-(src.length+3));return{title,link:i.link,t:Date.parse((i.pubDate||'').replace(' ','T')+'Z')||0,src,desc:/news\.google\./.test(url)?'':clean(i.description).slice(0,300),img:i.thumbnail||i.enclosure?.link||''}}).filter(i=>i.title)}
+  return j.items.slice(0,25).map(i=>{let title=clean(i.title);const src=(j.feed?.title||host(url)).slice(0,40);if(title.endsWith(' - '+src))title=title.slice(0,-(src.length+3));return{title,link:NewsWatch.unwrap(i.link),t:Date.parse((i.pubDate||'').replace(' ','T')+'Z')||0,src,desc:/news\.google\./.test(url)?'':clean(i.description).slice(0,300),img:i.thumbnail||i.enclosure?.link||''}}).filter(i=>i.title)}
 const norm=s=>s.toLocaleLowerCase('tr').replace(/[^\p{L}\p{N} ]/gu,'').slice(0,70);
 async function load(cat,force){const c=allCats().find(x=>x.id===cat);if(!c)return;const ids=cat==='hepsi'?CATS.map(x=>x.id):[cat];
   const need=ids.filter(id=>force||!C[id]||Date.now()-C[id].at>15*6e4);if(!need.length)return;busy=true;paint();
@@ -115,18 +116,24 @@ async function load(cat,force){const c=allCats().find(x=>x.id===cat);if(!c)retur
 /* ── çizim ── */
 function list(cat){if(cat==='hepsi'){const per=CATS.map(c=>(C[c.id]?.items||[]).slice(0,12)),out=[];for(let i=0;i<12;i++)per.forEach(l=>{if(l[i])out.push(l[i])});return out.filter(i=>Date.now()-i.t<3*864e5||!i.t)}
   return C[cat]?.items||[]}
+/* fotoğraf şart: RSS'te fotoğrafı olmayan haberin fotoğrafı kendi sayfasından bulunur (reader.js Pic.need); bulunamazsa gösterilmez */
+const PEND=new Set();let pT=0;
+function want(i){if(PEND.has(i.link)||i._np)return;PEND.add(i.link);Pic.need(i,im=>{PEND.delete(i.link);if(im)i.img=im;else i._np=1;
+  clearTimeout(pT);pT=setTimeout(()=>{lss('haberler:cache',C);paint()},im?250:PEND.size?600:50)})}
 function paint(){const cats=allCats();if(!cats.some(c=>c.id===cur))cur='hepsi';
   $('#cats').innerHTML=cats.map(c=>`<button class="cat" role="tab" data-c="${esc(c.id)}" aria-selected="${c.id===cur}">${esc(c.n)}${c.user?`<span class="x" data-del="${esc(c.n)}" title="Konuyu kaldır" aria-label="${esc(c.n)} konusunu kaldır">×</span>`:''}</button>`).join('')+`<button class="cat" data-c="+" aria-label="Konu ekle">+ Konu</button>`;
-  const L=list(cur),cn=id=>(CATS.find(c=>c.id===id)||{n:''}).n,m=$('#main');
+  const L0=list(cur),L=L0.filter(i=>i.img),cn=id=>(CATS.find(c=>c.id===id)||{n:''}).n,m=$('#main');
   $('#ref').classList.toggle('spin',busy);const at=cur==='hepsi'?Math.max(0,...CATS.map(c=>C[c.id]?.at||0)):C[cur]?.at;$('#st').textContent=busy?'Yükleniyor…':at?'Güncellendi '+ago(at):'';
-  if(!L.length){m.innerHTML=busy?`<div class="lead"><div class="im sk"></div><div><div class="sk" style="height:28px;width:90%"></div><div class="sk" style="height:28px;width:70%;margin-top:10px"></div><div class="sk" style="height:14px;width:60%;margin-top:16px"></div></div></div>
+  L0.forEach(i=>{if(!i.img)want(i)});
+  if(!L.length){m.innerHTML=(busy||PEND.size)?`<div class="lead"><div class="im sk"></div><div><div class="sk" style="height:28px;width:90%"></div><div class="sk" style="height:28px;width:70%;margin-top:10px"></div><div class="sk" style="height:14px;width:60%;margin-top:16px"></div></div></div>
       <div class="list">${'<div class="it"><div class="th sk"></div><div style="flex:1"><div class="sk" style="height:16px"></div><div class="sk" style="height:16px;width:70%;margin-top:8px"></div></div></div>'.repeat(6)}</div>`
+    :L0.length?`<div class="empty"><b>Fotoğraflı haber bulunamadı</b>Bu konudaki haberlerin fotoğrafı yok; birazdan yeniden bakılır.<br><button class="ib" id="retry">Tekrar dene</button></div>`
     :`<div class="empty"><b>${(C[cur]?.err||(cur==='hepsi'&&CATS.some(c=>C[c.id]?.err)))?'Haberler alınamadı':'Henüz haber yok'}</b>${(C[cur]?.err||cur==='hepsi')?'İnternet bağlantını kontrol et; bazı haber siteleri ara sıra yanıt vermeyebilir.':'Bu konuda son günlerde haber bulunamadı.'}<br><button class="ib" id="retry">Tekrar dene</button></div>`;
     $('#retry')?.addEventListener('click',()=>load(cur,true));return}
-  const lead=L.find(i=>i.img)||L[0],rest=L.filter(i=>i!==lead).slice(0,40),rd=i=>READ.has(i.link)?' read':'',tg=i=>cur==='hepsi'&&cn(i.cat)?`<span class="tag">${esc(cn(i.cat))}</span>`:'';
-  m.innerHTML=`<a class="lead${rd(lead)}" href="${esc(lead.link)}" target="_blank" rel="noopener">${lead.img?`<div class="im" style="background-image:url('${esc(lead.img)}')"></div>`:'<div class="im"></div>'}
+  const lead=L[0],rest=L.filter(i=>i!==lead).slice(0,40),rd=i=>READ.has(i.link)?' read':'',tg=i=>cur==='hepsi'&&cn(i.cat)?`<span class="tag">${esc(cn(i.cat))}</span>`:'';
+  m.innerHTML=`<a class="lead${rd(lead)}" href="${esc(lead.link)}" target="_blank" rel="noopener"><div class="im" style="background-image:url('${esc(lead.img)}')"></div>
       <div><h2>${esc(lead.title)}</h2>${lead.desc?`<p>${esc(lead.desc)}</p>`:''}<div class="meta">${tg(lead)}<b>${esc(lead.src)}</b>· ${ago(lead.t)}</div></div></a>
-    <div class="list">${rest.map(i=>`<a class="it${rd(i)}" href="${esc(i.link)}" target="_blank" rel="noopener">${i.img?`<div class="th" style="background-image:url('${esc(i.img)}')"></div>`:''}<div><h3>${esc(i.title)}</h3><div class="meta">${tg(i)}<b>${esc(i.src)}</b>· ${ago(i.t)}</div></div></a>`).join('')}</div>`}
+    <div class="list">${rest.map(i=>`<a class="it${rd(i)}" href="${esc(i.link)}" target="_blank" rel="noopener"><div class="th" style="background-image:url('${esc(i.img)}')"></div><div><h3>${esc(i.title)}</h3><div class="meta">${tg(i)}<b>${esc(i.src)}</b>· ${ago(i.t)}</div></div></a>`).join('')}</div>`}
 
 /* ── etkileşim ── */
 $('#cats').addEventListener('click',e=>{const d=e.target.closest('[data-del]');if(d){e.stopPropagation();lss('haberler:topics',TOP().filter(t=>t!==d.dataset.del));if(cur==='t:'+d.dataset.del)cur='hepsi';paint();return}
@@ -134,9 +141,10 @@ $('#cats').addEventListener('click',e=>{const d=e.target.closest('[data-del]');i
   cur=b.dataset.c;lss('haberler:cat',cur);paint();load(cur);scrollTo({top:0,behavior:'smooth'})});
 $('#cats').addEventListener('keydown',e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;const bs=[...document.querySelectorAll('.cat')],i=bs.indexOf(document.activeElement);if(i<0)return;e.preventDefault();bs[(i+(e.key==='ArrowRight'?1:-1)+bs.length)%bs.length].focus()});
 $('#add').addEventListener('submit',e=>{e.preventDefault();const v=$('#q').value.trim();if(!v)return;const t=TOP();if(!t.includes(v))lss('haberler:topics',[...t,v]);$('#q').value='';$('#add').hidden=true;cur='t:'+v;lss('haberler:cat',cur);paint();load(cur,true)});
-$('#main').addEventListener('click',e=>{const a=e.target.closest('a[href]');if(!a)return;const li=Object.values(C).flatMap(v=>v.items||[]).find(i=>i.link===a.getAttribute('href'));if(li)Feed.learnClick(li);READ.add(a.getAttribute('href'));lss('haberler:read',[...READ].slice(-600));setTimeout(()=>a.classList.add('read'),300)});
+$('#main').addEventListener('click',e=>{const a=e.target.closest('a[href]');if(!a)return;const li=Object.values(C).flatMap(v=>v.items||[]).find(i=>i.link===a.getAttribute('href'));if(li)Feed.learnClick(li);READ.add(a.getAttribute('href'));lss('haberler:read',[...READ].slice(-600));setTimeout(()=>a.classList.add('read'),300);
+  if(li&&!e.ctrlKey&&!e.metaKey&&!e.shiftKey&&e.button===0){e.preventDefault();Reader.open(li)}}); /* AppShell içinde okur; Ctrl/orta tık yine yeni sekme */
 $('#ref').addEventListener('click',()=>load(cur,true));
-addEventListener('keydown',e=>{if(!$('#ws').hidden){if(e.key==='Escape'){e.preventDefault();wsClose()}return}if(e.target.closest('input'))return;if(VIEW==='feed'){Feed.key(e);return}if(e.key==='r'||e.key==='R')load(cur,true)});
+addEventListener('keydown',e=>{if(Reader.isOpen)return;if(!$('#ws').hidden){if(e.key==='Escape'){e.preventDefault();wsClose()}return}if(e.target.closest('input'))return;if(VIEW==='feed'){Feed.key(e);return}if(e.key==='r'||e.key==='R')load(cur,true)});
 $('#dt').textContent=new Date().toLocaleDateString('tr-TR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 paint();load(cur);setInterval(()=>{if(!document.hidden)load(cur)},15*6e4);
 
@@ -149,6 +157,7 @@ $('#hb').addEventListener('click',e=>{const m=e.target.closest('[data-mode]');if
 $('#hbF').addEventListener('submit',e=>{e.preventDefault();const v=$('#hbIn').value.trim();if(!v)return;$('#hbIn').blur();setView('feed');Feed.search(v)});
 $('#hbIn').addEventListener('keydown',e=>{if(e.key==='Escape'){e.target.value='';e.target.blur();if(Feed.searching)Feed.endSearch()}});
 setView(VIEW);
+addEventListener('reader-close',()=>{if(VIEW==='feed')Feed.focus()});
 
 /* ── Haber takibi (“şu olunca haber ver”): kurallar shared/newswatch.js; hub içindeysek kontrolü ve bildirimi hub yapar ── */
 const PW=(()=>{try{return parent!==window&&parent.NewsWatch?parent:null}catch{return null}})();
@@ -180,7 +189,8 @@ $('#ws').addEventListener('click',async e=>{if(e.target.id==='ws')return wsClose
   if(w==='chk'){t.textContent='Kontrol ediliyor…';const n=await NWc().check(true);t.textContent=n?`${n} yeni haber bildirildi`:'Yeni haber yok';setTimeout(wsPaint,1800);return}
   const ex=t.closest('[data-ex]');if(ex){$('#wsIn').value=ex.dataset.ex;pv();$('#wsIn').focus();return}
   const sw=t.closest('[data-sw]');if(sw){const r=NewsWatch.list().find(x=>x.id===sw.dataset.sw);NewsWatch.patch(r.id,{on:!r.on});wsPaint();return}
-  const dl=t.closest('[data-del]');if(dl){NewsWatch.remove(dl.dataset.del);wsPaint()}});
+  const dl=t.closest('[data-del]');if(dl){NewsWatch.remove(dl.dataset.del);wsPaint();return}
+  const ha=t.closest('.ws-hits a[href]');if(ha&&!e.ctrlKey&&!e.metaKey){e.preventDefault();const h=NewsWatch.list().flatMap(r=>r.hits||[]).find(x=>x.link===ha.getAttribute('href'));Reader.open({title:h?.t||ha.textContent,link:ha.getAttribute('href'),src:h?.src||'',t:h?.at||0,img:h?.img||''})}});
 $('#ws').addEventListener('input',e=>{if(e.target.id==='wsIn')pv()});
 $('#ws').addEventListener('submit',e=>{e.preventDefault();const v=$('#wsIn').value.trim();if(!v)return;const r=NewsWatch.add({q:v});if(!r)return;$('#wsIn').value='';wsPaint();
   if(PW)setTimeout(()=>PW.NewsWatch.check(true,r.id).then(wsPaint),600)}); // ilk kontrol: mevcut haberleri kaydeder (eski haber bildirilmez)

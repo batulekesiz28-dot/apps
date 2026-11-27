@@ -6695,5 +6695,24 @@
     "fix": "fitPal: palet seçili moda uyarlanır (hub + skin.js)"
    }
   ]
+ },
+ {
+  "at": "2026-11-27T23:00:00Z",
+  "change": "Yemek tek arayüzde birleşti: ayrı “Atıştırmalık & lezzetler” ekranı kaldırıldı, her şey tarif kartlarında. Üstte Tümü · Yemek · İçecek · Tatlı · Atıştırmalık sekmeleri; hazır ürünü eklerken adını yazıp Bul'a basınca fotoğrafı ve markası geliyor. Daha önce eklediğin lezzetler doğru sekmeye taşındı.",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Yemek iki ayrı arayüze bölünmüştü",
+    "fix": "tek liste + grup sekmeleri; Medya görünümü kodu silindi"
+   }
+  ]
  }
 ]

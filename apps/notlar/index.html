@@ -467,17 +467,17 @@ kbd{font:500 11px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radius:
 </style>
 <script>/* mat cam tasarımı: bir kereliğine koyu temaya geç (sonra tema düğmesi serbest) */try{if(!localStorage.getItem('notlar:glass1')){localStorage.setItem('notlar:glass1','1');localStorage.setItem('notlar:theme','"dark"')}}catch(e){}</script>
 <script src="../../shared/skin.js?v=20261127c"></script>
-<link rel="stylesheet" href="player.css?v=20261127a">
-<link rel="stylesheet" href="library.css?v=20261127a">
-<link rel="stylesheet" href="brain.css?v=20261127a">
-<link rel="stylesheet" href="media.css?v=20261127a">
-<link rel="stylesheet" href="time.css?v=20261127a">
-<link rel="stylesheet" href="yearly.css?v=20261127a">
-<link rel="stylesheet" href="tasks.css?v=20261127a">
-<link rel="stylesheet" href="daypick.css?v=20261127a">
-<link rel="stylesheet" href="food.css?v=20261127a">
-<link rel="stylesheet" href="tables.css?v=20261127a">
-<link rel="stylesheet" href="ders.css?v=20261127a">
+<link rel="stylesheet" href="player.css?v=20261127c">
+<link rel="stylesheet" href="library.css?v=20261127c">
+<link rel="stylesheet" href="brain.css?v=20261127c">
+<link rel="stylesheet" href="media.css?v=20261127c">
+<link rel="stylesheet" href="time.css?v=20261127c">
+<link rel="stylesheet" href="yearly.css?v=20261127c">
+<link rel="stylesheet" href="tasks.css?v=20261127c">
+<link rel="stylesheet" href="daypick.css?v=20261127c">
+<link rel="stylesheet" href="food.css?v=20261127c">
+<link rel="stylesheet" href="tables.css?v=20261127c">
+<link rel="stylesheet" href="ders.css?v=20261127c">
 <style id="tnavCss">
 /* ── Üst gezinme (sol menü yerine) — ince cam şerit, kayan seçili vurgu ── */
 .app,.app[data-mode=lib],.app[data-mode=brain]{grid-template-columns:1fr}
@@ -592,7 +592,7 @@ kbd{font:500 11px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radius:
 @media (prefers-reduced-motion:reduce){.txt a[href^="http"]::after{transition:none}.lkpv-ld i{animation:none}}
 html[data-motion=off] .txt a[href^="http"]::after{transition:none}
 </style>
-<link rel="stylesheet" href="glass.css?v=20261127a">
+<link rel="stylesheet" href="glass.css?v=20261127c">
 <style id="docsCss">
 /* ── Docs gibi biçim: vurgu kalemi, yazı rengi, hizalama ── */
 mark.hl-y{background:#FFF1A8;color:inherit}mark.hl-g{background:#C9F2D0;color:inherit}mark.hl-b{background:#CFE4FF;color:inherit}mark.hl-p{background:#FFD6E8;color:inherit}mark.hl-o{background:#FFDDB5;color:inherit}
@@ -675,19 +675,19 @@ body.rsz,body.rsz *{cursor:ew-resize!important;user-select:none}
   </div>
 </div>
 <div class="toasts" id="toasts"></div>
-<script src="player.js?v=20261127a"></script>
-<script src="kb.js?v=20261127a"></script>
-<script src="library.js?v=20261127a"></script>
-<script src="media.js?v=20261127a"></script>
-<script src="brain.js?v=20261127a"></script>
-<script src="time.js?v=20261127a"></script>
-<script src="daypick.js?v=20261127a"></script>
-<script src="yearly.js?v=20261127a"></script>
-<script src="foodseed.js?v=20261127a"></script>
-<script src="food.js?v=20261127a"></script>
-<script src="tables.js?v=20261127a"></script>
-<script src="tasks.js?v=20261127a"></script>
-<script src="ders.js?v=20261127a"></script>
+<script src="player.js?v=20261127c"></script>
+<script src="kb.js?v=20261127c"></script>
+<script src="library.js?v=20261127c"></script>
+<script src="media.js?v=20261127c"></script>
+<script src="brain.js?v=20261127c"></script>
+<script src="time.js?v=20261127c"></script>
+<script src="daypick.js?v=20261127c"></script>
+<script src="yearly.js?v=20261127c"></script>
+<script src="foodseed.js?v=20261127c"></script>
+<script src="food.js?v=20261127c"></script>
+<script src="tables.js?v=20261127c"></script>
+<script src="tasks.js?v=20261127c"></script>
+<script src="ders.js?v=20261127c"></script>
 
 <script>
 'use strict';
@@ -909,7 +909,6 @@ function setMode(m,was){const app=$('#app'),prev=curMode;curMode=m;app.dataset.m
   $$('#modes a').forEach(a=>{const on=a.dataset.mode===m;a.classList.toggle('on',on);a.toggleAttribute('aria-current',on);if(a.dataset.mode==='ws')a.setAttribute('href',lastWs)});
   modeMark();
   if(m!=='lib'){Library.closeAll();app.classList.remove('mc-on')}
-  if(m!=='food')app.classList.remove('yk-dark');
   if(m!=='brain'&&prev==='brain')Brain.stop();
   if(m==='ws')return;
   const paint=()=>{hideFloat(true);closeDrawer();m==='lib'?Library.render(secParts):m==='food'?Food.render(secParts):Brain.render(secParts);$('#scroll').scrollTop=0;onScroll()};

@@ -6556,5 +6556,66 @@
     "fix": "Aday kapak listesi (data-alt) + Vikipedi afişi (wikiPosters) + geç gelen kapak fyPatch"
    }
   ]
+ },
+ {
+  "at": "2026-11-27T17:00:00Z",
+  "change": "Jarvis daha akıllı: zor işlerde derin düşünüyor (varsa güçlü model), yaptığı işi plan listesi olarak gösteriyor, bilgisayarda hangi pencerelerin açık olduğunu biliyor (öne getir, küçült, kapat), panoyu okuyabiliyor. Galeri: etiketler daha ayrıntılı (nesneler, ortam, renk, kategori, İngilizce karşılıklar), her fotoğrafın tarihi/yeri modele söyleniyor; aynı anda iki kez etiketleme hatası düzeldi. Yansıt: tabletten hiçbir şey yüklemeden yayın — tabletin kendi Smart View'u ile TV'ye ya da bilgisayara; bilgisayarda “Tabletten al” düğmesi.",
+  "scores": {
+   "jarvis telefon": {
+    "before": 94,
+    "after": 94
+   },
+   "galeri telefon": {
+    "before": 100,
+    "after": 100
+   },
+   "yansit telefon": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "jarvis",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Jarvis zor işlerde yüzeysel düşünüyordu",
+    "fix": "is_deep → yüksek düşünme + güçlü model + plan"
+   },
+   {
+    "app": "jarvis",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Telefonda üst çubuk taşıyordu (ayarlar düğmesi ekrandan çıkıyordu)",
+    "fix": "durum yazısı kısalır, düğmeler küçülmez"
+   },
+   {
+    "app": "jarvis",
+    "sev": "warn",
+    "status": "kabul",
+    "text": "Bağlantı ekranı bütün ekranı kaplıyor (Jarvis bilgisayarda çalışmıyorken bilerek)"
+   },
+   {
+    "app": "galeri",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Etiketleme kilidi bir yorum yüzünden çalışmıyordu (aynı fotoğraflar iki kez gönderilebiliyordu)",
+    "fix": "yorum /* */ yapıldı"
+   },
+   {
+    "app": "galeri",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Etiketler yeterince ayrıntılı değildi",
+    "fix": "AIV 4: bağlam, numaralı eşleme, nesne/sahne/renk/kategori/İngilizce"
+   },
+   {
+    "app": "yansit",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Tablet yayını için uygulama gerekiyordu",
+    "fix": "tabletin kendi yansıtması önce; alıcıda Tabletten al (Windows Miracast)"
+   }
+  ]
  }
 ]

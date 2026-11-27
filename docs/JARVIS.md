@@ -82,3 +82,10 @@ Kaynaklar: https://ai.google.dev/gemini-api/docs/rate-limits · https://ai.googl
 - Tarayıcı/oturum: https://docs.browser-use.com/customize/real-browser · https://playwright.dev/mcp/configuration/browser-extension · https://www.browserstack.com/guide/playwright-connect-to-existing-browser
 - Uyandırma kelimesi: https://deepwiki.com/dscripka/openWakeWord/6.3-hey-jarvis-model · https://github.com/dscripka/openWakeWord/blob/main/docs/custom_verifier_models.md
 - Türkçe ses: https://huggingface.co/ahakan/okur-tts · https://huggingface.co/freyavoice/freya-tts · https://huggingface.co/Sercan/whisper-small-cv-tr
+
+## 2026-11-27 — Daha akıllı Jarvis (Zoey OS örnek alındı)
+Zoey OS: sesle konuşulan, kalıcı hafızalı, yaptığı işi görsel olarak gösteren bir “yapay zekâ işletim sistemi”. Bizden aldıklarımız:
+- **Görünür iş:** çok adımlı işlerde `plan` aracı → arayüzde yapılacaklar listesi (biten ✓, sıradaki dönen halka).
+- **Zor işte derin düşünme:** `is_deep` → yüksek düşünme seviyesi + varsa Gemini Pro (ücretsiz kotası bitince Flash'a düşer). Kısa komutlar hızlı kalır.
+- **Bilgisayarı tanıma:** her istekte öndeki pencere + açık pencereler bağlama eklenir; `window` aracıyla öne getir/küçült/büyüt/kapat; `clipboard` ile pano.
+- **Hafıza:** tercihleri sormadan `remember` ile kaydeder; sohbet 3 saate kadar sürer.

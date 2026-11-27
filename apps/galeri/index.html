@@ -348,16 +348,26 @@ async function gemList(){if(gemM)return gemM.filter(m=>!gemBad[m]);
   const ids=all.filter(m=>(m.supportedGenerationMethods||['generateContent']).includes('generateContent')).map(m=>String(m.name).replace(/^models\//,''));
   const sc=[];for(const i of ids){const m=i.match(/^gemini-(\d+(?:\.\d+)?)-flash(-lite)?(-preview[\w.-]*|-latest|-\d{3})?$/);if(m&&!/image|tts|live|audio|exp/.test(i))sc.push([m[2]?0:1,parseFloat(m[1]),m[3]?0:1,i])} /* doğruluk için tam “flash” önce, kotası bitince “lite” */
   gemM=sc.sort((a,b)=>b[0]-a[0]||b[1]-a[1]||b[2]-a[2]).map(x=>x[3]);if(!gemM.length)gemM=['gemini-2.5-flash','gemini-2.5-flash-lite'];return gemM}
-const AIV=3; // etiket sürümü: 2 = büyük görüntü + yazılar (OCR) + adlar; eski (1) olanlar kendiliğinden yeniden etiketlenir
-const AIP=n=>`Bu ${n} fotoğrafın HER BİRİ için sırayla bir nesne üret. Sadece JSON dizi döndür, başka yazı yok:
-[{"ad":"2-5 kelimelik Türkçe isim — varsa en ayırt edici şeyi kullan (ör. “cyberleek Instagram gönderisi”, “Bahçede sarı çiçek”)",
-"cap":"en çok 20 kelimelik Türkçe açıklama: ne görünüyor, kim/ne paylaşmış, konu ne",
-"yazi":"fotoğrafta okunabilen BÜTÜN yazılar aynen, olduğu gibi (kullanıcı adları @… dahil, hashtag'ler, marka/logo yazıları, başlıklar, ekran görüntüsündeki metin, uygulama adları); yoksa boş; en çok 600 karakter",
-"meme":"meme/caps ise: şablonun bilinen adı (ör. Drake, Wojak, Gigachad, Distracted Boyfriend, Türk caps şablonları) + esprinin konusu bir cümle; değilse boş",
-"adlar":["tanınan özel adlar: hesap/kullanıcı adları, kişiler, karakterler, markalar, uygulamalar (Instagram, X, YouTube…), oyunlar, filmler, takımlar, yerler"],
-"tags":["10-25 küçük harfli Türkçe etiket: görünen her önemli şey hem genel hem özel adıyla (ör. çiçek, gül, bitki), sahne/yer türü, renkler, insan/hayvan/yemek/araç, etkinlik, duygu/ton (komik, meme, ciddi), konu (felsefe, teknoloji…), içerik türü (gönderi, ekran görüntüsü, belge, selfie)"],
+const AIV=4; /* etiket sürümü: 4 = fotoğraf başına bağlam (tarih/yer/tür), numaralı yanıt, nesneler + sahne + renk + İngilizce karşılıklar + ana kategori; eskiler kendiliğinden yeniden etiketlenir */
+const ACAT=['doğa','yemek','insan','hayvan','ekran görüntüsü','meme','belge','seyahat','şehir','araç','sanat','spor','oyun','alışveriş','ev','etkinlik','teknoloji','moda','diğer'];
+const AIP=n=>`Yukarıdaki ${n} fotoğrafın HER BİRİ için bir nesne üret (sıra önemli değil, "n" alanına fotoğraf numarasını yaz). Sadece JSON dizi döndür.
+Her fotoğrafı ayrı ayrı, dikkatle incele: önce gördüğün her şeyi say (ön plan, arka plan, köşelerdeki küçük yazılar/logolar), sonra alanları doldur.
+[{"n":1,
+"ad":"2-6 kelimelik Türkçe isim — en ayırt edici şey (ör. “cyberleek Instagram gönderisi”, “Kadıköy'de gün batımı”, “Drake memesi: sınav haftası”)",
+"cap":"en çok 25 kelimelik Türkçe açıklama: ne görünüyor, ne oluyor, kim/ne paylaşmış, konu ne",
+"yazi":"fotoğrafta okunabilen BÜTÜN yazılar aynen (kullanıcı adları @…, hashtag'ler, marka/logo, başlık, altyazı, ekran görüntüsündeki metin); yoksa boş; en çok 600 karakter",
+"meme":"meme/caps ise: şablonun bilinen adı + esprinin konusu tek cümle; değilse boş",
+"adlar":["özel adlar yazıldığı gibi: hesap/kullanıcı adları, ünlüler, karakterler, markalar, uygulamalar, oyunlar, diziler/filmler, takımlar, tanınan yerler/yapılar"],
+"nesne":["görünen somut nesneler, Türkçe, tekil, en çok 12 (ör. kedi, kupa, dizüstü bilgisayar, bisiklet)"],
+"sahne":"yer/ortam türü tek ifade (ör. mutfak, sahil, ofis, sokak, orman, konser, sınıf, uygulama ekranı)",
+"renk":["baskın 1-3 renk, Türkçe"],
+"kat":"şu listeden TEK en uygun kategori: ${ACAT.join(', ')}",
+"tags":["15-25 küçük harfli Türkçe etiket: genel + özel ad (çiçek, gül, bitki), etkinlik (yemek yapmak, doğum günü), insan sayısı/özellik (selfie, grup, çocuk), duygu/ton (komik, hüzünlü, ciddi), stil (fotoğraf, çizim, anime, 3d, karikatür), mevsim/zaman (kış, gece), içerik türü (gönderi, hikaye, sohbet, belge, fiş)"],
+"en":["aynı şeylerin 6-12 İngilizce karşılığı, küçük harf (cat, sunset, meme, receipt…)"],
 "doc":false}]
-doc: belge, fiş, not, ders notu, yazılı kâğıt ise true. Yazıyı çevirme, aynen yaz. Emin olmadığın şeyi uydurma; görmediğini etiketleme.`;
+doc: belge, fiş, not, ders notu, yazılı kâğıt ise true. Yazıyı çevirme, aynen yaz. Kişilerin kim olduğunu tahmin etme (tanınmış ünlü/karakter ya da fotoğrafta adı yazıyorsa hariç). Emin olmadığın şeyi uydurma; görmediğini etiketleme.`;
+/* fotoğraf başına bağlam: modele tarihi, yeri, türü ve dosya adını söyler (ekran görüntüsü mü, nerede çekilmiş) → daha isabetli isim/etiket */
+const aiCtx=it=>{const d=new Date(it.at),pl=placeOf(it);return[`tarih ${d.toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'})}`,pl&&`yer ${pl}`,KIND[it.kind]&&`tür ${KIND[it.kind]}`,it.cam&&`kamera ${it.cam}`,it.name&&!/^(img|dsc|pxl|photo|image|screenshot)?[_-]?\d/i.test(it.name)&&`dosya adı “${String(it.name).slice(0,60)}”`].filter(Boolean).join(', ')};
 /* yazıların okunabilmesi için küçük önizleme (360px) yerine tam boy fotoğraf 1280px'e küçültülüp gönderilir */
 async function aiImg(it){try{const b=await Store.full(it.id);if(b){const bm=await createImageBitmap(b),k=Math.min(1,1280/Math.max(bm.width,bm.height)),c=document.createElement('canvas');
     c.width=Math.round(bm.width*k);c.height=Math.round(bm.height*k);c.getContext('2d').drawImage(bm,0,0,c.width,c.height);bm.close?.();const u=c.toDataURL('image/jpeg',.85);return['image/jpeg',u.split(',')[1]]}}catch{}
@@ -365,21 +375,24 @@ async function aiImg(it){try{const b=await Store.full(it.id);if(b){const bm=awai
 const aiPatch=(o,it)=>{const low=t=>/[çğıöşüİÇĞÖŞÜ]/.test(t)?t.toLocaleLowerCase('tr'):t.toLowerCase(); /* Türkçe harfli kelime tr kuralıyla; “Instagram” → “instagram” (ınstagram değil) */
   const T=x=>[...new Set((x||[]).map(t=>low(String(t).trim())).filter(Boolean))];
   const N=x=>{const seen=new Set();return(x||[]).map(t=>String(t).trim()).filter(t=>t&&!seen.has(t.toLowerCase())&&seen.add(t.toLowerCase()))}; /* özel adlar yazıldığı gibi */
-  const p={ai:AIV,aname:String(o.ad||'').slice(0,70),cap:String(o.cap||'').slice(0,220),tags:T(o.tags).slice(0,25),ents:N(o.adlar).slice(0,15),ocr:String(o.yazi||'').replace(/\s+/g,' ').trim().slice(0,700),meme:String(o.meme||'').trim().slice(0,200)};if(p.meme&&!p.tags.includes('meme'))p.tags.unshift('meme');
+  const kat=ACAT.includes(low(String(o.kat||'')))?low(String(o.kat)):'';
+  const tg=T([...(o.tags||[]),...(o.nesne||[]),o.sahne,...(o.renk||[]),kat&&kat!=='diğer'?kat:'']).slice(0,40); /* nesneler, sahne, renk, kategori de aranabilir etiket */
+  const p={ai:AIV,aname:String(o.ad||'').slice(0,70),cap:String(o.cap||'').slice(0,240),tags:tg,en:T(o.en).slice(0,14),cat:kat,ents:N(o.adlar).slice(0,15),ocr:String(o.yazi||'').replace(/\s+/g,' ').trim().slice(0,700),meme:String(o.meme||'').trim().slice(0,200)};if(p.meme&&!p.tags.includes('meme'))p.tags.unshift('meme');
   if(o.doc&&it.kind!=='ekran')p.kind='belge';return p};
-async function gemBatch(L){const parts=[];for(let i=0;i<L.length;i++){const[mt,d]=await aiImg(L[i]);parts.push({text:`Fotoğraf ${i+1}:`},{inlineData:{mimeType:mt,data:d}})}parts.push({text:AIP(L.length)});
+async function gemBatch(L){const parts=[];for(let i=0;i<L.length;i++){const[mt,d]=await aiImg(L[i]);const c=aiCtx(L[i]);parts.push({text:`Fotoğraf ${i+1}${c?` (${c})`:''}:`},{inlineData:{mimeType:mt,data:d}})}parts.push({text:AIP(L.length)});
   for(let tr=0;tr<8;tr++){const M=await gemList();if(!M.length)throw new Error('Gemini ücretsiz günlük kotası doldu; yarın kaldığı yerden devam eder');const m=M[0];
     const r=await fetch(`${GM}models/${m}:generateContent`,{method:'POST',headers:{'content-type':'application/json','x-goog-api-key':gemKey()},
-      body:JSON.stringify({contents:[{role:'user',parts}],generationConfig:{responseMimeType:'application/json',maxOutputTokens:2000+L.length*900}})}).catch(()=>null);
+      body:JSON.stringify({contents:[{role:'user',parts}],generationConfig:{responseMimeType:'application/json',maxOutputTokens:3000+L.length*1400}})}).catch(()=>null);
     if(!r){await new Promise(z=>setTimeout(z,4000));continue}
     if(!r.ok){const t=await r.text();if(r.status===429){const w=parseFloat((t.match(/retry in ([\d.]+)s/i)||[])[1]||'0');if(/limit:\s*0\b|PerDay|per day/i.test(t)||w>60){gemBad[m]=1;continue}await new Promise(z=>setTimeout(z,Math.max(4,w)*1000));continue}
       if(r.status===404||(r.status===400&&/model|not found|not supported/i.test(t))){gemBad[m]=1;continue}if([400,401,403].includes(r.status)){const e=new Error('Gemini anahtarı kabul edilmedi');e.key=1;throw e}
       await new Promise(z=>setTimeout(z,3000));continue}
     const j=await r.json(),txt=(j.candidates?.[0]?.content?.parts||[]).filter(p=>!p.thought).map(p=>p.text||'').join('');let A=[];try{A=JSON.parse((txt.match(/\[[\s\S]*\]/)||[txt])[0])}catch{}
-    for(let i=0;i<L.length;i++)await Store.patch(L[i].id,aiPatch(A[i]||{},L[i]));return}
+    if(!Array.isArray(A))A=[A];const byN=n=>A.find(o=>o&&+o.n===n); /* numarayla eşle (model sırayı karıştırsa da doğru fotoğrafa yazılır) */
+    for(let i=0;i<L.length;i++)await Store.patch(L[i].id,aiPatch(byN(i+1)||(A.some(o=>o&&o.n)?{}:A[i])||{},L[i]));return}
   throw new Error('Gemini şu an yanıt vermiyor')}
-async function aiAll(){if(aiBusy||!aiOn())return;const todo=live().filter(x=>(x.ai||0)<AIV&&x.t).sort((a,b)=>(a.ai||0)-(b.ai||0)); // hiç etiketlenmemişler önce, sonra eski sürümif(!todo.length)return;aiBusy=true;aiTot=todo.length;aiDone=0;aiErr='';paintAi();
-  try{if(gemKey()){for(let i=0;i<todo.length;i+=4){await gemBatch(todo.slice(i,i+4));aiDone=Math.min(aiTot,i+4);paintAi()}}
+async function aiAll(){if(aiBusy||!aiOn())return;const todo=live().filter(x=>(x.ai||0)<AIV&&x.t).sort((a,b)=>(a.ai||0)-(b.ai||0)); /* hiç etiketlenmemişler önce, sonra eski sürüm */ if(!todo.length)return;aiBusy=true;aiTot=todo.length;aiDone=0;aiErr='';paintAi();
+  try{if(gemKey()){for(let i=0;i<todo.length;i+=3){await gemBatch(todo.slice(i,i+3));aiDone=Math.min(aiTot,i+3);paintAi()}} /* 3'erli: her fotoğrafa daha çok dikkat */
     else for(const it of todo.slice(0,60)){try{await aiOne(it);aiDone++;paintAi()}catch(e){if(/401|403|429|credit/i.test(e.message))throw e}}}
   catch(e){aiErr=e.message;console.warn('etiket',e)}
   aiBusy=false;paintAi();render();if(gemKey())embEnsure(live()).catch(()=>{})}
@@ -405,7 +418,7 @@ async function aiOne(it){const[mt,d]=await aiImg(it);const r=await fetch('https:
 
 /* ── arama ── */
 const norm=s=>String(s||'').toLocaleLowerCase('tr').normalize('NFKD').replace(/[̀-ͯ]/g,'').replace(/ı/g,'i');
-const textOf=it=>{const d=new Date(it.at);return norm([it.name,it.aname,it.meme,it.cap,it.ocr,...(it.ents||[]),...(it.tags||[]),placeOf(it),it.place?.country,it.place?.region,KIND[it.kind],it.cam,it.src,AY[d.getMonth()],d.getFullYear(),GUN[d.getDay()],it.fav?'favori':'',...(it.albums||[]).map(a=>S.albums.find(x=>x.id===a)?.name)].join(' '))};
+const textOf=it=>{const d=new Date(it.at);return norm([it.name,it.aname,it.meme,it.cap,it.ocr,...(it.ents||[]),...(it.tags||[]),...(it.en||[]),placeOf(it),it.place?.country,it.place?.region,KIND[it.kind],it.cam,it.src,AY[d.getMonth()],d.getFullYear(),GUN[d.getDay()],it.fav?'favori':'',...(it.albums||[]).map(a=>S.albums.find(x=>x.id===a)?.name)].join(' '))};
 const stem=w=>{const x=w.replace(/(lar|ler)(i|ı|in|ın|de|da|den|dan|e|a)?$|(nin|nın|nun|nün|de|da|den|dan|te|ta|ten|tan|yi|yı|yu|yü)$/,'');return x.length>=3?x:w}; // “çiçekler”, “denizde” → çiçek, deniz
 /* arama dizini (fotoğraf başına önbellek): düz metin, boşluk/noktasız hali (“@cyber.leek” ↔ “cyberleek”), kelimeler (yazım hatası toleransı) */
 const TXI=new Map();
@@ -417,12 +430,12 @@ const wm=(e,w)=>{if(e.t.includes(w)||e.t.includes(stem(w)))return true;const cw=
 const match=(it,q)=>{const e=tIdx(it);return norm(q).split(/\s+/).filter(Boolean).every(w=>wm(e,w))};
 /* Gelişmiş arama: her fotoğrafa puan — isim/adlar/yazı/meme ×3, etiket ×2, gerisi ×1; bütün kelimeler tutuyorsa büyük bonus;
    + Gemini anlam benzerliği (embedding): kelime tutmasa da anlamca yakın olanlar (“komik kedi” → kedi meme'i) */
-const fIdx=it=>{const e=tIdx(it);if(!e.f)e.f={a:norm([it.aname,it.meme,it.ocr,...(it.ents||[])].join(' ')),g:norm((it.tags||[]).join(' '))};return e};
+const fIdx=it=>{const e=tIdx(it);if(!e.f)e.f={a:norm([it.aname,it.meme,it.ocr,...(it.ents||[])].join(' ')),g:norm([...(it.tags||[]),...(it.en||[])].join(' '))};return e};
 const wScore=(e,w)=>{const sw=stem(w),cw=w.replace(/[^a-z0-9]/g,'');const inF=x=>x.includes(w)||x.includes(sw)||(cw.length>=4&&x.replace(/[^a-z0-9]/g,'').includes(cw));
   if(inF(e.f.a))return 3;if(inF(e.f.g))return 2;if(inF(e.t))return 1;return wm(e,w)?.6:0};
 const qScore=(it,W)=>{const e=fIdx(it);let s=0,h=0;for(const w of W){const x=wScore(e,w);if(x){h++;s+=x}}return h?s*(h/W.length)+(h===W.length?6:0):0};
 const SEM={q:'',v:null,map:null,busy:false};const EMB=new Map();
-const embText=it=>[it.aname,it.meme,it.cap,(it.ents||[]).join(', '),(it.tags||[]).join(', '),String(it.ocr||'').slice(0,300),KIND[it.kind],placeOf(it)].filter(Boolean).join(' · ');
+const embText=it=>[it.aname,it.meme,it.cap,(it.ents||[]).join(', '),(it.tags||[]).join(', '),(it.en||[]).join(', '),String(it.ocr||'').slice(0,300),KIND[it.kind],placeOf(it)].filter(Boolean).join(' · ');
 const unit=v=>{let n=0;for(const x of v)n+=x*x;n=Math.sqrt(n)||1;return Float32Array.from(v,x=>x/n)};
 async function embCall(texts,task){await gemList();const r=await fetch(`${GM}models/${gemE}:batchEmbedContents`,{method:'POST',headers:{'content-type':'application/json','x-goog-api-key':gemKey()},
     body:JSON.stringify({requests:texts.map(t=>({model:'models/'+gemE,content:{parts:[{text:t}]},taskType:task,outputDimensionality:256}))})});

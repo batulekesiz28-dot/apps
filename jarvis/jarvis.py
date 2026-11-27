@@ -29,7 +29,7 @@ try:
 except Exception:
     pass
 
-VERSION = "2026.11.26a"
+VERSION = "2026.11.27a"
 UA = "Jarvis/" + VERSION  # bazı servisler (Cloudflare arkasındakiler) Python'un varsayılan kimliğini engelliyor
 ROOT = pathlib.Path(__file__).resolve().parent
 CFG = ROOT / "ayarlar.json"
@@ -216,6 +216,83 @@ def open_any(target: str):
             os_open(app)
         return f"{t} açıldı"
     return None
+
+
+# ── pencereler (Windows): öndeki pencere, açık pencereler, öne getir / küçült / büyüt / kapat ──
+def _wins():
+    """Görünür, başlıklı üst düzey pencereler: [(hwnd, başlık)] (öndeki ilk)."""
+    if not WIN:
+        return []
+    import ctypes
+    from ctypes import wintypes
+    u = ctypes.windll.user32
+    out = []
+    PROC = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
+
+    def cb(h, _l):
+        if u.IsWindowVisible(h) and not u.GetWindow(h, 4):  # GW_OWNER yok = gerçek uygulama penceresi
+            n = u.GetWindowTextLengthW(h)
+            if n:
+                b = ctypes.create_unicode_buffer(n + 1); u.GetWindowTextW(h, b, n + 1)
+                t = b.value.strip()
+                if t and t not in ("Program Manager", "Windows Input Experience", "Settings", "Microsoft Text Input Application"):
+                    out.append((h, t))
+        return True
+    u.EnumWindows(PROC(cb), 0)
+    fg = u.GetForegroundWindow()
+    out.sort(key=lambda x: x[0] != fg)
+    return out[:25]
+
+
+def win_ctx():
+    try:
+        w = _wins()
+    except Exception:
+        return ""
+    if not w:
+        return ""
+    return f"; öndeki pencere: {w[0][1][:80]}" + (f"; açık pencereler: {' | '.join(t[:50] for _, t in w[1:12])}" if len(w) > 1 else "")
+
+
+def win_act(title, action):
+    if not WIN:
+        raise RuntimeError("pencere yönetimi şimdilik sadece Windows'ta")
+    import ctypes
+    u = ctypes.windll.user32
+    q = norm_name(title)
+    W = _wins()
+    hit = next(((h, t) for h, t in W if norm_name(t) == q), None) or next(((h, t) for h, t in W if q and q in norm_name(t)), None)
+    if not hit:
+        raise ValueError("böyle bir pencere yok. Açık olanlar: " + " | ".join(t[:50] for _, t in W[:15]))
+    h, t = hit
+    if action == "close":
+        u.PostMessageW(h, 0x0010, 0, 0)  # WM_CLOSE: kaydedilmemiş iş varsa uygulama kendisi sorar
+    elif action == "minimize":
+        u.ShowWindow(h, 6)
+    elif action == "maximize":
+        u.ShowWindow(h, 3); u.SetForegroundWindow(h)
+    else:
+        u.ShowWindow(h, 9); u.keybd_event(0x12, 0, 0, 0); u.SetForegroundWindow(h); u.keybd_event(0x12, 0, 2, 0)  # Alt hilesi: Windows öne almayı engellemesin
+    return t
+
+
+def clip_get():
+    if MOCK:
+        return "(sahte pano)"
+    if WIN:
+        r = subprocess.run(["powershell", "-NoProfile", "-Command", "Get-Clipboard -Raw"], capture_output=True, text=True, timeout=10, encoding="utf-8", errors="replace")
+        return (r.stdout or "").strip()
+    r = subprocess.run(["pbpaste"] if MAC else ["xclip", "-o", "-selection", "clipboard"], capture_output=True, text=True, timeout=10)
+    return (r.stdout or "").strip()
+
+
+def clip_set(t):
+    if MOCK:
+        return
+    if WIN:
+        subprocess.run(["powershell", "-NoProfile", "-Command", "$input | Set-Clipboard"], input=t, text=True, timeout=10, encoding="utf-8")
+    else:
+        subprocess.run(["pbcopy"] if MAC else ["xclip", "-selection", "clipboard"], input=t, text=True, timeout=10)
 
 
 def lock_pc():
@@ -458,6 +535,8 @@ def quick(text: str):
             kind, data, _ = shot(100000)
             p = SHOTS / time.strftime("ekran-%Y%m%d-%H%M%S." + ("png" if kind == "image/png" else "jpg")); p.write_bytes(data); os_open(str(p))
         return "Ekran görüntüsü alındı"
+    if re.match(r"^(tablet(i|imi)?|telefon(u|umu)?)\s*(ekranını\s*)?(bilgisayara\s*|buraya\s*)?yansıt(mayı aç)?$|^(bu bilgisayara yansıtma(yı)? aç|yansıtma alıcısını aç)$", s) and WIN:
+        os_open("ms-settings:project"); return "Bu bilgisayara yansıtma açıldı; tablette Smart View'den bilgisayarı seç"
     if re.match(r"^(bilgisayarı |ekranı )?kilitle$", s):
         lock_pc(); return "Bilgisayar kilitlendi"
     if re.match(r"^saat kaç$", s):
@@ -792,10 +871,17 @@ TEXTY = re.compile(r"(yorum|comment|mesaj|message|tweet|post|reply|yanıt|cevap|
 # ───────────────────────── AJAN ─────────────────────────
 SYSTEM = """Sen JARVIS'sin: kullanıcının bilgisayarında tam yetkili, Türkçe konuşan kişisel asistan. Kullanıcıyla sesli konuşuyorsun; yanıtların yüksek sesle okunuyor.
 
+Kişiliğin: sakin, zeki, esprili ama kısa — Iron Man'deki JARVIS gibi. Kullanıcıyı tanırsın: bağlamdaki “hatırladıkların”ı kullan, öğrendiğin kalıcı tercihleri (sevdiği müzik, kullandığı uygulamalar, kişiler, alışkanlıklar) remember ile kaydet — sormadan.
+Bağlamda öndeki pencereyi ve açık pencereleri görürsün: kullanıcı “bunu kapat”, “şunu özetle”, “buna dön” derse önce oraya bak. “Kopyaladığımı/bunu çevir” derse clipboard ile panoyu oku.
+
+Nasıl düşünürsün: İsteği tek cümlede anla; eksik bilgi tahmin edilebiliyorsa en makul olanı seç ve devam et (gerçekten belirsizse tek kısa soru sor). 3+ adımlı işlerde önce plan aracıyla plan yaz, adımları sırayla yap, her adımın sonucunu kontrol et, plan'ı güncelle. Bir yöntem iki kez olmazsa başka yönteme geç.
+İş bitince ne yaptığını somut söyle (ne açıldı, ne bulundu, sayı/isim) ve gerekiyorsa bir sonraki mantıklı adımı tek cümleyle öner.
+
 Nasıl çalışırsın:
 - Hemen harekete geç. İzin istemek için durma (sadece aşağıdaki geri alınamaz işler hariç). Önce yap, sonra kısaca söyle.
 - En kısa yolu seç: adresi biliyorsan doğrudan aç (open_target ya da browser_go), arama kutusuna yazıp tıklama. Uygulamayı open_target ile doğrudan aç.
 - Tarayıcıda bir sitede iş yapacaksan (giriş gerektiren: YouTube, YouTube Music, Gmail, takvim, randevu siteleri) browser_* araçlarını kullan; bu ayrı Jarvis tarayıcısıdır, kullanıcı bir kez giriş yapmıştır. Giriş istenirse kullanıcıya o pencerede giriş yapmasını söyle.
+- Açık bir pencereye geçmek/kapatmak/küçültmek için window aracı (ekran görüntüsü almadan, anında).
 - Masaüstü uygulamalarında screenshot → click/type_text/press_keys kullan. Tıkladıktan sonra sonucu kontrol et.
 - Bir yol olmazsa pes etme, alternatif düşün: başka bir sayfa, başka bir uygulama, kısayol tuşu, arama. Örnek: YouTube Music'te yorum özelliği yoksa aynı şarkının YouTube videosunu bul ve yorumu oraya yaz.
 - Bilgi soruları için web_search kullan; kısa ve kesin cevap ver.
@@ -847,6 +933,11 @@ TOOLS = [
        "params": {"type": "string", "description": "parametreler JSON metni olarak: {\"ad\": {\"type\": \"string|integer|number|boolean\", \"description\": \"…\"}}; parametre yoksa {}"}, "required": {"type": "array", "items": {"type": "string"}},
        "code": {"type": "string", "description": "Python kaynak kodu; def run(**params) içermeli"}}, ["name", "description", "code"]),
     T("delete_tool", "Daha önce yazdığın bir aracı sil.", {"name": S}, ["name"]),
+    T("plan", "Birden çok adımlı bir işe başlarken kısa bir plan yaz (kullanıcı ekranda yapılacaklar listesi olarak görür); ilerledikçe done ile biten adımları işaretle.",
+      {"steps": {"type": "array", "items": {"type": "string"}, "description": "3–7 kısa adım"}, "done": {"type": "integer", "description": "kaç adım bitti (0'dan başlar)"}}, ["steps"]),
+    T("window", "Bilgisayardaki açık pencereler: listele, öne getir, küçült, büyüt ya da kapat (başlığın bir kısmı yeter, ör. 'Chrome', 'Word', 'Spotify').",
+      {"action": {"type": "string", "enum": ["list", "focus", "minimize", "maximize", "close"]}, "title": S}, ["action"]),
+    T("clipboard", "Panoyu oku (kullanıcı 'bunu', 'kopyaladığımı' derse) ya da panoya metin koy.", {"action": {"type": "string", "enum": ["read", "write"]}, "text": S}, ["action"]),
 ]
 SCHEMA = {t["name"]: t["input_schema"] for t in TOOLS if "input_schema" in t}
 BUILTIN = set(SCHEMA) | {"web_search"}
@@ -961,8 +1052,11 @@ class Session:
         self.scale = 1.0
         self.model = ""
         self.last = time.time()
+        self.deep = False  # bu istek zor mu (is_deep) → derin düşünme + güçlü model
 
     async def send(self, **m):
+        if m.get("t") == "step" and m.get("label") == "plan":
+            return  # plan kendi listesinde görünür (t=plan), adım olarak tekrar yazılmaz
         try:
             await self.ws.send(json.dumps(m, ensure_ascii=False))
         except Exception:
@@ -1127,6 +1221,25 @@ async def run_tool(sess: Session, rid, name, a):
         (ARAC / f"{n}.py").write_text("# JARVIS_ARAC " + json.dumps(meta, ensure_ascii=False) + "\n" + a["code"], "utf-8")
         load_custom()
         return f"“{n}” aracı {'güncellendi' if upd else 'kaydedildi'}; artık kullanabilirsin (hemen dene)."
+    if name == "plan":
+        st = [str(x)[:90] for x in (a.get("steps") or [])][:8]
+        await sess.send(t="plan", id=rid, steps=st, done=int(a.get("done") or 0))
+        return "Plan ekranda. Adımları yap; her biri bitince plan'ı done ile güncelle."
+    if name == "window":
+        act = a.get("action", "list")
+        if act == "list":
+            W = await loop.run_in_executor(None, _wins)
+            return "\n".join(("▶ " if i == 0 else "• ") + t for i, (_, t) in enumerate(W)) or "Açık pencere yok."
+        if act == "close" and not sess.allow_cmd:
+            if not await sess.ask(rid, "Bu pencere kapatılsın mı?", a.get("title", "")):
+                return "Kullanıcı onaylamadı."
+        t = await loop.run_in_executor(None, win_act, a.get("title", ""), act)
+        return {"focus": "Öne getirildi", "minimize": "Küçültüldü", "maximize": "Büyütüldü", "close": "Kapatma isteği gönderildi"}[act] + f": {t}"
+    if name == "clipboard":
+        if a.get("action") == "write":
+            await loop.run_in_executor(None, clip_set, str(a.get("text", ""))); return "Panoya kopyalandı."
+        t = await loop.run_in_executor(None, clip_get)
+        return (t[:6000] + ("\n…(kısaltıldı)" if len(t) > 6000 else "")) or "Pano boş (ya da metin değil)."
     if name == "delete_tool":
         n = str(a["name"]).strip().lower()
         if n not in CUSTOM:
@@ -1143,13 +1256,17 @@ LABEL = {"open_target": "Açılıyor", "web_search": "İnternette aranıyor", "b
          "click": "Tıklanıyor", "type_text": "Yazılıyor", "press_keys": "Tuşa basılıyor", "run_command": "Komut çalıştırılıyor",
          "list_files": "Dosyalara bakılıyor", "read_file": "Dosya okunuyor", "appshell_reminder": "Hatırlatıcı kuruluyor",
          "remember": "Not alınıyor", "wait": "Bekleniyor", "fetch_page": "Sayfa okunuyor", "run_python": "Python çalıştırılıyor",
-         "create_tool": "Kendine araç yazıyor", "delete_tool": "Araç siliniyor"}
+         "create_tool": "Kendine araç yazıyor", "delete_tool": "Araç siliniyor", "window": "Pencere", "clipboard": "Pano"}
 
 
 def step_label(name, a):
     d = a.get("target") or a.get("url") or a.get("text") or a.get("keys") or a.get("command") or a.get("path") or a.get("fact") or a.get("why") or ""
     if name in ("create_tool", "delete_tool"):
         d = a.get("name", "")
+    elif name == "window":
+        d = {"list": "açık pencerelere bakılıyor", "focus": "öne getiriliyor", "minimize": "küçültülüyor", "maximize": "büyütülüyor", "close": "kapatılıyor"}.get(a.get("action"), "") + (f" — {a.get('title')}" if a.get("title") else "")
+    elif name == "clipboard":
+        d = "okunuyor" if a.get("action") != "write" else "kopyalanıyor"
     elif name in CUSTOM:
         return f"Araç: {name}"
     if name == "browser_click":
@@ -1162,8 +1279,17 @@ def context_note():
     now = datetime.datetime.now()
     g = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"][now.weekday()]
     mem = memory()
-    return (f"[Bağlam — şimdi: {now:%Y-%m-%d %H:%M}, {g}; işletim sistemi: {OS}; kullanıcı klasörü: {pathlib.Path.home()}"
-            + (f"; hatırladıkların: {' | '.join(mem[-25:])}" if mem else "") + "]")
+    return (f"[Bağlam — şimdi: {now:%Y-%m-%d %H:%M}, {g}; işletim sistemi: {OS}; kullanıcı klasörü: {pathlib.Path.home()}{win_ctx()}"
+            + (f"; hatırladıkların: {' | '.join(mem[-40:])}" if mem else "") + "]")
+
+
+# Zor iş mi? (çok adımlı, araştırma, yazma, karşılaştırma…) → daha derin düşün + varsa daha güçlü model. Kısa komutlar hızlı kalır.
+DEEP = re.compile(r"\b(ve sonra|sonra|ardından|araştır|karşılaştır|analiz|özetle|plan|neden|nasıl|açıkla|yaz(ar mısın)?|hazırla|düzenle|bul ve|hepsini|her\s|liste(le)?|hesapla|öner|fikir|kod|program|script|dosya(ları)?|rapor|e-?posta|mail|mesaj)\b", re.I)
+
+
+def is_deep(text):
+    t = text.strip()
+    return len(t) > 90 or len(t.split()) >= 9 or bool(DEEP.search(t))
 
 
 # ───────────────────────── Claude API (Python'un kendi HTTPS'i, akış) ─────────────────────────
@@ -1324,7 +1450,7 @@ async def agent(sess: Session, rid, text):
     sess.hist.append({"role": "user", "content": [{"type": "text", "text": context_note() + "\n" + text}]})
     for _turn in range(40):
         body = {"model": MODEL, "max_tokens": 16000, "system": SYSTEM, "tools": TOOLS + custom_tools(), "messages": sess.hist, "stream": True,
-                "thinking": {"type": "adaptive", "display": "updates"}, "output_config": {"effort": cfg.get("effort", "low")},
+                "thinking": {"type": "adaptive", "display": "updates"}, "output_config": {"effort": "medium" if getattr(sess, "deep", False) and cfg.get("effort", "low") == "low" else cfg.get("effort", "low")},
                 "fallbacks": "default", "cache_control": {"type": "ephemeral"}}
         if cfg.get("fast"):
             body["speed"] = "fast"
@@ -1389,7 +1515,7 @@ SCHEMA["web_search"] = {"type": "object", "properties": {"query": {"type": "stri
 def oa_tools():
     return OA_TOOLS + [{"type": "function", "function": {"name": n, "description": "[Senin yazdığın araç] " + c["description"],
                                                          **({"parameters": c["schema"]} if c["schema"]["properties"] else {})}} for n, c in CUSTOM.items()]
-MODELS, BADM = {}, {}  # sağlayıcı → (zaman, sıralı modeller) · model → kotası bitti (zaman)
+MODELS, BADM, PRO = {}, {}, {}  # sağlayıcı → (zaman, sıralı modeller) · model → kotası bitti (zaman) · sağlayıcı → güçlü modeller (zor işlerde önce)
 
 
 def oa_base(p):
@@ -1404,6 +1530,12 @@ def rank_models(p, ids):
             m = re.match(r"^gemini-(\d+(?:\.\d+)?)-flash(-lite)?(-preview[\w.-]*|-latest|-\d{3})?$", i)
             if m and not re.search(r"image|tts|live|audio|exp", i):
                 sc.append((float(m.group(1)), (0 if m.group(2) else 1), (0 if m.group(3) else 1), i))  # yeni sürüm > tam model > kararlı
+        pro = []
+        for i in ids:
+            m = re.match(r"^gemini-(\d+(?:\.\d+)?)-pro(-preview[\w.-]*|-latest)?$", i)
+            if m and not re.search(r"image|tts|live|audio|exp|computer", i):
+                pro.append((float(m.group(1)), 0 if m.group(2) else 1, i))
+        PRO["gemini"] = [x[-1] for x in sorted(pro, reverse=True)][:2]
         return [x[-1] for x in sorted(sc, reverse=True)] or ["gemini-2.5-flash", "gemini-2.5-flash-lite"]
     if p == "groq":
         pref = ["openai/gpt-oss-120b", "moonshotai/kimi-k2-instruct-0905", "moonshotai/kimi-k2-instruct", "llama-3.3-70b-versatile", "openai/gpt-oss-20b"]
@@ -1512,6 +1644,8 @@ async def oa_once(sess, rid, p, model, msgs):
     """Bir model turu (akış) → (yazı, araç çağrıları, bitiş sebebi)."""
     body = {"model": model, "messages": msgs, "tools": oa_tools(), "stream": True, "max_tokens": 4096}
     ef = {"xhigh": "high"}.get(cfg.get("effort", "low"), cfg.get("effort", "low"))
+    if getattr(sess, "deep", False) and ef == "low":
+        ef = "medium"
     if p == "gemini" or "gpt-oss" in model:
         body["reasoning_effort"] = ef
     text, calls, fin, reas, got = "", {}, None, "", False
@@ -1605,10 +1739,13 @@ async def gem_once(sess, rid, model, msgs):
     """Gemini'nin kendi akış yolu (x-goog-api-key başlığı; AQ. anahtarlar burada çalışır)."""
     sysi, contents = gem_contents(msgs)
     ef = cfg.get("effort", "low")
+    deep = getattr(sess, "deep", False)
     think = {"includeThoughts": True}
     if model.startswith("gemini-3") and GEMTHINK.get(model, 2):
-        think["thinkingLevel"] = ("minimal" if GEMTHINK.get(model, 2) == 2 else "low") if ef == "low" else "high"
-    body = {"contents": contents, "tools": gem_tools(), "generationConfig": {"maxOutputTokens": 4096, "thinkingConfig": think}}
+        think["thinkingLevel"] = "high" if (deep or ef != "low") else ("minimal" if GEMTHINK.get(model, 2) == 2 else "low")
+    elif deep:
+        think["thinkingBudget"] = -1  # 2.x: model kendisi ne kadar düşüneceğine karar verir
+    body = {"contents": contents, "tools": gem_tools(), "generationConfig": {"maxOutputTokens": 8192 if deep else 4096, "thinkingConfig": think}}
     if sysi:
         body["systemInstruction"] = sysi
     text, calls, fin, reas, got = "", [], None, "", False
@@ -1652,7 +1789,8 @@ async def oa_turn(sess, rid, p, msgs):
         models = await model_list(p, key)
         if not models:
             raise ApiErr(429, "quota", "ücretsiz günlük kota bitti")
-        model = models[0]
+        strong = [m for m in PRO.get(p, []) if time.time() - BADM.get(m, 0) > 3 * 3600] if getattr(sess, "deep", False) else []
+        model = (strong or models)[0]
         sess.model = model
         try:
             return await (gem_once(sess, rid, model, msgs) if p == "gemini" else oa_once(sess, rid, p, model, msgs))
@@ -1703,9 +1841,12 @@ async def oa_agent(sess: Session, rid, text, p):
     if not key_of(p):
         await sess.send(t="error", id=rid, msg=f"{PNAME[p]} anahtarı yok. Jarvis ekranındaki Ayarlar'dan ücretsiz anahtar ekle.")
         return "err"
-    if sess.hprov != p or time.time() - sess.last > 30 * 60 or len(sess.hist) > 80:
+    if sess.hprov != p or time.time() - sess.last > 3 * 3600:
         sess.hist, sess.hprov = [], p
         sess.n0 = 0
+    elif len(sess.hist) > 80:  # uzun sohbet: eski kısmı at, son konuşmalar kalsın (kullanıcı mesajı sınırından kes)
+        cut = next((i for i in range(len(sess.hist) - 40, len(sess.hist)) if sess.hist[i].get("role") == "user" and isinstance(sess.hist[i].get("content"), str)), 0)
+        sess.hist = sess.hist[cut:]; sess.n0 = 0
     sess.last = time.time()
     sess.hist.append({"role": "user", "content": context_note() + "\n" + text})
     vision = FREE[p]["vision"]
@@ -1776,7 +1917,10 @@ async def handle_say(sess: Session, rid, text):
             sess.hist.append({"role": "assistant", "content": q})
             return
         p = prov()
-        log(f"ajan ({PNAME[p]}):", text)
+        sess.deep = is_deep(text)
+        if sess.deep:
+            await sess.send(t="note", id=rid, nid="d", text="Derin düşünüyor…")
+        log(f"ajan ({PNAME[p]}{', derin' if sess.deep else ''}):", text)
         r = await (agent(sess, rid, text) if p == "claude" else oa_agent(sess, rid, text, p))
         if r != "ok":
             del sess.hist[sess.n0:]  # yarım kalan tur: geçmiş tutarlı kalsın

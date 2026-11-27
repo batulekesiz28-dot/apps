@@ -24,7 +24,9 @@
   .gd h2{font-size:17px;font-weight:600}.gd>p{font-size:14px;color:var(--ink2);margin-top:4px}
   .gd>p{max-width:66ch}.ss-in{display:block;width:100%;margin-top:8px;height:48px;padding:0 14px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:500 17px/1 inherit;font-family:inherit}
   .ssb{display:inline-flex;align-items:center;height:40px;padding:0 14px;border-radius:12px;background:var(--ink);color:var(--bg)!important;font-weight:600;text-decoration:none}.dg small{color:var(--ink3)}
-  .dg.ss .go{margin-top:6px}.dg details{margin-top:12px}.dg summary{cursor:pointer;font-weight:600;min-height:40px;display:flex;align-items:center}
+  .dg.ss .go{margin-top:6px}.dg .seg{margin:12px 0 4px}.dg ol.nat li{margin:10px 0}.dg details{margin-top:12px}.dg summary{cursor:pointer;font-weight:600;min-height:40px;display:flex;align-items:center}
+  .rx-nat{margin-top:22px;height:44px;padding:0 18px;border-radius:14px;background:rgba(255,255,255,.1);color:#fff;font-weight:600;font-size:15px}.rx-nat:hover{background:rgba(255,255,255,.16)}
+  .rx-nw ol{text-align:left;max-width:560px;margin:18px auto 0;color:rgba(255,255,255,.86);font-size:17px;line-height:1.55;padding-left:22px}.rx-nw li{margin:14px 0}.rx-nw small{display:block;margin-top:8px;color:rgba(255,255,255,.62);font-size:14px}.rx-nw .rx-open{display:inline-flex;align-items:center;margin:0;text-decoration:none}
   .rx-open{margin:18px auto 0;display:block;height:56px;padding:0 28px;border-radius:16px;background:#fff;color:#000;font-weight:700;font-size:20px}.dg{margin:14px 0 4px;padding:16px;border-radius:16px;background:var(--card);box-shadow:inset 0 0 0 1px var(--line);font-size:15px;line-height:1.5}.dg>b{font-size:16px}.dg p{margin:6px 0;color:var(--ink2)}.dg ol{margin:8px 0;padding-left:20px}.dg li{margin:6px 0}.dg a{color:inherit}
   .gd details{margin-top:12px;border-radius:16px;background:var(--card);box-shadow:inset 0 0 0 1px var(--line)}
   .gd summary{list-style:none;cursor:pointer;padding:14px 18px;font-weight:600;font-size:15px;display:flex;align-items:center;gap:10px;min-height:48px}
@@ -140,6 +142,7 @@ function txUI(pref){if(location.hash!=='#gonder'&&!pref)history.replaceState(nul
   $('#app').querySelectorAll('[data-src]').forEach(b=>b.onclick=()=>{TX.src=b.dataset.src;txUI(ci.value||' ')});
   qWire();
   const go=$('#txGo');if(go)go.onclick=()=>txStart(ci.value.trim());
+  $('#app').querySelectorAll('[data-tt]').forEach(b=>b.onclick=()=>{lss('yansit:tt',b.dataset.tt);txUI(ci.value||' ')});
   const sg=$('#ssGo');if(sg){const ui=$('#ssUrl');ui.addEventListener('keydown',e=>{if(e.key==='Enter')sg.click()});sg.onclick=()=>ssSend(ci.value.trim(),ui.value)}}
 /* ── Android tablet/telefondan doğrudan yayın ──
    Android tarayıcıları ekranı veremediği için ekranı ücretsiz, açık kaynak ScreenStream uygulaması yayınlar (aynı Wi-Fi'de http://IP:8080).
@@ -147,13 +150,20 @@ function txUI(pref){if(location.hash!=='#gonder'&&!pref)history.replaceState(nul
 const SS_PLAY='https://play.google.com/store/apps/details?id=info.dvkr.screenstream',SS_FD='https://f-droid.org/packages/info.dvkr.screenstream/';
 function lanUrl(v){v=String(v||'').trim();if(!v)return'';if(!/^https?:\/\//i.test(v))v='http://'+v;try{const u=new URL(v),h=u.hostname;
   return/^(10\.\d+|192\.168|172\.(1[6-9]|2\d|3[01])|169\.254)\.\d+\.\d+$/.test(h)||/\.local$/i.test(h)?u.origin+u.pathname:''}catch{return''}}
-function ssPanel(){return`<div class="dg ss"><b>Tabletten doğrudan yayınla</b><p>Android tarayıcıları ekranı paylaşamıyor; ekranı ücretsiz <b>ScreenStream</b> uygulaması yayınlar, Yansıt alıcıda açar.</p>
+/* Android tablet/telefon: tarayıcı ekranı veremez (Chrome/Samsung Internet'in sınırı). Uygulama YÜKLEMEDEN yol: cihazın kendi
+   yansıtması (Smart View / Ekran yansıtma — Miracast/Chromecast) → TV'ye ya da Windows'un kendi alıcısına (Bu bilgisayara yansıtma).
+   Tarayıcıda izlemek isteyene ikinci yol ScreenStream (uygulama gerekir). Hedef seçimi yansit:tt */
+const NATIVE_TV=['Tabletin ekranının en üstünden <b>iki kez aşağı kaydır</b> (hızlı ayarlar).','<b>Smart View</b>\'e dokun (Samsung) — başka markalarda <b>Ekran yansıtma</b>, <b>Yayınla</b> ya da <b>Cast</b>.','Listeden <b>televizyonu</b> seç. Görüntü ve ses TV\'de.'];
+const NATIVE_PC=['Bilgisayarda Yansıt → <b>Burada izle</b> → <b>Tabletten al</b>\'a bas (ya da Ayarlar → Sistem → <b>Bu bilgisayara yansıtma</b>).','Tablette üstten iki kez aşağı kaydır → <b>Smart View</b> / <b>Ekran yansıtma</b>.','Listeden <b>bilgisayarın adını</b> seç; bilgisayarda “Bağlan”a izin ver.'];
+function ssPanel(){const tt=lsg('yansit:tt','tv');return`<div class="dg ss"><b>Tabletin ekranını yayınla — hiçbir şey yüklemeden</b><p>Tarayıcı tabletin ekranını alamıyor; tabletin <b>kendi yansıtması</b> bunu zaten yapıyor ve en akıcısı (ses de gider).</p>
+    <div class="seg sm" role="group" aria-label="Nereye"><button data-tt="tv" aria-pressed="${tt==='tv'}">Televizyona</button><button data-tt="pc" aria-pressed="${tt==='pc'}">Bilgisayara</button></div>
+    <ol class="nat">${(tt==='pc'?NATIVE_PC:NATIVE_TV).map(x=>`<li>${x}</li>`).join('')}</ol>
+    <p class="hint">${tt==='pc'?'Bilgisayar Windows 10/11 olmalı ve aynı Wi-Fi\'de bulunmalı. Listede çıkmazsa bilgisayarda “Kablosuz Ekran” Windows özelliği bir kez eklenir (Ayarlar → İsteğe bağlı özellikler; Microsoft\'un kendi parçası).':'TV ve tablet aynı Wi-Fi\'de olmalı. Akıllı TV\'lerin çoğu bunu destekler (Samsung, LG, Android TV, Chromecast).'}</p>
+    <details><summary>Tarayıcıda izlemek istersen (uygulama gerekir)</summary>
     <ol><li><a class="ssb" href="${SS_PLAY}" target="_blank" rel="noopener">ScreenStream'i kur</a> <small>(ücretsiz, açık kaynak · <a href="${SS_FD}" target="_blank" rel="noopener">F-Droid</a>)</small></li>
       <li>Uygulamada <b>Yerel (Local)</b> modunda <b>Başlat</b>'a bas, izin ver.</li>
       <li>Uygulamada yazan adresi buraya yaz:<input class="ss-in" id="ssUrl" inputmode="url" autocomplete="off" spellcheck="false" placeholder="192.168.1.20:8080" value="${esc(lsg('yansit:ss',''))}" aria-label="ScreenStream adresi"></li></ol>
-    <button class="go" id="ssGo">Yayınla</button><p class="msg" id="txMsg" role="status" aria-live="polite"></p>
-    <details><summary>Ya da uygulamasız (yerleşik yansıtma)</summary>${devList()}</details>
-    <p class="hint">İki cihaz aynı Wi-Fi'de olmalı. Ses gitmez (ScreenStream sadece görüntü yollar).</p></div>`}
+    <button class="go" id="ssGo">Yayınla</button><p class="msg" id="txMsg" role="status" aria-live="polite"></p></details></div>`}
 async function ssSend(code,v){if(!/^[A-Z0-9]{6}$/.test(code)){txMsg('Önce alıcıdaki 6 harfli kodu yaz.','err');$('#code')?.focus();return}
   const url=lanUrl(v);if(!url){txMsg('Adres ScreenStream\'de yazan yerel adres olmalı (ör. 192.168.1.20:8080).','err');$('#ssUrl')?.focus();return}
   lss('yansit:ss',v.trim());const b=$('#ssGo');b.disabled=true;txMsg('Alıcıya gönderiliyor…');
@@ -215,7 +225,15 @@ async function rxStart(){history.replaceState(null,'','#izle');stopTx();const R=
   try{RX.lock=await navigator.wakeLock?.request('screen')}catch{}}
 function rxWait(st){const R=$('#rx');const u=location.origin+location.pathname.replace(/index\.html$/,'');
   R.innerHTML=`<div class="rx-w"><p class="rx-k">Bu ekranda göstermek için öbür cihaza bu kodu gir</p><p class="rx-c" aria-label="Kod ${[...RX.code].join(' ')}">${RX.code}</p>
-    <p class="rx-u">Öbür cihazda AppShell → <b>Yansıt</b> → <b>Bu ekranı göster</b><br>ya da: <b>${esc(u.replace(/^https?:\/\//,''))}#k=${RX.code}</b></p><p class="rx-s" role="status">${esc(st)}</p></div><button class="rx-x" data-go="home">Kapat</button>`}
+    <p class="rx-u">Öbür cihazda AppShell → <b>Yansıt</b> → <b>Bu ekranı göster</b><br>ya da: <b>${esc(u.replace(/^https?:\/\//,''))}#k=${RX.code}</b></p><p class="rx-s" role="status">${esc(st)}</p><button class="rx-nat" id="rxNat">Tabletten / telefondan al — uygulamasız</button></div><button class="rx-x" data-go="home">Kapat</button>`;
+  $('#rxNat').onclick=rxNative}
+/* uygulamasız alma: Windows'un kendi yansıtma alıcısı (Miracast). Tablette Smart View → bu bilgisayar. */
+function rxNative(){const R=$('#rx'),W=/Windows/.test(navigator.userAgent);
+  R.innerHTML=`<div class="rx-w rx-nw"><p class="rx-k">Tabletin ekranını bu ${W?'bilgisayarda':'cihazda'} göster</p>
+    ${W?`<ol><li><a class="rx-open" href="ms-settings:project">Bu bilgisayarı yansıtmaya aç</a><small>Açılan ayarda “Her yerde kullanılabilir” seç. Seçenek yoksa önce “Kablosuz Ekran” özelliğini ekle (aynı sayfada bağlantı var; Windows'un kendi parçası).</small></li>
+      <li>Tablette ekranın üstünden iki kez aşağı kaydır → <b>Smart View</b> / <b>Ekran yansıtma</b>.</li><li>Listeden <b>bu bilgisayarı</b> seç, burada “Bağlan”a izin ver. Görüntü Windows'un kendi penceresinde açılır.</li></ol>`
+    :`<ol><li>Bu cihaz Windows değil; tabletten doğrudan almak için <b>televizyonu</b> kullan: tablette üstten aşağı kaydır → <b>Smart View</b> → TV.</li><li>Ya da tablette Yansıt → Bu ekranı göster → <b>Tarayıcıda izlemek istersen</b>.</li></ol>`}
+    </div><button class="rx-x" id="rxBack">Geri</button>`;$('#rxBack').onclick=()=>rxWait('')}
 async function rxSig(m){if(m.type==='bye'){rxEnd('Yansıtma bitti. Yeniden göstermek için aynı kodu gir.');return}
   if(m.type==='url'){const url=lanUrl(m.url);if(!url)return;let top=true;try{top=window.top===window}catch{top=false}
     /* TV'de (Yansıt tek başına açık) doğrudan geçer; AppShell içindeyse http adresi çerçevede açılamaz → tek dokunuşla yeni pencere */

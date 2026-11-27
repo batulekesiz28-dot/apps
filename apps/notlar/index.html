@@ -438,8 +438,35 @@ kbd{font:500 11px/1 var(--mono);color:var(--ink3);padding:3px 5px;border-radius:
 .crumb .cr.up{gap:2px;color:var(--ink2)}.crumb .cr.up svg.i{width:14px;height:14px}
 @media (max-width:760px){.pgb{min-height:58px}.tw,.tw0{width:36px;height:40px}.ni.tr{padding-left:calc(2px + var(--dp,0)*14px)}.sub-add{height:44px}.crumb .cr{height:40px;max-width:120px}.pgn{display:none}.mv-q{height:40px}}
 </style>
+<style id="anCss">/* Tüm notlar (renderAll) */
+.an-h{display:flex;align-items:flex-end;gap:12px;margin:8px 0 18px}.an-h>div{margin-right:auto}.an-h h1{font-size:34px;font-weight:700;letter-spacing:-.02em}.an-h p{font-size:13.5px;color:var(--ink3);margin-top:4px}
+.an-h .btn{min-height:38px;padding:0 16px;border-radius:11px;background:var(--hover);color:var(--ink);font-weight:600;font-size:14px}.an-h .btn.on{background:var(--ink);color:var(--bg)}
+.an-tb{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.an-s{flex:1;min-width:200px;display:flex;align-items:center;gap:8px;height:40px;padding:0 12px;border-radius:12px;background:var(--hover)}.an-s input{flex:1;min-width:0;height:100%;border:0;background:none;outline:0;color:var(--ink);font:inherit;font-size:14.5px}.an-s svg{width:15px;height:15px;color:var(--ink3)}
+.an-f{display:inline-flex;padding:3px;border-radius:12px;background:var(--hover)}.an-f button{min-height:34px;padding:0 12px;border-radius:9px;font-size:13.5px;font-weight:600;color:var(--ink2)}.an-f button[aria-pressed=true]{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.an-l{display:grid;padding-bottom:110px}
+.an-r{display:flex;align-items:center;gap:12px;min-height:58px;padding:8px 10px;margin:0 -10px;border-radius:12px;cursor:pointer;user-select:none;-webkit-user-select:none;transition:background .15s}
+.an-r:hover{background:var(--hover)}.an-r:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.an-r.on{background:color-mix(in srgb,var(--accent) 14%,transparent)}
+.an-ck{flex-shrink:0;width:0;height:22px;border-radius:50%;box-shadow:inset 0 0 0 1.6px var(--ink3);opacity:0;margin-right:-12px;transition:width .25s var(--out,ease),opacity .2s,margin .25s,background .15s,box-shadow .15s;display:grid;place-items:center}
+.an.sel .an-ck{width:22px;opacity:1;margin-right:0}
+.an-r.on .an-ck{background:var(--accent);box-shadow:none}.an-r.on .an-ck::after{content:'';width:9px;height:5px;border:2px solid #fff;border-top:0;border-right:0;transform:translateY(-1px) rotate(-45deg)}
+.an-e{flex-shrink:0;width:26px;text-align:center;font-size:18px}
+.an-t{flex:1;min-width:0;display:grid;gap:2px}.an-t b{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.an-t small{font-size:12.5px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.an-m{flex-shrink:0;font-size:12.5px;color:var(--ink3)}
+.an-0{padding:40px 0;color:var(--ink3);text-align:center}
+.an-bar{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:6px;padding:6px 6px 6px 16px;border-radius:16px;background:var(--menu,var(--card));backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 18px 50px -14px rgba(0,0,0,.45),0 0 0 .5px var(--line2);max-width:calc(100vw - 24px)}
+.an-bar[hidden]{display:none}
+.an-n{font-size:14px;font-weight:600;white-space:nowrap;margin-right:6px}
+.an-bar button{min-height:40px;padding:0 14px;border-radius:11px;font-size:14px;font-weight:600;color:var(--ink);background:var(--hover);white-space:nowrap}
+.an-del{background:#DC2626!important;color:#fff!important}.an-del:disabled{opacity:.4}.an-del.arm{background:#991B1B!important}
+.an-undo{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:61;display:flex;align-items:center;gap:12px;padding:8px 8px 8px 16px;border-radius:14px;background:var(--ink);color:var(--bg);font-size:14px;font-weight:550;box-shadow:0 12px 30px -10px rgba(0,0,0,.4)}
+.an-undo button{min-height:36px;padding:0 12px;border-radius:9px;background:color-mix(in srgb,var(--bg) 18%,transparent);color:var(--bg);font-weight:700}
+@media (max-width:600px){.an-h h1{font-size:28px}.an-m{display:none}.an-bar{left:12px;right:12px;transform:none;max-width:none}.an-n{flex:1;margin:0}.an-bar button{padding:0 11px}.an-h .btn,.an-f button{min-height:40px}}
+@media (prefers-reduced-motion:reduce){.an-ck,.an-r{transition:none}}html[data-motion=off] :is(.an-ck,.an-r){transition:none}
+</style>
 <script>/* mat cam tasarımı: bir kereliğine koyu temaya geç (sonra tema düğmesi serbest) */try{if(!localStorage.getItem('notlar:glass1')){localStorage.setItem('notlar:glass1','1');localStorage.setItem('notlar:theme','"dark"')}}catch(e){}</script>
-<script src="../../shared/skin.js?v=20261127a"></script>
+<script src="../../shared/skin.js?v=20261127b"></script>
 <link rel="stylesheet" href="player.css?v=20261127a">
 <link rel="stylesheet" href="library.css?v=20261127a">
 <link rel="stylesheet" href="brain.css?v=20261127a">
@@ -866,6 +893,7 @@ function route(){
   else if(v==='acts'){location.replace('#cal');return}
   else if(v==='tasks'||v==='stats'){view=v;openId=null}
   else if(v==='tpl'){view='tpl';openId=null}
+  else if(v==='all'){view='all';openId=null}
   else if(v==='work'){view='home';openId=null}
   else if(v==='ders'){view='ders';openId=null}
   else if(v==='lib'||v==='brain'||v==='food'){const parts=h.split('/').slice(1);
@@ -904,6 +932,7 @@ function renderSide(){queueMicrotask(tnavPins);
   const hasToday=all.some(p=>p.tpl==='daily'&&p.date===today());
   $('#nav').innerHTML=`<div class="hl" id="hl"></div>`+
     navItem('#home',IC.home,'Notlar',view==='home')+
+    navItem('#all',ALLIC,'Tüm notlar',view==='all')+
     navItem('#today',IC.sun,'Bugün',view==='page'&&pages.get(openId)?.tpl==='daily'&&pages.get(openId)?.date===today(),hasToday?'':'<span class="cnt">+</span>')+
     navItem('#cal',IC.cal,'Takvim',view==='cal')+
     navItem('#timeline',IC.tl,'Zaman çizelgesi',view==='timeline')+
@@ -979,7 +1008,7 @@ function renderView(soft){
   if(view==='lib'||view==='brain'){if(!soft)(view==='lib'?Library:Brain).render(secParts);return}
   hideFloat();
   const v=$('#view'),sc=$('#scroll'),keep=soft?sc.scrollTop:0;
-  if(view==='ders')Ders.render();else if(view==='page')renderPage();else if(view==='timeline')renderTimeline();else if(view==='cal')renderCal();else if(view==='acts')Time.renderActs();else if(view==='tasks')Time.renderTasks();else if(view==='stats')Time.renderStats();else if(view==='tpl')renderTpl();else renderHome();
+  if(view==='ders')Ders.render();else if(view==='page')renderPage();else if(view==='timeline')renderTimeline();else if(view==='cal')renderCal();else if(view==='acts')Time.renderActs();else if(view==='tasks')Time.renderTasks();else if(view==='stats')Time.renderStats();else if(view==='all')renderAll();else if(view==='tpl')renderTpl();else renderHome();
   sc.scrollTop=keep;onScroll();
   $('#app').classList.toggle('nocrumb',!(view==='page'&&pages.get(openId)?.parent));
   if(!soft)anim(v,[{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'none'}],{duration:460,easing:OUT});
@@ -1019,13 +1048,72 @@ function renderHome(){
     <div class="sh"><span>Önümüzdeki 7 gün</span><span class="rule"></span><a data-go="#cal">Takvim →</a></div>
     <div class="agenda">${week.length?week.map(([d,its])=>`<div class="ag"><div class="d${d===t?' today':''}">${esc(dayLabel(d))}</div><div class="its">${its.map(p=>`<span class="pill" data-pid="${p.id}">${iconOf(p)} ${esc(titleOf(p))}</span>`).join('')}</div></div>`).join('')
       :`<div class="hint">Bu hafta planlanmış bir şey yok. <a data-go="#cal">Takvimden bir güne plan ekle</a>.</div>`}</div>
-    ${recent.length?`<div class="sh"><span>Son düzenlenenler</span><span class="rule"></span></div>
+    ${recent.length?`<div class="sh"><span>Son düzenlenenler</span><span class="rule"></span><a data-go="#all">Tümü · seç ve sil →</a></div>
     <div class="cards">${recent.map(p=>`<div class="card" data-pid="${p.id}"><span class="e">${iconOf(p)}</span><b>${esc(titleOf(p))}</b><p>${esc(firstText(p))}</p><small>${rel(p.updated)}</small></div>`).join('')}</div>`:''}
     <div class="sh"><span>Şablonla başla</span><span class="rule"></span><a data-go="#tpl">Tümü →</a></div>
     <div class="trow">${TPL.slice(0,8).map(t=>`<span class="pill" data-tpl="${t.k}">${t.e} ${esc(t.n)}</span>`).join('')}</div>
   </div>`;
   stagger('.qa,.ag,.card,.trow .pill');
 }
+/* ── Tüm notlar: liste + toplu seçim ve silme (Apple Notlar “Seç” / Gmail tarzı) ──
+   #all · ara, süz (Tümü/Sayfalar/Günlük) · “Seç” ya da sağ tık/uzun bas → seçim modu · Shift ile aralık · Ctrl/Cmd+A tümü · Delete sil · Esc çık.
+   Silme iki adımlı (“Sil” → “Emin misin?”), alt sayfalar da gider; 10 sn “Geri al” her şeyi geri getirir (üst sayfadaki bağlantı dahil). */
+const ALLIC='<svg class="li" viewBox="0 0 16 16"><path d="M5.5 4h8M5.5 8h8M5.5 12h8"/><circle cx="2.8" cy="4" r=".8"/><circle cx="2.8" cy="8" r=".8"/><circle cx="2.8" cy="12" r=".8"/></svg>';
+const AN={q:'',f:'',on:false,sel:new Set(),last:null,arm:0,undo:null};
+const anNorm=s=>String(s||'').toLocaleLowerCase('tr');
+function anList(){let L=sorted();if(AN.f==='daily')L=L.filter(p=>p.tpl==='daily');else if(AN.f==='pages')L=L.filter(p=>p.tpl!=='daily');
+  if(AN.q){const w=anNorm(AN.q).split(/\s+/).filter(Boolean);L=L.filter(p=>{const t=anNorm(titleOf(p)+' '+p.blocks.map(b=>plain(b.h)).join(' '));return w.every(x=>t.includes(x))})}return L}
+function anRow(p){const path=ancestors(p).map(titleOf).join(' › '),k=descendants(p.id).length,on=AN.sel.has(p.id);
+  return`<div class="an-r${on?' on':''}" data-aid="${p.id}" role="${AN.on?'checkbox':'link'}" ${AN.on?`aria-checked="${on}"`:''} tabindex="0"><span class="an-ck" aria-hidden="true"></span><span class="an-e">${iconOf(p)}</span>
+    <span class="an-t"><b title="${esc(titleOf(p))}">${esc(titleOf(p))}</b><small title="${esc([path,firstText(p)].filter(Boolean).join(' · ').slice(0,200))}">${esc([path,firstText(p)].filter(Boolean).join(' · ').slice(0,120))}</small></span><span class="an-m">${k?`${k} alt sayfa · `:''}${rel(p.updated)}</span></div>`}
+function renderAll(){setCrumb(ALLIC,'Tüm notlar');const L=anList(),n=pages.size;
+  for(const id of [...AN.sel])if(!pages.has(id))AN.sel.delete(id);
+  $('#view').innerHTML=`<div class="wrap an${AN.on?' sel':''}"><div class="an-h"><div><h1>Tüm notlar</h1><p>${n} not</p></div>
+    <button class="btn${AN.on?' on':''}" data-an="mode">${AN.on?'Bitti':'Seç'}</button></div>
+    <div class="an-tb"><label class="an-s"><svg class="li" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg><input data-anq type="search" placeholder="Notlarda ara" value="${esc(AN.q)}" aria-label="Notlarda ara"></label>
+      <div class="an-f" role="group" aria-label="Süzgeç">${[['','Tümü'],['pages','Sayfalar'],['daily','Günlük']].map(([k,t])=>`<button data-anf="${k}" aria-pressed="${AN.f===k}">${t}</button>`).join('')}</div></div>
+    <div class="an-l">${L.length?L.map(anRow).join(''):`<p class="an-0">${AN.q?'Eşleşen not yok.':'Henüz not yok.'}</p>`}</div>
+    <div class="an-bar" ${AN.on?'':'hidden'} role="toolbar" aria-label="Seçilenler"><span class="an-n" aria-live="polite">${AN.sel.size?`${AN.sel.size} not seçildi`:'Not seç'}</span>
+      <button data-an="all">${L.length&&L.every(p=>AN.sel.has(p.id))?'Seçimi kaldır':'Tümünü seç'}</button><button class="an-del${AN.arm?' arm':''}" data-an="del" ${AN.sel.size?'':'disabled'}>${AN.arm?`Emin misin? ${AN.sel.size} notu sil`:`Sil${AN.sel.size?` (${AN.sel.size})`:''}`}</button></div>
+    ${AN.undo?`<div class="an-undo" role="status"><span>${AN.undo.n} not silindi</span><button data-an="undo">Geri al</button></div>`:''}</div>`;
+  const q=$('[data-anq]');q.addEventListener('input',()=>{AN.q=q.value;const l=$('.an-l');l.innerHTML=anList().map(anRow).join('')||`<p class="an-0">Eşleşen not yok.</p>`;anBar()})}
+function anBar(){const b=$('.an-bar');if(!b)return;const L=anList();b.hidden=!AN.on;$('.an-n',b).textContent=AN.sel.size?`${AN.sel.size} not seçildi`:'Not seç';
+  $('[data-an=all]',b).textContent=L.length&&L.every(p=>AN.sel.has(p.id))?'Seçimi kaldır':'Tümünü seç';const d=$('[data-an=del]',b);d.disabled=!AN.sel.size;d.classList.toggle('arm',!!AN.arm);
+  d.textContent=AN.arm?`Emin misin? ${AN.sel.size} notu sil`:`Sil${AN.sel.size?` (${AN.sel.size})`:''}`;
+  $$('.an-r').forEach(r=>{const on=AN.sel.has(r.dataset.aid);r.classList.toggle('on',on);if(AN.on){r.setAttribute('role','checkbox');r.setAttribute('aria-checked',on)}})}
+function anMode(on){AN.on=on;AN.arm=0;if(!on)AN.sel.clear();$('.an')?.classList.toggle('sel',on);const m=$('[data-an=mode]');if(m){m.textContent=on?'Bitti':'Seç';m.classList.toggle('on',on)}
+  $$('.an-r').forEach(r=>{r.setAttribute('role',on?'checkbox':'link');if(!on)r.removeAttribute('aria-checked')});anBar();
+  const b=$('.an-bar');if(on&&b)anim(b,[{opacity:0,transform:'translate(-50%,16px)'},{opacity:1,transform:'translate(-50%,0)'}],{duration:320,easing:OUT})}
+function anToggle(id,range){if(range&&AN.last){const L=anList().map(p=>p.id),a=L.indexOf(AN.last),b=L.indexOf(id);if(a>=0&&b>=0){const[x,y]=a<b?[a,b]:[b,a];L.slice(x,y+1).forEach(i=>AN.sel.add(i));AN.last=id;AN.arm=0;anBar();return}}
+  AN.sel.has(id)?AN.sel.delete(id):AN.sel.add(id);AN.last=id;AN.arm=0;anBar()}
+function anDelete(){const ids=new Set(AN.sel);let gone=[];const links=[];
+  for(const id of ids){const p=pages.get(id);if(!p)continue;if(p.parent&&!ids.has(p.parent)&&pages.has(p.parent))links.push([p.parent,id]);
+    const all=[p,...descendants(id)].filter(x=>!gone.some(g=>g.id===x.id));gone.push(...all.map(x=>JSON.parse(JSON.stringify(x))))}
+  for(const p of [...gone])if(pages.has(p.id))deletePageTree(pages.get(p.id));
+  clearTimeout(AN.undo?.t);AN.undo={n:gone.length,pages:gone,links,t:setTimeout(()=>{AN.undo=null;$('.an-undo')?.remove()},10000)};
+  AN.sel.clear();AN.arm=0;AN.on=false;renderSide();renderAll()}
+function anUndo(){const u=AN.undo;if(!u)return;clearTimeout(u.t);AN.undo=null;
+  for(const p of u.pages){const x=norm(p);pages.set(x.id,x);save(x,true)}
+  for(const[par,id]of u.links){const P=pages.get(par);if(P&&!P.blocks.some(b=>b.t==='page'&&b.pid===id)){P.blocks.push(B('page','',{pid:id}));touch(P)}}
+  saveTree();renderSide();renderAll();toast(`${u.n} not geri getirildi`)}
+$('#view').addEventListener('click',e=>{if(view!=='all')return;const t=e.target;
+  const b=t.closest('[data-an]');if(b){const k=b.dataset.an;
+    if(k==='mode')anMode(!AN.on);
+    else if(k==='all'){const L=anList();const allOn=L.length&&L.every(p=>AN.sel.has(p.id));L.forEach(p=>allOn?AN.sel.delete(p.id):AN.sel.add(p.id));AN.arm=0;anBar()}
+    else if(k==='del'){if(!AN.sel.size)return;if(!AN.arm){AN.arm=1;anBar();setTimeout(()=>{if(AN.arm){AN.arm=0;anBar()}},4000)}else anDelete()}
+    else if(k==='undo')anUndo();return}
+  const f=t.closest('[data-anf]');if(f){AN.f=f.dataset.anf;renderAll();return}
+  const r=t.closest('.an-r');if(!r)return;if(AN.on)anToggle(r.dataset.aid,e.shiftKey);else if(e.shiftKey||e.metaKey||e.ctrlKey){anMode(true);anToggle(r.dataset.aid)}else go('#p/'+r.dataset.aid)});
+$('#view').addEventListener('contextmenu',e=>{if(view!=='all')return;const r=e.target.closest('.an-r');if(!r)return;e.preventDefault();if(!AN.on)anMode(true);if(!AN.sel.has(r.dataset.aid))anToggle(r.dataset.aid)});
+(()=>{let lt=0,lx=0,ly=0;$('#view').addEventListener('pointerdown',e=>{if(view!=='all'||e.pointerType!=='touch')return;const r=e.target.closest('.an-r');if(!r)return;lx=e.clientX;ly=e.clientY;
+  lt=setTimeout(()=>{lt=0;if(!AN.on)anMode(true);if(!AN.sel.has(r.dataset.aid))anToggle(r.dataset.aid);r._lp=1;navigator.vibrate?.(12)},450)});
+  const stop=e=>{if(lt&&(e.type!=='pointermove'||Math.hypot(e.clientX-lx,e.clientY-ly)>10)){clearTimeout(lt);lt=0}};['pointerup','pointercancel','pointermove'].forEach(k=>$('#view').addEventListener(k,stop));
+  $('#view').addEventListener('click',e=>{const r=e.target.closest?.('.an-r');if(r&&r._lp){r._lp=0;e.stopImmediatePropagation();e.preventDefault()}},true)})();
+addEventListener('keydown',e=>{if(view!=='all'||e.target.closest('input,textarea,[contenteditable]'))return;
+  if(e.key==='Escape'&&AN.on){e.preventDefault();anMode(false)}
+  else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='a'){e.preventDefault();if(!AN.on)anMode(true);anList().forEach(p=>AN.sel.add(p.id));anBar()}
+  else if((e.key==='Delete'||e.key==='Backspace')&&AN.on&&AN.sel.size){e.preventDefault();$('[data-an=del]')?.click()}
+  else if((e.key==='Enter'||e.key===' ')&&e.target.closest?.('.an-r')){e.preventDefault();e.target.closest('.an-r').click()}});
 /* Templates */
 function preview(t){return t.b().slice(0,9).map(b=>{const w=30+((b.id.charCodeAt(b.id.length-1)*7)%50);
   if(b.t.startsWith('h'))return`<div class="ln h"><i style="width:${Math.min(w,55)}%"></i></div>`;

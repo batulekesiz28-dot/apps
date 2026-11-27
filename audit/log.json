@@ -6643,5 +6643,38 @@
     "fix": "Hazır tarifler rafı (foodseed.js)"
    }
   ]
+ },
+ {
+  "at": "2026-11-27T21:00:00Z",
+  "change": "Notlar'a “Tüm notlar” ekranı: notları seçip toplu silebilirsin (Seç, Shift ile aralık, Tümünü seç, iki adımlı silme, 10 sn içinde Geri al). Kendi koyu renk paletini seçtiğinde Workspace'in beyaz görünmesi ve kendi vurgu renginin uygulamalara geçmemesi düzeldi.",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Koyu kendi renklerinde Workspace beyaz kalıyordu",
+    "fix": "skin.js paletin koyuluğuna göre koyu/açık modu ayarlar"
+   },
+   {
+    "app": "notlar",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Kendi vurgu rengin uygulamalara geçmiyordu (yorum satırı hatası)",
+    "fix": "satır düzeltildi"
+   },
+   {
+    "app": "notlar",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Notları tek tek silmek gerekiyordu",
+    "fix": "Tüm notlar: toplu seçim ve silme + geri al"
+   }
+  ]
  }
 ]

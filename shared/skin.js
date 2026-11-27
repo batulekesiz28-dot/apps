@@ -20,6 +20,7 @@
   /* kişisel görünüm (hub tema stüdyosu): vurgu rengi + yazı tipi */
   var LF={geist:['Geist','Geist:wght@300..800'],inter:['Inter','Inter:wght@300..800'],serif:['Fraunces','Fraunces:opsz,wght@9..144,300..800'],round:['Nunito','Nunito:wght@300..800'],mono:['JetBrains Mono','JetBrains+Mono:wght@300..700']};
   // hub tema stüdyosundaki “Kendi renklerim / İki temayı karıştır” (look.colors) — hub'daki SkinPal ile birebir aynı türetme
+  function palDark(h){var v=[1,3,5].map(function(i){var x=parseInt(h.substr(i,2),16)/255;return x<=.03928?x/12.92:Math.pow((x+.055)/1.055,2.4)});return .2126*v[0]+.7152*v[1]+.0722*v[2]<.4}
   function pal(c){if(!c||!/^#[0-9a-f]{6}$/i.test(c.bg||''))return'';var L=function(h){var v=[1,3,5].map(function(i){var x=parseInt(h.substr(i,2),16)/255;return x<=.03928?x/12.92:Math.pow((x+.055)/1.055,2.4)});return .2126*v[0]+.7152*v[1]+.0722*v[2]},dk=L(c.bg)<.4,m=function(p,a,b){return'color-mix(in srgb,'+a+' '+p+'%,'+(b||'transparent')+')'};
   return'html{--bg:'+c.bg+'!important;--bg2:'+m(94,c.bg,c.ink)+'!important;--surface:'+c.surface+'!important;--panel:'+c.surface+'!important;--card:'+c.surface+'!important;--surface2:'+m(93,c.surface,c.ink)+'!important;--tint:'+m(94,c.surface,c.ink)+'!important;'+
     '--ink:'+c.ink+'!important;--ink2:'+m(78,c.ink,c.bg)+'!important;--ink3:'+m(66,c.ink,c.bg)+'!important;--ink4:'+m(22,c.ink,c.bg)+'!important;'+
@@ -33,7 +34,10 @@
   if(l.lines==='strong')c+='html{--line:color-mix(in srgb,currentColor 22%,transparent)!important;--line2:color-mix(in srgb,currentColor 34%,transparent)!important}';
   if(l.lines==='none')c+='html{--line:transparent!important}';return c};
   function look(){var l=rd('appshell:look')||{},st=document.getElementById('lookCss');if(!st){st=document.createElement('style');st.id='lookCss';document.head.appendChild(st)}
-    var f=LF[l.font],css=lookExtra(l)+(root.hasAttribute('data-keep-dark')?'':pal(l.colors)); // her zaman koyu tasarlanmış uygulamalar (Jarvis) kendi renklerinle boyanmaz — yoksa açık zemin + açık yazı = görünmezif(/^#[0-9a-f]{6}$/i.test(l.accent||''))css+='html{--accent:'+l.accent+'!important;--acc:'+l.accent+'!important}';
+    var kd=root.hasAttribute('data-keep-dark'),f=LF[l.font],css=lookExtra(l)+(kd?'':pal(l.colors)); /* her zaman koyu tasarlanmış uygulamalar (Jarvis) kendi renklerinle boyanmaz — yoksa açık zemin + açık yazı = görünmez */
+    if(/^#[0-9a-f]{6}$/i.test(l.accent||''))css+='html{--accent:'+l.accent+'!important;--acc:'+l.accent+'!important}';
+    /* kendi renklerin koyuysa uygulama da KOYU modda açılsın (yoksa [data-theme=light]'a özel beyaz zeminler kalıyordu — “Workspace beyaz”) */
+    var c=l.colors;if(!kd&&c&&/^#[0-9a-f]{6}$/i.test(c.bg||'')){var th=palDark(c.bg)?'dark':'light';root.setAttribute('data-theme',th);try{if(rd('notlar:theme')!==th)localStorage.setItem('notlar:theme',JSON.stringify(th))}catch(e){}}
     if(f){if(!document.querySelector('link[data-look="'+l.font+'"]')){var k=document.createElement('link');k.rel='stylesheet';k.setAttribute('data-look',l.font);k.href='https://fonts.googleapis.com/css2?family='+f[1]+'&display=swap';document.head.appendChild(k)}
       css+="html{--font:'"+f[0]+"',system-ui,sans-serif!important;--serif:'"+f[0]+"',Georgia,serif!important}body{font-family:var(--font)}"}st.textContent=css}
   apply();

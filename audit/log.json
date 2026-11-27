@@ -6617,5 +6617,31 @@
     "fix": "tabletin kendi yansıtması önce; alıcıda Tabletten al (Windows Miracast)"
    }
   ]
+ },
+ {
+  "at": "2026-11-27T19:30:00Z",
+  "change": "Yemek'e “Atıştırmalık & lezzetler” eklendi: cips, çikolata, bisküvi, dondurma, içecek, kahvaltılık, fast food… Dizi ve oyun listesiyle aynı görünüm — raflar, kapaklar, Denenecek/Denedim/Favori, 10 üzerinden puan; ürünü adıyla arayınca fotoğrafı ve markası kendiliğinden gelir, Türkiye'de popüler ürünler “Keşfet” raflarında. Tariflere 19 hazır Türk tarifi eklendi (tek dokunuşla tariflerine geçer).",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "warn",
+    "status": "fixed",
+    "text": "Yemek'te tarif dışı lezzetleri (atıştırmalık vb.) tutacak yer yoktu",
+    "fix": "Atıştırmalık & lezzetler sekmesi (Medya görünümü)"
+   },
+   {
+    "app": "notlar",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Yemek boşken başlangıç tarifi yoktu",
+    "fix": "Hazır tarifler rafı (foodseed.js)"
+   }
+  ]
  }
 ]

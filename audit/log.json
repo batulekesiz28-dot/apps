@@ -6676,5 +6676,24 @@
     "fix": "Tüm notlar: toplu seçim ve silme + geri al"
    }
   ]
+ },
+ {
+  "at": "2026-11-27T22:10:00Z",
+  "change": "Karanlık mod Workspace'te (ve bütün uygulamalarda) yeniden çalışıyor: kendi renk paletin varken karanlık modu açınca paletinin aynı tonda koyu hâli kullanılıyor; aydınlıkta açık hâli.",
+  "scores": {
+   "notlar telefon": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "notlar",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Kendi renk paleti varken karanlık mod açılmıyordu",
+    "fix": "fitPal: palet seçili moda uyarlanır (hub + skin.js)"
+   }
+  ]
  }
 ]

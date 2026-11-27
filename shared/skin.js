@@ -21,6 +21,13 @@
   var LF={geist:['Geist','Geist:wght@300..800'],inter:['Inter','Inter:wght@300..800'],serif:['Fraunces','Fraunces:opsz,wght@9..144,300..800'],round:['Nunito','Nunito:wght@300..800'],mono:['JetBrains Mono','JetBrains+Mono:wght@300..700']};
   // hub tema stüdyosundaki “Kendi renklerim / İki temayı karıştır” (look.colors) — hub'daki SkinPal ile birebir aynı türetme
   function palDark(h){var v=[1,3,5].map(function(i){var x=parseInt(h.substr(i,2),16)/255;return x<=.03928?x/12.92:Math.pow((x+.055)/1.055,2.4)});return .2126*v[0]+.7152*v[1]+.0722*v[2]<.4}
+  /* paleti moda uydur (hub'daki fitPal ile AYNI): renk tonu (hue) korunur, açıklık moda göre */
+  function hsl(h){var r=parseInt(h.substr(1,2),16)/255,g=parseInt(h.substr(3,2),16)/255,b=parseInt(h.substr(5,2),16)/255,mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,d=mx-mn,s=0,H=0;
+    if(d){s=d/(1-Math.abs(2*l-1));H=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;H*=60;if(H<0)H+=360}return[H,s,l]}
+  function hex(H,S,L){var c=(1-Math.abs(2*L-1))*S,x=c*(1-Math.abs((H/60)%2-1)),m=L-c/2,a=H<60?[c,x,0]:H<120?[x,c,0]:H<180?[0,c,x]:H<240?[0,x,c]:H<300?[x,0,c]:[c,0,x];
+    return'#'+a.map(function(v){return('0'+Math.round((v+m)*255).toString(16)).slice(-2)}).join('')}
+  function fitPal(c,dark){if(!c||!/^#[0-9a-f]{6}$/i.test(c.bg||'')||palDark(c.bg)===!!dark)return c;var b=hsl(c.bg),sf=hsl(/^#[0-9a-f]{6}$/i.test(c.surface||'')?c.surface:c.bg),H=b[0],S=Math.min(b[1],.32);
+    return dark?{bg:hex(H,S,.075),surface:hex(sf[0],Math.min(sf[1],.28),.125),ink:hex(H,.12,.93),accent:c.accent}:{bg:hex(H,S,.965),surface:hex(sf[0],Math.min(sf[1],.3),.995),ink:hex(H,.18,.12),accent:c.accent}}
   function pal(c){if(!c||!/^#[0-9a-f]{6}$/i.test(c.bg||''))return'';var L=function(h){var v=[1,3,5].map(function(i){var x=parseInt(h.substr(i,2),16)/255;return x<=.03928?x/12.92:Math.pow((x+.055)/1.055,2.4)});return .2126*v[0]+.7152*v[1]+.0722*v[2]},dk=L(c.bg)<.4,m=function(p,a,b){return'color-mix(in srgb,'+a+' '+p+'%,'+(b||'transparent')+')'};
   return'html{--bg:'+c.bg+'!important;--bg2:'+m(94,c.bg,c.ink)+'!important;--surface:'+c.surface+'!important;--panel:'+c.surface+'!important;--card:'+c.surface+'!important;--surface2:'+m(93,c.surface,c.ink)+'!important;--tint:'+m(94,c.surface,c.ink)+'!important;'+
     '--ink:'+c.ink+'!important;--ink2:'+m(78,c.ink,c.bg)+'!important;--ink3:'+m(66,c.ink,c.bg)+'!important;--ink4:'+m(22,c.ink,c.bg)+'!important;'+
@@ -34,13 +41,15 @@
   if(l.lines==='strong')c+='html{--line:color-mix(in srgb,currentColor 22%,transparent)!important;--line2:color-mix(in srgb,currentColor 34%,transparent)!important}';
   if(l.lines==='none')c+='html{--line:transparent!important}';return c};
   function look(){var l=rd('appshell:look')||{},st=document.getElementById('lookCss');if(!st){st=document.createElement('style');st.id='lookCss';document.head.appendChild(st)}
-    var kd=root.hasAttribute('data-keep-dark'),f=LF[l.font],css=lookExtra(l)+(kd?'':pal(l.colors)); /* her zaman koyu tasarlanmış uygulamalar (Jarvis) kendi renklerinle boyanmaz — yoksa açık zemin + açık yazı = görünmez */
+    /* kendi renklerin o anki moda uyarlanır (fitPal): karanlık mod açıkken açık paletin koyu eşi, aydınlıkta koyu paletin açık eşi —
+       mod düğmesi her zaman çalışır, paletin tonu korunur. Her zaman koyu tasarlanmış uygulamalar (Jarvis) kendi renklerinle boyanmaz. */
+    var kd=root.hasAttribute('data-keep-dark'),dm=root.getAttribute('data-theme')?root.getAttribute('data-theme')==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
+    var f=LF[l.font],css=lookExtra(l)+(kd?'':pal(fitPal(l.colors,dm)));
     if(/^#[0-9a-f]{6}$/i.test(l.accent||''))css+='html{--accent:'+l.accent+'!important;--acc:'+l.accent+'!important}';
-    /* kendi renklerin koyuysa uygulama da KOYU modda açılsın (yoksa [data-theme=light]'a özel beyaz zeminler kalıyordu — “Workspace beyaz”) */
-    var c=l.colors;if(!kd&&c&&/^#[0-9a-f]{6}$/i.test(c.bg||'')){var th=palDark(c.bg)?'dark':'light';root.setAttribute('data-theme',th);try{if(rd('notlar:theme')!==th)localStorage.setItem('notlar:theme',JSON.stringify(th))}catch(e){}}
     if(f){if(!document.querySelector('link[data-look="'+l.font+'"]')){var k=document.createElement('link');k.rel='stylesheet';k.setAttribute('data-look',l.font);k.href='https://fonts.googleapis.com/css2?family='+f[1]+'&display=swap';document.head.appendChild(k)}
       css+="html{--font:'"+f[0]+"',system-ui,sans-serif!important;--serif:'"+f[0]+"',Georgia,serif!important}body{font-family:var(--font)}"}st.textContent=css}
   apply();
+  try{new MutationObserver(function(){look()}).observe(root,{attributes:true,attributeFilter:['data-theme']})}catch(e){}
   // ipucu: yalnızca simgesi olan düğmenin aria-label'ı fareyle üstüne gelince title olur (tek dinleyici, bütün uygulamalar)
   document.documentElement.setAttribute('data-autotip','');
   document.addEventListener('pointerover',function(e){var b=e.target&&e.target.closest&&e.target.closest('button[aria-label],a[aria-label],[role=button][aria-label]');

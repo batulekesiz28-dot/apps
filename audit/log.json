@@ -6714,5 +6714,24 @@
     "fix": "tek liste + grup sekmeleri; Medya görünümü kodu silindi"
    }
   ]
+ },
+ {
+  "at": "2026-11-27T23:40:00Z",
+  "change": "Uygulama açıkken üstten aşağı çekmek artık kontrol merkezini açıyor (eskiden uygulamayı küçük pencereye küçültüyordu ve kontrol merkezi açılmıyordu). Küçük pencere hâlâ şeritteki sarı ışık, menü ve Alt+M ile açılır.",
+  "scores": {
+   "hub telefon": {
+    "before": 100,
+    "after": 100
+   }
+  },
+  "items": [
+   {
+    "app": "hub",
+    "sev": "error",
+    "status": "fixed",
+    "text": "Aşağı çekme uygulamayı küçültüyordu, kontrol merkezi açılmıyordu",
+    "fix": "aşağı çekerek küçültme silindi; ada, üst çubuk, şerit ve tutamaktan aşağı çek = kontrol merkezi"
+   }
+  ]
  }
 ]

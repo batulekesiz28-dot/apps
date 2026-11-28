@@ -153,6 +153,13 @@
    "icon": "cast",
    "color": "blue",
    "desc": "Ekran yansıtma: bilgisayar ekranını televizyona ya da başka cihaza, telefon kamerasını bilgisayara kodla yansıt · telefon ekranı için Smart View / AirPlay rehberi"
+  },
+  {
+   "slug": "araba",
+   "name": "Asfalt",
+   "icon": "car",
+   "color": "amber",
+   "desc": "Oyun: üçüncü şahıs şehir sürüşü — geniş, canlı şehir, trafik, drift, rampalar · Kaçış modu: bütün arabalar sana çarpmaya çalışır, sen kaç · para topla, garajda yeni arabalar al · gün batımı, gündüz, gece"
   }
  ]
 }

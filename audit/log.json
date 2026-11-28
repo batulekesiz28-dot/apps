@@ -6733,5 +6733,34 @@
     "fix": "aşağı çekerek küçültme silindi; ada, üst çubuk, şerit ve tutamaktan aşağı çek = kontrol merkezi"
    }
   ]
+ },
+ {
+  "at": "2026-11-28T12:00:00Z",
+  "change": "Yeni oyun: Asfalt — üçüncü şahıs şehir sürüşü. Geniş ve canlı şehir (trafik, parklar, otoparklar, neon tabelalar, rampalar), gün batımı / gündüz / gece. Kaçış modunda şehirdeki arabalar tek tek peşine düşüp sana çarpmaya çalışır; onları birbirine ya da duvara çarptırınca para kazanırsın. Toplanan parayla garajdan 7 farklı araba alınır, renk seçilir. Telefonda dokunmatik tuşlarla oynanır.",
+  "scores": {
+   "araba telefon": {
+    "before": 0,
+    "after": 98
+   },
+   "araba masaüstü": {
+    "before": 0,
+    "after": 98
+   }
+  },
+  "items": [
+   {
+    "app": "araba",
+    "sev": "warn",
+    "status": "kabul",
+    "text": "Büyük dosya: 3B motoru (Three.js, ~690 KB)",
+    "fix": "oyun için gerekli; bir kez yüklenir"
+   },
+   {
+    "app": "araba",
+    "sev": "info",
+    "status": "kabul",
+    "text": "“Asfalt.” başlığı büyük (oyun logosu, bilerek)"
+   }
+  ]
  }
 ]

@@ -6762,5 +6762,42 @@
     "text": "“Asfalt.” başlığı büyük (oyun logosu, bilerek)"
    }
   ]
+ },
+ {
+  "at": "2026-11-28T15:00",
+  "change": "Asfalt: gerçek fizik motoru (devrilme, süspansiyon, gerçek çarpışma ve göçük), gerçekçi araba gövdeleri, trafik ışıkları ve çok daha akıllı trafik/avcılar.",
+  "scores": {
+   "araba telefon": {
+    "before": 98,
+    "after": 98
+   },
+   "araba masaüstü": {
+    "before": 98,
+    "after": 98
+   }
+  },
+  "items": [
+   {
+    "app": "araba",
+    "sev": "warn",
+    "status": "kabul",
+    "text": "Fizik motoru dosyası büyük (~4 MB, bir kez yüklenir)",
+    "fix": "gerçek fizik için gerekli; tarayıcı önbelleğe alır"
+   },
+   {
+    "app": "araba",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Avcılar yüksek hızda duvara çok giriyordu",
+    "fix": "viraj öncesi ve önündeki boşluğa göre frenliyorlar"
+   },
+   {
+    "app": "araba",
+    "sev": "info",
+    "status": "fixed",
+    "text": "Farlar gövdeden dışarı taşıyordu",
+    "fix": "yüzeye oturtuldu"
+   }
+  ]
  }
 ]
